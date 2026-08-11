@@ -1,0 +1,10 @@
+# OS / editor cruft
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.swp
+.vscode/
+.idea/
+
+# Local backups exported from the app — keep your training data out of git
+forge-backup-*.json

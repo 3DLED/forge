@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "PowerShell($n = Get-Command node -ErrorAction SilentlyContinue; if \\($n\\) { \"node: \" + $n.Source; node --version; npm --version } else { \"node: NOT FOUND\" }; $g = Get-Command git -ErrorAction SilentlyContinue; if \\($g\\) { \"git: \" + $g.Source } else { \"git: NOT FOUND\" }; $p = Get-Command python -ErrorAction SilentlyContinue; if \\($p\\) { \"python: \" + $p.Source } else { \"python: NOT FOUND\" })",
+      "PowerShell($base = \"C:\\\\Users\\\\johnc.moore\\\\OneDrive - qualitychemlabs.com\\\\Documents\\\\AICoding\\\\Workout tracking app\"; foreach \\($d in @\\(\"css\",\"js\",\"js\\\\views\",\"icons\"\\)\\) { New-Item -ItemType Directory -Force -Path \\(Join-Path $base $d\\) | Out-Null }; Get-ChildItem $base -Recurse -Directory | Select-Object -ExpandProperty FullName)"
+    ]
+  }
+}
