@@ -8,3 +8,9 @@ Desktop.ini
 
 # Local backups exported from the app — keep your training data out of git
 forge-backup-*.json
+
+# Node / Vite
+node_modules/
+dist/
+dist-ssr/
+*.local

@@ -1,0 +1,195 @@
+/*
+ * Visual directions.
+ *
+ * Each theme is a complete set of tokens — not just a palette. A direction that only swaps
+ * colours is a colour scheme; a direction worth choosing between changes shape, type,
+ * density, and how surfaces separate from each other. So these vary all four.
+ *
+ * Fonts are system stacks only, deliberately. The app has to open instantly with no network,
+ * and a webfont is either a blocking request or a flash of unstyled text at 5am in a garage.
+ *
+ * SIGNAL    — the default. OLED black, heavy type, big targets, one vivid accent.
+ *             Built for reading at arm's length, mid-set.
+ * FORGE     — dark, warm, card-based. Familiar gym-app territory.
+ * BLUEPRINT — dark, technical, hairline borders, tabular numerals. An instrument.
+ * CHALK     — light warm paper, serif headings, generous spacing. A training journal.
+ *
+ * Source order is load-bearing: `:root` and `[data-theme=x]` share a specificity, so the
+ * default must come first and the explicit themes after it.
+ */
+
+/* --- Signal (default): readable at arm's length, mid-set ----------------- */
+
+:root,
+[data-theme='signal'] {
+  color-scheme: dark;
+
+  --bg: #000000;
+  --surface: #0c0c0f;
+  --surface-2: #17171c;
+  --surface-3: #24242c;
+  --border: #2b2b34;
+  --text: #ffffff;
+  --muted: #a3a3ad;
+  --faint: #6c6c78;
+
+  --accent: #d4ff3f;
+  --accent-ink: #0e1204;
+  --accent-soft: rgba(212, 255, 63, 0.13);
+  --good: #4ade80;
+  --good-soft: rgba(74, 222, 128, 0.14);
+  --warn: #fbbf24;
+  --warn-soft: rgba(251, 191, 36, 0.14);
+  --danger: #fb7185;
+
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: var(--font-body);
+  --font-num: inherit;
+
+  --h1-size: 2rem;
+  --h1-weight: 800;
+  --h1-tracking: -0.035em;
+  --heading-transform: none;
+
+  --radius: 18px;
+  --radius-sm: 13px;
+  --radius-pill: 999px;
+  --border-width: 1px;
+  --card-shadow: none;
+  --card-padding: 1.1rem;
+  /* Bigger targets: this one is aimed squarely at using the app while training. */
+  --tap: 52px;
+
+  --overlay-ink: rgba(0, 0, 0, 0.22);
+}
+
+/* --- Forge: warm, dark, card-based --------------------------------------- */
+
+[data-theme='forge'] {
+  color-scheme: dark;
+
+  --bg: #0f1115;
+  --surface: #171a21;
+  --surface-2: #1e222b;
+  --surface-3: #272c37;
+  --border: #2b3140;
+  --text: #e8eaf0;
+  --muted: #98a1b3;
+  --faint: #6b7488;
+
+  --accent: #ff6b35;
+  --accent-ink: #17110c;
+  --accent-soft: rgba(255, 107, 53, 0.14);
+  --good: #4ade80;
+  --good-soft: rgba(74, 222, 128, 0.14);
+  --warn: #fbbf24;
+  --warn-soft: rgba(251, 191, 36, 0.14);
+  --danger: #f87171;
+
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: var(--font-body);
+  --font-num: inherit;
+
+  --h1-size: 1.5rem;
+  --h1-weight: 650;
+  --h1-tracking: -0.01em;
+  --heading-transform: none;
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-pill: 999px;
+  --border-width: 1px;
+  --card-shadow: none;
+  --card-padding: 1rem;
+  --tap: 44px;
+
+  --overlay-ink: rgba(0, 0, 0, 0.15);
+}
+
+/* --- Blueprint: an instrument, not an app ------------------------------- */
+
+[data-theme='blueprint'] {
+  color-scheme: dark;
+
+  --bg: #0b0e14;
+  --surface: #111621;
+  --surface-2: #161d2b;
+  --surface-3: #1e2739;
+  --border: #27324a;
+  --text: #dbe3f2;
+  --muted: #8695b0;
+  --faint: #5b6a86;
+
+  --accent: #4ea3ff;
+  --accent-ink: #04121f;
+  --accent-soft: rgba(78, 163, 255, 0.14);
+  --good: #35d0a5;
+  --good-soft: rgba(53, 208, 165, 0.14);
+  --warn: #f0b429;
+  --warn-soft: rgba(240, 180, 41, 0.14);
+  --danger: #ff5c5c;
+
+  --font-body: ui-sans-serif, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: var(--font-body);
+  /* Every number in a technical readout lines up in a column. */
+  --font-num: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+  --h1-size: 1.2rem;
+  --h1-weight: 600;
+  --h1-tracking: 0.02em;
+  --heading-transform: uppercase;
+
+  --radius: 3px;
+  --radius-sm: 2px;
+  --radius-pill: 2px;
+  --border-width: 1px;
+  --card-shadow: none;
+  --card-padding: 0.8rem;
+  --tap: 42px;
+
+  --overlay-ink: rgba(0, 0, 0, 0.2);
+}
+
+/* --- Chalk: a training journal ------------------------------------------ */
+
+[data-theme='chalk'] {
+  color-scheme: light;
+
+  --bg: #f5f2ea;
+  --surface: #fffdf8;
+  --surface-2: #f0ebe0;
+  --surface-3: #e4ddcd;
+  --border: #ded5c3;
+  --text: #1b1915;
+  --muted: #5d574a;
+  --faint: #8a8271;
+
+  --accent: #c2410c;
+  --accent-ink: #fff8f4;
+  --accent-soft: rgba(194, 65, 12, 0.1);
+  --good: #3f7d3f;
+  --good-soft: rgba(63, 125, 63, 0.12);
+  --warn: #a16207;
+  --warn-soft: rgba(161, 98, 7, 0.12);
+  --danger: #b91c1c;
+
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: ui-serif, Georgia, Cambria, 'Times New Roman', serif;
+  --font-num: inherit;
+
+  --h1-size: 1.75rem;
+  --h1-weight: 600;
+  --h1-tracking: -0.02em;
+  --heading-transform: none;
+
+  --radius: 10px;
+  --radius-sm: 7px;
+  --radius-pill: 999px;
+  --border-width: 1px;
+  /* Paper separates by lift, not by outline. */
+  --card-shadow: 0 1px 2px rgba(60, 50, 30, 0.06), 0 3px 8px rgba(60, 50, 30, 0.05);
+  --card-padding: 1.15rem;
+  --tap: 46px;
+
+  --overlay-ink: rgba(255, 255, 255, 0.28);
+}
