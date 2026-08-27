@@ -118,6 +118,11 @@ export interface Exercise extends Entity {
   progression: { easier: string[]; harder: string[] };
   /** Seeded library entries are read-only; user-created ones are editable. */
   isCustom: boolean;
+  /**
+   * A staple most people reach for. Surfaced above the long tail in the picker so a bench
+   * press is not buried between "Bear Crawl" and "Bench Dip" by an alphabetical sort.
+   */
+  common: boolean;
   notes?: string;
 }
 
@@ -281,6 +286,14 @@ export interface LoggedSession extends Entity {
   name: string;
   /** Timed containers. Sets reference these by `blockId`. */
   blocks?: LoggedBlock[];
+  /**
+   * Equipment available for this session only, overriding the profile default.
+   *
+   * Stored as a tag list rather than a profile reference: what you had in a hotel gym on a
+   * given Tuesday should stay true in the record even if you later rename or edit the
+   * profile you picked it from.
+   */
+  equipmentTags?: EquipmentTag[];
   startedAt?: Instant;
   endedAt?: Instant;
   /**

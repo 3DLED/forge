@@ -47,6 +47,33 @@ async function dedupeExercises(): Promise<number> {
   return doomed.length;
 }
 
+/**
+ * Brings curated flags on already-installed seed entries up to date.
+ *
+ * Seeding only ever *adds* missing slugs, which is right for user data but leaves existing
+ * installs stuck with whatever the library said the day they first ran it. Curation like
+ * `common` has to reach them too, or the picker's ordering silently does nothing for anyone
+ * who is not a brand new user. Custom entries are never touched.
+ */
+async function syncSeedFlags(): Promise<number> {
+  const existing = await db.exercises.toArray();
+  const stale = existing.filter((exercise) => {
+    if (exercise.isCustom || exercise.deletedAt) return false;
+    const seed = SEED_EXERCISES.find((s) => s.slug === exercise.slug);
+    return seed !== undefined && seed.common !== exercise.common;
+  });
+
+  if (stale.length === 0) return 0;
+
+  await db.exercises.bulkPut(
+    stale.map((exercise) => ({
+      ...exercise,
+      common: SEED_EXERCISES.find((s) => s.slug === exercise.slug)!.common,
+    })),
+  );
+  return stale.length;
+}
+
 async function seedExercises(): Promise<number> {
   const existing = await db.exercises.toArray();
   const known = new Set(existing.map((e) => e.slug));
@@ -145,6 +172,7 @@ async function runBootstrap(): Promise<BootstrapResult> {
   await seedEquipmentProfiles();
   await dedupeExercises();
   const exercisesAdded = await seedExercises();
+  await syncSeedFlags();
   const profile = await ensureProfile();
 
   if (previousSeed !== SEED_VERSION) await setMeta('seedVersion', SEED_VERSION);

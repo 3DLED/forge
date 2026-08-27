@@ -22,6 +22,7 @@ import RestTimer from './RestTimer';
 import WorkoutTimer, { blockTitle } from './WorkoutTimer';
 import NewBlockSheet from './NewBlockSheet';
 import SessionStopwatch from './SessionStopwatch';
+import SessionEquipmentSheet from './SessionEquipmentSheet';
 import { plural } from '../../ui/text';
 import {
   addBlock,
@@ -40,7 +41,9 @@ import { ulid } from '../../domain/ids';
 import { formatDayLabel } from '../../domain/dates';
 import { estimateDurationMin } from '../../domain/training';
 import { formatClock } from '../../domain/units';
+import { availableSlugs } from '../../domain/equipment';
 import type {
+  EquipmentTag,
   Exercise,
   Id,
   LoggedBlock,
@@ -75,7 +78,7 @@ type Section =
 export default function SessionLogger() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
-  const { units, exerciseBySlug } = useApp();
+  const { units, exerciseBySlug, exercises, available, activeEquipment } = useApp();
 
   // Resolves to null when the session genuinely does not exist, so "loading" and "missing"
   // stay distinguishable — useLiveQuery reports undefined until the first read settles.
@@ -92,6 +95,7 @@ export default function SessionLogger() {
   const [discarding, setDiscarding] = useState(false);
   const [creatingBlock, setCreatingBlock] = useState<'new' | 'convert' | null>(null);
   const [runningBlockId, setRunningBlockId] = useState<Id | null>(null);
+  const [editingEquipment, setEditingEquipment] = useState(false);
   /**
    * Which session the local `sets` were loaded from.
    *
@@ -116,6 +120,16 @@ export default function SessionLogger() {
   }, [sets, sessionId]);
 
   const blocks = useMemo(() => session?.blocks ?? [], [session]);
+
+  /**
+   * What this session can actually do. Falls back to the profile default when the session
+   * carries no override, so an untouched workout behaves exactly as before.
+   */
+  const sessionTags = session?.equipmentTags;
+  const sessionAvailable = useMemo(
+    () => (sessionTags ? availableSlugs(exercises, sessionTags) : available),
+    [sessionTags, exercises, available],
+  );
 
   /**
    * Sections in the order the sets were added, so a block appears where its first movement
@@ -292,6 +306,15 @@ export default function SessionLogger() {
             ⏱ Add block
           </button>
         </div>
+
+        <button
+          className="btn sm block"
+          style={{ marginTop: '0.5rem' }}
+          onClick={() => setEditingEquipment(true)}
+        >
+          🎒 {sessionTags ? 'Custom equipment' : (activeEquipment?.name ?? 'Equipment')} ·{' '}
+          {sessionAvailable.size} movements
+        </button>
       </div>
 
       {sections.length === 0 && (
@@ -426,7 +449,29 @@ export default function SessionLogger() {
         </button>
       </div>
 
-      {picking && <ExercisePicker onPick={addExercise} onClose={() => setPicking(null)} />}
+      {picking && (
+        <ExercisePicker
+          onPick={addExercise}
+          onClose={() => setPicking(null)}
+          available={sessionAvailable}
+        />
+      )}
+
+      {editingEquipment && (
+        <SessionEquipmentSheet
+          current={sessionTags ?? activeEquipment?.items ?? []}
+          isOverridden={Boolean(sessionTags)}
+          onClose={() => setEditingEquipment(false)}
+          onApply={async (next: EquipmentTag[]) => {
+            await loggedSessionRepo.update(session.id, { equipmentTags: next });
+            setEditingEquipment(false);
+          }}
+          onReset={async () => {
+            await loggedSessionRepo.update(session.id, { equipmentTags: undefined });
+            setEditingEquipment(false);
+          }}
+        />
+      )}
 
       {creatingBlock && (
         <NewBlockSheet

@@ -52,6 +52,7 @@ export interface ExerciseSpec {
   harder?: string[];
   primary?: string[];
   secondary?: string[];
+  common?: boolean;
   notes?: string;
 }
 
@@ -102,6 +103,7 @@ export function ex(
     substitutes: spec.subs ?? [],
     progression: { easier: spec.easier ?? [], harder: spec.harder ?? [] },
     isCustom: false,
+    common: spec.common ?? false,
     notes: spec.notes,
   };
 }

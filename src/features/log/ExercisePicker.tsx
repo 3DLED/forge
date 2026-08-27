@@ -1,24 +1,24 @@
 /**
  * Movement picker.
  *
+ * Ordering, in priority: what you actually train, then the staples, then everything else
+ * alphabetically. A pure alphabetical list buries the bench press between "Bear Crawl" and
+ * "Bench Dip", which makes a 230-movement library feel like a filing cabinet.
+ *
  * Exercises your equipment does not cover are still listed — dimmed, and annotated with the
- * substitute that would work — rather than hidden. Hiding them makes the library feel
- * broken when you know the movement exists; showing the swap teaches the ladder instead.
+ * substitute that would work — rather than hidden. Hiding them makes the library feel broken
+ * when you know the movement exists; showing the swap teaches the ladder instead.
  */
 
 import { useMemo, useState } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
 import Sheet from '../../ui/Sheet';
 import { useApp } from '../../ui/AppProvider';
 import { resolveExercise } from '../../domain/equipment';
-import type { Exercise, Modality } from '../../domain/types';
-
-const MODALITY_FILTERS: { value: Modality | 'all'; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'strength', label: 'Strength' },
-  { value: 'cardio', label: 'Cardio' },
-  { value: 'skill', label: 'Skill' },
-  { value: 'mobility', label: 'Mobility' },
-];
+import { CATEGORY_LABELS, CATEGORY_ORDER, categoryOf } from '../../domain/categories';
+import { exerciseUsage } from '../../data/sessions';
+import type { Exercise } from '../../domain/types';
+import type { ExerciseCategory } from '../../domain/categories';
 
 const PATTERN_LABELS: Record<string, string> = {
   squat: 'Squat',
@@ -37,19 +37,27 @@ const PATTERN_LABELS: Record<string, string> = {
 export default function ExercisePicker({
   onPick,
   onClose,
+  available: availableOverride,
 }: {
   onPick: (exercise: Exercise) => void;
   onClose: () => void;
+  /** Session-specific equipment, when it differs from the profile default. */
+  available?: Set<string>;
 }) {
-  const { exercises, exerciseBySlug, available } = useApp();
-  const [query, setQuery] = useState('');
-  const [modality, setModality] = useState<Modality | 'all'>('all');
+  const app = useApp();
+  const available = availableOverride ?? app.available;
+  const { exercises, exerciseBySlug } = app;
 
-  const results = useMemo(() => {
+  const [query, setQuery] = useState('');
+  const [category, setCategory] = useState<ExerciseCategory | 'all'>('all');
+
+  const usage = useLiveQuery(() => exerciseUsage(), [], undefined);
+
+  const { used, common, rest, total } = useMemo(() => {
     const needle = query.trim().toLowerCase();
 
     const matches = exercises.filter((exercise) => {
-      if (modality !== 'all' && exercise.modality !== modality) return false;
+      if (category !== 'all' && categoryOf(exercise) !== category) return false;
       if (!needle) return true;
       return (
         exercise.name.toLowerCase().includes(needle) ||
@@ -59,12 +67,51 @@ export default function ExercisePicker({
       );
     });
 
-    // Things you can do right now come first; the rest stay visible below them.
-    return matches.sort((a, b) => {
+    // Things you can do right now come first within every group.
+    const byRank = (a: Exercise, b: Exercise) => {
       const usable = Number(available.has(b.slug)) - Number(available.has(a.slug));
-      return usable !== 0 ? usable : a.name.localeCompare(b.name);
-    });
-  }, [exercises, query, modality, available]);
+      if (usable !== 0) return usable;
+      const count = (usage?.get(b.slug) ?? 0) - (usage?.get(a.slug) ?? 0);
+      if (count !== 0) return count;
+      return a.name.localeCompare(b.name);
+    };
+
+    return {
+      used: matches.filter((e) => (usage?.get(e.slug) ?? 0) > 0).sort(byRank),
+      common: matches.filter((e) => e.common && !(usage?.get(e.slug) ?? 0)).sort(byRank),
+      rest: matches.filter((e) => !e.common && !(usage?.get(e.slug) ?? 0)).sort(byRank),
+      total: matches.length,
+    };
+  }, [exercises, query, category, available, usage]);
+
+  const renderRow = (exercise: Exercise) => {
+    const usable = available.has(exercise.slug);
+    const swap = usable ? null : resolveExercise(exercise.slug, exerciseBySlug, available);
+    const swapName = swap ? exerciseBySlug.get(swap.slug)?.name : null;
+
+    return (
+      <button
+        key={exercise.id}
+        className={`pick${usable ? '' : ' unavailable'}`}
+        onClick={() => onPick(exercise)}
+      >
+        <span className="grow">
+          <span style={{ fontWeight: 600 }}>{exercise.name}</span>
+          <br />
+          <span className="tiny faint">
+            {PATTERN_LABELS[exercise.pattern] ?? exercise.pattern}
+            {exercise.primaryMuscles.length > 0 && ` · ${exercise.primaryMuscles.join(', ')}`}
+            {!usable && swapName && ` · try ${swapName} instead`}
+            {!usable && !swapName && ' · no equipment for this'}
+          </span>
+        </span>
+        {usable ? <span className="pill accent">Add</span> : <span className="pill">Add anyway</span>}
+      </button>
+    );
+  };
+
+  // While searching, sections get in the way — one ranked list is what you want.
+  const searching = query.trim().length > 0;
 
   return (
     <Sheet title="Add exercise" onClose={onClose}>
@@ -77,55 +124,76 @@ export default function ExercisePicker({
       />
 
       <div className="chip-row" style={{ margin: '0.6rem 0 0.75rem' }}>
-        {MODALITY_FILTERS.map((filter) => (
+        <button
+          className={`chip${category === 'all' ? ' on' : ''}`}
+          onClick={() => setCategory('all')}
+        >
+          All
+        </button>
+        {CATEGORY_ORDER.map((value) => (
           <button
-            key={filter.value}
-            className={`chip${modality === filter.value ? ' on' : ''}`}
-            onClick={() => setModality(filter.value)}
+            key={value}
+            className={`chip${category === value ? ' on' : ''}`}
+            onClick={() => setCategory(value)}
           >
-            {filter.label}
+            {CATEGORY_LABELS[value]}
           </button>
         ))}
       </div>
 
-      {results.length === 0 && (
+      {total === 0 && (
         <div className="empty">
           <span className="glyph">🔍</span>
           <p className="small">No movement matches “{query}”.</p>
         </div>
       )}
 
-      {results.map((exercise) => {
-        const usable = available.has(exercise.slug);
-        const swap = usable
-          ? null
-          : resolveExercise(exercise.slug, exerciseBySlug, available);
-        const swapName = swap ? exerciseBySlug.get(swap.slug)?.name : null;
+      {searching ? (
+        [...used, ...common, ...rest].map(renderRow)
+      ) : (
+        <>
+          {used.length > 0 && (
+            <>
+              <div className="section-title">You train these</div>
+              {used.map(renderRow)}
+            </>
+          )}
 
-        return (
-          <button
-            key={exercise.id}
-            className={`pick${usable ? '' : ' unavailable'}`}
-            onClick={() => onPick(exercise)}
-          >
-            <span className="grow">
-              <span style={{ fontWeight: 600 }}>{exercise.name}</span>
-              <br />
-              <span className="tiny faint">
-                {PATTERN_LABELS[exercise.pattern] ?? exercise.pattern}
-                {exercise.primaryMuscles.length > 0 && ` · ${exercise.primaryMuscles.join(', ')}`}
-                {!usable && swapName && ` · try ${swapName} instead`}
-                {!usable && !swapName && ' · no equipment for this'}
-              </span>
-            </span>
-            {usable ? (
-              <span className="pill accent">Add</span>
-            ) : (
-              <span className="pill">Add anyway</span>
-            )}
-          </button>
-        );
-      })}
+          {/*
+            Grouped by category when nothing is filtered. Seventy-odd staples in one
+            alphabetical run still buries the bench press behind Cat-Cow, which is the
+            problem this section exists to solve.
+          */}
+          {common.length > 0 && category === 'all' && (
+            <>
+              {CATEGORY_ORDER.map((group) => {
+                const inGroup = common.filter((e) => categoryOf(e) === group);
+                if (inGroup.length === 0) return null;
+                return (
+                  <div key={group}>
+                    <div className="section-title">Common · {CATEGORY_LABELS[group]}</div>
+                    {inGroup.map(renderRow)}
+                  </div>
+                );
+              })}
+            </>
+          )}
+
+          {common.length > 0 && category !== 'all' && (
+            <>
+              <div className="section-title">Common</div>
+              {common.map(renderRow)}
+            </>
+          )}
+
+          {rest.length > 0 && (
+            <>
+              <div className="section-title">Everything else</div>
+              {rest.map(renderRow)}
+            </>
+          )}
+        </>
+      )}
     </Sheet>
   );
 }

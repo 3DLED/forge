@@ -46,6 +46,24 @@ export async function sessionsWithExercise(slug: string): Promise<LoggedSession[
   return rows.filter((s) => !s.deletedAt).sort((a, b) => b.date.localeCompare(a.date));
 }
 
+/**
+ * How often each movement has been logged recently.
+ *
+ * What you actually train is a far better ordering than any curated list, so this outranks
+ * the `common` flag in the picker. Bounded to recent sessions: a movement dropped six months
+ * ago should stop floating to the top.
+ */
+export async function exerciseUsage(sessionLimit = 40): Promise<Map<string, number>> {
+  const sessions = await recentSessions(sessionLimit);
+  const counts = new Map<string, number>();
+  for (const session of sessions) {
+    for (const slug of new Set(session.sets.map((s) => s.exerciseSlug))) {
+      counts.set(slug, (counts.get(slug) ?? 0) + 1);
+    }
+  }
+  return counts;
+}
+
 export async function plannedOnDay(date: DayKey): Promise<PlannedSession[]> {
   const rows = await db.plannedSessions.where('date').equals(date).toArray();
   return rows.filter((s) => !s.deletedAt);

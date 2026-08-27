@@ -15,7 +15,7 @@
 
 import { cardio, ex, mobility, type SeedExercise } from './define';
 
-export const SEED_EXERCISES: SeedExercise[] = [
+const LIBRARY: SeedExercise[] = [
   // -------------------------------------------------------------------------
   // Squat
   // -------------------------------------------------------------------------
@@ -809,4 +809,46 @@ export const SEED_EXERCISES: SeedExercise[] = [
 ];
 
 /** Fast lookup by slug, used everywhere a prescription resolves a movement. */
+/**
+ * The staples, kept as one list rather than a flag scattered through 230 entries so the
+ * curation can actually be reviewed and argued with.
+ *
+ * The test for inclusion is not "is this a good exercise" but "would burying this under an
+ * alphabetical sort be surprising". A bench press ranks; a bench dip does not.
+ */
+const COMMON_SLUGS = new Set([
+  // Weights — the movements most programs are built from
+  'back-squat', 'front-squat', 'goblet-squat', 'leg-press',
+  'deadlift', 'romanian-deadlift', 'kb-swing', 'hip-thrust',
+  'bench-press', 'db-bench-press', 'incline-bench-press',
+  'overhead-press', 'db-shoulder-press', 'kb-press', 'lateral-raise',
+  'barbell-row', 'db-row', 'lat-pulldown', 'seated-cable-row',
+  'bulgarian-split-squat', 'kb-walking-lunge', 'farmers-carry',
+  'bicep-curl', 'leg-curl', 'turkish-get-up',
+
+  // Calisthenics — what you reach for with a floor and a bar
+  'push-up', 'incline-push-up', 'knee-push-up', 'pike-push-up', 'dip',
+  'pull-up', 'chin-up', 'inverted-row', 'negative-pull-up', 'dead-hang',
+  'air-squat', 'reverse-lunge', 'walking-lunge', 'step-up', 'glute-bridge',
+  'plank', 'side-plank', 'hollow-hold', 'sit-up', 'hanging-knee-raise',
+  'mountain-climber', 'burpee', 'bear-crawl', 'box-jump', 'wall-sit',
+
+  // Cardio
+  'easy-run', 'long-run', 'tempo-run', 'interval-run', 'recovery-run',
+  'trail-run', 'treadmill-run', 'hill-repeats', 'walk', 'ruck',
+  'row-erg', 'bike-erg', 'ski-erg', 'swim', 'stair-climb',
+
+  // Conditioning containers and skills
+  'amrap', 'emom', 'for-time', 'jump-rope', 'double-unders', 'wall-ball',
+
+  // Mobility
+  'couch-stretch', 'hamstring-stretch', 'hip-flexor-stretch', 'cat-cow',
+  'downward-dog', 'worlds-greatest-stretch', 'pigeon-pose', 'calf-stretch',
+]);
+
+export const SEED_EXERCISES: SeedExercise[] = LIBRARY.map((exercise) => ({
+  ...exercise,
+  common: COMMON_SLUGS.has(exercise.slug),
+}));
+
 export const SEED_EXERCISE_BY_SLUG = new Map(SEED_EXERCISES.map((e) => [e.slug, e]));
