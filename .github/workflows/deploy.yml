@@ -1,0 +1,56 @@
+# Builds the app and publishes it to GitHub Pages.
+#
+# Building here rather than committing `dist/` keeps generated output out of the repo and
+# means a phone gets the new version from a plain `git push` — no local build step, and no
+# chance of shipping a stale bundle someone forgot to rebuild.
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main, rebuild/v2]
+  workflow_dispatch:
+
+# Allow the workflow to publish Pages, nothing more.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race; let an in-flight one finish rather than cancelling it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      # Typechecks as part of the build script, so a type error fails the deploy
+      # rather than shipping.
+      - run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
