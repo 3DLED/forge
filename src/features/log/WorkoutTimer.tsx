@@ -164,6 +164,8 @@ export default function WorkoutTimer({
     <Sheet
       title={block.label ?? blockTitle(block)}
       onClose={onClose}
+      // A running clock and its logged rounds are not recoverable by reopening the sheet.
+      confirmClose
       footer={
         <div className="row" style={{ gap: '0.5rem' }}>
           {running ? (

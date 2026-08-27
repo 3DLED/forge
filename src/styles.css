@@ -555,14 +555,40 @@ input[type='number']::-webkit-inner-spin-button {
   z-index: 50;
   background: rgba(0, 0, 0, 0.6);
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/*
+ * The dismiss control for sheets that guard their state. It occupies the empty space above
+ * the sheet — where the accidental taps were landing — and turns that area from an
+ * unlabelled trapdoor into the one place closing is possible.
+ */
+.sheet-dismiss {
+  flex: 0 0 auto;
+  margin-bottom: 0.75rem;
+  padding: 0.6rem 1.4rem;
+  min-height: var(--tap);
+  border-radius: var(--radius-pill);
+  border: var(--border-width) solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font-weight: 650;
+  font-size: 0.9rem;
+}
+
+.sheet-dismiss.armed {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: var(--bg);
 }
 
 .sheet {
   width: 100%;
   max-width: 720px;
   max-height: 88dvh;
+  flex: 0 1 auto;
   display: flex;
   flex-direction: column;
   background: var(--surface);
@@ -575,6 +601,11 @@ input[type='number']::-webkit-inner-spin-button {
 @keyframes sheet-up {
   from { transform: translateY(18px); opacity: 0.4; }
   to { transform: translateY(0); opacity: 1; }
+}
+
+/* Leave room for the dismiss control so the sheet cannot push it off-screen. */
+.sheet.with-dismiss {
+  max-height: 80dvh;
 }
 
 .sheet-body {
