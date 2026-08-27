@@ -104,6 +104,7 @@ export function ex(
     progression: { easier: spec.easier ?? [], harder: spec.harder ?? [] },
     isCustom: false,
     common: spec.common ?? false,
+    isAccessory: false,
     notes: spec.notes,
   };
 }

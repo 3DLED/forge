@@ -644,6 +644,25 @@ input[type='number']::-webkit-inner-spin-button {
 .pick.selected { border-color: var(--accent); background: var(--accent-soft); }
 .pick.unavailable { opacity: 0.5; }
 
+/*
+ * A row in the suggested session. Shaped like `.pick` because it is the same idea — a
+ * movement and what to do about it — but it holds two controls rather than being one, so it
+ * cannot reuse the class outright.
+ */
+.suggest-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.6rem 0.55rem 0.75rem;
+  background: var(--surface-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.4rem;
+  min-height: var(--tap);
+}
+
+.suggest-row .grow { min-width: 0; }
+
 /* --- rest timer ---------------------------------------------------------- */
 
 .rest-timer {

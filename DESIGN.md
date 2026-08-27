@@ -112,6 +112,12 @@ Each milestone ends with something usable, not a half-app.
   full-body 3x / 5k / half / marathon / Hyrox / OCR), apply-a-plan, drag to reschedule.
 - **M4 — Progress.** Volume and load trends, PRs, pace and mileage, plan-vs-actual adherence.
 - **M5 — Generator + calendar rules.** Goal in, periodized block out, respecting availability.
+  The per-session half is built: pick a region and a goal, get a draft session from whatever
+  equipment is on hand (`domain/generator.ts`). The per-*plan* half is still ahead.
 - **M6 — Later.** Run file import (GPX / TCX / Strava export / Apple Health), optional sync.
+- **Deferred — exercise demos.** Images or clips per movement. Held because no freely
+  licensed library exists: `free-exercise-db`'s maintainer states the provenance of its
+  images is unknown, and the widely-copied GIF sets are Gym Visual's, licensed per-project.
+  Anything built here needs original artwork, a purchased licence, or the athlete's own media.
 
 M2 and M4 are in the first release per requirements; M5 follows immediately after.

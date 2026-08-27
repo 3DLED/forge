@@ -846,9 +846,43 @@ const COMMON_SLUGS = new Set([
   'downward-dog', 'worlds-greatest-stretch', 'pigeon-pose', 'calf-stretch',
 ]);
 
+/**
+ * Isolation, prep, and top-up work.
+ *
+ * Used only for ordering a suggested session: these come after the movement that the session
+ * is actually about. A curl is a fine exercise and a bad thing to open an upper day with.
+ *
+ * Core is deliberately sparse here — in a core section everything is isolation, so flagging
+ * it all would say nothing. Only the rehab-and-prep end of it is marked.
+ */
+const ACCESSORY_SLUGS = new Set([
+  // Arms and delts
+  'bicep-curl', 'kb-curl', 'band-curl',
+  'lateral-raise', 'band-lateral-raise',
+  'bench-dip',
+
+  // Chest and back isolation
+  'cable-fly', 'band-chest-fly',
+  'face-pull', 'band-face-pull', 'band-pull-apart',
+
+  // Legs isolation
+  'leg-extension', 'leg-curl', 'slider-leg-curl', 'sissy-squat',
+  'glute-bridge', 'single-leg-glute-bridge',
+
+  // Posterior chain support
+  'back-extension', 'reverse-hyper', 'superman-hold', 'band-good-morning',
+
+  // Grip and shoulder prep
+  'dead-hang', 'single-arm-hang', 'towel-hang', 'plate-pinch', 'scapular-pull',
+
+  // Core prep / anti-rotation
+  'bird-dog', 'dead-bug', 'pallof-press', 'kb-windmill',
+]);
+
 export const SEED_EXERCISES: SeedExercise[] = LIBRARY.map((exercise) => ({
   ...exercise,
   common: COMMON_SLUGS.has(exercise.slug),
+  isAccessory: ACCESSORY_SLUGS.has(exercise.slug),
 }));
 
 export const SEED_EXERCISE_BY_SLUG = new Map(SEED_EXERCISES.map((e) => [e.slug, e]));

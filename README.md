@@ -35,6 +35,10 @@ Then open `http://localhost:5173`.
   bolted on. Type `5k` into a miles field and it converts.
 - **234 movements** across strength, cardio, mobility, and skill — each with substitutes for
   when you lack the kit, and a progression ladder for when you cannot add load.
+- **Suggested sessions.** Pick upper / lower / core and a goal — build strength, muscle, or
+  endurance — and get a draft workout from the equipment you have today, with the sets, reps,
+  and rest that match the goal. Swap or drop anything before it lands in your log. With no
+  weights to add, a strength goal steps up to a harder variation instead of piling on reps.
 - **Equipment profiles.** Switch between bodyweight, kettlebells, and a full gym; the
   library re-resolves. The gap list tells you what one more purchase would unlock.
 - **Progress.** Training load (session RPE × minutes, so running and lifting add up),

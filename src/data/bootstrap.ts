@@ -54,22 +54,30 @@ async function dedupeExercises(): Promise<number> {
  * installs stuck with whatever the library said the day they first ran it. Curation like
  * `common` has to reach them too, or the picker's ordering silently does nothing for anyone
  * who is not a brand new user. Custom entries are never touched.
+ *
+ * Only the curated flags are pushed. Names, equipment, and progressions are left alone: those
+ * are things a user may reasonably have edited, and overwriting them would be data loss.
  */
 async function syncSeedFlags(): Promise<number> {
   const existing = await db.exercises.toArray();
+  const seedBySlug = new Map(SEED_EXERCISES.map((s) => [s.slug, s]));
+
   const stale = existing.filter((exercise) => {
     if (exercise.isCustom || exercise.deletedAt) return false;
-    const seed = SEED_EXERCISES.find((s) => s.slug === exercise.slug);
-    return seed !== undefined && seed.common !== exercise.common;
+    const seed = seedBySlug.get(exercise.slug);
+    if (!seed) return false;
+    // `isAccessory` is compared loosely: installs from before the field existed have it
+    // undefined, which must still count as stale so the flag actually lands.
+    return seed.common !== exercise.common || seed.isAccessory !== Boolean(exercise.isAccessory);
   });
 
   if (stale.length === 0) return 0;
 
   await db.exercises.bulkPut(
-    stale.map((exercise) => ({
-      ...exercise,
-      common: SEED_EXERCISES.find((s) => s.slug === exercise.slug)!.common,
-    })),
+    stale.map((exercise) => {
+      const seed = seedBySlug.get(exercise.slug)!;
+      return { ...exercise, common: seed.common, isAccessory: seed.isAccessory };
+    }),
   );
   return stale.length;
 }

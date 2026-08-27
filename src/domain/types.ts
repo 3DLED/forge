@@ -123,6 +123,13 @@ export interface Exercise extends Entity {
    * press is not buried between "Bear Crawl" and "Bench Dip" by an alphabetical sort.
    */
   common: boolean;
+  /**
+   * Isolation and support work — curls, raises, face pulls, glute bridges.
+   *
+   * Not a judgement about value, only about ordering: a suggested session should open with
+   * the movement that justifies the session and finish with the ones that top it up.
+   */
+  isAccessory: boolean;
   notes?: string;
 }
 

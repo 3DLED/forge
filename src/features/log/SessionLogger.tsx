@@ -21,6 +21,7 @@ import ExerciseGroup from './ExerciseGroup';
 import RestTimer from './RestTimer';
 import WorkoutTimer, { blockShape, blockTitle } from './WorkoutTimer';
 import NewBlockSheet from './NewBlockSheet';
+import SuggestWorkoutSheet from './SuggestWorkoutSheet';
 import SessionStopwatch from './SessionStopwatch';
 import SessionEquipmentSheet from './SessionEquipmentSheet';
 import { plural } from '../../ui/text';
@@ -50,6 +51,7 @@ import { formatDayLabel } from '../../domain/dates';
 import { estimateDurationMin } from '../../domain/training';
 import { formatClock } from '../../domain/units';
 import { availableSlugs } from '../../domain/equipment';
+import type { SuggestedItem } from '../../domain/generator';
 import type {
   EquipmentTag,
   Exercise,
@@ -99,6 +101,7 @@ export default function SessionLogger() {
   const [sets, setSets] = useState<LoggedSet[] | null>(null);
   /** Non-null while the picker is open; carries the block to add into, if any. */
   const [picking, setPicking] = useState<{ blockId?: Id } | null>(null);
+  const [suggesting, setSuggesting] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [restEndsAt, setRestEndsAt] = useState<number | null>(null);
   const [discarding, setDiscarding] = useState(false);
@@ -196,6 +199,16 @@ export default function SessionLogger() {
     [sets],
   );
 
+  /**
+   * What is already in the workout, as a stable set. Keyed off the joined string so the
+   * identity only changes when the movements do — the generator re-runs on it, and a fresh
+   * Set every render would re-run it on every keystroke.
+   */
+  const loggedSlugs = useMemo(
+    () => new Set(allSlugs ? allSlugs.split('|') : []),
+    [allSlugs],
+  );
+
   /** Previous runs of each named block, so a result can be read against its own history. */
   const templateIds = blocks.map((b) => b.sourceTemplateId).filter(Boolean).join('|');
   const blockHistories = useLiveQuery(async () => {
@@ -243,6 +256,28 @@ export default function SessionLogger() {
       ...sets,
       { id: ulid(), exerciseSlug: exercise.slug, blockId, setIndex: 0, values, completed: false },
     ]);
+  };
+
+  /**
+   * Accepts a generated draft: every movement arrives with its prescribed number of sets and
+   * the rep or time target pre-filled. Load is left blank on purpose — what the bar should
+   * weigh is the one thing the generator has no business guessing.
+   */
+  const addSuggested = (items: SuggestedItem[]) => {
+    setSuggesting(false);
+    const created: LoggedSet[] = [];
+    for (const item of items) {
+      for (let index = 0; index < item.sets; index++) {
+        created.push({
+          id: ulid(),
+          exerciseSlug: item.exercise.slug,
+          setIndex: index,
+          values: { ...item.values },
+          completed: false,
+        });
+      }
+    }
+    mutate([...sets, ...created]);
   };
 
   const addSet = (slug: string) => {
@@ -473,6 +508,14 @@ export default function SessionLogger() {
         + Add exercise
       </button>
 
+      <button
+        className="btn block"
+        onClick={() => setSuggesting(true)}
+        style={{ marginTop: '0.5rem' }}
+      >
+        ✨ Suggest a workout
+      </button>
+
       {/* Only offered when there is something loose to wrap. */}
       {looseCount > 0 && (
         <button
@@ -507,6 +550,15 @@ export default function SessionLogger() {
           onPick={addExercise}
           onClose={() => setPicking(null)}
           available={sessionAvailable}
+        />
+      )}
+
+      {suggesting && (
+        <SuggestWorkoutSheet
+          available={sessionAvailable}
+          existingSlugs={loggedSlugs}
+          onAdd={addSuggested}
+          onClose={() => setSuggesting(false)}
         />
       )}
 
