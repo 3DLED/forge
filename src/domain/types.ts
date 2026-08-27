@@ -233,6 +233,12 @@ export interface LoggedSet {
   side?: 'left' | 'right';
   completed: boolean;
   notes?: string;
+  /**
+   * For AMRAP and EMOM work: seconds from the start of the effort at which each round was
+   * completed. `values.rounds` is the count; this is the pacing behind it — whether you held
+   * 90-second rounds or fell off a cliff at round six.
+   */
+  roundSplitsSec?: number[];
 }
 
 export interface LoggedSession extends Entity {
@@ -241,6 +247,14 @@ export interface LoggedSession extends Entity {
   name: string;
   startedAt?: Instant;
   endedAt?: Instant;
+  /**
+   * Session stopwatch. `elapsedSec` is time banked from previous runs; `runningSince` is set
+   * while the clock is going. Storing an instant rather than a countdown means the elapsed
+   * time stays true across a reload, a backgrounded tab, or a phone that went to sleep —
+   * all of which happen constantly during a real session.
+   */
+  elapsedSec?: number;
+  runningSince?: Instant | null;
   sets: LoggedSet[];
   /** Session RPE x duration is the one training-load number that spans all modalities. */
   sessionRpe?: Rpe;

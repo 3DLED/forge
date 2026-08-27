@@ -53,6 +53,12 @@ export function averageSetRpe(session: LoggedSession): number | null {
 
 /** Wall-clock minutes if the session was timed; otherwise inferred from its contents. */
 export function estimateDurationMin(session: LoggedSession): number {
+  // The stopwatch is the only source that reflects actual working time rather than how long
+  // the screen happened to be open, so it wins when it was used.
+  const stopwatch = (session.elapsedSec ?? 0) +
+    (session.runningSince ? Math.max(0, (Date.now() - Date.parse(session.runningSince)) / 1000) : 0);
+  if (stopwatch > 30) return Math.round(stopwatch / 60);
+
   if (session.startedAt && session.endedAt) {
     const ms = Date.parse(session.endedAt) - Date.parse(session.startedAt);
     if (ms > 0) return Math.round(ms / 60_000);
@@ -113,6 +119,14 @@ export interface PersonalRecord {
   bestDistanceM?: number;
   /** Fastest pace over at least a kilometre, in seconds per km. */
   bestPaceSecPerKm?: number;
+  /** Most rounds in a timed block. */
+  bestRounds?: number;
+  /**
+   * The cap the round count was set against. Rounds are only comparable within the same
+   * window — 9 rounds in 20 minutes is not a better score than 7 in 12 — so the number is
+   * never shown without it.
+   */
+  bestRoundsTimeSec?: number;
   date: string;
 }
 
@@ -130,7 +144,13 @@ export function personalRecords(sessions: LoggedSession[]): Map<string, Personal
       };
       let improved = false;
 
-      const { weightKg, reps, timeSec, distanceM } = set.values;
+      const { weightKg, reps, timeSec, distanceM, rounds } = set.values;
+
+      if (rounds && rounds > (record.bestRounds ?? 0)) {
+        record.bestRounds = rounds;
+        record.bestRoundsTimeSec = timeSec;
+        improved = true;
+      }
 
       if (weightKg && reps) {
         const oneRm = estimate1RM(weightKg, reps);

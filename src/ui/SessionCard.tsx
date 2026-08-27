@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useApp } from './AppProvider';
+import { plural } from './text';
 import { formatDayLabel } from '../domain/dates';
 import { formatDistance, formatDuration, formatWeight } from '../domain/units';
 import {
@@ -24,6 +25,12 @@ export function sessionSummary(
   const exercises = new Set(session.sets.map((s) => s.exerciseSlug)).size;
   const done = session.sets.filter((s) => s.completed).length;
   if (done > 0) parts.push(`${done} set${done === 1 ? '' : 's'} · ${exercises} movement${exercises === 1 ? '' : 's'}`);
+
+  const rounds = session.sets.reduce(
+    (total, set) => total + (set.completed ? (set.values.rounds ?? 0) : 0),
+    0,
+  );
+  if (rounds > 0) parts.push(plural(rounds, 'round'));
 
   const distance = sessionDistanceM(session);
   if (distance > 0) parts.push(formatDistance(distance, units));

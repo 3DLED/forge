@@ -126,6 +126,23 @@ export function formatDuration(totalSec: number): string {
   return `${s}s`;
 }
 
+/**
+ * Always-colonised clock: "0:45", "12:30", "1:04:15".
+ *
+ * `formatDuration` shortens sub-minute values to "45s", which is right in prose and wrong on
+ * a running clock — the display would change shape as it crossed a minute.
+ */
+export function formatClock(totalSec: number): string {
+  const sec = Math.max(0, Math.floor(totalSec));
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  const mm = h > 0 ? String(m).padStart(2, '0') : String(m);
+  return h > 0
+    ? `${h}:${mm}:${String(s).padStart(2, '0')}`
+    : `${mm}:${String(s).padStart(2, '0')}`;
+}
+
 /** Accepts "8:30", "830", "90" (seconds), or "1:04:15". Returns seconds, or null. */
 export function parseDuration(input: string): number | null {
   const text = input.trim();

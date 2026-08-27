@@ -737,6 +737,22 @@ export const SEED_EXERCISES: SeedExercise[] = [
     notes: 'Clean, press, squat, row, swing without setting the bell down.',
   }),
 
+  // Timed conditioning blocks. These are containers rather than movements — what the rounds
+  // consisted of goes in the set's notes — but modelling them as ordinary library entries
+  // means rounds get history, personal bests, and charts for free.
+  ex('amrap', 'AMRAP Block', 'fullBody', ['bodyweight'], {
+    metrics: ['rounds', 'timeSec', 'rpe'],
+    notes: 'As many rounds as possible inside a time cap.',
+  }),
+  ex('emom', 'EMOM Block', 'fullBody', ['bodyweight'], {
+    metrics: ['rounds', 'timeSec', 'rpe'],
+    notes: 'Every minute on the minute. The rest is whatever the minute leaves you.',
+  }),
+  ex('for-time', 'For Time', 'fullBody', ['bodyweight'], {
+    metrics: ['rounds', 'timeSec', 'rpe'],
+    notes: 'Fixed work, clock running. The score is the time.',
+  }),
+
   // -------------------------------------------------------------------------
   // Running and other cardio
   // -------------------------------------------------------------------------

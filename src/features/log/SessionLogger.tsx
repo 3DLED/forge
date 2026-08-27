@@ -15,6 +15,9 @@ import AskSheet from '../../ui/AskSheet';
 import ExercisePicker from './ExercisePicker';
 import MetricInput, { metricLabel } from './MetricInput';
 import RestTimer from './RestTimer';
+import { plural } from '../../ui/text';
+import WorkoutTimer from './WorkoutTimer';
+import SessionStopwatch from './SessionStopwatch';
 import {
   deleteSession,
   finishSession,
@@ -27,7 +30,14 @@ import { ulid } from '../../domain/ids';
 import { formatDayLabel } from '../../domain/dates';
 import { estimateDurationMin } from '../../domain/training';
 import { formatDistance, formatDuration, formatWeight } from '../../domain/units';
-import type { Exercise, LoggedSession, LoggedSet, MetricKey, UnitSystem } from '../../domain/types';
+import type {
+  Exercise,
+  LoggedSession,
+  LoggedSet,
+  MetricKey,
+  MetricValues,
+  UnitSystem,
+} from '../../domain/types';
 
 const DEFAULT_REST_SEC = 90;
 
@@ -58,6 +68,7 @@ export default function SessionLogger() {
   const [finishing, setFinishing] = useState(false);
   const [restEndsAt, setRestEndsAt] = useState<number | null>(null);
   const [discarding, setDiscarding] = useState(false);
+  const [timing, setTiming] = useState(false);
   const hydrated = useRef(false);
 
   // Hydrate once. Later live-query updates are this component's own writes coming back.
@@ -182,6 +193,15 @@ export default function SessionLogger() {
         </div>
       </header>
 
+      <div className="card tight">
+        <div className="row between">
+          <SessionStopwatch session={session} />
+          <button className="btn sm" onClick={() => setTiming(true)}>
+            ⏱ EMOM / AMRAP
+          </button>
+        </div>
+      </div>
+
       {groups.length === 0 && (
         <div className="empty">
           <span className="glyph">🏋️</span>
@@ -230,9 +250,9 @@ export default function SessionLogger() {
             </div>
 
             {group.sets.map((set, index) => (
+              <div key={set.id}>
               <div
                 className="set-row"
-                key={set.id}
                 style={{ gridTemplateColumns: 'auto 1fr auto' }}
               >
                 <span className="set-no">{index + 1}</span>
@@ -255,6 +275,22 @@ export default function SessionLogger() {
                 >
                   ✓
                 </button>
+              </div>
+
+              {/*
+                What a timed block actually consisted of, and how the rounds were paced.
+                Both are recorded by the timer and were previously invisible once saved.
+              */}
+              {(set.notes || (set.roundSplitsSec?.length ?? 0) > 1) && (
+                <div className="tiny faint" style={{ paddingLeft: '2.15rem', paddingBottom: '0.3rem' }}>
+                  {set.notes}
+                  {set.notes && (set.roundSplitsSec?.length ?? 0) > 1 && ' · '}
+                  {(set.roundSplitsSec?.length ?? 0) > 1 &&
+                    `avg round ${formatDuration(
+                      set.roundSplitsSec![set.roundSplitsSec!.length - 1] / set.roundSplitsSec!.length,
+                    )}`}
+                </div>
+              )}
               </div>
             ))}
 
@@ -315,6 +351,34 @@ export default function SessionLogger() {
 
       {picking && <ExercisePicker onPick={addExercise} onClose={() => setPicking(false)} />}
 
+      {timing && (
+        <WorkoutTimer
+          onClose={() => setTiming(false)}
+          onSave={(result) => {
+            // Timed blocks land as ordinary sets on a container movement, so rounds inherit
+            // history, personal bests, and charts without any special-casing downstream.
+            const slug =
+              result.mode === 'amrap' ? 'amrap' : result.mode === 'emom' ? 'emom' : 'for-time';
+            const values: MetricValues = { timeSec: result.timeSec };
+            if (result.rounds != null) values.rounds = result.rounds;
+
+            mutate([
+              ...sets,
+              {
+                id: ulid(),
+                exerciseSlug: slug,
+                setIndex: sets.filter((s) => s.exerciseSlug === slug).length,
+                values,
+                completed: true,
+                notes: result.notes,
+                roundSplitsSec: result.roundSplitsSec,
+              },
+            ]);
+            setTiming(false);
+          }}
+        />
+      )}
+
       {restEndsAt && (
         <RestTimer
           endsAt={restEndsAt}
@@ -339,6 +403,12 @@ export default function SessionLogger() {
 }
 
 function summariseSets(sets: LoggedSet[], metrics: MetricKey[], units: UnitSystem): string {
+  if (metrics.includes('rounds')) {
+    const rounds = sets.reduce((total, s) => total + (s.values.rounds ?? 0), 0);
+    const time = sets.reduce((total, s) => total + (s.values.timeSec ?? 0), 0);
+    return time > 0 ? `${plural(rounds, 'round')} in ${formatDuration(time)}` : plural(rounds, 'round');
+  }
+
   if (metrics.includes('distanceM')) {
     const distance = sets.reduce((total, s) => total + (s.values.distanceM ?? 0), 0);
     const time = sets.reduce((total, s) => total + (s.values.timeSec ?? 0), 0);

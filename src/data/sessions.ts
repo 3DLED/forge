@@ -131,6 +131,39 @@ export async function updateSets(sessionId: Id, sets: LoggedSet[]): Promise<void
   await loggedSessionRepo.update(sessionId, { sets });
 }
 
+// --- session stopwatch ----------------------------------------------------
+
+/**
+ * Elapsed seconds on the session stopwatch: time banked from earlier runs, plus the current
+ * run if it is going. Derived rather than stored so it stays right across reloads and sleeps.
+ */
+export function sessionElapsedSec(session: LoggedSession, now: number = Date.now()): number {
+  const banked = session.elapsedSec ?? 0;
+  if (!session.runningSince) return banked;
+  return banked + Math.max(0, (now - Date.parse(session.runningSince)) / 1000);
+}
+
+export function isStopwatchRunning(session: LoggedSession): boolean {
+  return Boolean(session.runningSince);
+}
+
+export async function startStopwatch(session: LoggedSession): Promise<void> {
+  if (session.runningSince) return;
+  await loggedSessionRepo.update(session.id, { runningSince: new Date().toISOString() });
+}
+
+export async function pauseStopwatch(session: LoggedSession): Promise<void> {
+  if (!session.runningSince) return;
+  await loggedSessionRepo.update(session.id, {
+    elapsedSec: Math.round(sessionElapsedSec(session)),
+    runningSince: null,
+  });
+}
+
+export async function resetStopwatch(session: LoggedSession): Promise<void> {
+  await loggedSessionRepo.update(session.id, { elapsedSec: 0, runningSince: null });
+}
+
 /**
  * Finish a session: stamp the end time, and mark any planned session it came from as done
  * so plan-vs-actual stays honest.

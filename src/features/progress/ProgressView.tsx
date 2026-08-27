@@ -137,7 +137,12 @@ export default function ProgressView() {
           const marks = [
             record.best1RMKg && `est. 1RM ${formatWeight(record.best1RMKg, units)}`,
             record.bestReps && `${record.bestReps} reps`,
-            record.bestTimeSec && formatDuration(record.bestTimeSec),
+            // Rounds always carry their time cap — see the note on PersonalRecord.
+            record.bestRounds &&
+              `${record.bestRounds} rounds${
+                record.bestRoundsTimeSec ? ` in ${formatDuration(record.bestRoundsTimeSec)}` : ''
+              }`,
+            !record.bestRounds && record.bestTimeSec && formatDuration(record.bestTimeSec),
             record.bestDistanceM && formatDistance(record.bestDistanceM, units),
             record.bestPaceSecPerKm && formatPace(record.bestPaceSecPerKm, units),
           ].filter(Boolean);

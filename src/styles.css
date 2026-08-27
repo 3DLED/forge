@@ -410,6 +410,101 @@ input[type='number']::-webkit-inner-spin-button {
   font-weight: 700;
 }
 
+/* --- workout timer ------------------------------------------------------- */
+
+.timer-face {
+  text-align: center;
+  padding: 1.1rem 0.5rem 0.9rem;
+  margin: 0.75rem 0;
+  background: var(--surface-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius);
+}
+
+.timer-face.finished {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/*
+ * Sized to be read at arm's length on the floor, not held up to your face. clamp() keeps it
+ * from overflowing a narrow phone while still filling a larger screen.
+ */
+.timer-big {
+  font-size: clamp(3.2rem, 18vw, 5rem);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.timer-sub {
+  margin-top: 0.4rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/*
+ * The AMRAP round button. Deliberately the largest target in the app: it gets hit while
+ * genuinely out of breath, often without looking directly at it.
+ */
+.round-button {
+  width: 100%;
+  min-height: 128px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.round-button:active {
+  filter: brightness(0.9);
+  transform: scale(0.99);
+}
+
+.round-button:disabled {
+  background: var(--surface-2);
+  border-color: var(--border);
+  color: var(--faint);
+  opacity: 1;
+}
+
+.round-count {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.round-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+/* --- session stopwatch --------------------------------------------------- */
+
+.stopwatch {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stopwatch .elapsed {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.stopwatch .elapsed.idle { color: var(--faint); }
+
 /* --- modal / sheet ------------------------------------------------------- */
 
 .sheet-backdrop {
