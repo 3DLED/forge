@@ -41,6 +41,9 @@ Then open `http://localhost:5173`.
   weights to add, a strength goal steps up to a harder variation instead of piling on reps.
   Name a session you liked and it comes back — from the suggest sheet, or dropped onto a day
   in your plan. The rest timer runs for however long the session prescribed, not a fixed 90s.
+- **Log a run in fifteen seconds.** Type, distance, time, effort — pace computed as you type,
+  straight off your watch. Effort is required, because it is the half of training load that no
+  watch file or import can supply, and just after the run is the only moment anyone knows it.
 - **Equipment profiles.** Switch between bodyweight, kettlebells, and a full gym; the
   library re-resolves. The gap list tells you what one more purchase would unlock.
 - **Progress.** Training load (session RPE × minutes, so running and lifting add up),

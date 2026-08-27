@@ -115,6 +115,15 @@ Each milestone ends with something usable, not a half-app.
   The per-session half is built: pick a region and a goal, get a draft session from whatever
   equipment is on hand (`domain/generator.ts`). The per-*plan* half is still ahead.
 - **M6 — Later.** Run file import (GPX / TCX / Strava export / Apple Health), optional sync.
+  Deliberately behind fast manual entry. Every import path has to invent the session RPE it
+  cannot know, and load is `minutes × RPE` — so an imported run either fabricates the number
+  or silently counts as a zero-effort day. Typing three numbers off a watch captures the real
+  one. Notes for when this is picked up: Strava sends `access-control-allow-origin: *`, so a
+  browser can call it directly; what it lacks is PKCE, and `client_secret` is required for
+  both exchange and refresh. Either the athlete registers their own API app and the secret
+  stays on their device, or a proxy holds it — the first does not scale to a public release.
+  Strava's bulk export carries `activities.csv`, which has everything Forge stores, so that
+  path needs no FIT or GPX parsing at all.
 - **Deferred — exercise demos.** Images or clips per movement. Held because no freely
   licensed library exists: `free-exercise-db`'s maintainer states the provenance of its
   images is unknown, and the widely-copied GIF sets are Gym Visual's, licensed per-project.

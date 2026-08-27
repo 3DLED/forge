@@ -663,6 +663,37 @@ input[type='number']::-webkit-inner-spin-button {
 
 .suggest-row .grow { min-width: 0; }
 
+/* --- quick run entry ------------------------------------------------------ */
+
+/*
+ * Distance and time side by side: they are read off the same watch screen in one glance, and
+ * stacking them puts a scroll between two numbers that belong together.
+ */
+.run-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+}
+
+.run-field { display: flex; flex-direction: column; gap: 0.25rem; }
+.run-field input { font-size: 1.35rem; text-align: center; font-variant-numeric: tabular-nums; }
+
+.run-pace {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  margin-top: 0.6rem;
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  opacity: 0.5;
+}
+
+.run-pace.on { opacity: 1; background: var(--accent-soft); }
+.run-pace .mono { font-size: 1.5rem; font-weight: 700; }
+
 /* --- rest timer ---------------------------------------------------------- */
 
 .rest-timer {

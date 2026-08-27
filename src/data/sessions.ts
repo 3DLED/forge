@@ -198,6 +198,57 @@ export function expandPrescription(prescription: Prescription): ExpandedPrescrip
   return { blocks, sets };
 }
 
+/**
+ * Logs a cardio effort that is already over — a run you just got back from.
+ *
+ * Written as one finished record rather than start-then-edit-then-finish, because there is
+ * no session to conduct: the work happened on the road. Everything the analytics need is
+ * present at the moment of the write, including the RPE, which is the entire argument for
+ * typing three numbers off a watch instead of importing a file that cannot know how it felt.
+ *
+ * The effort lands as a single set carrying distance and time, so pace history, weekly
+ * mileage, and training load all read it through the same queries as everything else.
+ */
+export async function logCardioSession(options: {
+  exerciseSlug: string;
+  name: string;
+  date?: DayKey;
+  distanceM?: number;
+  timeSec: number;
+  rpe?: number;
+  feel?: LoggedSession['feel'];
+  notes?: string;
+}): Promise<LoggedSession> {
+  const endedAt = new Date();
+  const values: MetricValues = { timeSec: options.timeSec };
+  if (options.distanceM != null) values.distanceM = options.distanceM;
+  if (options.rpe != null) values.rpe = options.rpe;
+
+  return loggedSessionRepo.create({
+    date: options.date ?? todayKey(),
+    name: options.name,
+    // Backdated from the finish, so a session logged an hour later still says it took 48
+    // minutes rather than claiming to have started when you opened the app.
+    startedAt: new Date(endedAt.getTime() - options.timeSec * 1000).toISOString(),
+    endedAt: endedAt.toISOString(),
+    elapsedSec: Math.round(options.timeSec),
+    durationMin: Math.max(1, Math.round(options.timeSec / 60)),
+    sessionRpe: options.rpe,
+    feel: options.feel,
+    notes: options.notes,
+    sets: [
+      {
+        id: ulid(),
+        exerciseSlug: options.exerciseSlug,
+        setIndex: 0,
+        values,
+        completed: true,
+      },
+    ],
+    exerciseSlugs: [],
+  } as Omit<StoredLoggedSession, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>);
+}
+
 export async function updateSets(sessionId: Id, sets: LoggedSet[]): Promise<void> {
   await loggedSessionRepo.update(sessionId, { sets });
 }

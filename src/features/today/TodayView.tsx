@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import PageHeader from '../../ui/PageHeader';
 import SessionCard from '../../ui/SessionCard';
+import LogRunSheet from '../log/LogRunSheet';
 import { plural } from '../../ui/text';
 import { useApp } from '../../ui/AppProvider';
 import { plannedBetween, sessionsBetween, startFromPlanned, startSession } from '../../data/sessions';
@@ -17,6 +19,7 @@ import { sessionLoad } from '../../domain/training';
 
 export default function TodayView() {
   const navigate = useNavigate();
+  const [loggingRun, setLoggingRun] = useState(false);
   const { profile, activeEquipment } = useApp();
   const today = todayKey();
   const week = weekDays(today, profile.weekStartsOn);
@@ -145,6 +148,23 @@ export default function TodayView() {
       >
         {inProgress ? 'Start a separate workout' : 'Start a workout'}
       </button>
+
+      {/*
+        A run is already finished by the time you are looking at this, so it does not want the
+        session flow at all — it wants somewhere to put three numbers.
+      */}
+      <button className="btn block" onClick={() => setLoggingRun(true)} style={{ marginTop: '0.5rem' }}>
+        🏃 Log a run
+      </button>
+
+      {loggingRun && (
+        <LogRunSheet
+          onClose={() => setLoggingRun(false)}
+          // Stays here rather than opening the session. The run is over; landing in a logger
+          // that offers to start a clock and "finish" it reads as though the save did not take.
+          onSaved={() => setLoggingRun(false)}
+        />
+      )}
 
       <YesterdayHint />
     </>
