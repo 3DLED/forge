@@ -139,7 +139,6 @@ export default function MetricInput({
         onKeyDown={(event) => {
           if (event.key === 'Enter') event.currentTarget.blur();
         }}
-        style={{ minHeight: '38px', padding: '0.3rem 0.35rem' }}
       />
     </div>
   );

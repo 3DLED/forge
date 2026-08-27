@@ -309,11 +309,21 @@ input[type='number']::-webkit-inner-spin-button {
 
 /* --- set logging grid ---------------------------------------------------- */
 
+/*
+ * Sizes derive from --tap so a theme that promises bigger targets actually delivers them
+ * here — this is the screen where target size matters most, and it used to hardcode 38px
+ * regardless of what the theme claimed.
+ */
+:root {
+  --field-h: calc(var(--tap) - 4px);
+  --check-w: calc(var(--tap) + 12px);
+}
+
 .set-row {
   display: grid;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.3rem 0;
+  padding: 0.25rem 0;
 }
 
 .set-row .set-no {
@@ -333,6 +343,14 @@ input[type='number']::-webkit-inner-spin-button {
   flex: 1;
 }
 
+/* The logged numbers are the content of this screen, so they get the weight. */
+.set-fields input {
+  min-height: var(--field-h);
+  padding: 0.3rem 0.35rem;
+  font-size: 1.05rem;
+  font-weight: 650;
+}
+
 .field-label {
   display: block;
   font-size: 0.65rem;
@@ -344,21 +362,52 @@ input[type='number']::-webkit-inner-spin-button {
   text-align: center;
 }
 
+/*
+ * The highest-frequency control in the whole app — hit once per set, often while breathing
+ * hard. It gets the widest target and the accent colour, rather than the once-per-session
+ * finish button.
+ */
 .set-check {
-  width: var(--tap);
-  min-width: var(--tap);
-  height: 38px;
+  width: var(--check-w);
+  min-width: var(--check-w);
+  height: var(--field-h);
   border-radius: var(--radius-sm);
   border: var(--border-width) solid var(--border);
   background: var(--surface-2);
   color: var(--faint);
-  font-size: 1rem;
+  font-size: 1.15rem;
+  font-weight: 700;
 }
 
 .set-check.done {
-  background: var(--good-soft);
-  border-color: var(--good);
-  color: var(--good);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+/*
+ * The session name is editable, but it is a heading first. Rendering it as a filled input
+ * gave a field you rename once the visual weight of the primary control on the screen.
+ */
+.session-title {
+  background: transparent;
+  border-color: transparent;
+  font-family: var(--font-display);
+  font-size: var(--h1-size);
+  font-weight: var(--h1-weight);
+  letter-spacing: var(--h1-tracking);
+  padding: 0.1rem 0.35rem;
+  margin-left: -0.35rem;
+  min-height: 0;
+}
+
+.session-title:hover { border-color: var(--border); }
+
+/* Solid and unmissable, but not wearing the accent. See the note in SessionLogger. */
+.finish-btn {
+  background: var(--surface-3);
+  border-color: var(--border);
+  font-weight: 700;
 }
 
 /* --- modal / sheet ------------------------------------------------------- */

@@ -35,6 +35,8 @@ export default function TodayView() {
     (p) => p.date === today && p.status === 'planned',
   );
   const weekLoad = (weekSessions ?? []).reduce((total, s) => total + sessionLoad(s), 0);
+  /** A session opened but never finished — resuming it beats starting another. */
+  const inProgress = todaySessions.find((s) => !s.endedAt);
 
   const start = async () => {
     const session = await startSession({ name: defaultSessionName() });
@@ -121,8 +123,27 @@ export default function TodayView() {
         </div>
       )}
 
-      <button className="btn primary block" onClick={start} style={{ marginTop: '0.5rem' }}>
-        Start a workout
+      {/*
+        The accent goes to the most likely next action, not to a fixed button. With a session
+        already open, "Start a workout" as the loudest control quietly invites you to begin a
+        second one and split the day's training across two records.
+      */}
+      {inProgress && (
+        <button
+          className="btn primary block"
+          style={{ marginTop: '0.5rem' }}
+          onClick={() => navigate(`/log/${inProgress.id}`)}
+        >
+          Continue {inProgress.name}
+        </button>
+      )}
+
+      <button
+        className={`btn block${inProgress ? '' : ' primary'}`}
+        onClick={start}
+        style={{ marginTop: '0.5rem' }}
+      >
+        {inProgress ? 'Start a separate workout' : 'Start a workout'}
       </button>
 
       <YesterdayHint />

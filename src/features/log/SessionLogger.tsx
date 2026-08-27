@@ -171,10 +171,10 @@ export default function SessionLogger() {
       <header className="page-head">
         <div className="grow">
           <input
+            className="session-title"
             value={session.name}
             aria-label="Session name"
             onChange={(event) => void loggedSessionRepo.update(session.id, { name: event.target.value })}
-            style={{ fontSize: '1.3rem', fontWeight: 650, padding: '0.3rem 0.4rem' }}
           />
           <div className="subtitle">
             {formatDayLabel(session.date)} · {completedCount} of {sets.length} sets done
@@ -225,7 +225,8 @@ export default function SessionLogger() {
                   </span>
                 ))}
               </div>
-              <span style={{ width: 'var(--tap)' }} />
+              {/* Must match .set-check exactly, or the labels drift off their columns. */}
+              <span style={{ width: 'var(--check-w)' }} />
             </div>
 
             {group.sets.map((set, index) => (
@@ -278,21 +279,25 @@ export default function SessionLogger() {
         + Add exercise
       </button>
 
+      {/*
+        Finish is deliberately NOT the accent colour. The accent belongs to checking off a
+        set — the thing done twenty times a session. A glowing button for the once-per-session
+        action, sitting above a red destructive one, inverts the hierarchy and puts "discard"
+        under the thumb of someone reaching to finish.
+      */}
       <button
-        className="btn primary block"
+        className="btn block finish-btn"
         style={{ marginTop: '0.75rem' }}
         onClick={() => setFinishing(true)}
       >
         Finish workout
       </button>
 
-      <button
-        className="btn ghost danger block"
-        style={{ marginTop: '0.25rem' }}
-        onClick={() => setDiscarding(true)}
-      >
-        Discard session
-      </button>
+      <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+        <button className="btn ghost sm danger" onClick={() => setDiscarding(true)}>
+          Discard session
+        </button>
+      </div>
 
       {discarding && (
         <AskSheet
