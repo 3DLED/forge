@@ -142,6 +142,8 @@ export type BlockStyle =
   | 'emom'
   /** As many rounds as possible in a time cap. */
   | 'amrap'
+  /** Fixed work against the clock; the score is the time. */
+  | 'forTime'
   /** Work / recovery repeats — 6x400 m, 8x30 s hill. */
   | 'interval'
   /** One continuous effort — an easy run, a long ride. */
@@ -264,7 +266,16 @@ export type LoggedBlockStyle = 'amrap' | 'emom' | 'forTime';
 export interface LoggedBlock {
   id: Id;
   style: LoggedBlockStyle;
+  /** A name, when this is a workout worth recognising again. */
   label?: string;
+  /**
+   * The saved workout this came from.
+   *
+   * This is what makes "am I getting better at Cindy" answerable. Comparing any AMRAP to any
+   * other AMRAP is meaningless — the score depends entirely on what was in the round — so
+   * results are only ever compared within the same source.
+   */
+  sourceTemplateId?: Id;
   /** Time cap, for AMRAP and capped for-time work. */
   capSec?: number;
   /** Interval length, for EMOM. */

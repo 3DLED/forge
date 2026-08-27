@@ -167,24 +167,25 @@ export default function WorkoutTimer({
       // A running clock and its logged rounds are not recoverable by reopening the sheet.
       confirmClose
       footer={
-        <div className="row" style={{ gap: '0.5rem' }}>
+        /*
+         * One control per line, each the full width of the sheet. These are hit mid-effort,
+         * often without looking straight at the screen; a row of three shared-width buttons
+         * turns "pause" into a target you can miss and land on "reset" instead.
+         */
+        <div className="stack">
           {running ? (
-            <button className="btn grow" onClick={pause}>
+            <button className="btn block timer-action" onClick={pause}>
               Pause
             </button>
           ) : (
-            <button className="btn primary grow" onClick={start}>
+            <button className="btn primary block timer-action" onClick={start}>
               {started ? 'Resume' : 'Start'}
             </button>
           )}
-          {started && (
-            <button className="btn" onClick={reset}>
-              Reset
-            </button>
-          )}
+
           {started && !running && (
             <button
-              className="btn primary grow"
+              className="btn primary block timer-action"
               onClick={() =>
                 void onSave({
                   timeSec: Math.round(elapsedSec),
@@ -194,6 +195,12 @@ export default function WorkoutTimer({
               }
             >
               Save
+            </button>
+          )}
+
+          {started && (
+            <button className="btn block" onClick={reset}>
+              Reset
             </button>
           )}
         </div>
@@ -281,12 +288,18 @@ export default function WorkoutTimer({
   );
 }
 
-export function blockTitle(block: LoggedBlock): string {
+/** The shape of the block — "AMRAP 20:00" — independent of any name it carries. */
+export function blockShape(block: LoggedBlock): string {
   if (block.style === 'amrap') return `AMRAP ${formatClock(block.capSec ?? 0)}`;
   if (block.style === 'emom') {
     return `EMOM ${formatClock(block.intervalSec ?? 60)} × ${block.targetRounds ?? 10}`;
   }
   return block.capSec ? `For time (cap ${formatClock(block.capSec)})` : 'For time';
+}
+
+/** A name when it has one, otherwise the shape. */
+export function blockTitle(block: LoggedBlock): string {
+  return block.label?.trim() || blockShape(block);
 }
 
 /** Keeps the screen awake while the clock runs. Unsupported browsers simply do without. */

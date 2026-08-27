@@ -19,7 +19,7 @@ import AskSheet from '../../ui/AskSheet';
 import ExercisePicker from './ExercisePicker';
 import ExerciseGroup from './ExerciseGroup';
 import RestTimer from './RestTimer';
-import WorkoutTimer, { blockTitle } from './WorkoutTimer';
+import WorkoutTimer, { blockShape, blockTitle } from './WorkoutTimer';
 import NewBlockSheet from './NewBlockSheet';
 import SessionStopwatch from './SessionStopwatch';
 import SessionEquipmentSheet from './SessionEquipmentSheet';
@@ -37,6 +37,14 @@ import {
   updateSets,
 } from '../../data/sessions';
 import { loggedSessionRepo } from '../../data/repos';
+import {
+  describeMovements,
+  nameBlock,
+  saveBlockAsWorkout,
+  suggestedName,
+  workoutHistory,
+  workoutToDraft,
+} from '../../data/namedWorkouts';
 import { ulid } from '../../domain/ids';
 import { formatDayLabel } from '../../domain/dates';
 import { estimateDurationMin } from '../../domain/training';
@@ -50,6 +58,7 @@ import type {
   LoggedSession,
   LoggedSet,
   MetricKey,
+  SessionTemplate,
 } from '../../domain/types';
 
 const DEFAULT_REST_SEC = 90;
@@ -96,6 +105,7 @@ export default function SessionLogger() {
   const [creatingBlock, setCreatingBlock] = useState<'new' | 'convert' | null>(null);
   const [runningBlockId, setRunningBlockId] = useState<Id | null>(null);
   const [editingEquipment, setEditingEquipment] = useState(false);
+  const [namingBlockId, setNamingBlockId] = useState<Id | null>(null);
   /**
    * Which session the local `sets` were loaded from.
    *
@@ -185,6 +195,16 @@ export default function SessionLogger() {
     () => [...new Set((sets ?? []).map((s) => s.exerciseSlug))].join('|'),
     [sets],
   );
+
+  /** Previous runs of each named block, so a result can be read against its own history. */
+  const templateIds = blocks.map((b) => b.sourceTemplateId).filter(Boolean).join('|');
+  const blockHistories = useLiveQuery(async () => {
+    const ids = templateIds ? templateIds.split('|') : [];
+    const entries = await Promise.all(
+      ids.map(async (id) => [id, await workoutHistory(id, 5)] as const),
+    );
+    return new Map(entries);
+  }, [templateIds]);
 
   const history = useLiveQuery(async () => {
     const slugs = allSlugs ? allSlugs.split('|') : [];
@@ -346,15 +366,38 @@ export default function SessionLogger() {
               <div className="grow">
                 <h3 className="truncate">{blockTitle(section.block)}</h3>
                 <div className="tiny faint">
+                  {section.block.label ? `${blockShape(section.block)} · ` : ''}
                   {section.groups.length === 0
                     ? 'Add the movements that make up one round'
-                    : `${plural(movementLines(section.groups).length, 'movement')} per round`}
+                    : describeMovements(
+                        section.groups.flatMap((g) => g.sets),
+                        exerciseBySlug,
+                      )}
                 </div>
               </div>
               {section.block.rounds != null && (
                 <span className="pill accent">{plural(section.block.rounds, 'round')}</span>
               )}
             </div>
+
+            {/* Only ever compared against itself — see the note in namedWorkouts.ts. */}
+            {(() => {
+              const past = section.block.sourceTemplateId
+                ? (blockHistories?.get(section.block.sourceTemplateId) ?? []).filter(
+                    (r) => r.sessionId !== session.id,
+                  )
+                : [];
+              if (past.length === 0) return null;
+              const last = past[0];
+              return (
+                <div className="tiny faint" style={{ marginBottom: '0.4rem' }}>
+                  Last time ({formatDayLabel(last.date).toLowerCase()}):{' '}
+                  {last.rounds != null ? plural(last.rounds, 'round') : ''}
+                  {last.rounds != null && last.timeSec ? ' in ' : ''}
+                  {last.timeSec ? formatClock(last.timeSec) : ''}
+                </div>
+              );
+            })()}
 
             {section.groups.length > 0 && <div className="round-recipe-title">Each round</div>}
 
@@ -399,6 +442,16 @@ export default function SessionLogger() {
                     section.block.roundSplitsSec!.at(-1)! / section.block.roundSplitsSec!.length,
                   )}`}
               </div>
+            )}
+
+            {section.groups.length > 0 && (
+              <button
+                className="btn sm block"
+                style={{ marginTop: '0.5rem' }}
+                onClick={() => setNamingBlockId(section.block.id)}
+              >
+                {section.block.sourceTemplateId ? '✎ Rename workout' : '💾 Name & save this workout'}
+              </button>
             )}
 
             <button
@@ -457,6 +510,38 @@ export default function SessionLogger() {
         />
       )}
 
+      {namingBlockId && (() => {
+        const target = blocks.find((b) => b.id === namingBlockId);
+        const blockSets = sets.filter((x) => x.blockId === namingBlockId);
+        if (!target) return null;
+        return (
+          <AskSheet
+            title={target.sourceTemplateId ? 'Rename this workout' : 'Name this workout'}
+            message="Saved workouts can be started again from the block menu, dropped onto a day in your plan, and compared against their own history."
+            input={{
+              label: 'Name',
+              defaultValue: target.label ?? suggestedName(blockSets, exerciseBySlug),
+              placeholder: 'Cindy',
+              required: true,
+            }}
+            confirmLabel="Save workout"
+            onCancel={() => setNamingBlockId(null)}
+            onConfirm={async (name) => {
+              const fresh = await getSession(session.id);
+              if (!fresh) return;
+              if (target.sourceTemplateId) {
+                await nameBlock(fresh, target.id, name.trim());
+              } else {
+                const template = await saveBlockAsWorkout(name.trim(), target, blockSets);
+                const reread = await getSession(session.id);
+                if (reread) await nameBlock(reread, target.id, name.trim(), template.id);
+              }
+              setNamingBlockId(null);
+            }}
+          />
+        );
+      })()}
+
       {editingEquipment && (
         <SessionEquipmentSheet
           current={sessionTags ?? activeEquipment?.items ?? []}
@@ -483,6 +568,27 @@ export default function SessionLogger() {
               : undefined
           }
           onClose={() => setCreatingBlock(null)}
+          onPickSaved={
+            creatingBlock === 'new'
+              ? async (template: SessionTemplate) => {
+                  const draft = workoutToDraft(template);
+                  if (!draft) return;
+                  const created = await addBlock({ ...session, sets }, draft.block);
+                  mutate([
+                    ...sets,
+                    ...draft.items.map((item) => ({
+                      id: ulid(),
+                      exerciseSlug: item.exerciseSlug,
+                      blockId: created.id,
+                      setIndex: 0,
+                      values: item.values,
+                      completed: false,
+                    })),
+                  ]);
+                  setCreatingBlock(null);
+                }
+              : undefined
+          }
           onCreate={async (draft) => {
             if (creatingBlock === 'convert') {
               const created = await convertSessionToBlock({ ...session, sets }, draft);

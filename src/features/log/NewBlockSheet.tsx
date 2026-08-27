@@ -6,9 +6,12 @@
  */
 
 import { useState } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
 import Sheet from '../../ui/Sheet';
 import { formatClock } from '../../domain/units';
-import type { LoggedBlock, LoggedBlockStyle } from '../../domain/types';
+import { savedWorkouts } from '../../data/namedWorkouts';
+import { plural } from '../../ui/text';
+import type { LoggedBlock, LoggedBlockStyle, SessionTemplate } from '../../domain/types';
 
 const STYLES: { value: LoggedBlockStyle; label: string; blurb: string }[] = [
   {
@@ -33,14 +36,20 @@ export default function NewBlockSheet({
   confirmLabel,
   message,
   onCreate,
+  onPickSaved,
   onClose,
 }: {
   title: string;
   confirmLabel: string;
   message?: string;
   onCreate: (block: Omit<LoggedBlock, 'id'>) => void | Promise<void>;
+  /** Offered only when creating a fresh block, not when converting an existing workout. */
+  onPickSaved?: (template: SessionTemplate) => void | Promise<void>;
   onClose: () => void;
 }) {
+  const saved = useLiveQuery(() => (onPickSaved ? savedWorkouts() : Promise.resolve([])), [
+    Boolean(onPickSaved),
+  ]);
   const [style, setStyle] = useState<LoggedBlockStyle>('amrap');
   const [capMin, setCapMin] = useState(12);
   const [intervalSec, setIntervalSec] = useState(60);
@@ -68,6 +77,30 @@ export default function NewBlockSheet({
       }
     >
       {message && <p className="small muted">{message}</p>}
+
+      {/* Repeating a workout you have already named is the common case, so it comes first. */}
+      {onPickSaved && (saved?.length ?? 0) > 0 && (
+        <>
+          <div className="section-title">Your saved workouts</div>
+          {saved!.map((template) => (
+            <button
+              key={template.id}
+              className="pick"
+              onClick={() => void onPickSaved(template)}
+            >
+              <span className="grow">
+                <strong>{template.name}</strong>
+                <br />
+                <span className="tiny faint">
+                  {plural(template.blocks[0]?.items.length ?? 0, 'movement')} · run it again
+                </span>
+              </span>
+              <span className="pill accent">Use</span>
+            </button>
+          ))}
+          <div className="section-title">Or build a new one</div>
+        </>
+      )}
 
       <div className="chip-row">
         {STYLES.map((option) => (

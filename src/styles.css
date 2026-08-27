@@ -530,6 +530,13 @@ input[type='number']::-webkit-inner-spin-button {
   padding: 0.1rem 0;
 }
 
+/* Taller than a normal button: hit while breathing hard, sometimes without looking. */
+.timer-action {
+  min-height: calc(var(--tap) + 8px);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
 /* --- session stopwatch --------------------------------------------------- */
 
 .stopwatch {

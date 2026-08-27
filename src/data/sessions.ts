@@ -94,12 +94,13 @@ export async function startSession(options: {
  * every set unchecked, with the prescribed numbers pre-filled as the targets to beat.
  */
 export async function startFromPlanned(planned: PlannedSession): Promise<LoggedSession> {
-  const sets = prescriptionToSets(planned.prescription);
+  const { blocks, sets } = expandPrescription(planned.prescription);
   const session = await loggedSessionRepo.create({
     date: planned.date,
     name: planned.prescription.name,
     plannedSessionId: planned.id,
     startedAt: new Date().toISOString(),
+    blocks,
     sets,
     exerciseSlugs: [],
   } as Omit<StoredLoggedSession, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>);
@@ -108,11 +109,69 @@ export async function startFromPlanned(planned: PlannedSession): Promise<LoggedS
   return session;
 }
 
-/** Expands a prescription into blank sets, carrying targets through as starting values. */
-export function prescriptionToSets(prescription: Prescription): LoggedSet[] {
+/** Timed prescription styles become real logged blocks rather than flattened sets. */
+const TIMED_STYLES = new Set(['amrap', 'emom', 'forTime']);
+
+export interface ExpandedPrescription {
+  blocks: LoggedBlock[];
+  sets: LoggedSet[];
+}
+
+/**
+ * Expands a prescription into what the logger works with: blank sets, plus real blocks for
+ * anything timed.
+ *
+ * A prescribed AMRAP used to be flattened into one set per movement per round, tagged with
+ * a block id that referred to nothing — so starting a planned AMRAP produced a pile of loose
+ * sets and no clock. Timed styles now materialise as a `LoggedBlock` holding one set per
+ * movement: the round's recipe, which is what the block UI and the timer both expect.
+ */
+export function expandPrescription(prescription: Prescription): ExpandedPrescription {
+  const blocks: LoggedBlock[] = [];
   const sets: LoggedSet[] = [];
 
+  const nextIndex = (slug: string) => sets.filter((s) => s.exerciseSlug === slug).length;
+
+  const valuesFor = (item: Prescription['blocks'][number]['items'][number]): MetricValues => {
+    const values: MetricValues = {};
+    if (item.reps != null) values.reps = item.reps;
+    else if (item.repRange) values.reps = item.repRange[0];
+    if (item.timeSec != null) values.timeSec = item.timeSec;
+    if (item.distanceM != null) values.distanceM = item.distanceM;
+    if (item.load.kind === 'absolute') values.weightKg = item.load.weightKg;
+    if (item.load.kind === 'rpe') values.rpe = item.load.rpe;
+    return values;
+  };
+
   for (const block of prescription.blocks) {
+    if (TIMED_STYLES.has(block.style)) {
+      const logged: LoggedBlock = {
+        id: ulid(),
+        style: block.style === 'emom' ? 'emom' : block.style === 'forTime' ? 'forTime' : 'amrap',
+        label: block.label ?? prescription.name,
+        // Carried through so a planned run of a saved workout joins that workout's history
+        // rather than starting a fresh, uncomparable one.
+        sourceTemplateId: prescription.sourceTemplateId,
+        capSec: block.capSec,
+        intervalSec: block.style === 'emom' ? block.restSec ?? 60 : undefined,
+        targetRounds: block.style === 'emom' ? block.rounds ?? 10 : undefined,
+      };
+      blocks.push(logged);
+
+      for (const item of block.items) {
+        sets.push({
+          id: ulid(),
+          exerciseSlug: item.exerciseSlug,
+          blockId: logged.id,
+          itemId: item.id,
+          setIndex: nextIndex(item.exerciseSlug),
+          values: valuesFor(item),
+          completed: false,
+        });
+      }
+      continue;
+    }
+
     // Circuits and intervals repeat their whole item list; straight sets repeat one item.
     const outerRounds = block.style === 'straight' || block.style === 'superset' ? 1 : block.rounds ?? 1;
 
@@ -121,21 +180,12 @@ export function prescriptionToSets(prescription: Prescription): LoggedSet[] {
         const innerSets = block.style === 'straight' || block.style === 'superset' ? item.sets ?? 1 : 1;
 
         for (let setIndex = 0; setIndex < innerSets; setIndex++) {
-          const values: MetricValues = {};
-          if (item.reps != null) values.reps = item.reps;
-          else if (item.repRange) values.reps = item.repRange[0];
-          if (item.timeSec != null) values.timeSec = item.timeSec;
-          if (item.distanceM != null) values.distanceM = item.distanceM;
-          if (item.load.kind === 'absolute') values.weightKg = item.load.weightKg;
-          if (item.load.kind === 'rpe') values.rpe = item.load.rpe;
-
           sets.push({
             id: ulid(),
             exerciseSlug: item.exerciseSlug,
-            blockId: block.id,
             itemId: item.id,
-            setIndex: sets.filter((s) => s.exerciseSlug === item.exerciseSlug).length,
-            values,
+            setIndex: nextIndex(item.exerciseSlug),
+            values: valuesFor(item),
             completed: false,
           });
         }
@@ -143,7 +193,7 @@ export function prescriptionToSets(prescription: Prescription): LoggedSet[] {
     }
   }
 
-  return sets;
+  return { blocks, sets };
 }
 
 export async function updateSets(sessionId: Id, sets: LoggedSet[]): Promise<void> {

@@ -23,6 +23,7 @@ import {
   unskipPlannedSession,
 } from '../../data/plans';
 import { SEED_SESSION_TEMPLATES } from '../../data/seed/sessionTemplates';
+import { savedWorkouts } from '../../data/namedWorkouts';
 import { materialisePrescription } from '../../domain/planning';
 import { resolveDayAvailability } from '../../domain/scheduling';
 import { formatDayLabel, todayKey } from '../../domain/dates';
@@ -45,6 +46,7 @@ export default function DaySheet({ date, onClose }: { date: DayKey; onClose: () 
   const planned = useLiveQuery(() => plannedOnDay(date), [date]);
   const logged = useLiveQuery(() => sessionsOnDay(date), [date]);
   const exceptions = useLiveQuery(() => calendarExceptions(), []);
+  const saved = useLiveQuery(() => savedWorkouts(), []);
 
   const availability = resolveDayAvailability(date, profile.availability, exceptions ?? []);
   const blackout = (exceptions ?? []).find(
@@ -71,6 +73,30 @@ export default function DaySheet({ date, onClose }: { date: DayKey; onClose: () 
     setQuery('');
   };
 
+  /**
+   * A workout you named in the logger is already a SessionTemplate, so planning it is just
+   * copying its blocks across — no substitution pass, because you built it from movements
+   * you had rather than from an idealised template.
+   */
+  const addSavedWorkout = async (templateId: string) => {
+    const template = (saved ?? []).find((t) => t.id === templateId);
+    if (!template) return;
+
+    await plannedSessionRepo.create({
+      date,
+      prescription: {
+        name: template.name,
+        modalities: template.modalities,
+        estimatedMinutes: template.estimatedMinutes,
+        blocks: template.blocks,
+        sourceTemplateId: template.id,
+      },
+      status: 'planned',
+    } as Omit<PlannedSession, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>);
+    setAdding(false);
+    setQuery('');
+  };
+
   if (adding) {
     const needle = query.trim().toLowerCase();
     const results = SEED_SESSION_TEMPLATES.filter(
@@ -87,6 +113,34 @@ export default function DaySheet({ date, onClose }: { date: DayKey; onClose: () 
           autoFocus
         />
         <div style={{ height: '0.6rem' }} />
+
+        {(saved ?? []).filter(
+          (t) => !needle || t.name.toLowerCase().includes(needle),
+        ).length > 0 && (
+          <>
+            <div className="section-title">Your saved workouts</div>
+            {(saved ?? [])
+              .filter((t) => !needle || t.name.toLowerCase().includes(needle))
+              .map((template) => (
+                <button
+                  key={template.id}
+                  className="pick"
+                  onClick={() => void addSavedWorkout(template.id)}
+                >
+                  <span className="grow">
+                    <strong>{template.name}</strong>
+                    <br />
+                    <span className="tiny faint">
+                      {template.blocks[0]?.items.length ?? 0} movements · your workout
+                    </span>
+                  </span>
+                  <span className="pill accent">Add</span>
+                </button>
+              ))}
+            <div className="section-title">From the library</div>
+          </>
+        )}
+
         {results.map((template) => (
           <button key={template.slug} className="pick" onClick={() => void addFromTemplate(template.slug)}>
             <span className="grow">
