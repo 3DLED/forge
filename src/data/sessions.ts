@@ -12,6 +12,7 @@ import { todayKey } from '../domain/dates';
 import type {
   DayKey,
   Id,
+  LoggedBlock,
   LoggedSession,
   LoggedSet,
   MetricValues,
@@ -129,6 +130,59 @@ export function prescriptionToSets(prescription: Prescription): LoggedSet[] {
 
 export async function updateSets(sessionId: Id, sets: LoggedSet[]): Promise<void> {
   await loggedSessionRepo.update(sessionId, { sets });
+}
+
+// --- timed blocks ---------------------------------------------------------
+
+export async function addBlock(
+  session: LoggedSession,
+  block: Omit<LoggedBlock, 'id'>,
+): Promise<LoggedBlock> {
+  const created: LoggedBlock = { ...block, id: ulid() };
+  await loggedSessionRepo.update(session.id, {
+    blocks: [...(session.blocks ?? []), created],
+  });
+  return created;
+}
+
+export async function updateBlock(
+  session: LoggedSession,
+  blockId: Id,
+  patch: Partial<Omit<LoggedBlock, 'id'>>,
+): Promise<void> {
+  await loggedSessionRepo.update(session.id, {
+    blocks: (session.blocks ?? []).map((b) => (b.id === blockId ? { ...b, ...patch } : b)),
+  });
+}
+
+/**
+ * Removes the block but keeps its movements, detaching them back into the flat list.
+ * Deleting the container should not delete the work recorded inside it.
+ */
+export async function removeBlock(session: LoggedSession, blockId: Id): Promise<void> {
+  await loggedSessionRepo.update(session.id, {
+    blocks: (session.blocks ?? []).filter((b) => b.id !== blockId),
+    sets: session.sets.map((set) =>
+      set.blockId === blockId ? { ...set, blockId: undefined } : set,
+    ),
+  });
+}
+
+/**
+ * Turns the whole workout into one timed block: every movement already logged becomes part
+ * of a round. Deliberately non-destructive — sets are re-parented, never dropped — so
+ * converting a session you have been building is always undoable by removing the block.
+ */
+export async function convertSessionToBlock(
+  session: LoggedSession,
+  block: Omit<LoggedBlock, 'id'>,
+): Promise<LoggedBlock> {
+  const created: LoggedBlock = { ...block, id: ulid() };
+  await loggedSessionRepo.update(session.id, {
+    blocks: [...(session.blocks ?? []), created],
+    sets: session.sets.map((set) => (set.blockId ? set : { ...set, blockId: created.id })),
+  });
+  return created;
 }
 
 // --- session stopwatch ----------------------------------------------------

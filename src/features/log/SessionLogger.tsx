@@ -4,6 +4,10 @@
  * Sets are held in local state and flushed to IndexedDB on a short debounce. Writing on
  * every keystroke would be a transaction per character; writing only at the end would lose
  * a session to a dropped phone. Half a second of lag is the right trade.
+ *
+ * Blocks are the exception: they live on the session record and are written immediately,
+ * because they are created and edited far less often and a half-second window in which a
+ * newly created block does not exist yet would make the "add a movement to it" flow racy.
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -13,30 +17,35 @@ import { useApp } from '../../ui/AppProvider';
 import Sheet from '../../ui/Sheet';
 import AskSheet from '../../ui/AskSheet';
 import ExercisePicker from './ExercisePicker';
-import MetricInput, { metricLabel } from './MetricInput';
+import ExerciseGroup from './ExerciseGroup';
 import RestTimer from './RestTimer';
-import { plural } from '../../ui/text';
-import WorkoutTimer from './WorkoutTimer';
+import WorkoutTimer, { blockTitle } from './WorkoutTimer';
+import NewBlockSheet from './NewBlockSheet';
 import SessionStopwatch from './SessionStopwatch';
+import { plural } from '../../ui/text';
 import {
+  addBlock,
+  convertSessionToBlock,
   deleteSession,
   finishSession,
   getSession,
   lastPerformance,
+  removeBlock,
+  updateBlock,
   updateSets,
 } from '../../data/sessions';
 import { loggedSessionRepo } from '../../data/repos';
 import { ulid } from '../../domain/ids';
 import { formatDayLabel } from '../../domain/dates';
 import { estimateDurationMin } from '../../domain/training';
-import { formatDistance, formatDuration, formatWeight } from '../../domain/units';
+import { formatClock } from '../../domain/units';
 import type {
   Exercise,
+  Id,
+  LoggedBlock,
   LoggedSession,
   LoggedSet,
   MetricKey,
-  MetricValues,
-  UnitSystem,
 } from '../../domain/types';
 
 const DEFAULT_REST_SEC = 90;
@@ -51,6 +60,17 @@ const FEELS: { value: Feel; label: string }[] = [
   { value: 'bad', label: '🥴 Bad' },
 ];
 
+/** A movement with its sets. */
+interface Group {
+  slug: string;
+  sets: LoggedSet[];
+}
+
+/** The screen is a list of these: loose movements, and timed blocks containing movements. */
+type Section =
+  | { kind: 'exercise'; key: string; group: Group }
+  | { kind: 'block'; key: string; block: LoggedBlock; groups: Group[] };
+
 export default function SessionLogger() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
@@ -64,49 +84,100 @@ export default function SessionLogger() {
   );
 
   const [sets, setSets] = useState<LoggedSet[] | null>(null);
-  const [picking, setPicking] = useState(false);
+  /** Non-null while the picker is open; carries the block to add into, if any. */
+  const [picking, setPicking] = useState<{ blockId?: Id } | null>(null);
   const [finishing, setFinishing] = useState(false);
   const [restEndsAt, setRestEndsAt] = useState<number | null>(null);
   const [discarding, setDiscarding] = useState(false);
-  const [timing, setTiming] = useState(false);
-  const hydrated = useRef(false);
+  const [creatingBlock, setCreatingBlock] = useState<'new' | 'convert' | null>(null);
+  const [runningBlockId, setRunningBlockId] = useState<Id | null>(null);
+  /**
+   * Which session the local `sets` were loaded from.
+   *
+   * This must be an id, never a boolean. Routing between two sessions reuses this component,
+   * so a plain "have I hydrated?" flag stays true across the switch: the load is skipped for
+   * the new session while the save fires immediately, writing the previous session's sets
+   * over it. Comparing ids means sets can only ever be written back to their own session.
+   */
+  const hydratedFor = useRef<Id | null>(null);
 
-  // Hydrate once. Later live-query updates are this component's own writes coming back.
   useEffect(() => {
-    if (session && !hydrated.current) {
+    if (session && hydratedFor.current !== session.id) {
       setSets(session.sets);
-      hydrated.current = true;
+      hydratedFor.current = session.id;
     }
   }, [session]);
 
   useEffect(() => {
-    if (!sets || !sessionId || !hydrated.current) return;
+    if (!sets || !sessionId || hydratedFor.current !== sessionId) return;
     const timer = setTimeout(() => void updateSets(sessionId, sets), 400);
     return () => clearTimeout(timer);
   }, [sets, sessionId]);
 
-  /** Movements in the order they were added, each with its sets. */
-  const groups = useMemo(() => {
-    if (!sets) return [];
-    const order: string[] = [];
-    const bySlug = new Map<string, LoggedSet[]>();
+  const blocks = useMemo(() => session?.blocks ?? [], [session]);
+
+  /**
+   * Sections in the order the sets were added, so a block appears where its first movement
+   * does rather than being hoisted to the top or bottom.
+   */
+  const sections = useMemo(() => {
+    if (!sets) return [] as Section[];
+
+    const blockById = new Map(blocks.map((b) => [b.id, b]));
+    const out: Section[] = [];
+    const blockSections = new Map<Id, Extract<Section, { kind: 'block' }>>();
+    const looseSections = new Map<string, Extract<Section, { kind: 'exercise' }>>();
+
     for (const set of sets) {
-      if (!bySlug.has(set.exerciseSlug)) {
-        bySlug.set(set.exerciseSlug, []);
-        order.push(set.exerciseSlug);
+      const block = set.blockId ? blockById.get(set.blockId) : undefined;
+
+      if (block) {
+        let section = blockSections.get(block.id);
+        if (!section) {
+          section = { kind: 'block', key: block.id, block, groups: [] };
+          blockSections.set(block.id, section);
+          out.push(section);
+        }
+        let group = section.groups.find((g) => g.slug === set.exerciseSlug);
+        if (!group) {
+          group = { slug: set.exerciseSlug, sets: [] };
+          section.groups.push(group);
+        }
+        group.sets.push(set);
+        continue;
       }
-      bySlug.get(set.exerciseSlug)!.push(set);
+
+      let section = looseSections.get(set.exerciseSlug);
+      if (!section) {
+        section = { kind: 'exercise', key: set.exerciseSlug, group: { slug: set.exerciseSlug, sets: [] } };
+        looseSections.set(set.exerciseSlug, section);
+        out.push(section);
+      }
+      section.group.sets.push(set);
     }
-    return order.map((slug) => ({ slug, sets: bySlug.get(slug)! }));
-  }, [sets]);
+
+    // Blocks created but not yet filled have no sets to place them, so they go last.
+    for (const block of blocks) {
+      if (!blockSections.has(block.id)) {
+        out.push({ kind: 'block', key: block.id, block, groups: [] });
+      }
+    }
+
+    return out;
+  }, [sets, blocks]);
+
+  const allSlugs = useMemo(
+    () => [...new Set((sets ?? []).map((s) => s.exerciseSlug))].join('|'),
+    [sets],
+  );
 
   const history = useLiveQuery(async () => {
-    const slugs = groups.map((g) => g.slug);
+    const slugs = allSlugs ? allSlugs.split('|') : [];
     const entries = await Promise.all(
       slugs.map(async (slug) => [slug, await lastPerformance(slug, sessionId)] as const),
     );
     return new Map(entries);
-  }, [groups.map((g) => g.slug).join('|'), sessionId]);
+  }, [allSlugs, sessionId]);
 
   if (!sessionId) return null;
   if (session === undefined) return <p className="muted">Loading…</p>;
@@ -123,7 +194,9 @@ export default function SessionLogger() {
   const mutate = (next: LoggedSet[]) => setSets(next);
 
   const addExercise = async (exercise: Exercise) => {
-    setPicking(false);
+    const blockId = picking?.blockId;
+    setPicking(null);
+
     // Start from what you did last time — far more useful than an empty row.
     const previous = await lastPerformance(exercise.slug, sessionId);
     const seed = previous?.sets.at(-1)?.values ?? {};
@@ -133,18 +206,12 @@ export default function SessionLogger() {
 
     mutate([
       ...sets,
-      {
-        id: ulid(),
-        exerciseSlug: exercise.slug,
-        setIndex: 0,
-        values,
-        completed: false,
-      },
+      { id: ulid(), exerciseSlug: exercise.slug, blockId, setIndex: 0, values, completed: false },
     ]);
   };
 
   const addSet = (slug: string) => {
-    const existing = sets.filter((s) => s.exerciseSlug === slug);
+    const existing = sets.filter((s) => s.exerciseSlug === slug && !s.blockId);
     const previous = existing.at(-1);
     const insertAfter = previous ? sets.lastIndexOf(previous) : sets.length - 1;
     const created: LoggedSet = {
@@ -173,9 +240,33 @@ export default function SessionLogger() {
   };
 
   const removeSet = (setId: string) => mutate(sets.filter((s) => s.id !== setId));
-  const removeExercise = (slug: string) => mutate(sets.filter((s) => s.exerciseSlug !== slug));
+
+  /** Removes a movement from one context only — the block it is in, or the loose list. */
+  const removeExerciseFrom = (slug: string, blockId?: Id) =>
+    mutate(sets.filter((s) => !(s.exerciseSlug === slug && s.blockId === blockId)));
 
   const completedCount = sets.filter((s) => s.completed).length;
+  const looseCount = sets.filter((s) => !s.blockId).length;
+  const runningBlock = blocks.find((b) => b.id === runningBlockId) ?? null;
+  const runningSection = sections.find(
+    (s): s is Extract<Section, { kind: 'block' }> =>
+      s.kind === 'block' && s.block.id === runningBlockId,
+  );
+
+  /** "10 × Burpee" lines for the timer, so a round can be read off the screen mid-effort. */
+  const movementLines = (groups: Group[]): string[] =>
+    groups.flatMap((group) =>
+      group.sets.map((set) => {
+        const name = exerciseBySlug.get(group.slug)?.name ?? group.slug;
+        const reps = set.values.reps;
+        const time = set.values.timeSec;
+        const distance = set.values.distanceM;
+        if (reps) return `${reps} × ${name}`;
+        if (time) return `${formatClock(time)} ${name}`;
+        if (distance) return `${distance} m ${name}`;
+        return name;
+      }),
+    );
 
   return (
     <>
@@ -196,130 +287,129 @@ export default function SessionLogger() {
       <div className="card tight">
         <div className="row between">
           <SessionStopwatch session={session} />
-          <button className="btn sm" onClick={() => setTiming(true)}>
-            ⏱ EMOM / AMRAP
+          <button className="btn sm" onClick={() => setCreatingBlock('new')}>
+            ⏱ Add block
           </button>
         </div>
       </div>
 
-      {groups.length === 0 && (
+      {sections.length === 0 && (
         <div className="empty">
           <span className="glyph">🏋️</span>
           <p>Nothing logged yet.</p>
-          <p className="small faint">Add a movement to get started.</p>
+          <p className="small faint">Add a movement, or start an AMRAP or EMOM block.</p>
         </div>
       )}
 
-      {groups.map((group) => {
-        const exercise = exerciseBySlug.get(group.slug);
-        const metrics = exercise?.metrics ?? (['reps', 'rpe'] as MetricKey[]);
-        const previous = history?.get(group.slug);
-
-        return (
-          <section className="card" key={group.slug}>
+      {sections.map((section) =>
+        section.kind === 'exercise' ? (
+          <ExerciseGroup
+            key={section.key}
+            slug={section.group.slug}
+            sets={section.group.sets}
+            exercise={exerciseBySlug.get(section.group.slug)}
+            units={units}
+            previous={history?.get(section.group.slug)}
+            onSetValue={setValue}
+            onToggle={toggleComplete}
+            onRemoveSet={removeSet}
+            onAddSet={addSet}
+            onRemoveExercise={(slug) => removeExerciseFrom(slug)}
+          />
+        ) : (
+          <section className="card block-card" key={section.key}>
             <div className="card-head">
               <div className="grow">
-                <h3 className="truncate">{exercise?.name ?? group.slug}</h3>
-                {previous && (
-                  <div className="tiny faint">
-                    Last {formatDayLabel(previous.session.date).toLowerCase()}:{' '}
-                    {summariseSets(previous.sets, metrics, units)}
-                  </div>
-                )}
-              </div>
-              <button
-                className="btn ghost sm"
-                aria-label={`Remove ${exercise?.name ?? group.slug}`}
-                onClick={() => removeExercise(group.slug)}
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="set-row" style={{ gridTemplateColumns: 'auto 1fr auto' }}>
-              <span className="set-no" />
-              <div className="set-fields">
-                {metrics.map((metric) => (
-                  <span className="field-label" key={metric}>
-                    {metricLabel(metric, units)}
-                  </span>
-                ))}
-              </div>
-              {/* Must match .set-check exactly, or the labels drift off their columns. */}
-              <span style={{ width: 'var(--check-w)' }} />
-            </div>
-
-            {group.sets.map((set, index) => (
-              <div key={set.id}>
-              <div
-                className="set-row"
-                style={{ gridTemplateColumns: 'auto 1fr auto' }}
-              >
-                <span className="set-no">{index + 1}</span>
-                <div className="set-fields">
-                  {metrics.map((metric) => (
-                    <MetricInput
-                      key={metric}
-                      metric={metric}
-                      units={units}
-                      value={set.values[metric]}
-                      onChange={(value) => setValue(set.id, metric, value)}
-                    />
-                  ))}
+                <h3 className="truncate">{blockTitle(section.block)}</h3>
+                <div className="tiny faint">
+                  {section.groups.length === 0
+                    ? 'Add the movements that make up one round'
+                    : `${plural(movementLines(section.groups).length, 'movement')} per round`}
                 </div>
-                <button
-                  className={`set-check${set.completed ? ' done' : ''}`}
-                  aria-label={set.completed ? `Set ${index + 1} done` : `Mark set ${index + 1} done`}
-                  onClick={() => toggleComplete(set.id)}
-                  onDoubleClick={() => removeSet(set.id)}
-                >
-                  ✓
-                </button>
               </div>
-
-              {/*
-                What a timed block actually consisted of, and how the rounds were paced.
-                Both are recorded by the timer and were previously invisible once saved.
-              */}
-              {(set.notes || (set.roundSplitsSec?.length ?? 0) > 1) && (
-                <div className="tiny faint" style={{ paddingLeft: '2.15rem', paddingBottom: '0.3rem' }}>
-                  {set.notes}
-                  {set.notes && (set.roundSplitsSec?.length ?? 0) > 1 && ' · '}
-                  {(set.roundSplitsSec?.length ?? 0) > 1 &&
-                    `avg round ${formatDuration(
-                      set.roundSplitsSec![set.roundSplitsSec!.length - 1] / set.roundSplitsSec!.length,
-                    )}`}
-                </div>
+              {section.block.rounds != null && (
+                <span className="pill accent">{plural(section.block.rounds, 'round')}</span>
               )}
-              </div>
+            </div>
+
+            {section.groups.length > 0 && <div className="round-recipe-title">Each round</div>}
+
+            {section.groups.map((group) => (
+              <ExerciseGroup
+                key={group.slug}
+                slug={group.slug}
+                sets={group.sets}
+                exercise={exerciseBySlug.get(group.slug)}
+                units={units}
+                nested
+                onSetValue={setValue}
+                onToggle={toggleComplete}
+                onRemoveSet={removeSet}
+                onAddSet={addSet}
+                onRemoveExercise={(slug) => removeExerciseFrom(slug, section.block.id)}
+              />
             ))}
 
-            <div className="row" style={{ marginTop: '0.5rem', gap: '0.5rem' }}>
-              <button className="btn sm grow" onClick={() => addSet(group.slug)}>
-                + Set
-              </button>
-              {group.sets.length > 1 && (
-                <button
-                  className="btn sm ghost"
-                  onClick={() => removeSet(group.sets.at(-1)!.id)}
-                >
-                  − Set
-                </button>
-              )}
-            </div>
-          </section>
-        );
-      })}
+            <button
+              className="btn sm block"
+              style={{ marginTop: '0.5rem' }}
+              onClick={() => setPicking({ blockId: section.block.id })}
+            >
+              + Add movement to this block
+            </button>
 
-      <button className="btn block" onClick={() => setPicking(true)} style={{ marginTop: '0.5rem' }}>
+            <button
+              className="btn primary block"
+              style={{ marginTop: '0.5rem' }}
+              onClick={() => setRunningBlockId(section.block.id)}
+            >
+              {section.block.timeSec ? 'Open timer' : 'Start timer'}
+            </button>
+
+            {section.block.timeSec != null && (
+              <div className="tiny faint" style={{ marginTop: '0.5rem', textAlign: 'center' }}>
+                {section.block.rounds != null && `${plural(section.block.rounds, 'round')} · `}
+                {formatClock(section.block.timeSec)}
+                {(section.block.roundSplitsSec?.length ?? 0) > 1 &&
+                  ` · avg round ${formatClock(
+                    section.block.roundSplitsSec!.at(-1)! / section.block.roundSplitsSec!.length,
+                  )}`}
+              </div>
+            )}
+
+            <button
+              className="btn ghost sm block"
+              style={{ marginTop: '0.25rem' }}
+              onClick={() => void removeBlock(session, section.block.id)}
+            >
+              Ungroup block
+            </button>
+          </section>
+        ),
+      )}
+
+      <button
+        className="btn block"
+        onClick={() => setPicking({})}
+        style={{ marginTop: '0.5rem' }}
+      >
         + Add exercise
       </button>
 
+      {/* Only offered when there is something loose to wrap. */}
+      {looseCount > 0 && (
+        <button
+          className="btn block"
+          style={{ marginTop: '0.5rem' }}
+          onClick={() => setCreatingBlock('convert')}
+        >
+          Make this workout an AMRAP
+        </button>
+      )}
+
       {/*
         Finish is deliberately NOT the accent colour. The accent belongs to checking off a
-        set — the thing done twenty times a session. A glowing button for the once-per-session
-        action, sitting above a red destructive one, inverts the hierarchy and puts "discard"
-        under the thumb of someone reaching to finish.
+        set — the thing done twenty times a session.
       */}
       <button
         className="btn block finish-btn"
@@ -335,6 +425,54 @@ export default function SessionLogger() {
         </button>
       </div>
 
+      {picking && <ExercisePicker onPick={addExercise} onClose={() => setPicking(null)} />}
+
+      {creatingBlock && (
+        <NewBlockSheet
+          title={creatingBlock === 'convert' ? 'Make this an AMRAP' : 'Add a timed block'}
+          confirmLabel={creatingBlock === 'convert' ? 'Convert workout' : 'Add block'}
+          message={
+            creatingBlock === 'convert'
+              ? 'Everything already logged becomes one round. Nothing is deleted — ungrouping the block puts it all back.'
+              : undefined
+          }
+          onClose={() => setCreatingBlock(null)}
+          onCreate={async (draft) => {
+            if (creatingBlock === 'convert') {
+              const created = await convertSessionToBlock({ ...session, sets }, draft);
+              mutate(sets.map((s) => (s.blockId ? s : { ...s, blockId: created.id })));
+            } else {
+              await addBlock({ ...session, sets }, draft);
+            }
+            setCreatingBlock(null);
+          }}
+        />
+      )}
+
+      {runningBlock && (
+        <WorkoutTimer
+          block={runningBlock}
+          movements={runningSection ? movementLines(runningSection.groups) : []}
+          onClose={() => setRunningBlockId(null)}
+          onSave={async (result) => {
+            await updateBlock({ ...session, sets }, runningBlock.id, {
+              rounds: result.rounds,
+              roundSplitsSec: result.roundSplitsSec,
+              timeSec: result.timeSec,
+            });
+            setRunningBlockId(null);
+          }}
+        />
+      )}
+
+      {restEndsAt && (
+        <RestTimer
+          endsAt={restEndsAt}
+          onExtend={(seconds) => setRestEndsAt((end) => (end ?? Date.now()) + seconds * 1000)}
+          onDismiss={() => setRestEndsAt(null)}
+        />
+      )}
+
       {discarding && (
         <AskSheet
           title="Discard this session?"
@@ -346,44 +484,6 @@ export default function SessionLogger() {
             await deleteSession(session);
             navigate('/today');
           }}
-        />
-      )}
-
-      {picking && <ExercisePicker onPick={addExercise} onClose={() => setPicking(false)} />}
-
-      {timing && (
-        <WorkoutTimer
-          onClose={() => setTiming(false)}
-          onSave={(result) => {
-            // Timed blocks land as ordinary sets on a container movement, so rounds inherit
-            // history, personal bests, and charts without any special-casing downstream.
-            const slug =
-              result.mode === 'amrap' ? 'amrap' : result.mode === 'emom' ? 'emom' : 'for-time';
-            const values: MetricValues = { timeSec: result.timeSec };
-            if (result.rounds != null) values.rounds = result.rounds;
-
-            mutate([
-              ...sets,
-              {
-                id: ulid(),
-                exerciseSlug: slug,
-                setIndex: sets.filter((s) => s.exerciseSlug === slug).length,
-                values,
-                completed: true,
-                notes: result.notes,
-                roundSplitsSec: result.roundSplitsSec,
-              },
-            ]);
-            setTiming(false);
-          }}
-        />
-      )}
-
-      {restEndsAt && (
-        <RestTimer
-          endsAt={restEndsAt}
-          onExtend={(seconds) => setRestEndsAt((end) => (end ?? Date.now()) + seconds * 1000)}
-          onDismiss={() => setRestEndsAt(null)}
         />
       )}
 
@@ -400,32 +500,6 @@ export default function SessionLogger() {
       )}
     </>
   );
-}
-
-function summariseSets(sets: LoggedSet[], metrics: MetricKey[], units: UnitSystem): string {
-  if (metrics.includes('rounds')) {
-    const rounds = sets.reduce((total, s) => total + (s.values.rounds ?? 0), 0);
-    const time = sets.reduce((total, s) => total + (s.values.timeSec ?? 0), 0);
-    return time > 0 ? `${plural(rounds, 'round')} in ${formatDuration(time)}` : plural(rounds, 'round');
-  }
-
-  if (metrics.includes('distanceM')) {
-    const distance = sets.reduce((total, s) => total + (s.values.distanceM ?? 0), 0);
-    const time = sets.reduce((total, s) => total + (s.values.timeSec ?? 0), 0);
-    return [distance > 0 && formatDistance(distance, units), time > 0 && formatDuration(time)]
-      .filter(Boolean)
-      .join(' in ');
-  }
-
-  const weight = sets[0]?.values.weightKg;
-  const reps = sets.map((s) => s.values.reps).filter((r): r is number => r != null);
-  if (reps.length > 0) {
-    const repText = reps.every((r) => r === reps[0]) ? `${reps.length}×${reps[0]}` : reps.join('/');
-    return weight ? `${repText} @ ${formatWeight(weight, units)}` : repText;
-  }
-
-  const time = sets.reduce((total, s) => total + (s.values.timeSec ?? 0), 0);
-  return time > 0 ? `${sets.length}× ${formatDuration(time / sets.length)}` : `${sets.length} sets`;
 }
 
 function FinishSheet({

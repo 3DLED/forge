@@ -488,6 +488,48 @@ input[type='number']::-webkit-inner-spin-button {
   opacity: 0.75;
 }
 
+/* --- timed blocks -------------------------------------------------------- */
+
+/* Accent-edged so a block reads as a container rather than another exercise card. */
+.block-card {
+  border-color: var(--accent);
+  border-width: 2px;
+}
+
+/* A movement nested inside a block: indented, no card chrome of its own. */
+.block-movement {
+  padding: 0.35rem 0 0.35rem 0.6rem;
+  border-left: 2px solid var(--border);
+  margin-bottom: 0.35rem;
+}
+
+.block-movement h3 {
+  font-size: 0.92rem;
+}
+
+.round-recipe {
+  margin: 0.75rem 0;
+  padding: 0.7rem 0.85rem;
+  background: var(--surface-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.round-recipe-title {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--faint);
+  margin-bottom: 0.3rem;
+}
+
+.round-recipe-line {
+  font-size: 1rem;
+  font-weight: 650;
+  padding: 0.1rem 0;
+}
+
 /* --- session stopwatch --------------------------------------------------- */
 
 .stopwatch {

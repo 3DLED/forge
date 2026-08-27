@@ -241,10 +241,46 @@ export interface LoggedSet {
   roundSplitsSec?: number[];
 }
 
+/** How a logged block is scored. */
+export type LoggedBlockStyle = 'amrap' | 'emom' | 'forTime';
+
+/**
+ * A timed container for several movements — an AMRAP, an EMOM, a for-time piece.
+ *
+ * The movements inside it are ordinary `LoggedSet`s carrying this block's `id` in their
+ * `blockId`, so nothing downstream needs to learn a second shape: volume, history, and the
+ * exercise library all keep working on the sets exactly as before. What lives here is only
+ * what belongs to the block as a whole — the clock, and the rounds it produced.
+ *
+ * Within a block a set states what one round contains ("10 burpees"), not one performance of
+ * it. Ticking every movement on every round would be unusable at the pace these are done;
+ * the round count is the record.
+ */
+export interface LoggedBlock {
+  id: Id;
+  style: LoggedBlockStyle;
+  label?: string;
+  /** Time cap, for AMRAP and capped for-time work. */
+  capSec?: number;
+  /** Interval length, for EMOM. */
+  intervalSec?: number;
+  /** Prescribed rounds, for EMOM. */
+  targetRounds?: number;
+  /** Rounds actually completed. */
+  rounds?: number;
+  /** Seconds from block start at which each round was completed. */
+  roundSplitsSec?: number[];
+  /** Total working seconds once the block has been run. */
+  timeSec?: number;
+  notes?: string;
+}
+
 export interface LoggedSession extends Entity {
   date: DayKey;
   plannedSessionId?: Id;
   name: string;
+  /** Timed containers. Sets reference these by `blockId`. */
+  blocks?: LoggedBlock[];
   startedAt?: Instant;
   endedAt?: Instant;
   /**
