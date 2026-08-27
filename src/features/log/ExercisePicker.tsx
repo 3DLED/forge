@@ -17,6 +17,7 @@ import { useApp } from '../../ui/AppProvider';
 import { resolveExercise } from '../../domain/equipment';
 import { CATEGORY_LABELS, CATEGORY_ORDER, categoryOf } from '../../domain/categories';
 import { exerciseUsage } from '../../data/sessions';
+import { CONTAINER_SLUGS } from '../../domain/training';
 import type { Exercise } from '../../domain/types';
 import type { ExerciseCategory } from '../../domain/categories';
 
@@ -57,6 +58,8 @@ export default function ExercisePicker({
     const needle = query.trim().toLowerCase();
 
     const matches = exercises.filter((exercise) => {
+      // AMRAP / EMOM / For Time are containers, not movements — they belong to "Add block".
+      if (CONTAINER_SLUGS.has(exercise.slug)) return false;
       if (category !== 'all' && categoryOf(exercise) !== category) return false;
       if (!needle) return true;
       return (

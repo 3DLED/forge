@@ -26,6 +26,7 @@
 
 import type { EquipmentTag, Exercise, MetricValues, MovementPattern } from './types';
 import { BUILDABLE_REGIONS, PATTERNS_IN_REGION, regionOf, type BodyRegion } from './regions';
+import { CONTAINER_SLUGS } from './training';
 
 export type TrainingGoal = 'strength' | 'muscle' | 'endurance';
 
@@ -73,9 +74,6 @@ export const GOAL_SCHEMES: Record<TrainingGoal, GoalScheme> = {
 };
 
 export const GOAL_ORDER: TrainingGoal[] = ['strength', 'muscle', 'endurance'];
-
-/** Container pseudo-movements. Real records, but never something to *suggest*. */
-const CONTAINERS = new Set(['amrap', 'emom', 'for-time']);
 
 /** Tags that mean the movement carries external resistance, so load is the way to progress. */
 const LOADED_TAGS = new Set<EquipmentTag>([
@@ -158,7 +156,7 @@ export function suggestWorkout(options: SuggestOptions): Suggestion {
   const candidates = exercises.filter(
     (exercise) =>
       exercise.modality === 'strength' &&
-      !CONTAINERS.has(exercise.slug) &&
+      !CONTAINER_SLUGS.has(exercise.slug) &&
       !exclude.has(exercise.slug) &&
       available.has(exercise.slug) &&
       regions.includes(regionOf(exercise)),

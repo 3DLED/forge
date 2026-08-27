@@ -232,3 +232,13 @@ const CONTAINER_SLUG: Record<string, string> = {
   emom: 'emom',
   forTime: 'for-time',
 };
+
+/**
+ * The container entries themselves, for anything that browses the library.
+ *
+ * They are not movements. They exist so a block's rounds have something to record a best
+ * against and so the Progress view has a name to print, which is why they are hidden rather
+ * than deleted — removing the records would leave every AMRAP personal best nameless. Adding
+ * one to a workout was never the way to start a timed piece; ‘Add block’ is.
+ */
+export const CONTAINER_SLUGS = new Set(Object.values(CONTAINER_SLUG));
