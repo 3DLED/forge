@@ -39,12 +39,15 @@ export default function WorkoutTimer({
   movements,
   onClose,
   onSave,
+  onStart,
 }: {
   block: LoggedBlock;
   /** One line per movement in a round, e.g. "10 × Burpee". Display only. */
   movements: string[];
   onClose: () => void;
   onSave: (result: TimerResult) => void | Promise<void>;
+  /** Fired when the clock starts, so the session clock can start with it. */
+  onStart?: () => void;
 }) {
   const style = block.style;
   const intervalSec = block.intervalSec ?? 60;
@@ -115,6 +118,9 @@ export default function WorkoutTimer({
     setNow(Date.now());
     setRunning(true);
     setFinished(false);
+    // Starting a block is starting the workout. Requiring a separate tap on the session
+    // clock only produces sessions whose recorded duration is zero.
+    onStart?.();
   };
 
   const pause = () => {

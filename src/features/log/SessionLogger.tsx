@@ -31,6 +31,7 @@ import {
   getSession,
   lastPerformance,
   removeBlock,
+  startStopwatch,
   updateBlock,
   updateSets,
 } from '../../data/sessions';
@@ -453,6 +454,7 @@ export default function SessionLogger() {
         <WorkoutTimer
           block={runningBlock}
           movements={runningSection ? movementLines(runningSection.groups) : []}
+          onStart={() => void startStopwatch(session)}
           onClose={() => setRunningBlockId(null)}
           onSave={async (result) => {
             await updateBlock({ ...session, sets }, runningBlock.id, {
@@ -496,6 +498,7 @@ export default function SessionLogger() {
             navigate('/history');
           }}
           suggestedMinutes={estimateDurationMin({ ...session, sets })}
+          existing={session}
         />
       )}
     </>
@@ -506,6 +509,7 @@ function FinishSheet({
   onClose,
   onSave,
   suggestedMinutes,
+  existing,
 }: {
   onClose: () => void;
   onSave: (details: {
@@ -515,11 +519,13 @@ function FinishSheet({
     durationMin?: number;
   }) => Promise<void>;
   suggestedMinutes: number;
+  /** A session finished earlier, so reopening it shows what was entered rather than blanks. */
+  existing: LoggedSession;
 }) {
-  const [rpe, setRpe] = useState<number | undefined>();
-  const [feel, setFeel] = useState<Feel | undefined>();
-  const [notes, setNotes] = useState('');
-  const [minutes, setMinutes] = useState(String(suggestedMinutes));
+  const [rpe, setRpe] = useState<number | undefined>(existing.sessionRpe);
+  const [feel, setFeel] = useState<Feel | undefined>(existing.feel);
+  const [notes, setNotes] = useState(existing.notes ?? '');
+  const [minutes, setMinutes] = useState(String(existing.durationMin ?? suggestedMinutes));
   const [saving, setSaving] = useState(false);
 
   const load = rpe ? Math.round(rpe * (Number(minutes) || 0)) : null;

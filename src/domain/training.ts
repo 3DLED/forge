@@ -51,13 +51,32 @@ export function averageSetRpe(session: LoggedSession): number | null {
   return values.reduce((a, b) => a + b, 0) / values.length;
 }
 
+/** Seconds recorded by the session stopwatch, including any run currently in progress. */
+export function stopwatchSec(session: LoggedSession): number {
+  return (
+    (session.elapsedSec ?? 0) +
+    (session.runningSince ? Math.max(0, (Date.now() - Date.parse(session.runningSince)) / 1000) : 0)
+  );
+}
+
+/** Seconds spent inside timed blocks. */
+export function blocksSec(session: LoggedSession): number {
+  return (session.blocks ?? []).reduce((total, block) => total + (block.timeSec ?? 0), 0);
+}
+
+/** Rounds completed across every timed block in the session. */
+export function sessionRounds(session: LoggedSession): number {
+  return (session.blocks ?? []).reduce((total, block) => total + (block.rounds ?? 0), 0);
+}
+
 /** Wall-clock minutes if the session was timed; otherwise inferred from its contents. */
 export function estimateDurationMin(session: LoggedSession): number {
-  // The stopwatch is the only source that reflects actual working time rather than how long
-  // the screen happened to be open, so it wins when it was used.
-  const stopwatch = (session.elapsedSec ?? 0) +
-    (session.runningSince ? Math.max(0, (Date.now() - Date.parse(session.runningSince)) / 1000) : 0);
-  if (stopwatch > 30) return Math.round(stopwatch / 60);
+  // The stopwatch and the block clocks both measure real working time, unlike start/end
+  // timestamps which only bound how long the screen was open. Take whichever saw more: the
+  // stopwatch covers a block it was running through, and a block covers itself when the
+  // session clock was never started.
+  const timed = Math.max(stopwatchSec(session), blocksSec(session));
+  if (timed > 30) return Math.round(timed / 60);
 
   if (session.startedAt && session.endedAt) {
     const ms = Date.parse(session.endedAt) - Date.parse(session.startedAt);
@@ -81,7 +100,11 @@ export function sessionDistanceM(session: LoggedSession): number {
 }
 
 export function sessionWorkSec(session: LoggedSession): number {
-  return session.sets.reduce((total, set) => total + (set.completed ? set.values.timeSec ?? 0 : 0), 0);
+  const setSec = session.sets.reduce(
+    (total, set) => total + (set.completed ? (set.values.timeSec ?? 0) : 0),
+    0,
+  );
+  return setSec + blocksSec(session);
 }
 
 // --- across sessions ------------------------------------------------------
@@ -182,7 +205,30 @@ export function personalRecords(sessions: LoggedSession[]): Map<string, Personal
       if (improved) record.date = session.date;
       records.set(set.exerciseSlug, record);
     }
+
+    // Rounds live on the block, not on its movements, so blocks are scanned separately and
+    // attributed to the container entry for their style. Without this, moving rounds onto
+    // blocks would silently kill round tracking.
+    for (const block of session.blocks ?? []) {
+      if (!block.rounds) continue;
+      const slug = CONTAINER_SLUG[block.style];
+      const record = records.get(slug) ?? { exerciseSlug: slug, date: session.date };
+
+      if (block.rounds > (record.bestRounds ?? 0)) {
+        record.bestRounds = block.rounds;
+        record.bestRoundsTimeSec = block.capSec ?? block.timeSec;
+        record.date = session.date;
+      }
+      records.set(slug, record);
+    }
   }
 
   return records;
 }
+
+/** Library entries that stand in for a timed block when recording a best. */
+const CONTAINER_SLUG: Record<string, string> = {
+  amrap: 'amrap',
+  emom: 'emom',
+  forTime: 'for-time',
+};

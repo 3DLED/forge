@@ -6,6 +6,7 @@ import { formatDistance, formatDuration, formatWeight } from '../domain/units';
 import {
   sessionDistanceM,
   sessionLoad,
+  sessionRounds,
   sessionVolumeKg,
   sessionWorkSec,
 } from '../domain/training';
@@ -23,14 +24,25 @@ export function sessionSummary(
   const parts: string[] = [];
 
   const exercises = new Set(session.sets.map((s) => s.exerciseSlug)).size;
-  const done = session.sets.filter((s) => s.completed).length;
-  if (done > 0) parts.push(`${done} set${done === 1 ? '' : 's'} · ${exercises} movement${exercises === 1 ? '' : 's'}`);
 
-  const rounds = session.sets.reduce(
-    (total, set) => total + (set.completed ? (set.values.rounds ?? 0) : 0),
-    0,
-  );
-  if (rounds > 0) parts.push(plural(rounds, 'round'));
+  /*
+   * Only loose sets are counted here. A movement inside a timed block describes what one
+   * round contains and is never ticked off, so counting completed sets across the whole
+   * session reported an AMRAP as an empty workout.
+   */
+  const done = session.sets.filter((s) => !s.blockId && s.completed).length;
+  if (done > 0) {
+    parts.push(`${plural(done, 'set')} · ${plural(exercises, 'movement')}`);
+  }
+
+  const blocks = session.blocks ?? [];
+  const rounds = sessionRounds(session);
+  if (rounds > 0) {
+    parts.push(plural(rounds, 'round'));
+  } else if (blocks.length > 0) {
+    // A block that was set up but never run still means the session is not empty.
+    parts.push(`${plural(blocks.length, 'timed block')} · ${plural(exercises, 'movement')}`);
+  }
 
   const distance = sessionDistanceM(session);
   if (distance > 0) parts.push(formatDistance(distance, units));
