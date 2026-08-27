@@ -9,7 +9,8 @@ import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import Sheet from '../../ui/Sheet';
 import { formatClock } from '../../domain/units';
-import { savedWorkouts } from '../../data/namedWorkouts';
+import { deleteSavedWorkout, isTimedWorkout, savedWorkouts } from '../../data/namedWorkouts';
+import SavedWorkoutRow from './SavedWorkoutRow';
 import { plural } from '../../ui/text';
 import type { LoggedBlock, LoggedBlockStyle, SessionTemplate } from '../../domain/types';
 
@@ -47,9 +48,12 @@ export default function NewBlockSheet({
   onPickSaved?: (template: SessionTemplate) => void | Promise<void>;
   onClose: () => void;
 }) {
-  const saved = useLiveQuery(() => (onPickSaved ? savedWorkouts() : Promise.resolve([])), [
-    Boolean(onPickSaved),
-  ]);
+  // Timed only. A saved straight session has no clock and no rounds; offered here it would
+  // come back wearing an AMRAP's timer.
+  const saved = useLiveQuery(
+    async () => (onPickSaved ? (await savedWorkouts()).filter(isTimedWorkout) : []),
+    [Boolean(onPickSaved)],
+  );
   const [style, setStyle] = useState<LoggedBlockStyle>('amrap');
   const [capMin, setCapMin] = useState(12);
   const [intervalSec, setIntervalSec] = useState(60);
@@ -81,22 +85,15 @@ export default function NewBlockSheet({
       {/* Repeating a workout you have already named is the common case, so it comes first. */}
       {onPickSaved && (saved?.length ?? 0) > 0 && (
         <>
-          <div className="section-title">Your saved workouts</div>
+          <div className="section-title">Your saved timed workouts</div>
           {saved!.map((template) => (
-            <button
+            <SavedWorkoutRow
               key={template.id}
-              className="pick"
-              onClick={() => void onPickSaved(template)}
-            >
-              <span className="grow">
-                <strong>{template.name}</strong>
-                <br />
-                <span className="tiny faint">
-                  {plural(template.blocks[0]?.items.length ?? 0, 'movement')} · run it again
-                </span>
-              </span>
-              <span className="pill accent">Use</span>
-            </button>
+              template={template}
+              subtitle={`${plural(template.blocks[0]?.items.length ?? 0, 'movement')} · run it again`}
+              onUse={() => onPickSaved(template)}
+              onDelete={() => deleteSavedWorkout(template.id)}
+            />
           ))}
           <div className="section-title">Or build a new one</div>
         </>

@@ -246,6 +246,14 @@ export interface LoggedSet {
   /** For unilateral work logged per side. */
   side?: 'left' | 'right';
   completed: boolean;
+  /**
+   * Rest prescribed after this set, when something prescribed one.
+   *
+   * Lives on the set rather than the exercise because it is a property of the *dose*, not of
+   * the movement: the same back squat rests three minutes for a heavy triple and forty-five
+   * seconds inside a circuit. Absent means the logger's default.
+   */
+  restSec?: number;
   notes?: string;
   /**
    * For AMRAP and EMOM work: seconds from the start of the effort at which each round was

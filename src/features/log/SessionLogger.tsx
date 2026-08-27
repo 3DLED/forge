@@ -41,6 +41,8 @@ import { loggedSessionRepo } from '../../data/repos';
 import {
   describeMovements,
   nameBlock,
+  saveSessionAsWorkout,
+  savedWorkoutToSets,
   saveBlockAsWorkout,
   suggestedName,
   workoutHistory,
@@ -63,6 +65,7 @@ import type {
   SessionTemplate,
 } from '../../domain/types';
 
+/** Used only when nothing prescribed a rest — a movement added by hand. */
 const DEFAULT_REST_SEC = 90;
 
 type Feel = NonNullable<LoggedSession['feel']>;
@@ -109,6 +112,7 @@ export default function SessionLogger() {
   const [runningBlockId, setRunningBlockId] = useState<Id | null>(null);
   const [editingEquipment, setEditingEquipment] = useState(false);
   const [namingBlockId, setNamingBlockId] = useState<Id | null>(null);
+  const [namingSession, setNamingSession] = useState(false);
   /**
    * Which session the local `sets` were loaded from.
    *
@@ -273,11 +277,18 @@ export default function SessionLogger() {
           exerciseSlug: item.exercise.slug,
           setIndex: index,
           values: { ...item.values },
+          restSec: item.restSec,
           completed: false,
         });
       }
     }
     mutate([...sets, ...created]);
+  };
+
+  /** Re-runs a saved session: its movements and sets, blank, ready to log against. */
+  const useSavedSession = (template: SessionTemplate) => {
+    setSuggesting(false);
+    mutate([...sets, ...savedWorkoutToSets(template)]);
   };
 
   const addSet = (slug: string) => {
@@ -289,6 +300,7 @@ export default function SessionLogger() {
       exerciseSlug: slug,
       setIndex: existing.length,
       values: { ...(previous?.values ?? {}) },
+      restSec: previous?.restSec,
       completed: false,
     };
     mutate([...sets.slice(0, insertAfter + 1), created, ...sets.slice(insertAfter + 1)]);
@@ -305,8 +317,12 @@ export default function SessionLogger() {
   const toggleComplete = (setId: string) => {
     const target = sets.find((s) => s.id === setId);
     mutate(sets.map((set) => (set.id === setId ? { ...set, completed: !set.completed } : set)));
-    // Completing a set starts the clock; un-completing one should not.
-    if (target && !target.completed) setRestEndsAt(Date.now() + DEFAULT_REST_SEC * 1000);
+    // Completing a set starts the clock; un-completing one should not. The rest the set was
+    // prescribed wins: telling you to rest three minutes and then handing you a ninety-second
+    // timer is the app disagreeing with itself.
+    if (target && !target.completed) {
+      setRestEndsAt(Date.now() + (target.restSec ?? DEFAULT_REST_SEC) * 1000);
+    }
   };
 
   const removeSet = (setId: string) => mutate(sets.filter((s) => s.id !== setId));
@@ -516,7 +532,17 @@ export default function SessionLogger() {
         ✨ Suggest a workout
       </button>
 
-      {/* Only offered when there is something loose to wrap. */}
+      {/* Both of these act on the loose movements, so neither is offered without any. */}
+      {looseCount > 0 && (
+        <button
+          className="btn block"
+          style={{ marginTop: '0.5rem' }}
+          onClick={() => setNamingSession(true)}
+        >
+          💾 Save as a workout
+        </button>
+      )}
+
       {looseCount > 0 && (
         <button
           className="btn block"
@@ -558,7 +584,27 @@ export default function SessionLogger() {
           available={sessionAvailable}
           existingSlugs={loggedSlugs}
           onAdd={addSuggested}
+          onUseSaved={useSavedSession}
           onClose={() => setSuggesting(false)}
+        />
+      )}
+
+      {namingSession && (
+        <AskSheet
+          title="Save this workout"
+          message="Saved sessions come back from ‘Suggest a workout’, and can be dropped onto a day in your plan."
+          input={{
+            label: 'Name',
+            defaultValue: suggestedName(sets.filter((x) => !x.blockId), exerciseBySlug),
+            placeholder: 'Upper A',
+            required: true,
+          }}
+          confirmLabel="Save workout"
+          onCancel={() => setNamingSession(false)}
+          onConfirm={async (name) => {
+            await saveSessionAsWorkout(name.trim(), sets.filter((x) => !x.blockId));
+            setNamingSession(false);
+          }}
         />
       )}
 

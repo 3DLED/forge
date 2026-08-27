@@ -39,6 +39,8 @@ Then open `http://localhost:5173`.
   endurance — and get a draft workout from the equipment you have today, with the sets, reps,
   and rest that match the goal. Swap or drop anything before it lands in your log. With no
   weights to add, a strength goal steps up to a harder variation instead of piling on reps.
+  Name a session you liked and it comes back — from the suggest sheet, or dropped onto a day
+  in your plan. The rest timer runs for however long the session prescribed, not a fixed 90s.
 - **Equipment profiles.** Switch between bodyweight, kettlebells, and a full gym; the
   library re-resolves. The gap list tells you what one more purchase would unlock.
 - **Progress.** Training load (session RPE × minutes, so running and lifting add up),

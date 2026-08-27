@@ -16,6 +16,8 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import Sheet from '../../ui/Sheet';
 import { useApp } from '../../ui/AppProvider';
 import { exerciseUsage } from '../../data/sessions';
+import { deleteSavedWorkout, isTimedWorkout, savedWorkouts } from '../../data/namedWorkouts';
+import SavedWorkoutRow from './SavedWorkoutRow';
 import { formatClock } from '../../domain/units';
 import { plural } from '../../ui/text';
 import {
@@ -26,6 +28,7 @@ import {
   type TrainingGoal,
 } from '../../domain/generator';
 import { BUILDABLE_REGIONS, REGION_LABELS, type BodyRegion } from '../../domain/regions';
+import type { SessionTemplate } from '../../domain/types';
 
 const MINUTE_OPTIONS = [20, 30, 45, 60];
 
@@ -33,6 +36,7 @@ export default function SuggestWorkoutSheet({
   available,
   existingSlugs,
   onAdd,
+  onUseSaved,
   onClose,
 }: {
   /** Movements performable with this session's equipment. */
@@ -40,10 +44,18 @@ export default function SuggestWorkoutSheet({
   /** Already in the workout — never suggested twice. */
   existingSlugs: Set<string>;
   onAdd: (items: SuggestedItem[]) => void | Promise<void>;
+  /** Re-run a session saved earlier, instead of generating a new one. */
+  onUseSaved: (template: SessionTemplate) => void | Promise<void>;
   onClose: () => void;
 }) {
   const { exercises } = useApp();
   const usage = useLiveQuery(() => exerciseUsage(), [], undefined);
+
+  // Straight sessions only — timed pieces are added as blocks, from "Add block".
+  const saved = useLiveQuery(
+    async () => (await savedWorkouts()).filter((t) => !isTimedWorkout(t)),
+    [],
+  );
 
   const [regions, setRegions] = useState<BodyRegion[]>(['upper']);
   const [goal, setGoal] = useState<TrainingGoal>('muscle');
@@ -125,6 +137,26 @@ export default function SuggestWorkoutSheet({
         </button>
       }
     >
+      {/* A session you already decided was good beats one generated fresh, so it goes first. */}
+      {(saved?.length ?? 0) > 0 && (
+        <>
+          <div className="section-title">Your saved sessions</div>
+          {saved!.map((template) => (
+            <SavedWorkoutRow
+              key={template.id}
+              template={template}
+              subtitle={
+                plural(template.blocks[0]?.items.length ?? 0, 'movement') +
+                (template.estimatedMinutes ? ` · about ${template.estimatedMinutes} min` : '')
+              }
+              onUse={() => onUseSaved(template)}
+              onDelete={() => deleteSavedWorkout(template.id)}
+            />
+          ))}
+          <div className="section-title">Or build a new one</div>
+        </>
+      )}
+
       <div className="section-title">Train</div>
       <div className="chip-row">
         {BUILDABLE_REGIONS.map((region) => (

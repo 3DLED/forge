@@ -166,6 +166,7 @@ export function expandPrescription(prescription: Prescription): ExpandedPrescrip
           itemId: item.id,
           setIndex: nextIndex(item.exerciseSlug),
           values: valuesFor(item),
+          restSec: item.restSec,
           completed: false,
         });
       }
@@ -186,6 +187,7 @@ export function expandPrescription(prescription: Prescription): ExpandedPrescrip
             itemId: item.id,
             setIndex: nextIndex(item.exerciseSlug),
             values: valuesFor(item),
+            restSec: item.restSec,
             completed: false,
           });
         }

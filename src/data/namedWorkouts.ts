@@ -13,6 +13,7 @@
 
 import { db } from '../db/db';
 import { loggedSessionRepo, templateRepo } from './repos';
+import { expandPrescription } from './sessions';
 import { ulid } from '../domain/ids';
 import type {
   Block,
@@ -114,6 +115,84 @@ export async function saveBlockAsWorkout(
   });
 }
 
+/**
+ * Timed pieces and whole sessions are both saved here, and they are not interchangeable.
+ *
+ * A saved AMRAP goes back into a session as a block with a clock; a saved session goes back
+ * as loose sets. Offering one where the other belongs produces a straight workout wearing an
+ * AMRAP's timer, so every list of saved workouts filters on this.
+ */
+export function isTimedWorkout(template: SessionTemplate): boolean {
+  const style = template.blocks[0]?.style;
+  return style === 'amrap' || style === 'emom' || style === 'forTime';
+}
+
+/**
+ * Saves the loose part of a session — a whole workout's worth of movements and their sets.
+ *
+ * Sets of the same movement collapse into one prescribed item carrying a count, which is what
+ * a template is: "four sets of eight", not four identical records. The numbers come from the
+ * first set of each movement, since that is the target the rest were working towards.
+ */
+export async function saveSessionAsWorkout(
+  name: string,
+  sets: LoggedSet[],
+  modalities: Modality[] = ['strength'],
+): Promise<SessionTemplate> {
+  const order: string[] = [];
+  const bySlug = new Map<string, LoggedSet[]>();
+
+  for (const set of sets) {
+    if (set.blockId) continue;
+    if (!bySlug.has(set.exerciseSlug)) {
+      bySlug.set(set.exerciseSlug, []);
+      order.push(set.exerciseSlug);
+    }
+    bySlug.get(set.exerciseSlug)!.push(set);
+  }
+
+  const block: Block = {
+    id: ulid(),
+    style: 'straight',
+    label: name,
+    items: order.map((slug) => {
+      const group = bySlug.get(slug)!;
+      const first = group[0];
+      return {
+        id: ulid(),
+        exerciseSlug: slug,
+        sets: group.length,
+        reps: first.values.reps,
+        timeSec: first.values.timeSec,
+        distanceM: first.values.distanceM,
+        restSec: first.restSec,
+        load:
+          first.values.weightKg != null
+            ? ({ kind: 'absolute', weightKg: first.values.weightKg } as const)
+            : ({ kind: 'unspecified' } as const),
+      };
+    }),
+  };
+
+  return templateRepo.create({
+    name,
+    modalities,
+    // Rough, but honest: the working sets plus the rest between them.
+    estimatedMinutes: Math.max(
+      10,
+      Math.round(
+        block.items.reduce((total, item) => {
+          const work = item.timeSec ?? (item.reps ?? 10) * 3;
+          const count = item.sets ?? 1;
+          return total + (count * work + (count - 1) * (item.restSec ?? 90)) / 60;
+        }, 0),
+      ),
+    ),
+    blocks: [block],
+    isCustom: true,
+  });
+}
+
 export interface WorkoutDraft {
   block: Omit<LoggedBlock, 'id'>;
   /** One entry per movement in a round. */
@@ -146,6 +225,23 @@ export function workoutToDraft(template: SessionTemplate): WorkoutDraft | null {
       },
     })),
   };
+}
+
+/**
+ * A saved session, back as loose sets ready to log.
+ *
+ * Deliberately routed through `expandPrescription` rather than reimplemented: that is the
+ * same function that turns a *planned* session into sets, so running a saved workout now and
+ * running it off the calendar next Thursday can never drift into producing different things.
+ */
+export function savedWorkoutToSets(template: SessionTemplate): LoggedSet[] {
+  return expandPrescription({
+    name: template.name,
+    modalities: template.modalities,
+    estimatedMinutes: template.estimatedMinutes,
+    blocks: template.blocks,
+    sourceTemplateId: template.id,
+  }).sets;
 }
 
 export interface WorkoutResult {
