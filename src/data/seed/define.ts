@@ -106,6 +106,7 @@ export function ex(
     common: spec.common ?? false,
     isAccessory: false,
     level: 3,
+    bodyweightFactor: 0,
     notes: spec.notes,
   };
 }

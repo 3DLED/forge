@@ -72,7 +72,8 @@ async function syncSeedFlags(): Promise<number> {
     return (
       seed.common !== exercise.common ||
       seed.isAccessory !== Boolean(exercise.isAccessory) ||
-      seed.level !== (exercise.level ?? 0)
+      seed.level !== (exercise.level ?? 0) ||
+      seed.bodyweightFactor !== (exercise.bodyweightFactor ?? -1)
     );
   });
 
@@ -81,7 +82,13 @@ async function syncSeedFlags(): Promise<number> {
   await db.exercises.bulkPut(
     stale.map((exercise) => {
       const seed = seedBySlug.get(exercise.slug)!;
-      return { ...exercise, common: seed.common, isAccessory: seed.isAccessory, level: seed.level };
+      return {
+        ...exercise,
+        common: seed.common,
+        isAccessory: seed.isAccessory,
+        level: seed.level,
+        bodyweightFactor: seed.bodyweightFactor,
+      };
     }),
   );
   return stale.length;

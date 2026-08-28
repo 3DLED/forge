@@ -44,6 +44,10 @@ Then open `http://localhost:5173`.
 - **Log a run in fifteen seconds.** Type, distance, time, effort — pace computed as you type,
   straight off your watch. Effort is required, because it is the half of training load that no
   watch file or import can supply, and just after the run is the only moment anyone knows it.
+- **Bodyweight counts as load.** Log your weight under *More → Bodyweight* and push-ups,
+  pull-ups and lunges finally contribute to your volume chart instead of reading as no work.
+  Sessions are valued at what you weighed that week, so logging today does not rewrite last
+  spring. Lifts also get a relative-strength best — "est. 1RM 315 lb · 1.72× BW".
 - **Every movement is written up.** Tap any exercise name for how to set up, two or three cues
   in the order they happen, and the mistake most people make. 234 movements, written for this
   app so there is no licensing attached, and bundled so it works with no signal at all.

@@ -1,5 +1,8 @@
 import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { bodyweightEntries } from '../../data/body';
+import { bodyweightLookup } from '../../domain/bodyweight';
 import PageHeader from '../../ui/PageHeader';
 import BarChart, { type Bar } from '../../ui/BarChart';
 import { useApp } from '../../ui/AppProvider';
@@ -27,6 +30,16 @@ export default function ProgressView() {
     [firstWeekStart, lastWeekEnd],
   );
   const allSessions = useLiveQuery(() => sessionsBetween('0000-01-01', '9999-12-31'), []);
+  const weighIns = useLiveQuery(() => bodyweightEntries(), [], undefined);
+
+  /*
+   * Each session is valued at what you weighed that week, not what you weigh now. Otherwise a
+   * ten-pound gain silently lifts every past bodyweight session on the chart.
+   */
+  const bodyweight = useMemo(
+    () => bodyweightLookup(weighIns ?? [], profile.bodyweightKg),
+    [weighIns, profile.bodyweightKg],
+  );
 
   const weeks = useMemo(() => {
     return Array.from({ length: WEEKS_SHOWN }, (_, index) => {
@@ -38,13 +51,19 @@ export default function ProgressView() {
         label: `${monthName(start, true)} ${Number(start.slice(8))}`,
         load: inWeek.reduce((total, s) => total + sessionLoad(s), 0),
         distanceM: inWeek.reduce((total, s) => total + sessionDistanceM(s), 0),
-        volumeKg: inWeek.reduce((total, s) => total + sessionVolumeKg(s, exerciseBySlug), 0),
+        volumeKg: inWeek.reduce(
+          (total, s) => total + sessionVolumeKg(s, exerciseBySlug, bodyweight.at(s.date)),
+          0,
+        ),
         count: inWeek.length,
       };
     });
-  }, [sessions, firstWeekStart, profile.weekStartsOn, exerciseBySlug]);
+  }, [sessions, firstWeekStart, profile.weekStartsOn, exerciseBySlug, bodyweight]);
 
-  const records = useMemo(() => personalRecords(allSessions ?? []), [allSessions]);
+  const records = useMemo(
+    () => personalRecords(allSessions ?? [], bodyweight),
+    [allSessions, bodyweight],
+  );
   const ratio = acuteChronicRatio(weeks.map((w) => w.load));
 
   if (!sessions || !allSessions) return <p className="muted">Loading…</p>;
@@ -126,6 +145,13 @@ export default function ProgressView() {
         </section>
       )}
 
+      {!bodyweight.latest && (
+        <p className="tiny faint">
+          <Link to="/more/body">Log your bodyweight</Link> and push-ups, pull-ups and lunges
+          start counting toward volume instead of reading as no work.
+        </p>
+      )}
+
       <div className="section-title">Personal bests</div>
       {records.size === 0 && <p className="small muted">Complete some sets and PRs land here.</p>}
 
@@ -135,7 +161,10 @@ export default function ProgressView() {
         .map((record) => {
           const exercise = exerciseBySlug.get(record.exerciseSlug);
           const marks = [
-            record.best1RMKg && `est. 1RM ${formatWeight(record.best1RMKg, units)}`,
+            record.best1RMKg &&
+              `est. 1RM ${formatWeight(record.best1RMKg, units)}${
+                record.best1RMxBw ? ` · ${record.best1RMxBw.toFixed(2)}× BW` : ''
+              }`,
             record.bestReps && `${record.bestReps} reps`,
             // Rounds always carry their time cap — see the note on PersonalRecord.
             record.bestRounds &&

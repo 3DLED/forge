@@ -143,6 +143,15 @@ export interface Exercise extends Entity {
    * See `domain/difficulty.ts` for why this is authored rather than derived.
    */
   level: number;
+  /**
+   * Share of your own bodyweight this movement makes you move, per rep. 0 when the load is
+   * entirely external.
+   *
+   * Without it every calisthenics set scores zero volume, because volume was weight x reps
+   * and a push-up records no weight. Set for unloaded movements and for the weighted variants
+   * of them, where added load stacks on top of bodyweight rather than replacing it.
+   */
+  bodyweightFactor: number;
   notes?: string;
 }
 

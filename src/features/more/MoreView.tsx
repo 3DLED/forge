@@ -9,6 +9,7 @@ import AskSheet from '../../ui/AskSheet';
 import { DEFAULT_THEME, THEMES } from '../../ui/themes';
 import { downloadBackup, restoreBackup, wipeAllData } from '../../data/backup';
 import { db } from '../../db/db';
+import { displayWeight, weightLabel } from '../../domain/units';
 
 export default function MoreView() {
   const { activeEquipment, exercises, profile } = useApp();
@@ -65,6 +66,19 @@ export default function MoreView() {
           <br />
           <span className="tiny faint">
             {THEMES.find((t) => t.id === (profile.theme ?? DEFAULT_THEME))?.name ?? 'Forge'} · try the other directions
+          </span>
+        </span>
+        <span className="faint">›</span>
+      </Link>
+
+      <Link to="/more/body" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">
+          <strong>Bodyweight</strong>
+          <br />
+          <span className="tiny faint">
+            {profile.bodyweightKg
+              ? `${Math.round(displayWeight(profile.bodyweightKg, profile.units))} ${weightLabel(profile.units)} · the load in every push-up`
+              : 'Not set — bodyweight sets count as no work without it'}
           </span>
         </span>
         <span className="faint">›</span>

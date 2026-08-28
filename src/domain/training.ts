@@ -7,6 +7,7 @@
  * instead of staring at two charts that never meet.
  */
 
+import type { BodyweightLookup } from './bodyweight';
 import type { Exercise, LoggedSession, LoggedSet } from './types';
 
 // --- per-set --------------------------------------------------------------
@@ -20,12 +21,25 @@ export function estimate1RM(weightKg: number, reps: number): number | null {
   return weightKg * (1 + reps / 30);
 }
 
-/** Load moved by one set, in kg-reps. Unilateral work counts both sides. */
-export function setVolumeKg(set: LoggedSet, exercise?: Exercise): number {
-  const weight = set.values.weightKg ?? 0;
+/**
+ * Load moved by one set, in kg-reps. Unilateral work counts both sides.
+ *
+ * Bodyweight counts. Half the library records no external weight at all, so without this a
+ * hundred push-ups scored as no work done — and for anyone training on bodyweight and
+ * kettlebells that is most of the chart missing. Added load stacks on top rather than
+ * replacing: a weighted pull-up is you plus the plate.
+ *
+ * The estimate is rough, and it is not comparable across movements — a set of air squats
+ * outscores a set of goblet squats, because your own mass is genuinely more than a 24 kg bell.
+ * That is fine for what this feeds: a trend for one movement, and a week-over-week total.
+ * It is not a claim that the two are equivalent work.
+ */
+export function setVolumeKg(set: LoggedSet, exercise?: Exercise, bodyweightKg?: number): number {
+  const external = set.values.weightKg ?? 0;
+  const own = (exercise?.bodyweightFactor ?? 0) * (bodyweightKg ?? 0);
   const reps = set.values.reps ?? 0;
   const sides = exercise?.unilateral && !set.side ? 2 : 1;
-  return weight * reps * sides;
+  return (external + own) * reps * sides;
 }
 
 export function setDistanceM(set: LoggedSet): number {
@@ -88,9 +102,15 @@ export function estimateDurationMin(session: LoggedSession): number {
   return session.sets.filter((s) => s.completed).length * 3;
 }
 
-export function sessionVolumeKg(session: LoggedSession, bySlug: Map<string, Exercise>): number {
+export function sessionVolumeKg(
+  session: LoggedSession,
+  bySlug: Map<string, Exercise>,
+  /** Bodyweight as of this session's date — see `domain/bodyweight.ts`. */
+  bodyweightKg?: number,
+): number {
   return session.sets.reduce(
-    (total, set) => total + (set.completed ? setVolumeKg(set, bySlug.get(set.exerciseSlug)) : 0),
+    (total, set) =>
+      total + (set.completed ? setVolumeKg(set, bySlug.get(set.exerciseSlug), bodyweightKg) : 0),
     0,
   );
 }
@@ -134,6 +154,14 @@ export interface PersonalRecord {
   exerciseSlug: string;
   /** Best estimated 1RM, for loaded work. */
   best1RMKg?: number;
+  /**
+   * That 1RM as a multiple of what you weighed when you hit it.
+   *
+   * The number people actually compare. A 140 kg deadlift says little on its own; twice
+   * bodyweight says a lot, and it stays honest across a bulk or a cut in a way the raw
+   * figure does not.
+   */
+  best1RMxBw?: number;
   /** Most reps in a single set, for bodyweight work. */
   bestReps?: number;
   /** Longest hold, for planks and hangs. */
@@ -154,7 +182,11 @@ export interface PersonalRecord {
 }
 
 /** Best-ever marks per movement, scanned from logged sets. */
-export function personalRecords(sessions: LoggedSession[]): Map<string, PersonalRecord> {
+export function personalRecords(
+  sessions: LoggedSession[],
+  /** Bodyweight on any given day, for relative-strength bests. Optional. */
+  bodyweight?: BodyweightLookup,
+): Map<string, PersonalRecord> {
   const records = new Map<string, PersonalRecord>();
 
   for (const session of sessions) {
@@ -179,6 +211,10 @@ export function personalRecords(sessions: LoggedSession[]): Map<string, Personal
         const oneRm = estimate1RM(weightKg, reps);
         if (oneRm && oneRm > (record.best1RMKg ?? 0)) {
           record.best1RMKg = oneRm;
+          // Divided by what you weighed *then*, not now, so the ratio records what actually
+          // happened rather than shifting every time the scale does.
+          const bw = bodyweight?.at(session.date);
+          record.best1RMxBw = bw && bw > 0 ? oneRm / bw : undefined;
           improved = true;
         }
       }

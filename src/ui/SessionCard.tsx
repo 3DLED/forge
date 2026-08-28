@@ -20,6 +20,12 @@ export function sessionSummary(
   session: LoggedSession,
   bySlug: Parameters<typeof sessionVolumeKg>[1],
   units: 'imperial' | 'metric',
+  /**
+   * Current bodyweight, so calisthenics sets contribute to the "moved" figure. The summary
+   * line uses today's weight rather than the weight on the day: the precision matters for a
+   * trend chart, not for one line on a card.
+   */
+  bodyweightKg?: number,
 ): string {
   const parts: string[] = [];
 
@@ -47,7 +53,7 @@ export function sessionSummary(
   const distance = sessionDistanceM(session);
   if (distance > 0) parts.push(formatDistance(distance, units));
 
-  const volume = sessionVolumeKg(session, bySlug);
+  const volume = sessionVolumeKg(session, bySlug, bodyweightKg);
   if (volume > 0) parts.push(`${formatWeight(volume, units)} moved`);
 
   const work = sessionWorkSec(session);
@@ -58,7 +64,7 @@ export function sessionSummary(
 }
 
 export default function SessionCard({ session }: { session: LoggedSession }) {
-  const { units, exerciseBySlug } = useApp();
+  const { units, exerciseBySlug, profile } = useApp();
   const inProgress = !session.endedAt;
   const load = sessionLoad(session);
 
@@ -72,7 +78,9 @@ export default function SessionCard({ session }: { session: LoggedSession }) {
           load > 0 && <span className="pill">load {load}</span>
         )}
       </div>
-      <div className="small muted">{sessionSummary(session, exerciseBySlug, units)}</div>
+      <div className="small muted">
+        {sessionSummary(session, exerciseBySlug, units, profile.bodyweightKg)}
+      </div>
       <div className="tiny faint" style={{ marginTop: '0.2rem' }}>
         {formatDayLabel(session.date)}
         {session.durationMin ? ` · ${session.durationMin} min` : ''}

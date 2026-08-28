@@ -961,6 +961,73 @@ const LEVELS: Record<number, string[]> = {
   ],
 };
 
+/**
+ * Share of bodyweight moved per rep, for movements where your own mass is the load.
+ *
+ * Without these, half the library scores zero volume: volume is load x reps, and a push-up
+ * records no load at all, so a hundred of them read as no work done. Anything unlisted is 0,
+ * which is right for barbell and machine work where the implement is the whole load.
+ *
+ * The weighted variants of bodyweight movements carry a factor too, because there the added
+ * plate stacks on top of you rather than replacing you. Without that a weighted pull-up would
+ * score less volume than an unweighted one, which is nonsense.
+ *
+ * Rough by nature — true load varies with limb length and exactly how high the box is. They
+ * are consistent per movement, which is what matters, because the chart is read as one
+ * movement over time rather than as physics.
+ *
+ * Holds and carries are absent on purpose. They record seconds, not reps, so kg-reps does not
+ * describe them and the volume figure stays at zero however hard they were.
+ */
+const BODYWEIGHT_FACTORS: Record<string, number> = {
+  // Hanging from your own arms: all of you, every rep.
+  'pull-up': 1, 'chin-up': 1, 'negative-pull-up': 1, 'scapular-pull': 1,
+  'commando-pull-up': 1, 'archer-pull-up': 1, 'muscle-up': 1,
+  'weighted-pull-up': 1, 'weighted-chin-up': 1,
+  'dip': 1, 'ring-dip': 1, 'weighted-dip': 1,
+
+  // Inverted, so nearly all of you, minus what the wall or floor takes.
+  'wall-handstand-push-up': 0.9, 'freestanding-handstand-push-up': 0.9,
+
+  // Standing on your legs: bodyweight less the shanks and feet.
+  'air-squat': 0.85, 'tempo-air-squat': 0.85, 'jump-squat': 0.85,
+  'pistol-squat': 0.85, 'weighted-pistol-squat': 0.85, 'assisted-pistol-squat': 0.85,
+  'shrimp-squat': 0.85, 'sissy-squat': 0.85, 'split-squat': 0.85,
+  'forward-lunge': 0.85, 'reverse-lunge': 0.85, 'walking-lunge': 0.85,
+  'lateral-lunge': 0.85, 'cossack-squat': 0.85, 'jumping-lunge': 0.85,
+  'bulgarian-split-squat': 0.85, 'kb-bulgarian-split-squat': 0.85,
+  'step-up': 0.85, 'kb-step-up': 0.85, 'box-step-over': 0.85,
+  'burpee': 0.85, 'burpee-broad-jump': 0.85, 'burpee-pull-up': 0.85,
+  'squat-thrust': 0.85, 'box-jump': 0.85, 'broad-jump': 0.85,
+
+  // Pushing the floor away, at varying leverage.
+  'one-arm-push-up': 0.8, 'archer-push-up': 0.8,
+  'pike-push-up': 0.75, 'elevated-pike-push-up': 0.75,
+  'pseudo-planche-push-up': 0.75, 'decline-push-up': 0.75,
+  'push-up': 0.64, 'tempo-push-up': 0.64, 'diamond-push-up': 0.64, 'plyo-push-up': 0.64,
+  'knee-push-up': 0.5, 'bench-dip': 0.5, 'incline-push-up': 0.45,
+
+  // Assisted versions of the above — the band carries some of you.
+  'band-assisted-pull-up': 0.7, 'band-assisted-dip': 0.7,
+
+  // Rowing your own weight off the floor.
+  'feet-elevated-inverted-row': 0.75, 'archer-row': 0.7,
+  'inverted-row': 0.6, 'ring-row': 0.6, 'table-row': 0.5,
+
+  // Posterior chain against your own lever.
+  'nordic-curl': 0.7, 'band-nordic-curl': 0.55, 'ghr': 0.7,
+  'glute-bridge': 0.45, 'single-leg-glute-bridge': 0.45,
+  'bodyweight-single-leg-rdl': 0.45, 'slider-leg-curl': 0.4,
+  'back-extension': 0.35, 'reverse-hyper': 0.3,
+
+  // Trunk, moving some fraction of the torso or legs.
+  'v-up': 0.4, 'hollow-rock': 0.4, 'bicycle-crunch': 0.35, 'mountain-climber': 0.35,
+  'sit-up': 0.35, 'weighted-sit-up': 0.35,
+  'lying-leg-raise': 0.35, 'hanging-knee-raise': 0.35,
+  'hanging-leg-raise': 0.4, 'toes-to-bar': 0.4, 'ab-wheel': 0.4,
+  'bird-dog': 0.2, 'dead-bug': 0.2,
+};
+
 const LEVEL_BY_SLUG = new Map<string, number>();
 for (const [level, slugs] of Object.entries(LEVELS)) {
   for (const slug of slugs) LEVEL_BY_SLUG.set(slug, Number(level));
@@ -971,6 +1038,7 @@ export const SEED_EXERCISES: SeedExercise[] = LIBRARY.map((exercise) => ({
   common: COMMON_SLUGS.has(exercise.slug),
   isAccessory: ACCESSORY_SLUGS.has(exercise.slug),
   level: LEVEL_BY_SLUG.get(exercise.slug) ?? 3,
+  bodyweightFactor: BODYWEIGHT_FACTORS[exercise.slug] ?? 0,
 }));
 
 export const SEED_EXERCISE_BY_SLUG = new Map(SEED_EXERCISES.map((e) => [e.slug, e]));

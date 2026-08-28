@@ -8,6 +8,7 @@ import MoreView from './features/more/MoreView';
 import EquipmentView from './features/more/EquipmentView';
 import SettingsView from './features/more/SettingsView';
 import AppearanceView from './features/more/AppearanceView';
+import BodyView from './features/more/BodyView';
 
 const TABS = [
   { to: '/today', glyph: '🔥', label: 'Today' },
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="/history" element={<HistoryView />} />
           <Route path="/progress" element={<ProgressView />} />
           <Route path="/more" element={<MoreView />} />
+          <Route path="/more/body" element={<BodyView />} />
           <Route path="/more/equipment" element={<EquipmentView />} />
           <Route path="/more/settings" element={<SettingsView />} />
           <Route path="/more/appearance" element={<AppearanceView />} />
