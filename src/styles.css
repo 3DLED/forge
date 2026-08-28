@@ -705,10 +705,14 @@ input[type='number']::-webkit-inner-spin-button {
   margin: 0 auto;
   max-width: 720px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.6rem 1rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  /* About a third of the screen. dvh follows the mobile browser chrome as it hides and
+     shows; vh is the fallback for anything that does not know it. */
+  min-height: 32vh;
+  min-height: 32dvh;
+  padding: 1rem 1rem 1.1rem;
   background: var(--accent);
   color: var(--accent-ink);
   font-weight: 700;
@@ -716,10 +720,33 @@ input[type='number']::-webkit-inner-spin-button {
 
 .rest-timer.done { background: var(--good); }
 
+.rest-label {
+  text-align: center;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  opacity: 0.75;
+}
+
 .rest-timer .clock {
+  /* Grows to whatever height is left over, so the number fills the panel rather than the
+     panel being padded out around a fixed number. */
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-num);
-  font-size: 1.4rem;
+  /* Scales with the narrow edge so it stays huge on a phone without becoming absurd on a
+     desktop, where the panel is capped at 720px anyway. */
+  font-size: clamp(3.25rem, 17vmin, 5.5rem);
+  line-height: 1;
   font-variant-numeric: tabular-nums;
+}
+
+.rest-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 /* --- calendar ------------------------------------------------------------ */
