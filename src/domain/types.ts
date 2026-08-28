@@ -137,6 +137,12 @@ export interface Exercise extends Entity {
    * the movement that justifies the session and finish with the ones that top it up.
    */
   isAccessory: boolean;
+  /**
+   * Difficulty, 1 (easiest) to 5, calibrated across the whole library rather than within a
+   * pattern. Drives the ladder you see when swapping a movement for an easier or harder one.
+   * See `domain/difficulty.ts` for why this is authored rather than derived.
+   */
+  level: number;
   notes?: string;
 }
 

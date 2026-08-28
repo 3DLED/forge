@@ -644,6 +644,13 @@ input[type='number']::-webkit-inner-spin-button {
 .pick.selected { border-color: var(--accent); background: var(--accent-soft); }
 .pick.unavailable { opacity: 0.5; }
 
+/* A rung on a movement's difficulty ladder. */
+.variation .pips {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  vertical-align: 1px;
+}
+
 /*
  * A row in the suggested session. Shaped like `.pick` because it is the same idea — a
  * movement and what to do about it — but it holds two controls rather than being one, so it

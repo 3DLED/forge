@@ -31,6 +31,7 @@ export default function ExerciseGroup({
   onRemoveSet,
   onAddSet,
   onRemoveExercise,
+  onSwapExercise,
 }: {
   slug: string;
   sets: LoggedSet[];
@@ -43,6 +44,8 @@ export default function ExerciseGroup({
   onRemoveSet: (setId: string) => void;
   onAddSet: (slug: string) => void;
   onRemoveExercise: (slug: string) => void;
+  /** Open the difficulty ladder for this movement. */
+  onSwapExercise: (slug: string) => void;
 }) {
   /*
    * Effort is recorded once for the whole session unless asked for per set.
@@ -74,6 +77,15 @@ export default function ExerciseGroup({
             </div>
           )}
         </div>
+        {/* Next to the name, because "this is too hard today" is a thought you have while
+            looking at the movement, not one you go hunting through a menu for. */}
+        <button
+          className="btn ghost sm"
+          aria-label={`Swap ${exercise?.name ?? slug} for another version`}
+          onClick={() => onSwapExercise(slug)}
+        >
+          Swap
+        </button>
         <button
           className="btn ghost sm"
           aria-label={`Remove ${exercise?.name ?? slug}`}

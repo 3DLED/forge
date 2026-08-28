@@ -105,6 +105,7 @@ export function ex(
     isCustom: false,
     common: spec.common ?? false,
     isAccessory: false,
+    level: 3,
     notes: spec.notes,
   };
 }

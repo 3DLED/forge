@@ -879,10 +879,98 @@ const ACCESSORY_SLUGS = new Set([
   'bird-dog', 'dead-bug', 'pallof-press', 'kb-windmill',
 ]);
 
+/**
+ * Difficulty, 1 (easiest) to 5, for the swap ladder. Anything unlisted is a 3 — the version
+ * most people mean when they name the movement.
+ *
+ * Calibrated across the library rather than within a pattern, so a level 4 pull is meant to
+ * cost about what a level 4 push costs. Judgement calls throughout; these are meant to be
+ * argued with and edited, which is the point of having them written down in one place.
+ */
+const LEVELS: Record<number, string[]> = {
+  1: [
+    'wall-sit', 'leg-extension', 'air-squat',
+    'glute-bridge', 'superman-hold', 'back-extension', 'band-good-morning', 'kb-deadlift',
+    'step-up', 'lateral-lunge',
+    'incline-push-up', 'knee-push-up', 'band-chest-press', 'chest-press-machine', 'bench-dip',
+    'band-overhead-press', 'band-lateral-raise', 'lateral-raise', 'landmine-press',
+    'band-row', 'table-row', 'band-pull-apart', 'band-face-pull', 'face-pull',
+    'machine-row', 'seated-cable-row', 'chest-supported-row',
+    'band-lat-pulldown', 'lat-pulldown', 'scapular-pull', 'band-assisted-pull-up',
+    'band-curl', 'bicep-curl', 'kb-curl',
+    'dead-bug', 'bird-dog', 'plank', 'sit-up', 'bicycle-crunch', 'russian-twist',
+    'mountain-climber',
+    'suitcase-carry', 'dead-hang', 'plate-pinch', 'bucket-carry',
+    'jump-rope', 'bear-crawl', 'squat-thrust',
+  ],
+  2: [
+    'tempo-air-squat', 'goblet-squat', 'db-goblet-squat', 'leg-press', 'smith-squat',
+    'single-leg-wall-sit', 'split-squat',
+    'single-leg-glute-bridge', 'good-morning', 'kb-hip-thrust', 'hip-thrust',
+    'db-romanian-deadlift', 'kb-romanian-deadlift', 'romanian-deadlift', 'leg-curl',
+    'slider-leg-curl', 'band-nordic-curl', 'reverse-hyper',
+    'forward-lunge', 'reverse-lunge', 'walking-lunge', 'kb-step-up', 'kb-reverse-lunge',
+    'push-up', 'band-chest-fly', 'cable-fly', 'kb-floor-press', 'db-bench-press',
+    'db-incline-press', 'incline-bench-press',
+    'pike-push-up', 'db-shoulder-press', 'kb-press', 'overhead-press', 'arnold-press',
+    'wall-handstand-hold',
+    'inverted-row', 'ring-row', 'db-row', 'kb-row', 'barbell-row',
+    'negative-pull-up', 'kb-high-pull',
+    'side-plank', 'hollow-hold', 'lying-leg-raise', 'long-lever-plank', 'weighted-sit-up',
+    'weighted-russian-twist', 'pallof-press', 'kb-windmill',
+    'front-rack-carry', 'overhead-carry', 'sandbag-carry', 'sled-push', 'sled-pull',
+    'farmers-carry', 'db-farmers-carry',
+    'single-arm-hang', 'towel-hang',
+    'box-jump', 'broad-jump', 'burpee', 'double-unders', 'slam-ball', 'wall-ball',
+    'battle-ropes', 'kb-thruster', 'thruster',
+  ],
+  // 3 is the default; listed here only where it is a deliberate call rather than a fallback.
+  3: [
+    'back-squat', 'front-squat', 'kb-front-squat', 'box-squat', 'jump-squat',
+    'assisted-pistol-squat',
+    'deadlift', 'sumo-deadlift', 'trap-bar-deadlift', 'kb-swing', 'db-swing',
+    'kb-single-arm-swing', 'bodyweight-single-leg-rdl',
+    'bulgarian-split-squat', 'db-walking-lunge', 'kb-walking-lunge', 'kb-front-rack-lunge',
+    'jumping-lunge', 'box-step-over', 'cossack-squat',
+    'bench-press', 'pause-bench-press', 'dip', 'band-assisted-dip', 'tempo-push-up',
+    'decline-push-up', 'diamond-push-up', 'kb-single-arm-floor-press',
+    'push-press', 'kb-push-press', 'elevated-pike-push-up',
+    'pendlay-row', 'kb-gorilla-row', 'feet-elevated-inverted-row', 'renegade-row',
+    'pull-up', 'chin-up',
+    'v-up', 'hollow-rock', 'hanging-knee-raise', 'ab-wheel',
+    'bottoms-up-carry', 'monkey-bars',
+    'man-maker', 'burpee-broad-jump', 'turkish-get-up', 'kb-complex',
+  ],
+  4: [
+    'pause-back-squat', 'pistol-squat', 'shrimp-squat', 'sissy-squat',
+    'nordic-curl', 'ghr', 'deficit-deadlift', 'single-leg-rdl', 'kb-clean', 'kb-snatch',
+    'kb-bulgarian-split-squat',
+    'plyo-push-up', 'archer-push-up', 'ring-dip', 'weighted-dip',
+    'wall-handstand-push-up', 'kb-bottoms-up-press',
+    'archer-row',
+    'weighted-pull-up', 'weighted-chin-up', 'commando-pull-up',
+    'l-sit', 'hanging-leg-raise', 'toes-to-bar',
+    'rope-climb',
+    'burpee-pull-up', 'devils-press',
+  ],
+  5: [
+    'weighted-pistol-squat',
+    'one-arm-push-up', 'pseudo-planche-push-up',
+    'freestanding-handstand-hold', 'freestanding-handstand-push-up',
+    'muscle-up', 'archer-pull-up',
+  ],
+};
+
+const LEVEL_BY_SLUG = new Map<string, number>();
+for (const [level, slugs] of Object.entries(LEVELS)) {
+  for (const slug of slugs) LEVEL_BY_SLUG.set(slug, Number(level));
+}
+
 export const SEED_EXERCISES: SeedExercise[] = LIBRARY.map((exercise) => ({
   ...exercise,
   common: COMMON_SLUGS.has(exercise.slug),
   isAccessory: ACCESSORY_SLUGS.has(exercise.slug),
+  level: LEVEL_BY_SLUG.get(exercise.slug) ?? 3,
 }));
 
 export const SEED_EXERCISE_BY_SLUG = new Map(SEED_EXERCISES.map((e) => [e.slug, e]));

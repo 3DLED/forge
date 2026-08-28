@@ -18,6 +18,7 @@ import { useApp } from '../../ui/AppProvider';
 import { exerciseUsage } from '../../data/sessions';
 import { deleteSavedWorkout, isTimedWorkout, savedWorkouts } from '../../data/namedWorkouts';
 import SavedWorkoutRow from './SavedWorkoutRow';
+import VariationSheet from './VariationSheet';
 import { formatClock } from '../../domain/units';
 import { plural } from '../../ui/text';
 import {
@@ -28,7 +29,7 @@ import {
   type TrainingGoal,
 } from '../../domain/generator';
 import { BUILDABLE_REGIONS, REGION_LABELS, type BodyRegion } from '../../domain/regions';
-import type { SessionTemplate } from '../../domain/types';
+import type { Exercise, SessionTemplate } from '../../domain/types';
 
 const MINUTE_OPTIONS = [20, 30, 45, 60];
 
@@ -62,8 +63,10 @@ export default function SuggestWorkoutSheet({
   const [minutes, setMinutes] = useState(45);
   const [variant, setVariant] = useState(0);
 
-  /** Per-movement swap offsets, keyed by pattern, reset whenever the inputs change. */
-  const [swaps, setSwaps] = useState<Record<string, number>>({});
+  /** Deliberate replacements, keyed by pattern. Reset whenever the inputs change. */
+  const [swaps, setSwaps] = useState<Record<string, Exercise>>({});
+  /** The row whose ladder is open. */
+  const [swapping, setSwapping] = useState<string | null>(null);
   const [dropped, setDropped] = useState<string[]>([]);
 
   useEffect(() => {
@@ -91,10 +94,8 @@ export default function SuggestWorkoutSheet({
     return suggestion.items
       .filter((item) => !dropped.includes(item.pattern))
       .map((item) => {
-        const offset = swaps[item.pattern] ?? 0;
-        if (offset === 0 || item.alternatives.length === 0) return item;
-        const pool = [item.exercise, ...item.alternatives];
-        return { ...item, exercise: pool[offset % pool.length] };
+        const replacement = swaps[item.pattern];
+        return replacement ? { ...item, exercise: replacement } : item;
       });
   }, [suggestion, swaps, dropped]);
 
@@ -229,14 +230,8 @@ export default function SuggestWorkoutSheet({
           </span>
           <button
             className="btn ghost sm"
-            disabled={item.alternatives.length === 0}
-            title="Swap for another movement in this pattern"
-            onClick={() =>
-              setSwaps((current) => ({
-                ...current,
-                [item.pattern]: (current[item.pattern] ?? 0) + 1,
-              }))
-            }
+            title="Swap for an easier or harder version"
+            onClick={() => setSwapping(item.pattern)}
           >
             Swap
           </button>
@@ -265,6 +260,22 @@ export default function SuggestWorkoutSheet({
           🎲 Suggest something else
         </button>
       )}
+
+      {swapping && (() => {
+        const target = items.find((item) => item.pattern === swapping);
+        if (!target) return null;
+        return (
+          <VariationSheet
+            exercise={target.exercise}
+            available={available}
+            onClose={() => setSwapping(null)}
+            onPick={(next) => {
+              setSwaps((current) => ({ ...current, [swapping]: next }));
+              setSwapping(null);
+            }}
+          />
+        );
+      })()}
     </Sheet>
   );
 }

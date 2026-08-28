@@ -22,6 +22,7 @@ import RestTimer from './RestTimer';
 import WorkoutTimer, { blockShape, blockTitle } from './WorkoutTimer';
 import NewBlockSheet from './NewBlockSheet';
 import SuggestWorkoutSheet from './SuggestWorkoutSheet';
+import VariationSheet from './VariationSheet';
 import SessionStopwatch from './SessionStopwatch';
 import SessionEquipmentSheet from './SessionEquipmentSheet';
 import { plural } from '../../ui/text';
@@ -113,6 +114,7 @@ export default function SessionLogger() {
   const [editingEquipment, setEditingEquipment] = useState(false);
   const [namingBlockId, setNamingBlockId] = useState<Id | null>(null);
   const [namingSession, setNamingSession] = useState(false);
+  const [swappingSlug, setSwappingSlug] = useState<string | null>(null);
   /**
    * Which session the local `sets` were loaded from.
    *
@@ -327,6 +329,19 @@ export default function SessionLogger() {
 
   const removeSet = (setId: string) => mutate(sets.filter((s) => s.id !== setId));
 
+  /**
+   * Swaps a movement for another rung on its ladder, keeping the sets.
+   *
+   * Reps and load carry over untouched. They are wrong for the new movement about as often as
+   * they are right, but they are a starting point you can edit, whereas emptying every row
+   * punishes you for finding the exercise too hard — which is exactly when this gets used.
+   */
+  const swapExercise = (from: string, to: Exercise) => {
+    setSwappingSlug(null);
+    if (from === to.slug) return;
+    mutate(sets.map((set) => (set.exerciseSlug === from ? { ...set, exerciseSlug: to.slug } : set)));
+  };
+
   /** Removes a movement from one context only — the block it is in, or the loose list. */
   const removeExerciseFrom = (slug: string, blockId?: Id) =>
     mutate(sets.filter((s) => !(s.exerciseSlug === slug && s.blockId === blockId)));
@@ -410,6 +425,7 @@ export default function SessionLogger() {
             onRemoveSet={removeSet}
             onAddSet={addSet}
             onRemoveExercise={(slug) => removeExerciseFrom(slug)}
+            onSwapExercise={setSwappingSlug}
           />
         ) : (
           <section className="card block-card" key={section.key}>
@@ -465,6 +481,7 @@ export default function SessionLogger() {
                 onRemoveSet={removeSet}
                 onAddSet={addSet}
                 onRemoveExercise={(slug) => removeExerciseFrom(slug, section.block.id)}
+                onSwapExercise={setSwappingSlug}
               />
             ))}
 
@@ -588,6 +605,19 @@ export default function SessionLogger() {
           onClose={() => setSuggesting(false)}
         />
       )}
+
+      {swappingSlug && (() => {
+        const target = exerciseBySlug.get(swappingSlug);
+        if (!target) return null;
+        return (
+          <VariationSheet
+            exercise={target}
+            available={sessionAvailable}
+            onClose={() => setSwappingSlug(null)}
+            onPick={(next) => swapExercise(swappingSlug, next)}
+          />
+        );
+      })()}
 
       {namingSession && (
         <AskSheet

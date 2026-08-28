@@ -44,6 +44,10 @@ Then open `http://localhost:5173`.
 - **Log a run in fifteen seconds.** Type, distance, time, effort — pace computed as you type,
   straight off your watch. Effort is required, because it is the half of training load that no
   watch file or import can supply, and just after the run is the only moment anyone knows it.
+- **Swap up or down a ladder.** Every movement sits on a difficulty scale, 1 to 5, banded
+  beginner / intermediate / advanced. Tap Swap on any exercise — in a workout or in a
+  suggestion — and you get every version of that movement ordered easiest to hardest, with
+  the one you are doing marked. Too hard today, pick a rung down; stopped being hard, go up.
 - **Equipment profiles.** Switch between bodyweight, kettlebells, and a full gym; the
   library re-resolves. The gap list tells you what one more purchase would unlock.
 - **Progress.** Training load (effort × minutes, so running and lifting add up),

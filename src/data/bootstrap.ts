@@ -66,9 +66,13 @@ async function syncSeedFlags(): Promise<number> {
     if (exercise.isCustom || exercise.deletedAt) return false;
     const seed = seedBySlug.get(exercise.slug);
     if (!seed) return false;
-    // `isAccessory` is compared loosely: installs from before the field existed have it
-    // undefined, which must still count as stale so the flag actually lands.
-    return seed.common !== exercise.common || seed.isAccessory !== Boolean(exercise.isAccessory);
+    // Compared loosely: installs from before a field existed have it undefined, which must
+    // still count as stale so the value actually lands.
+    return (
+      seed.common !== exercise.common ||
+      seed.isAccessory !== Boolean(exercise.isAccessory) ||
+      seed.level !== (exercise.level ?? 0)
+    );
   });
 
   if (stale.length === 0) return 0;
@@ -76,7 +80,7 @@ async function syncSeedFlags(): Promise<number> {
   await db.exercises.bulkPut(
     stale.map((exercise) => {
       const seed = seedBySlug.get(exercise.slug)!;
-      return { ...exercise, common: seed.common, isAccessory: seed.isAccessory };
+      return { ...exercise, common: seed.common, isAccessory: seed.isAccessory, level: seed.level };
     }),
   );
   return stale.length;
