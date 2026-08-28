@@ -94,7 +94,7 @@ export default function ProgressView() {
         </div>
         <BarChart bars={loadBars} />
         <p className="tiny faint" style={{ marginTop: '0.5rem', marginBottom: 0 }}>
-          Session RPE × minutes, so running and lifting add into one number. Ramping past
+          Effort × minutes, so running and lifting add into one number. Ramping past
           about 1.5× your four-week average is where injuries cluster.
         </p>
       </section>

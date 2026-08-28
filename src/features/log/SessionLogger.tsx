@@ -803,10 +803,10 @@ function FinishSheet({
     >
       <p className="small muted">
         How hard was the whole session? This is what makes running and lifting comparable —
-        RPE × minutes is the one load number that spans both.
+        effort × minutes is the one load number that spans both.
       </p>
 
-      <div className="section-title">Session RPE</div>
+      <div className="section-title">Effort</div>
       <div className="chip-row">
         {Array.from({ length: 10 }, (_, i) => i + 1).map((value) => (
           <button

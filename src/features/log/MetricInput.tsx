@@ -27,7 +27,7 @@ export function metricLabel(metric: MetricKey, units: UnitSystem): string {
     case 'reps': return 'reps';
     case 'timeSec': return 'time';
     case 'distanceM': return distanceLabel(units);
-    case 'rpe': return 'rpe';
+    case 'rpe': return 'effort';
     case 'rounds': return 'rounds';
   }
 }

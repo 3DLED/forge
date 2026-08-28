@@ -85,7 +85,14 @@ export type MetricKey =
   | 'rpe'
   | 'rounds';
 
-/** Perceived effort, 1-10 (RPE) — the one number that spans running and lifting. */
+/**
+ * Perceived effort, 1-10 — the one number that spans running and lifting.
+ *
+ * Called RPE in the literature and in this code; the interface says "Effort" everywhere,
+ * because that is the word people can actually answer without translating first. The stored
+ * field names stay `rpe` / `sessionRpe`: renaming them buys nothing and breaks every backup
+ * file already written.
+ */
 export type Rpe = number;
 
 // ---------------------------------------------------------------------------
@@ -331,7 +338,7 @@ export interface LoggedSession extends Entity {
   elapsedSec?: number;
   runningSince?: Instant | null;
   sets: LoggedSet[];
-  /** Session RPE x duration is the one training-load number that spans all modalities. */
+  /** Effort x duration is the one training-load number that spans all modalities. */
   sessionRpe?: Rpe;
   durationMin?: number;
   feel?: 'great' | 'good' | 'ok' | 'rough' | 'bad';

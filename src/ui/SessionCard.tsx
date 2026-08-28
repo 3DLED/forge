@@ -76,7 +76,7 @@ export default function SessionCard({ session }: { session: LoggedSession }) {
       <div className="tiny faint" style={{ marginTop: '0.2rem' }}>
         {formatDayLabel(session.date)}
         {session.durationMin ? ` · ${session.durationMin} min` : ''}
-        {session.sessionRpe ? ` · RPE ${session.sessionRpe}` : ''}
+        {session.sessionRpe ? ` · effort ${session.sessionRpe}` : ''}
       </div>
     </Link>
   );

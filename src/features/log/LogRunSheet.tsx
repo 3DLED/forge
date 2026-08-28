@@ -183,7 +183,7 @@ export default function LogRunSheet({
         </span>
       </div>
 
-      <div className="section-title">How hard was it?</div>
+      <div className="section-title">Effort</div>
       <div className="chip-row">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
           <button

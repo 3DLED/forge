@@ -43,7 +43,21 @@ export default function ExerciseGroup({
   onAddSet: (slug: string) => void;
   onRemoveExercise: (slug: string) => void;
 }) {
-  const metrics = exercise?.metrics ?? (['reps', 'rpe'] as MetricKey[]);
+  /*
+   * Effort is recorded once for the whole session, not per set.
+   *
+   * The two are different measurements wearing one name. Per-set RPE is a load-selection
+   * tool — "how many reps were left" — and it only pays for itself if you act on it before
+   * the next set. Session effort is the Foster scale, and it is what multiplies by duration
+   * to give the training load the Progress view is built on. Asking for the first on every
+   * row to obtain the second is a tax on every set of every workout.
+   *
+   * Filtered here rather than removed from the library, so a prescribed effort target still
+   * has somewhere to live and old sets keep the values they were logged with.
+   */
+  const metrics = (exercise?.metrics ?? (['reps', 'rpe'] as MetricKey[])).filter(
+    (metric) => metric !== 'rpe',
+  );
 
   return (
     <section className={nested ? 'block-movement' : 'card'}>

@@ -189,7 +189,7 @@ export default function SuggestWorkoutSheet({
         ))}
       </div>
       <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
-        {scheme.blurb} · {scheme.sets} sets of {scheme.reps[0]}–{scheme.reps[1]} · RPE{' '}
+        {scheme.blurb} · {scheme.sets} sets of {scheme.reps[0]}–{scheme.reps[1]} · effort{' '}
         {scheme.rpe} · rest {formatClock(scheme.restSec)}
       </p>
 
@@ -224,7 +224,7 @@ export default function SuggestWorkoutSheet({
             <strong>{item.exercise.name}</strong>
             <br />
             <span className="tiny faint">
-              {item.sets} × {item.target} · rest {formatClock(item.restSec)} · RPE {scheme.rpe}
+              {item.sets} × {item.target} · rest {formatClock(item.restSec)} · effort {scheme.rpe}
             </span>
           </span>
           <button

@@ -46,7 +46,7 @@ Then open `http://localhost:5173`.
   watch file or import can supply, and just after the run is the only moment anyone knows it.
 - **Equipment profiles.** Switch between bodyweight, kettlebells, and a full gym; the
   library re-resolves. The gap list tells you what one more purchase would unlock.
-- **Progress.** Training load (session RPE × minutes, so running and lifting add up),
+- **Progress.** Training load (effort × minutes, so running and lifting add up),
   weekly distance and volume, and personal bests including running pace.
 - **Plan.** A month calendar, 13 prebuilt programs (5K through marathon, PPL / upper-lower
   / full-body, bodyweight-only, kettlebell-only, Hyrox, Spartan/OCR, hybrid run-and-lift),
