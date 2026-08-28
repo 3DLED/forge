@@ -23,6 +23,7 @@ import WorkoutTimer, { blockShape, blockTitle } from './WorkoutTimer';
 import NewBlockSheet from './NewBlockSheet';
 import SuggestWorkoutSheet from './SuggestWorkoutSheet';
 import VariationSheet from './VariationSheet';
+import ExerciseInfoSheet from './ExerciseInfoSheet';
 import SessionStopwatch from './SessionStopwatch';
 import SessionEquipmentSheet from './SessionEquipmentSheet';
 import { plural } from '../../ui/text';
@@ -115,6 +116,7 @@ export default function SessionLogger() {
   const [namingBlockId, setNamingBlockId] = useState<Id | null>(null);
   const [namingSession, setNamingSession] = useState(false);
   const [swappingSlug, setSwappingSlug] = useState<string | null>(null);
+  const [infoSlug, setInfoSlug] = useState<string | null>(null);
   /**
    * Which session the local `sets` were loaded from.
    *
@@ -426,6 +428,7 @@ export default function SessionLogger() {
             onAddSet={addSet}
             onRemoveExercise={(slug) => removeExerciseFrom(slug)}
             onSwapExercise={setSwappingSlug}
+            onShowInfo={setInfoSlug}
           />
         ) : (
           <section className="card block-card" key={section.key}>
@@ -482,6 +485,7 @@ export default function SessionLogger() {
                 onAddSet={addSet}
                 onRemoveExercise={(slug) => removeExerciseFrom(slug, section.block.id)}
                 onSwapExercise={setSwappingSlug}
+                onShowInfo={setInfoSlug}
               />
             ))}
 
@@ -605,6 +609,21 @@ export default function SessionLogger() {
           onClose={() => setSuggesting(false)}
         />
       )}
+
+      {infoSlug && (() => {
+        const target = exerciseBySlug.get(infoSlug);
+        if (!target) return null;
+        return (
+          <ExerciseInfoSheet
+            exercise={target}
+            onClose={() => setInfoSlug(null)}
+            onSwap={() => {
+              setInfoSlug(null);
+              setSwappingSlug(infoSlug);
+            }}
+          />
+        );
+      })()}
 
       {swappingSlug && (() => {
         const target = exerciseBySlug.get(swappingSlug);

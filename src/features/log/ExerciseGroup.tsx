@@ -32,6 +32,7 @@ export default function ExerciseGroup({
   onAddSet,
   onRemoveExercise,
   onSwapExercise,
+  onShowInfo,
 }: {
   slug: string;
   sets: LoggedSet[];
@@ -46,6 +47,8 @@ export default function ExerciseGroup({
   onRemoveExercise: (slug: string) => void;
   /** Open the difficulty ladder for this movement. */
   onSwapExercise: (slug: string) => void;
+  /** Open the write-up: setup, cues, and the common fault. */
+  onShowInfo: (slug: string) => void;
 }) {
   /*
    * Effort is recorded once for the whole session unless asked for per set.
@@ -69,7 +72,14 @@ export default function ExerciseGroup({
     <section className={nested ? 'block-movement' : 'card'}>
       <div className="card-head">
         <div className="grow">
-          <h3 className="truncate">{exercise?.name ?? slug}</h3>
+          {/* The name is the affordance. Nobody should leave the app mid-set to look up
+              what a Cossack squat is. */}
+          <h3 className="truncate">
+            <button className="name-link" onClick={() => onShowInfo(slug)}>
+              {exercise?.name ?? slug}
+              <span className="info-dot" aria-hidden="true">ⓘ</span>
+            </button>
+          </h3>
           {previous && (
             <div className="tiny faint">
               Last {formatDayLabel(previous.session.date).toLowerCase()}:{' '}

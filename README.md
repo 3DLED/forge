@@ -44,6 +44,9 @@ Then open `http://localhost:5173`.
 - **Log a run in fifteen seconds.** Type, distance, time, effort — pace computed as you type,
   straight off your watch. Effort is required, because it is the half of training load that no
   watch file or import can supply, and just after the run is the only moment anyone knows it.
+- **Every movement is written up.** Tap any exercise name for how to set up, two or three cues
+  in the order they happen, and the mistake most people make. 234 movements, written for this
+  app so there is no licensing attached, and bundled so it works with no signal at all.
 - **Swap up or down a ladder.** Every movement sits on a difficulty scale, 1 to 5, banded
   beginner / intermediate / advanced. Tap Swap on any exercise — in a workout or in a
   suggestion — and you get every version of that movement ordered easiest to hardest, with

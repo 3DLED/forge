@@ -124,6 +124,10 @@ Each milestone ends with something usable, not a half-app.
   stays on their device, or a proxy holds it — the first does not scale to a public release.
   Strava's bulk export carries `activities.csv`, which has everything Forge stores, so that
   path needs no FIT or GPX parsing at all.
+- **Done — exercise write-ups.** Setup, cues and the common fault for all 234 real movements,
+  in `data/seed/coaching.ts`. Authored rather than sourced, for the licensing reason below.
+  Looked up at render time rather than stored: static reference data no user edits, so keeping
+  it out of the database avoids a migration and a sync every time a cue is reworded.
 - **Deferred — exercise demos.** Images or clips per movement. Held because no freely
   licensed library exists: `free-exercise-db`'s maintainer states the provenance of its
   images is unknown, and the widely-copied GIF sets are Gym Visual's, licensed per-project.

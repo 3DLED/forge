@@ -12,6 +12,7 @@ import type { AvailabilityRule, Profile, Weekday } from '../domain/types';
 import { equipmentProfileRepo, exerciseRepo, profileRepo } from './repos';
 import { SEED_EQUIPMENT_PROFILES } from './seed/equipment';
 import { SEED_EXERCISES } from './seed/exercises';
+import { COACHED_SLUGS } from './seed/coaching';
 import { SEED_SESSION_TEMPLATES } from './seed/sessionTemplates';
 import { SEED_PLAN_TEMPLATES } from './seed/planTemplates';
 
@@ -171,6 +172,21 @@ function verifySeedIntegrity(): void {
 
   if (missing.size > 0) {
     console.error('Seed data references unknown slugs:', [...missing]);
+  }
+
+  // Coaching text is authored by hand, so a movement added later silently ships without a
+  // write-up unless something says so. Containers are not movements and have nothing to write.
+  const containers = new Set(['amrap', 'emom', 'for-time']);
+  const uncoached = SEED_EXERCISES.filter(
+    (e) => !containers.has(e.slug) && !COACHED_SLUGS.has(e.slug),
+  ).map((e) => e.slug);
+  if (uncoached.length > 0) {
+    console.warn('Movements with no coaching write-up:', uncoached);
+  }
+
+  const orphaned = [...COACHED_SLUGS].filter((slug) => !known.has(slug));
+  if (orphaned.length > 0) {
+    console.warn('Coaching text for slugs no longer in the library:', orphaned);
   }
 }
 
