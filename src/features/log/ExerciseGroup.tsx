@@ -8,6 +8,7 @@
 
 import MetricInput, { metricLabel } from './MetricInput';
 import { plural } from '../../ui/text';
+import { useApp } from '../../ui/AppProvider';
 import { formatDayLabel } from '../../domain/dates';
 import { formatDistance, formatDuration, formatWeight } from '../../domain/units';
 import type { Exercise, LoggedSet, MetricKey, UnitSystem } from '../../domain/types';
@@ -44,19 +45,21 @@ export default function ExerciseGroup({
   onRemoveExercise: (slug: string) => void;
 }) {
   /*
-   * Effort is recorded once for the whole session, not per set.
+   * Effort is recorded once for the whole session unless asked for per set.
    *
    * The two are different measurements wearing one name. Per-set RPE is a load-selection
    * tool — "how many reps were left" — and it only pays for itself if you act on it before
    * the next set. Session effort is the Foster scale, and it is what multiplies by duration
-   * to give the training load the Progress view is built on. Asking for the first on every
-   * row to obtain the second is a tax on every set of every workout.
+   * to give the training load the Progress view is built on. Charging every set of every
+   * workout for the first in order to get the second is the wrong default, so it is opt-in
+   * under Settings.
    *
-   * Filtered here rather than removed from the library, so a prescribed effort target still
-   * has somewhere to live and old sets keep the values they were logged with.
+   * Filtered at render rather than removed from the library, so flipping the setting back on
+   * reveals values already logged instead of having thrown them away.
    */
+  const { perSetEffort } = useApp().profile;
   const metrics = (exercise?.metrics ?? (['reps', 'rpe'] as MetricKey[])).filter(
-    (metric) => metric !== 'rpe',
+    (metric) => metric !== 'rpe' || perSetEffort,
   );
 
   return (

@@ -74,6 +74,27 @@ export default function SettingsView() {
         ))}
       </div>
 
+      <div className="section-title">Effort per set</div>
+      <div className="row" style={{ gap: '0.5rem' }}>
+        <button
+          className={`btn grow${profile.perSetEffort ? '' : ' primary'}`}
+          onClick={() => void profileRepo.update(profile.id, { perSetEffort: false })}
+        >
+          Once per session
+        </button>
+        <button
+          className={`btn grow${profile.perSetEffort ? ' primary' : ''}`}
+          onClick={() => void profileRepo.update(profile.id, { perSetEffort: true })}
+        >
+          Every set
+        </button>
+      </div>
+      <p className="tiny faint">
+        Per-set effort is how autoregulated strength work picks its loads — a 9 on a triple
+        you wanted at 8 means the next set comes down. It is worth the extra box on every row
+        only if you act on it between sets. Training load uses the session figure either way.
+      </p>
+
       <div className="section-title">Weekly availability</div>
       <div className="card">
         <p className="small muted">

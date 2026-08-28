@@ -427,6 +427,15 @@ export interface Profile extends Entity {
   weekStartsOn: Weekday;
   /** Visual direction — see `src/ui/themes.ts`. Absent means the default. */
   theme?: string;
+  /**
+   * Show an effort box on every set, as well as the one for the whole session.
+   *
+   * Off unless asked for. It is a load-selection tool for autoregulated strength work —
+   * you hit a 9 on a triple you wanted at 8, so the next set comes down — and it only
+   * earns the extra box per row if you actually act on it between sets. Everyone else
+   * wants the single figure at the end, which is the one training load is built from.
+   */
+  perSetEffort?: boolean;
 }
 
 /** Bodyweight, resting HR, and anything else tracked over time rather than per set. */
