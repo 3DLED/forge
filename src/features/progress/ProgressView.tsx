@@ -1,10 +1,11 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { bodyweightEntries } from '../../data/body';
 import { bodyweightLookup } from '../../domain/bodyweight';
 import PageHeader from '../../ui/PageHeader';
 import BarChart, { type Bar } from '../../ui/BarChart';
+import PrSheet, { prMarks } from './PrSheet';
 import { useApp } from '../../ui/AppProvider';
 import { sessionsBetween } from '../../data/sessions';
 import { addWeeks, monthName, startOfWeek, todayKey, weekDays } from '../../domain/dates';
@@ -15,12 +16,14 @@ import {
   sessionLoad,
   sessionVolumeKg,
 } from '../../domain/training';
-import { formatDistance, formatDuration, formatPace, formatWeight } from '../../domain/units';
+import { formatDistance, formatWeight } from '../../domain/units';
 
 const WEEKS_SHOWN = 12;
 
 export default function ProgressView() {
   const { profile, units, exerciseBySlug } = useApp();
+  /** The movement whose record is open, by slug. */
+  const [openPr, setOpenPr] = useState<string | null>(null);
 
   const firstWeekStart = startOfWeek(addWeeks(todayKey(), -(WEEKS_SHOWN - 1)), profile.weekStartsOn);
   const lastWeekEnd = weekDays(todayKey(), profile.weekStartsOn)[6];
@@ -63,6 +66,25 @@ export default function ProgressView() {
   const records = useMemo(
     () => personalRecords(allSessions ?? [], bodyweight),
     [allSessions, bodyweight],
+  );
+
+  /*
+   * Records that actually hold a mark, newest first.
+   *
+   * Completing sets of a movement is enough to open a record for it, but not enough to put a
+   * number in one: twenty reps is above the cap where an estimated 1RM still means anything,
+   * and a rep count is only a mark when there was no load on it. Those entries are real and
+   * worth keeping — they just have nothing to show, and a "personal best" row with no best on
+   * it is a row that makes the list harder to read.
+   */
+  const ranked = useMemo(
+    () =>
+      [...records.values()]
+        .map((record) => ({ record, marks: prMarks(record, units) }))
+        .filter((entry) => entry.marks.length > 0)
+        .sort((a, b) => b.record.date.localeCompare(a.record.date))
+        .slice(0, 25),
+    [records, units],
   );
   const ratio = acuteChronicRatio(weeks.map((w) => w.load));
 
@@ -153,38 +175,48 @@ export default function ProgressView() {
       )}
 
       <div className="section-title">Personal bests</div>
-      {records.size === 0 && <p className="small muted">Complete some sets and PRs land here.</p>}
+      {ranked.length === 0 && <p className="small muted">Complete some sets and PRs land here.</p>}
 
-      {[...records.values()]
-        .sort((a, b) => b.date.localeCompare(a.date))
-        .slice(0, 25)
-        .map((record) => {
+      {/*
+        One mark per movement, so the list can be scanned. Everything a record holds — the
+        other marks, the caveats, the date — is a tap away in the sheet rather than crammed
+        onto a line nobody finishes reading.
+      */}
+      {ranked.map(({ record, marks }) => {
           const exercise = exerciseBySlug.get(record.exerciseSlug);
-          const marks = [
-            record.best1RMKg &&
-              `est. 1RM ${formatWeight(record.best1RMKg, units)}${
-                record.best1RMxBw ? ` · ${record.best1RMxBw.toFixed(2)}× BW` : ''
-              }`,
-            record.bestReps && `${record.bestReps} reps`,
-            // Rounds always carry their time cap — see the note on PersonalRecord.
-            record.bestRounds &&
-              `${record.bestRounds} rounds${
-                record.bestRoundsTimeSec ? ` in ${formatDuration(record.bestRoundsTimeSec)}` : ''
-              }`,
-            !record.bestRounds && record.bestTimeSec && formatDuration(record.bestTimeSec),
-            record.bestDistanceM && formatDistance(record.bestDistanceM, units),
-            record.bestPaceSecPerKm && formatPace(record.bestPaceSecPerKm, units),
-          ].filter(Boolean);
+          const [headline] = marks;
+          const extra = marks.length - 1;
 
           return (
-            <div className="card tight" key={record.exerciseSlug}>
+            <button
+              className="card tight pr-row"
+              key={record.exerciseSlug}
+              onClick={() => setOpenPr(record.exerciseSlug)}
+            >
               <div className="row between">
                 <span className="grow truncate">{exercise?.name ?? record.exerciseSlug}</span>
-                <span className="small mono muted">{marks.join(' · ')}</span>
+                <span className="small mono muted">{headline.value}</span>
               </div>
-            </div>
+              <div className="tiny faint" style={{ marginTop: '0.15rem', textAlign: 'left' }}>
+                {headline.label}
+                {extra > 0 && ` · +${extra} more`}
+              </div>
+            </button>
           );
         })}
+
+      {openPr && (() => {
+        const record = records.get(openPr);
+        if (!record) return null;
+        return (
+          <PrSheet
+            record={record}
+            name={exerciseBySlug.get(openPr)?.name ?? openPr}
+            units={units}
+            onClose={() => setOpenPr(null)}
+          />
+        );
+      })()}
     </>
   );
 }

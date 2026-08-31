@@ -403,6 +403,52 @@ input[type='number']::-webkit-inner-spin-button {
 
 .session-title:hover { border-color: var(--border); }
 
+/*
+ * Reviewing a finished workout.
+ *
+ * The read-only screen is deliberately the same screen: same rows, same columns, same tick in
+ * the same place. Only the affordances go. A separate "history detail" layout would mean two
+ * renderings of a session to keep in agreement, and the one you see least would be the one
+ * that rots.
+ */
+.session-title-static {
+  font-family: var(--font-display);
+  font-size: var(--h1-size);
+  font-weight: var(--h1-weight);
+  letter-spacing: var(--h1-tracking);
+  margin: 0;
+}
+
+/* A span rather than a button, so it needs the centring a button gave for free. */
+span.set-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Still aligned to its column, but visibly not a field you are being asked to fill in. */
+input.field-static {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.review-note {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* A personal best is a row you open, so it is a button — dressed as the card it replaced. */
+.pr-row {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
 /* Solid and unmissable, but not wearing the accent. See the note in SessionLogger. */
 .finish-btn {
   background: var(--surface-3);
@@ -789,6 +835,8 @@ input[type='number']::-webkit-inner-spin-button {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 4px;
+  /* Vertical scrolling stays the browser's; horizontal is the month swipe. */
+  touch-action: pan-y;
 }
 
 .cal-weekday {

@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { beepFinish, buzz } from '../../ui/beep';
 
 /**
  * Counts down to a wall-clock instant rather than decrementing a number, so the timer stays
@@ -34,6 +35,26 @@ export default function RestTimer({
   const minutes = Math.floor(remaining / 60);
   const seconds = remaining % 60;
   const done = remaining === 0;
+
+  /*
+   * The cue, once per deadline.
+   *
+   * Keyed on the deadline itself rather than a boolean: +30s moves the deadline, which has to
+   * re-arm the cue, while the 250ms tick must not fire it four times a second once the clock
+   * has settled on zero.
+   *
+   * Audio needs an unlocked AudioContext, which only a real tap can provide — the tap that
+   * ticks the set off does it, over in SessionLogger. Without that this is silently a no-op,
+   * which is the right failure: the countdown on screen is still correct.
+   */
+  const cuedFor = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!done || cuedFor.current === endsAt) return;
+    cuedFor.current = endsAt;
+    beepFinish();
+    buzz([120, 80, 120]);
+  }, [done, endsAt]);
 
   return (
     <div className={`rest-timer${done ? ' done' : ''}`}>

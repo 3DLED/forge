@@ -26,6 +26,8 @@ export default function ExerciseGroup({
   previous,
   /** Inside a timed block: sets are the round's recipe, so per-set controls are hidden. */
   nested = false,
+  /** Reviewing a finished workout: everything is shown, nothing is editable. */
+  readOnly = false,
   onSetValue,
   onToggle,
   onRemoveSet,
@@ -40,6 +42,7 @@ export default function ExerciseGroup({
   units: UnitSystem;
   previous?: PreviousPerformance | null;
   nested?: boolean;
+  readOnly?: boolean;
   onSetValue: (setId: string, metric: MetricKey, value: number | undefined) => void;
   onToggle: (setId: string) => void;
   onRemoveSet: (setId: string) => void;
@@ -89,20 +92,24 @@ export default function ExerciseGroup({
         </div>
         {/* Next to the name, because "this is too hard today" is a thought you have while
             looking at the movement, not one you go hunting through a menu for. */}
-        <button
-          className="btn ghost sm"
-          aria-label={`Swap ${exercise?.name ?? slug} for another version`}
-          onClick={() => onSwapExercise(slug)}
-        >
-          Swap
-        </button>
-        <button
-          className="btn ghost sm"
-          aria-label={`Remove ${exercise?.name ?? slug}`}
-          onClick={() => onRemoveExercise(slug)}
-        >
-          ✕
-        </button>
+        {!readOnly && (
+          <>
+            <button
+              className="btn ghost sm"
+              aria-label={`Swap ${exercise?.name ?? slug} for another version`}
+              onClick={() => onSwapExercise(slug)}
+            >
+              Swap
+            </button>
+            <button
+              className="btn ghost sm"
+              aria-label={`Remove ${exercise?.name ?? slug}`}
+              onClick={() => onRemoveExercise(slug)}
+            >
+              ✕
+            </button>
+          </>
+        )}
       </div>
 
       <div className="set-row" style={{ gridTemplateColumns: 'auto 1fr auto' }}>
@@ -129,11 +136,28 @@ export default function ExerciseGroup({
                   metric={metric}
                   units={units}
                   value={set.values[metric]}
+                  readOnly={readOnly}
                   onChange={(value) => onSetValue(set.id, metric, value)}
                 />
               ))}
             </div>
-            {nested ? (
+            {readOnly ? (
+              /*
+               * Still a tick, still in the same column — a finished workout should look like
+               * what you logged, not like a different screen. It just no longer answers to a
+               * thumb, so scrolling back through history cannot quietly un-complete a set.
+               */
+              nested ? (
+                <span style={{ width: 'var(--check-w)' }} />
+              ) : (
+                <span
+                  className={`set-check${set.completed ? ' done' : ''}`}
+                  aria-label={set.completed ? `Set ${index + 1} done` : `Set ${index + 1} not completed`}
+                >
+                  {set.completed ? '✓' : ''}
+                </span>
+              )
+            ) : nested ? (
               <button
                 className="set-check"
                 aria-label={`Remove ${exercise?.name ?? slug} from this round`}
@@ -170,7 +194,7 @@ export default function ExerciseGroup({
         </div>
       ))}
 
-      {!nested && (
+      {!nested && !readOnly && (
         <div className="row" style={{ marginTop: '0.5rem', gap: '0.5rem' }}>
           <button className="btn sm grow" onClick={() => onAddSet(slug)}>
             + Set

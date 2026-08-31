@@ -6,7 +6,7 @@
  * how you end up not looking at it.
  */
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import PageHeader from '../../ui/PageHeader';
 import { useApp } from '../../ui/AppProvider';
@@ -25,7 +25,21 @@ import {
   weekdayName,
 } from '../../domain/dates';
 import { resolveDayAvailability } from '../../domain/scheduling';
-import type { Weekday } from '../../domain/types';
+import type { DayKey, Weekday } from '../../domain/types';
+
+/** How far a finger has to travel across the grid before it counts as a month change. */
+const SWIPE_PX = 50;
+
+/**
+ * The month either side of `key`.
+ *
+ * Stepping a day back from the first lands on the last of the previous month; stepping 32
+ * forward clears even a 31-day month without ever skipping one, since the shortest month
+ * still leaves you on the 5th at the far end.
+ */
+function shiftMonth(key: DayKey, delta: -1 | 1): DayKey {
+  return startOfMonth(delta < 0 ? addDays(key, -1) : addDays(key, 32));
+}
 
 export default function PlanView() {
   const { profile } = useApp();
@@ -33,6 +47,40 @@ export default function PlanView() {
   const [anchor, setAnchor] = useState(() => startOfMonth(today));
   const [openDay, setOpenDay] = useState<string | null>(null);
   const [browsing, setBrowsing] = useState(false);
+
+  /*
+   * Swipe state.
+   *
+   * `swiped` is what stops a swipe from also opening whichever day it happened to start on:
+   * a horizontal drag across a grid of buttons still delivers a click to the one under the
+   * finger, so the day handler checks this flag before opening its sheet. A ref rather than
+   * state, because that click arrives in the same tick as the touchend and a re-render would
+   * come too late to be consulted.
+   */
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const swiped = useRef(false);
+
+  const onTouchStart = (event: React.TouchEvent) => {
+    const point = event.touches[0];
+    touchStart.current = { x: point.clientX, y: point.clientY };
+    swiped.current = false;
+  };
+
+  const onTouchEnd = (event: React.TouchEvent) => {
+    const start = touchStart.current;
+    touchStart.current = null;
+    if (!start) return;
+
+    const point = event.changedTouches[0];
+    const dx = point.clientX - start.x;
+    const dy = point.clientY - start.y;
+
+    // Comfortably horizontal, or it was a page scroll that drifted sideways on the way.
+    if (Math.abs(dx) < SWIPE_PX || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+
+    swiped.current = true;
+    setAnchor((current) => shiftMonth(current, dx < 0 ? 1 : -1));
+  };
 
   const grid = useMemo(
     () => monthGrid(anchor, profile.weekStartsOn),
@@ -84,7 +132,7 @@ export default function PlanView() {
             <button
               className="btn sm"
               aria-label="Previous month"
-              onClick={() => setAnchor(startOfMonth(addDays(anchor, -1)))}
+              onClick={() => setAnchor((current) => shiftMonth(current, -1))}
             >
               ‹
             </button>
@@ -94,7 +142,7 @@ export default function PlanView() {
             <button
               className="btn sm"
               aria-label="Next month"
-              onClick={() => setAnchor(startOfMonth(addDays(anchor, 32)))}
+              onClick={() => setAnchor((current) => shiftMonth(current, 1))}
             >
               ›
             </button>
@@ -121,7 +169,12 @@ export default function PlanView() {
         </div>
       )}
 
-      <div className="calendar" style={{ marginTop: '0.5rem' }}>
+      <div
+        className="calendar"
+        style={{ marginTop: '0.5rem' }}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
         {weekdayHeaders.map((weekday) => (
           <div className="cal-weekday" key={weekday}>
             {weekdayName(weekday, true).slice(0, 2)}
@@ -149,7 +202,10 @@ export default function PlanView() {
             <button
               key={day}
               className={classes}
-              onClick={() => setOpenDay(day)}
+              onClick={() => {
+                if (swiped.current) return;
+                setOpenDay(day);
+              }}
               aria-label={`${day}, ${dayPlanned.length} planned, ${dayLogged.length} completed`}
             >
               {Number(day.slice(8))}
@@ -177,6 +233,10 @@ export default function PlanView() {
         <span><i className="cal-dot skipped" /> Skipped</span>
         <span style={{ opacity: 0.6 }}>Striped = blocked out</span>
       </div>
+
+      <p className="tiny faint" style={{ textAlign: 'center', marginTop: '0.35rem' }}>
+        Swipe the calendar to change month.
+      </p>
 
       <button
         className="btn primary block"

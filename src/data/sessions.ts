@@ -349,7 +349,9 @@ export async function finishSession(
 ): Promise<void> {
   await loggedSessionRepo.update(session.id, {
     ...details,
-    endedAt: new Date().toISOString(),
+    // Re-openable: editing the effort or the notes on a workout from three weeks ago must not
+    // restamp it as having ended today. The first finish is the one that happened.
+    endedAt: session.endedAt ?? new Date().toISOString(),
   });
 
   if (session.plannedSessionId) {

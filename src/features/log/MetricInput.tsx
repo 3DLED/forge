@@ -99,12 +99,15 @@ export default function MetricInput({
   units,
   onChange,
   showLabel = false,
+  readOnly = false,
 }: {
   metric: MetricKey;
   value: number | undefined;
   units: UnitSystem;
   onChange: (next: number | undefined) => void;
   showLabel?: boolean;
+  /** Reviewing a finished workout: the number is shown, not offered for editing. */
+  readOnly?: boolean;
 }) {
   const [draft, setDraft] = useState(() => toDraft(metric, value, units));
   const [focused, setFocused] = useState(false);
@@ -127,15 +130,18 @@ export default function MetricInput({
       <input
         type="text"
         inputMode={inputModeFor(metric)}
+        className={readOnly ? 'field-static' : undefined}
         value={draft}
-        placeholder={placeholderFor(metric)}
+        readOnly={readOnly}
+        placeholder={readOnly ? '' : placeholderFor(metric)}
         aria-label={metricLabel(metric, units)}
         onFocus={(event) => {
+          if (readOnly) return;
           setFocused(true);
           event.currentTarget.select();
         }}
         onChange={(event) => setDraft(event.target.value)}
-        onBlur={commit}
+        onBlur={readOnly ? undefined : commit}
         onKeyDown={(event) => {
           if (event.key === 'Enter') event.currentTarget.blur();
         }}

@@ -26,6 +26,7 @@ import VariationSheet from './VariationSheet';
 import ExerciseInfoSheet from './ExerciseInfoSheet';
 import SessionStopwatch from './SessionStopwatch';
 import SessionEquipmentSheet from './SessionEquipmentSheet';
+import { unlockAudio } from '../../ui/beep';
 import { plural } from '../../ui/text';
 import {
   addBlock,
@@ -109,6 +110,14 @@ export default function SessionLogger() {
   const [suggesting, setSuggesting] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [restEndsAt, setRestEndsAt] = useState<number | null>(null);
+  /**
+   * Opt-in editing of a workout that is already finished.
+   *
+   * Resets to false on every mount, so arriving from History always lands in review. Anything
+   * else means the state of the last session you edited decides whether the next one you open
+   * is live — and the whole point is that a scroll through old workouts cannot change them.
+   */
+  const [editing, setEditing] = useState(false);
   const [discarding, setDiscarding] = useState(false);
   const [creatingBlock, setCreatingBlock] = useState<'new' | 'convert' | null>(null);
   const [runningBlockId, setRunningBlockId] = useState<Id | null>(null);
@@ -247,7 +256,23 @@ export default function SessionLogger() {
     );
   }
 
-  const mutate = (next: LoggedSet[]) => setSets(next);
+  /**
+   * A finished workout is a record until you say otherwise.
+   *
+   * History links straight into this screen, so without the gate every past session is one
+   * mis-tap from being rewritten — silently, since the sets flush on a debounce and nothing
+   * announces the change. The flag is derived from the session, not from how you got here,
+   * which means an in-progress workout is always live no matter which screen opened it.
+   */
+  const finished = Boolean(session.endedAt);
+  const readOnly = finished && !editing;
+
+  // The single choke point every set edit goes through, so review mode cannot be defeated by
+  // a control that was missed when the buttons were hidden.
+  const mutate = (next: LoggedSet[]) => {
+    if (readOnly) return;
+    setSets(next);
+  };
 
   const addExercise = async (exercise: Exercise) => {
     const blockId = picking?.blockId;
@@ -271,11 +296,19 @@ export default function SessionLogger() {
    * the rep or time target pre-filled. Load is left blank on purpose — what the bar should
    * weigh is the one thing the generator has no business guessing.
    */
-  const addSuggested = (items: SuggestedItem[]) => {
+  const addSuggested = (items: SuggestedItem[], timed?: boolean) => {
     setSuggesting(false);
     const created: LoggedSet[] = [];
     for (const item of items) {
-      for (let index = 0; index < item.sets; index++) {
+      /*
+       * A timed block takes one row per movement, not one per set.
+       *
+       * The sets in a suggestion are "four rounds of eight, resting between" — a shape a
+       * clock replaces outright. Copying them in would write the round recipe out four times
+       * and claim the EMOM contains twelve movements when it contains three.
+       */
+      const rows = timed ? 1 : item.sets;
+      for (let index = 0; index < rows; index++) {
         created.push({
           id: ulid(),
           exerciseSlug: item.exercise.slug,
@@ -287,6 +320,11 @@ export default function SessionLogger() {
       }
     }
     mutate([...sets, ...created]);
+
+    // Straight into the block sheet, where the shape is chosen. The conversion itself is the
+    // one that already exists — everything loose becomes one round — so an AMRAP built here
+    // and an AMRAP built after the fact are the same object, not two near-identical paths.
+    if (timed) setCreatingBlock('convert');
   };
 
   /** Re-runs a saved session: its movements and sets, blank, ready to log against. */
@@ -325,6 +363,10 @@ export default function SessionLogger() {
     // prescribed wins: telling you to rest three minutes and then handing you a ninety-second
     // timer is the app disagreeing with itself.
     if (target && !target.completed) {
+      // This tap is the only user gesture in the rest flow, and browsers hand out an
+      // AudioContext nowhere else. Unlocking here is what lets the timer make a sound when
+      // it runs out — by then there is no gesture left to ask for one.
+      unlockAudio();
       setRestEndsAt(Date.now() + (target.restSec ?? DEFAULT_REST_SEC) * 1000);
     }
   };
@@ -375,41 +417,81 @@ export default function SessionLogger() {
     <>
       <header className="page-head">
         <div className="grow">
-          <input
-            className="session-title"
-            value={session.name}
-            aria-label="Session name"
-            onChange={(event) => void loggedSessionRepo.update(session.id, { name: event.target.value })}
-          />
+          {readOnly ? (
+            <h1 className="session-title-static">{session.name}</h1>
+          ) : (
+            <input
+              className="session-title"
+              value={session.name}
+              aria-label="Session name"
+              onChange={(event) => void loggedSessionRepo.update(session.id, { name: event.target.value })}
+            />
+          )}
           <div className="subtitle">
             {formatDayLabel(session.date)} · {completedCount} of {sets.length} sets done
           </div>
         </div>
+        {finished && (
+          <button className="btn sm" onClick={() => setEditing((on) => !on)}>
+            {readOnly ? '✎ Edit' : 'Done'}
+          </button>
+        )}
       </header>
 
-      <div className="card tight">
-        <div className="row between">
-          <SessionStopwatch session={session} />
-          <button className="btn sm" onClick={() => setCreatingBlock('new')}>
-            ⏱ Add block
+      {readOnly ? (
+        <div className="card tight">
+          <span className="review-note">
+            Finished workout — reviewing. Tap Edit to change anything.
+          </span>
+          {(session.durationMin || session.sessionRpe || session.feel) && (
+            <div className="tiny faint" style={{ marginTop: '0.35rem' }}>
+              {[
+                session.durationMin && `${session.durationMin} min`,
+                session.sessionRpe && `effort ${session.sessionRpe}`,
+                session.feel && `felt ${session.feel}`,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+            </div>
+          )}
+          {session.notes && (
+            <div className="small muted" style={{ marginTop: '0.35rem' }}>
+              {session.notes}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="card tight">
+          {finished && (
+            <div className="review-note" style={{ marginBottom: '0.5rem' }}>
+              Editing a finished workout. Changes save as you make them.
+            </div>
+          )}
+          <div className="row between">
+            <SessionStopwatch session={session} />
+            <button className="btn sm" onClick={() => setCreatingBlock('new')}>
+              ⏱ Add block
+            </button>
+          </div>
+
+          <button
+            className="btn sm block"
+            style={{ marginTop: '0.5rem' }}
+            onClick={() => setEditingEquipment(true)}
+          >
+            🎒 {sessionTags ? 'Custom equipment' : (activeEquipment?.name ?? 'Equipment')} ·{' '}
+            {sessionAvailable.size} movements
           </button>
         </div>
-
-        <button
-          className="btn sm block"
-          style={{ marginTop: '0.5rem' }}
-          onClick={() => setEditingEquipment(true)}
-        >
-          🎒 {sessionTags ? 'Custom equipment' : (activeEquipment?.name ?? 'Equipment')} ·{' '}
-          {sessionAvailable.size} movements
-        </button>
-      </div>
+      )}
 
       {sections.length === 0 && (
         <div className="empty">
           <span className="glyph">🏋️</span>
-          <p>Nothing logged yet.</p>
-          <p className="small faint">Add a movement, or start an AMRAP or EMOM block.</p>
+          <p>Nothing logged{readOnly ? ' in this one' : ' yet'}.</p>
+          {!readOnly && (
+            <p className="small faint">Add a movement, or start an AMRAP or EMOM block.</p>
+          )}
         </div>
       )}
 
@@ -422,6 +504,7 @@ export default function SessionLogger() {
             exercise={exerciseBySlug.get(section.group.slug)}
             units={units}
             previous={history?.get(section.group.slug)}
+            readOnly={readOnly}
             onSetValue={setValue}
             onToggle={toggleComplete}
             onRemoveSet={removeSet}
@@ -479,6 +562,7 @@ export default function SessionLogger() {
                 exercise={exerciseBySlug.get(group.slug)}
                 units={units}
                 nested
+                readOnly={readOnly}
                 onSetValue={setValue}
                 onToggle={toggleComplete}
                 onRemoveSet={removeSet}
@@ -489,21 +573,25 @@ export default function SessionLogger() {
               />
             ))}
 
-            <button
-              className="btn sm block"
-              style={{ marginTop: '0.5rem' }}
-              onClick={() => setPicking({ blockId: section.block.id })}
-            >
-              + Add movement to this block
-            </button>
+            {!readOnly && (
+              <>
+                <button
+                  className="btn sm block"
+                  style={{ marginTop: '0.5rem' }}
+                  onClick={() => setPicking({ blockId: section.block.id })}
+                >
+                  + Add movement to this block
+                </button>
 
-            <button
-              className="btn primary block"
-              style={{ marginTop: '0.5rem' }}
-              onClick={() => setRunningBlockId(section.block.id)}
-            >
-              {section.block.timeSec ? 'Open timer' : 'Start timer'}
-            </button>
+                <button
+                  className="btn primary block"
+                  style={{ marginTop: '0.5rem' }}
+                  onClick={() => setRunningBlockId(section.block.id)}
+                >
+                  {section.block.timeSec ? 'Open timer' : 'Start timer'}
+                </button>
+              </>
+            )}
 
             {section.block.timeSec != null && (
               <div className="tiny faint" style={{ marginTop: '0.5rem', textAlign: 'center' }}>
@@ -516,7 +604,7 @@ export default function SessionLogger() {
               </div>
             )}
 
-            {section.groups.length > 0 && (
+            {section.groups.length > 0 && !readOnly && (
               <button
                 className="btn sm block"
                 style={{ marginTop: '0.5rem' }}
@@ -526,34 +614,44 @@ export default function SessionLogger() {
               </button>
             )}
 
-            <button
-              className="btn ghost sm block"
-              style={{ marginTop: '0.25rem' }}
-              onClick={() => void removeBlock(session, section.block.id)}
-            >
-              Ungroup block
-            </button>
+            {!readOnly && (
+              <button
+                className="btn ghost sm block"
+                style={{ marginTop: '0.25rem' }}
+                onClick={() => void removeBlock(session, section.block.id)}
+              >
+                Ungroup block
+              </button>
+            )}
           </section>
         ),
       )}
 
-      <button
-        className="btn block"
-        onClick={() => setPicking({})}
-        style={{ marginTop: '0.5rem' }}
-      >
-        + Add exercise
-      </button>
+      {!readOnly && (
+        <>
+          <button
+            className="btn block"
+            onClick={() => setPicking({})}
+            style={{ marginTop: '0.5rem' }}
+          >
+            + Add exercise
+          </button>
 
-      <button
-        className="btn block"
-        onClick={() => setSuggesting(true)}
-        style={{ marginTop: '0.5rem' }}
-      >
-        ✨ Suggest a workout
-      </button>
+          <button
+            className="btn block"
+            onClick={() => setSuggesting(true)}
+            style={{ marginTop: '0.5rem' }}
+          >
+            ✨ Suggest a workout
+          </button>
+        </>
+      )}
 
-      {/* Both of these act on the loose movements, so neither is offered without any. */}
+      {/*
+        Saving a workout as a template reads the session without touching it, so it stays
+        offered while reviewing — "that one was good, run it again" is a thought you have
+        looking back at it, not only in the moment.
+      */}
       {looseCount > 0 && (
         <button
           className="btn block"
@@ -564,13 +662,14 @@ export default function SessionLogger() {
         </button>
       )}
 
-      {looseCount > 0 && (
+      {/* Names all three shapes, because the sheet behind it offers all three. */}
+      {looseCount > 0 && !readOnly && (
         <button
           className="btn block"
           style={{ marginTop: '0.5rem' }}
           onClick={() => setCreatingBlock('convert')}
         >
-          Make this workout an AMRAP
+          ⏱ Make this a timed workout
         </button>
       )}
 
@@ -578,19 +677,23 @@ export default function SessionLogger() {
         Finish is deliberately NOT the accent colour. The accent belongs to checking off a
         set — the thing done twenty times a session.
       */}
-      <button
-        className="btn block finish-btn"
-        style={{ marginTop: '0.75rem' }}
-        onClick={() => setFinishing(true)}
-      >
-        Finish workout
-      </button>
-
-      <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-        <button className="btn ghost sm danger" onClick={() => setDiscarding(true)}>
-          Discard session
+      {!readOnly && (
+        <button
+          className="btn block finish-btn"
+          style={{ marginTop: '0.75rem' }}
+          onClick={() => setFinishing(true)}
+        >
+          {finished ? 'Edit effort, duration & notes' : 'Finish workout'}
         </button>
-      </div>
+      )}
+
+      {!readOnly && (
+        <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+          <button className="btn ghost sm danger" onClick={() => setDiscarding(true)}>
+            Discard session
+          </button>
+        </div>
+      )}
 
       {picking && (
         <ExercisePicker
@@ -707,7 +810,7 @@ export default function SessionLogger() {
 
       {creatingBlock && (
         <NewBlockSheet
-          title={creatingBlock === 'convert' ? 'Make this an AMRAP' : 'Add a timed block'}
+          title={creatingBlock === 'convert' ? 'Make this a timed workout' : 'Add a timed block'}
           confirmLabel={creatingBlock === 'convert' ? 'Convert workout' : 'Add block'}
           message={
             creatingBlock === 'convert'
@@ -789,6 +892,7 @@ export default function SessionLogger() {
 
       {finishing && (
         <FinishSheet
+          finished={finished}
           onClose={() => setFinishing(false)}
           onSave={async (details) => {
             await updateSets(session.id, sets);
@@ -808,6 +912,7 @@ function FinishSheet({
   onSave,
   suggestedMinutes,
   existing,
+  finished,
 }: {
   onClose: () => void;
   onSave: (details: {
@@ -819,6 +924,8 @@ function FinishSheet({
   suggestedMinutes: number;
   /** A session finished earlier, so reopening it shows what was entered rather than blanks. */
   existing: LoggedSession;
+  /** Already finished: this is an edit of the details, not the end of a workout. */
+  finished: boolean;
 }) {
   const [rpe, setRpe] = useState<number | undefined>(existing.sessionRpe);
   const [feel, setFeel] = useState<Feel | undefined>(existing.feel);
@@ -830,7 +937,7 @@ function FinishSheet({
 
   return (
     <Sheet
-      title="Finish workout"
+      title={finished ? 'Workout details' : 'Finish workout'}
       onClose={onClose}
       footer={
         <button
@@ -846,7 +953,7 @@ function FinishSheet({
             });
           }}
         >
-          {saving ? 'Saving…' : 'Save workout'}
+          {saving ? 'Saving…' : finished ? 'Save changes' : 'Save workout'}
         </button>
       }
     >

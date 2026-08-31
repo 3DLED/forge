@@ -44,7 +44,11 @@ export default function SuggestWorkoutSheet({
   available: Set<string>;
   /** Already in the workout — never suggested twice. */
   existingSlugs: Set<string>;
-  onAdd: (items: SuggestedItem[]) => void | Promise<void>;
+  /**
+   * Hand the draft to the session. `timed` asks for it to land as one timed block —
+   * an AMRAP, an EMOM, or a for-time piece — rather than as straight sets.
+   */
+  onAdd: (items: SuggestedItem[], timed?: boolean) => void | Promise<void>;
   /** Re-run a session saved earlier, instead of generating a new one. */
   onUseSaved: (template: SessionTemplate) => void | Promise<void>;
   onClose: () => void;
@@ -127,15 +131,33 @@ export default function SuggestWorkoutSheet({
       title="Suggest a workout"
       onClose={onClose}
       footer={
-        <button
-          className="btn primary block"
-          disabled={items.length === 0}
-          onClick={() => void onAdd(items)}
-        >
-          {items.length === 0
-            ? 'Nothing to add'
-            : `Add ${plural(items.length, 'movement')} to workout`}
-        </button>
+        <>
+          <button
+            className="btn primary block"
+            disabled={items.length === 0}
+            onClick={() => void onAdd(items)}
+          >
+            {items.length === 0
+              ? 'Nothing to add'
+              : `Add ${plural(items.length, 'movement')} to workout`}
+          </button>
+
+          {/*
+            The same movements, scored on a clock instead of ticked off set by set. Offered
+            here rather than only after the fact because "today is a twenty-minute AMRAP" is
+            a decision you make before you start, not one you reach for once the sets are
+            already sitting in the log.
+          */}
+          {items.length > 0 && (
+            <button
+              className="btn block"
+              style={{ marginTop: '0.5rem' }}
+              onClick={() => void onAdd(items, true)}
+            >
+              ⏱ Add as a timed workout
+            </button>
+          )}
+        </>
       }
     >
       {/* A session you already decided was good beats one generated fresh, so it goes first. */}
