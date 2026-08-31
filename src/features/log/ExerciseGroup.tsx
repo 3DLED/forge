@@ -19,6 +19,7 @@ export interface PreviousPerformance {
 }
 
 export default function ExerciseGroup({
+  id,
   slug,
   sets,
   exercise,
@@ -36,6 +37,8 @@ export default function ExerciseGroup({
   onSwapExercise,
   onShowInfo,
 }: {
+  /** Anchor for the rest panel's jump-to-next. */
+  id?: string;
   slug: string;
   sets: LoggedSet[];
   exercise: Exercise | undefined;
@@ -72,7 +75,7 @@ export default function ExerciseGroup({
   );
 
   return (
-    <section className={nested ? 'block-movement' : 'card'}>
+    <section id={id} className={nested ? 'block-movement' : 'card'}>
       <div className="card-head">
         <div className="grow">
           {/* The name is the affordance. Nobody should leave the app mid-set to look up

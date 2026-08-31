@@ -15,14 +15,27 @@ import { beepFinish, buzz } from '../../ui/beep';
  * "0:00" for a big "Rest done" would resize the panel at the exact moment you are looking at
  * it, which reads as a glitch.
  */
+export interface UpNext {
+  /** "Set 3 of 4 · Kettlebell Swing", or "Pike Push-Up". */
+  label: string;
+  /** True while there are sets left on the movement you just finished. */
+  sameMovement: boolean;
+}
+
 export default function RestTimer({
   endsAt,
+  upNext,
   onExtend,
   onDismiss,
+  onJump,
 }: {
   endsAt: number;
+  /** What the rest is for. Absent once nothing is left unticked. */
+  upNext?: UpNext | null;
   onExtend: (seconds: number) => void;
   onDismiss: () => void;
+  /** Close the rest and scroll to whatever is next. */
+  onJump: () => void;
 }) {
   const [now, setNow] = useState(Date.now());
 
@@ -62,6 +75,24 @@ export default function RestTimer({
       <span className="clock">
         {minutes}:{String(seconds).padStart(2, '0')}
       </span>
+      {/*
+        What the rest is for, above the controls.
+        
+        Resting is the one moment in a session with nothing to do and a question worth
+        answering — the phone is already in your hand and you are about to go looking for the
+        answer by scrolling anyway. It sits above the buttons rather than below the clock so
+        the number keeps the middle of the panel, and it is a button because "what's next" and
+        "take me there" are the same thought.
+      */}
+      {upNext && (
+        <button className="rest-next" onClick={onJump}>
+          <span className="rest-next-label">
+            {upNext.sameMovement ? 'Up next' : 'Then'}
+          </span>
+          <span className="rest-next-value">{upNext.label}</span>
+        </button>
+      )}
+
       <div className="rest-actions">
         <button className="btn block on-accent timer-action" onClick={() => onExtend(30)}>
           +30s

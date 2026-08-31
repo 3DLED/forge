@@ -18,13 +18,15 @@ import Sheet from '../../ui/Sheet';
 import AskSheet from '../../ui/AskSheet';
 import ExercisePicker from './ExercisePicker';
 import ExerciseGroup from './ExerciseGroup';
-import RestTimer from './RestTimer';
-import WorkoutTimer, { blockShape, blockTitle } from './WorkoutTimer';
+import RestTimer, { type UpNext } from './RestTimer';
+import WorkoutTimer from './WorkoutTimer';
+import PinnedTimer from './PinnedTimer';
+import { useBlockTimer } from './useBlockTimer';
+import { blockShape, blockTitle } from './blockLabels';
 import NewBlockSheet from './NewBlockSheet';
 import SuggestWorkoutSheet from './SuggestWorkoutSheet';
 import VariationSheet from './VariationSheet';
 import ExerciseInfoSheet from './ExerciseInfoSheet';
-import SessionStopwatch from './SessionStopwatch';
 import SessionEquipmentSheet from './SessionEquipmentSheet';
 import { unlockAudio } from '../../ui/beep';
 import { plural } from '../../ui/text';
@@ -35,6 +37,7 @@ import {
   finishSession,
   getSession,
   lastPerformance,
+  isStopwatchRunning,
   removeBlock,
   startStopwatch,
   updateBlock,
@@ -110,6 +113,8 @@ export default function SessionLogger() {
   const [suggesting, setSuggesting] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [restEndsAt, setRestEndsAt] = useState<number | null>(null);
+  /** The movement the current rest follows, which is what makes "up next" answerable. */
+  const [restingAfter, setRestingAfter] = useState<string | null>(null);
   /**
    * Opt-in editing of a workout that is already finished.
    *
@@ -122,7 +127,10 @@ export default function SessionLogger() {
   const [creatingBlock, setCreatingBlock] = useState<'new' | 'convert' | null>(null);
   /** The block whose shape is being changed — AMRAP to EMOM, a longer cap, more rounds. */
   const [editingBlockId, setEditingBlockId] = useState<Id | null>(null);
-  const [runningBlockId, setRunningBlockId] = useState<Id | null>(null);
+  /** The block holding the pinned strip. Not necessarily running — loaded is enough. */
+  const [activeBlockId, setActiveBlockId] = useState<Id | null>(null);
+  /** Whether the full timer is open over it. The clock runs either way. */
+  const [timerExpanded, setTimerExpanded] = useState(false);
   const [editingEquipment, setEditingEquipment] = useState(false);
   const [namingBlockId, setNamingBlockId] = useState<Id | null>(null);
   const [namingSession, setNamingSession] = useState(false);
@@ -152,6 +160,33 @@ export default function SessionLogger() {
   }, [sets, sessionId]);
 
   const blocks = useMemo(() => session?.blocks ?? [], [session]);
+
+  const activeBlock = useMemo(
+    () => blocks.find((b) => b.id === activeBlockId) ?? null,
+    [blocks, activeBlockId],
+  );
+
+  /*
+   * Held here rather than inside the timer sheet, which is what lets the strip keep counting
+   * after the sheet is dismissed. Must sit above the early returns below — it is a hook.
+   */
+  const timer = useBlockTimer(activeBlock, () => {
+    if (session) void startStopwatch(session);
+  });
+
+  /*
+   * One tick for the session clock in the strip, only while it is actually running. Depending
+   * on the boolean rather than the session keeps this from tearing down and rebuilding the
+   * interval on every keystroke — the session is a live query and changes identity constantly.
+   */
+  const stopwatchRunning = session ? isStopwatchRunning(session) : false;
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (!stopwatchRunning) return;
+    const tick = setInterval(() => setNow(Date.now()), 500);
+    return () => clearInterval(tick);
+  }, [stopwatchRunning]);
 
   /**
    * What this session can actually do. Falls back to the profile default when the session
@@ -302,15 +337,7 @@ export default function SessionLogger() {
     setSuggesting(false);
     const created: LoggedSet[] = [];
     for (const item of items) {
-      /*
-       * A timed block takes one row per movement, not one per set.
-       *
-       * The sets in a suggestion are "four rounds of eight, resting between" — a shape a
-       * clock replaces outright. Copying them in would write the round recipe out four times
-       * and claim the EMOM contains twelve movements when it contains three.
-       */
-      const rows = timed ? 1 : item.sets;
-      for (let index = 0; index < rows; index++) {
+      for (let index = 0; index < item.sets; index++) {
         created.push({
           id: ulid(),
           exerciseSlug: item.exercise.slug,
@@ -323,9 +350,9 @@ export default function SessionLogger() {
     }
     mutate([...sets, ...created]);
 
-    // Straight into the block sheet, where the shape is chosen. The conversion itself is the
-    // one that already exists — everything loose becomes one round — so an AMRAP built here
-    // and an AMRAP built after the fact are the same object, not two near-identical paths.
+    // Straight into the block sheet, where the shape is chosen. The conversion collapses the
+    // sets to one row per movement on the way through, so an AMRAP built here and one built
+    // after the fact come out identical rather than by two near-identical routes.
     if (timed) setCreatingBlock('convert');
   };
 
@@ -370,7 +397,29 @@ export default function SessionLogger() {
       // it runs out — by then there is no gesture left to ask for one.
       unlockAudio();
       setRestEndsAt(Date.now() + (target.restSec ?? DEFAULT_REST_SEC) * 1000);
+      setRestingAfter(target.exerciseSlug);
+
+      /*
+       * Ticking your first set is starting the workout.
+       *
+       * The same argument the block timer already made for itself: a clock you have to
+       * remember to start separately is a clock that records zero. Nothing else in a straight
+       * strength session ever started it, so a session of nothing but sets came out with no
+       * duration and no training load.
+       *
+       * Only ever the first tick. Once the clock has been touched at all, a later pause was a
+       * deliberate act — you racked the bar to take a call — and completing the next set
+       * should not quietly undo it. Finished workouts are excluded outright: editing a
+       * session from March must not set its clock running today.
+       */
+      const clockUntouched = !session.runningSince && !session.elapsedSec;
+      if (!finished && clockUntouched) void startStopwatch(session);
     }
+  };
+
+  const endRest = () => {
+    setRestEndsAt(null);
+    setRestingAfter(null);
   };
 
   const removeSet = (setId: string) => mutate(sets.filter((s) => s.id !== setId));
@@ -394,11 +443,55 @@ export default function SessionLogger() {
 
   const completedCount = sets.filter((s) => s.completed).length;
   const looseCount = sets.filter((s) => !s.blockId).length;
-  const runningBlock = blocks.find((b) => b.id === runningBlockId) ?? null;
-  const runningSection = sections.find(
+  const activeSection = sections.find(
     (s): s is Extract<Section, { kind: 'block' }> =>
-      s.kind === 'block' && s.block.id === runningBlockId,
+      s.kind === 'block' && s.block.id === activeBlockId,
   );
+
+  /**
+   * What the rest is for.
+   *
+   * Sets left on the movement you just finished win: mid-movement the honest answer is
+   * "another one of those", and naming the movement after it instead would send you down the
+   * screen to something you are not ready for. Blocks are skipped — a round recipe is never
+   * ticked off, so it has no next set to point at.
+   */
+  const upNext: (UpNext & { slug: string }) | null = (() => {
+    if (!restingAfter) return null;
+    const loose = sets.filter((set) => !set.blockId);
+
+    const onSameMovement = loose.filter((set) => set.exerciseSlug === restingAfter);
+    const remaining = onSameMovement.filter((set) => !set.completed);
+    if (remaining.length > 0) {
+      const name = exerciseBySlug.get(restingAfter)?.name ?? restingAfter;
+      const doneHere = onSameMovement.length - remaining.length;
+      return {
+        slug: restingAfter,
+        sameMovement: true,
+        label: `Set ${doneHere + 1} of ${onSameMovement.length} · ${name}`,
+      };
+    }
+
+    const next = loose.find((set) => !set.completed);
+    if (!next) return null;
+    return {
+      slug: next.exerciseSlug,
+      sameMovement: false,
+      label: exerciseBySlug.get(next.exerciseSlug)?.name ?? next.exerciseSlug,
+    };
+  })();
+
+  const jumpToNext = () => {
+    const slug = upNext?.slug;
+    endRest();
+    if (!slug) return;
+    // After the panel has gone, or the scroll lands under where it used to be.
+    requestAnimationFrame(() => {
+      document
+        .getElementById(`movement-${slug}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  };
 
   /** "10 × Burpee" lines for the timer, so a round can be read off the screen mid-effort. */
   const movementLines = (groups: Group[]): string[] =>
@@ -417,6 +510,23 @@ export default function SessionLogger() {
 
   return (
     <>
+      {!readOnly && (
+        <>
+          <PinnedTimer
+            session={session}
+            now={now}
+            timer={timer}
+            onExpand={() => setTimerExpanded(true)}
+            onCloseBlock={() => {
+              setActiveBlockId(null);
+              setTimerExpanded(false);
+            }}
+          />
+          {/* Holds the space the fixed strip occupies, so the title is not underneath it. */}
+          <div className="pinned-spacer" />
+        </>
+      )}
+
       <header className="page-head">
         <div className="grow">
           {readOnly ? (
@@ -469,12 +579,9 @@ export default function SessionLogger() {
               Editing a finished workout. Changes save as you make them.
             </div>
           )}
-          <div className="row between">
-            <SessionStopwatch session={session} />
-            <button className="btn sm" onClick={() => setCreatingBlock('new')}>
-              ⏱ Add block
-            </button>
-          </div>
+          <button className="btn sm block" onClick={() => setCreatingBlock('new')}>
+            ⏱ Add block
+          </button>
 
           <button
             className="btn sm block"
@@ -501,6 +608,7 @@ export default function SessionLogger() {
         section.kind === 'exercise' ? (
           <ExerciseGroup
             key={section.key}
+            id={`movement-${section.group.slug}`}
             slug={section.group.slug}
             sets={section.group.sets}
             exercise={exerciseBySlug.get(section.group.slug)}
@@ -588,7 +696,10 @@ export default function SessionLogger() {
                 <button
                   className="btn primary block"
                   style={{ marginTop: '0.5rem' }}
-                  onClick={() => setRunningBlockId(section.block.id)}
+                  onClick={() => {
+                    setActiveBlockId(section.block.id);
+                    setTimerExpanded(true);
+                  }}
                 >
                   {section.block.timeSec ? 'Open timer' : 'Start timer'}
                 </button>
@@ -846,7 +957,7 @@ export default function SessionLogger() {
           confirmLabel={creatingBlock === 'convert' ? 'Convert workout' : 'Add block'}
           message={
             creatingBlock === 'convert'
-              ? 'Everything already logged becomes one round. Nothing is deleted — ungrouping the block puts it all back.'
+              ? 'Each movement becomes one line of a round — in a timed piece the rounds replace the sets, so four sets of one movement collapse to one. Anything already ticked off is kept.'
               : undefined
           }
           onClose={() => setCreatingBlock(null)}
@@ -873,8 +984,8 @@ export default function SessionLogger() {
           }
           onCreate={async (draft) => {
             if (creatingBlock === 'convert') {
-              const created = await convertSessionToBlock({ ...session, sets }, draft);
-              mutate(sets.map((s) => (s.blockId ? s : { ...s, blockId: created.id })));
+              const converted = await convertSessionToBlock({ ...session, sets }, draft);
+              mutate(converted.sets);
             } else {
               await addBlock({ ...session, sets }, draft);
             }
@@ -901,19 +1012,20 @@ export default function SessionLogger() {
         );
       })()}
 
-      {runningBlock && (
+      {timer && timerExpanded && (
         <WorkoutTimer
-          block={runningBlock}
-          movements={runningSection ? movementLines(runningSection.groups) : []}
-          onStart={() => void startStopwatch(session)}
-          onClose={() => setRunningBlockId(null)}
+          timer={timer}
+          movements={activeSection ? movementLines(activeSection.groups) : []}
+          // Collapsing, not stopping. The strip has the clock.
+          onClose={() => setTimerExpanded(false)}
           onSave={async (result) => {
-            await updateBlock({ ...session, sets }, runningBlock.id, {
+            await updateBlock({ ...session, sets }, timer.block.id, {
               rounds: result.rounds,
               roundSplitsSec: result.roundSplitsSec,
               timeSec: result.timeSec,
             });
-            setRunningBlockId(null);
+            setTimerExpanded(false);
+            setActiveBlockId(null);
           }}
         />
       )}
@@ -921,8 +1033,10 @@ export default function SessionLogger() {
       {restEndsAt && (
         <RestTimer
           endsAt={restEndsAt}
+          upNext={upNext}
           onExtend={(seconds) => setRestEndsAt((end) => (end ?? Date.now()) + seconds * 1000)}
-          onDismiss={() => setRestEndsAt(null)}
+          onDismiss={endRest}
+          onJump={jumpToNext}
         />
       )}
 

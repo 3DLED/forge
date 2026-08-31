@@ -290,20 +290,51 @@ export async function removeBlock(session: LoggedSession, blockId: Id): Promise<
 }
 
 /**
- * Turns the whole workout into one timed block: every movement already logged becomes part
- * of a round. Deliberately non-destructive — sets are re-parented, never dropped — so
- * converting a session you have been building is always undoable by removing the block.
+ * Turns the whole workout into one timed block: the movements become the recipe for a round.
+ *
+ * Sets collapse to one row per movement, because in a timed piece the rounds *are* the sets.
+ * Carrying four sets of push-ups across would describe a round as forty reps of push-ups
+ * followed by everything else — you would finish one round and the workout would be over.
+ * What you actually do is one set of each, then round two.
+ *
+ * The exception is work already recorded. A set you ticked off is a fact about your training
+ * and collapsing it would delete it, so completed sets are kept even where that leaves a
+ * movement with more than one row. In the ordinary case — converting a workout you have
+ * built but not started — nothing is completed and every movement condenses to one line.
  */
 export async function convertSessionToBlock(
   session: LoggedSession,
   block: Omit<LoggedBlock, 'id'>,
-): Promise<LoggedBlock> {
+): Promise<{ block: LoggedBlock; sets: LoggedSet[] }> {
   const created: LoggedBlock = { ...block, id: ulid() };
+
+  const kept: LoggedSet[] = [];
+  const recipeFor = new Set<string>();
+
+  for (const set of session.sets) {
+    // Already inside some other block: left exactly as it is.
+    if (set.blockId) {
+      kept.push(set);
+      continue;
+    }
+
+    if (!recipeFor.has(set.exerciseSlug)) {
+      recipeFor.add(set.exerciseSlug);
+      kept.push({ ...set, blockId: created.id, setIndex: 0 });
+    } else if (set.completed) {
+      kept.push({ ...set, blockId: created.id });
+    }
+  }
+
   await loggedSessionRepo.update(session.id, {
     blocks: [...(session.blocks ?? []), created],
-    sets: session.sets.map((set) => (set.blockId ? set : { ...set, blockId: created.id })),
+    sets: kept,
   });
-  return created;
+
+  // The sets go back to the caller because the logger holds its own copy and flushes it on a
+  // debounce. Left to re-parent what it already had, it writes the un-collapsed list straight
+  // back over this a moment later.
+  return { block: created, sets: kept };
 }
 
 // --- session stopwatch ----------------------------------------------------
@@ -352,6 +383,18 @@ export async function finishSession(
     // Re-openable: editing the effort or the notes on a workout from three weeks ago must not
     // restamp it as having ended today. The first finish is the one that happened.
     endedAt: session.endedAt ?? new Date().toISOString(),
+    /*
+     * Finishing stops the clock.
+     *
+     * The stopwatch is derived — banked seconds plus however long it has been since
+     * runningSince — so leaving that timestamp in place on a finished workout does not just
+     * look wrong on screen. The elapsed time keeps climbing for as long as the record exists,
+     * and every later read of it, days afterwards, gets a bigger number than the one before.
+     * Banking it here is the same thing pausing does, at the one moment it is certain the
+     * work is over.
+     */
+    elapsedSec: Math.round(sessionElapsedSec(session)),
+    runningSince: null,
   });
 
   if (session.plannedSessionId) {
