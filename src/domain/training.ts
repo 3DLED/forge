@@ -8,7 +8,7 @@
  */
 
 import type { BodyweightLookup } from './bodyweight';
-import type { Exercise, LoggedSession, LoggedSet } from './types';
+import type { DayKey, Exercise, Id, LoggedSession, LoggedSet } from './types';
 
 // --- per-set --------------------------------------------------------------
 
@@ -150,6 +150,15 @@ export function acuteChronicRatio(weeklyLoads: number[]): number | null {
   return weeklyLoads[weeklyLoads.length - 1] / chronic;
 }
 
+/** The kinds of mark a movement can hold a best in. */
+export type PrKind = 'oneRm' | 'reps' | 'time' | 'distance' | 'pace' | 'rounds';
+
+/** Which workout a mark came from, so a best can be traced back to the day it happened. */
+export interface PrSource {
+  sessionId: Id;
+  date: DayKey;
+}
+
 export interface PersonalRecord {
   exerciseSlug: string;
   /** Best estimated 1RM, for loaded work. */
@@ -178,68 +187,112 @@ export interface PersonalRecord {
    * never shown without it.
    */
   bestRoundsTimeSec?: number;
-  date: string;
+  /**
+   * Where each mark was set, by kind.
+   *
+   * Per mark rather than per record, because a movement's best 1RM and its best rep count
+   * routinely come from different workouts. A single date on the record would be right for
+   * one of them and quietly wrong for the other.
+   */
+  sources: Partial<Record<PrKind, PrSource>>;
+  /** The most recent day anything on this record improved. */
+  date: DayKey;
 }
 
-/** Best-ever marks per movement, scanned from logged sets. */
-export function personalRecords(
+/** A mark being beaten, on the day it happened. */
+export interface PrEvent {
+  sessionId: Id;
+  date: DayKey;
+  exerciseSlug: string;
+  kind: PrKind;
+  /** The new mark, in storage units. */
+  value: number;
+  /** What it beat. Always present — establishing a first mark is not an event. */
+  previous: number;
+}
+
+/** Lower is better for pace; every other mark is a bigger-is-better number. */
+function beats(kind: PrKind, candidate: number, existing: number): boolean {
+  return kind === 'pace' ? candidate < existing : candidate > existing;
+}
+
+/** The best of a kind that one session produced, before it is judged against history. */
+interface Candidate {
+  value: number;
+  /** Carried alongside a rounds mark: the window it was scored against. */
+  timeSec?: number;
+  /** Carried alongside a 1RM: bodyweight that day, for the relative figure. */
+  bodyweightKg?: number;
+}
+
+export interface RecordScan {
+  records: Map<string, PersonalRecord>;
+  /** Every improvement, oldest first. */
+  events: PrEvent[];
+}
+
+/**
+ * Best-ever marks per movement, and the moments they were set.
+ *
+ * Two rules are what make the events mean anything:
+ *
+ * 1. **A session is judged against everything before it, never against itself.** Each session
+ *    is reduced to its own best of each kind first, then compared. Without that, a warm-up
+ *    ramp of 40/60/80 kg reports two personal bests on the way to one working set.
+ *
+ * 2. **Establishing a first mark is not an event.** The arithmetic says the first time you do
+ *    anything is a best in everything, which would flag most of a new athlete's first month
+ *    and leave the badge meaning nothing. A PR here is beating something you had already done.
+ *
+ * Sessions are sorted before scanning. An event is a claim about chronology, so it must not
+ * depend on the order a caller happened to read the table in.
+ */
+export function scanRecords(
   sessions: LoggedSession[],
   /** Bodyweight on any given day, for relative-strength bests. Optional. */
   bodyweight?: BodyweightLookup,
-): Map<string, PersonalRecord> {
+): RecordScan {
   const records = new Map<string, PersonalRecord>();
+  const events: PrEvent[] = [];
 
-  for (const session of sessions) {
+  const ordered = [...sessions].sort(
+    (a, b) => a.date.localeCompare(b.date) || (a.endedAt ?? '').localeCompare(b.endedAt ?? ''),
+  );
+
+  for (const session of ordered) {
+    /** slug -> kind -> the best this one session managed. */
+    const sessionBest = new Map<string, Partial<Record<PrKind, Candidate>>>();
+
+    const offer = (slug: string, kind: PrKind, candidate: Candidate) => {
+      const forSlug = sessionBest.get(slug) ?? {};
+      const held = forSlug[kind];
+      if (!held || beats(kind, candidate.value, held.value)) {
+        forSlug[kind] = candidate;
+        sessionBest.set(slug, forSlug);
+      }
+    };
+
     for (const set of session.sets) {
       if (!set.completed) continue;
-
-      const record = records.get(set.exerciseSlug) ?? {
-        exerciseSlug: set.exerciseSlug,
-        date: session.date,
-      };
-      let improved = false;
-
       const { weightKg, reps, timeSec, distanceM, rounds } = set.values;
 
-      if (rounds && rounds > (record.bestRounds ?? 0)) {
-        record.bestRounds = rounds;
-        record.bestRoundsTimeSec = timeSec;
-        improved = true;
-      }
+      if (rounds) offer(set.exerciseSlug, 'rounds', { value: rounds, timeSec });
 
       if (weightKg && reps) {
         const oneRm = estimate1RM(weightKg, reps);
-        if (oneRm && oneRm > (record.best1RMKg ?? 0)) {
-          record.best1RMKg = oneRm;
-          // Divided by what you weighed *then*, not now, so the ratio records what actually
-          // happened rather than shifting every time the scale does.
-          const bw = bodyweight?.at(session.date);
-          record.best1RMxBw = bw && bw > 0 ? oneRm / bw : undefined;
-          improved = true;
+        if (oneRm) {
+          offer(set.exerciseSlug, 'oneRm', {
+            value: oneRm,
+            bodyweightKg: bodyweight?.at(session.date),
+          });
         }
       }
-      if (reps && !weightKg && reps > (record.bestReps ?? 0)) {
-        record.bestReps = reps;
-        improved = true;
-      }
-      if (timeSec && !distanceM && timeSec > (record.bestTimeSec ?? 0)) {
-        record.bestTimeSec = timeSec;
-        improved = true;
-      }
-      if (distanceM && distanceM > (record.bestDistanceM ?? 0)) {
-        record.bestDistanceM = distanceM;
-        improved = true;
-      }
+      if (reps && !weightKg) offer(set.exerciseSlug, 'reps', { value: reps });
+      if (timeSec && !distanceM) offer(set.exerciseSlug, 'time', { value: timeSec });
+      if (distanceM) offer(set.exerciseSlug, 'distance', { value: distanceM });
       if (distanceM && timeSec && distanceM >= 1000) {
-        const pace = timeSec / (distanceM / 1000);
-        if (pace < (record.bestPaceSecPerKm ?? Infinity)) {
-          record.bestPaceSecPerKm = pace;
-          improved = true;
-        }
+        offer(set.exerciseSlug, 'pace', { value: timeSec / (distanceM / 1000) });
       }
-
-      if (improved) record.date = session.date;
-      records.set(set.exerciseSlug, record);
     }
 
     // Rounds live on the block, not on its movements, so blocks are scanned separately and
@@ -247,19 +300,100 @@ export function personalRecords(
     // blocks would silently kill round tracking.
     for (const block of session.blocks ?? []) {
       if (!block.rounds) continue;
-      const slug = CONTAINER_SLUG[block.style];
-      const record = records.get(slug) ?? { exerciseSlug: slug, date: session.date };
+      offer(CONTAINER_SLUG[block.style], 'rounds', {
+        value: block.rounds,
+        timeSec: block.capSec ?? block.timeSec,
+      });
+    }
 
-      if (block.rounds > (record.bestRounds ?? 0)) {
-        record.bestRounds = block.rounds;
-        record.bestRoundsTimeSec = block.capSec ?? block.timeSec;
+    for (const [slug, kinds] of sessionBest) {
+      const record: PersonalRecord = records.get(slug) ?? {
+        exerciseSlug: slug,
+        sources: {},
+        date: session.date,
+      };
+
+      for (const key of Object.keys(kinds) as PrKind[]) {
+        const candidate = kinds[key];
+        if (!candidate) continue;
+
+        const existing = currentMark(record, key);
+        const isFirst = existing == null;
+        if (!isFirst && !beats(key, candidate.value, existing)) continue;
+
+        applyMark(record, key, candidate);
+        record.sources[key] = { sessionId: session.id, date: session.date };
         record.date = session.date;
+
+        if (!isFirst) {
+          events.push({
+            sessionId: session.id,
+            date: session.date,
+            exerciseSlug: slug,
+            kind: key,
+            value: candidate.value,
+            previous: existing,
+          });
+        }
       }
+
       records.set(slug, record);
     }
   }
 
-  return records;
+  return { records, events };
+}
+
+function currentMark(record: PersonalRecord, kind: PrKind): number | undefined {
+  switch (kind) {
+    case 'oneRm': return record.best1RMKg;
+    case 'reps': return record.bestReps;
+    case 'time': return record.bestTimeSec;
+    case 'distance': return record.bestDistanceM;
+    case 'pace': return record.bestPaceSecPerKm;
+    case 'rounds': return record.bestRounds;
+  }
+}
+
+function applyMark(record: PersonalRecord, kind: PrKind, candidate: Candidate): void {
+  switch (kind) {
+    case 'oneRm':
+      record.best1RMKg = candidate.value;
+      // Divided by what you weighed *then*, not now, so the ratio records what actually
+      // happened rather than shifting every time the scale does.
+      record.best1RMxBw =
+        candidate.bodyweightKg && candidate.bodyweightKg > 0
+          ? candidate.value / candidate.bodyweightKg
+          : undefined;
+      return;
+    case 'reps': record.bestReps = candidate.value; return;
+    case 'time': record.bestTimeSec = candidate.value; return;
+    case 'distance': record.bestDistanceM = candidate.value; return;
+    case 'pace': record.bestPaceSecPerKm = candidate.value; return;
+    case 'rounds':
+      record.bestRounds = candidate.value;
+      record.bestRoundsTimeSec = candidate.timeSec;
+      return;
+  }
+}
+
+/** Best-ever marks per movement, scanned from logged sets. */
+export function personalRecords(
+  sessions: LoggedSession[],
+  bodyweight?: BodyweightLookup,
+): Map<string, PersonalRecord> {
+  return scanRecords(sessions, bodyweight).records;
+}
+
+/** PR events grouped by the workout that set them — what History flags a session on. */
+export function prEventsBySession(events: PrEvent[]): Map<Id, PrEvent[]> {
+  const bySession = new Map<Id, PrEvent[]>();
+  for (const event of events) {
+    const list = bySession.get(event.sessionId);
+    if (list) list.push(event);
+    else bySession.set(event.sessionId, [event]);
+  }
+  return bySession;
 }
 
 /** Library entries that stand in for a timed block when recording a best. */

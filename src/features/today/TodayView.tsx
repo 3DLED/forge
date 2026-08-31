@@ -4,6 +4,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import PageHeader from '../../ui/PageHeader';
 import SessionCard from '../../ui/SessionCard';
 import LogRunSheet from '../log/LogRunSheet';
+import WeekSheet from './WeekSheet';
 import { plural } from '../../ui/text';
 import { useApp } from '../../ui/AppProvider';
 import { plannedBetween, sessionsBetween, startFromPlanned, startSession } from '../../data/sessions';
@@ -20,6 +21,7 @@ import { sessionLoad } from '../../domain/training';
 export default function TodayView() {
   const navigate = useNavigate();
   const [loggingRun, setLoggingRun] = useState(false);
+  const [openWeek, setOpenWeek] = useState(false);
   const { profile, activeEquipment } = useApp();
   const today = todayKey();
   const week = weekDays(today, profile.weekStartsOn);
@@ -53,8 +55,19 @@ export default function TodayView() {
         subtitle={`${weekdayName(weekdayOf(today))}, ${monthName(today, true)} ${Number(today.slice(8))}`}
       />
 
-      {/* Week strip: a dot per day, filled where something was actually done. */}
-      <div className="card tight">
+      {/*
+        Week strip: a dot per day, filled where something was actually done.
+
+        The whole strip is the control. Seven separate day targets across a phone width are
+        about 40px each, which is under the tap size everything else here is built to, and the
+        question the strip provokes — "what was Wednesday?" — is answered by the week, not by
+        one day in isolation.
+      */}
+      <button
+        className="card tight week-strip"
+        onClick={() => setOpenWeek(true)}
+        aria-label="Show this week's workouts"
+      >
         <div className="row between" style={{ marginBottom: '0.5rem' }}>
           <span className="tiny faint" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>
             This week
@@ -84,7 +97,12 @@ export default function TodayView() {
             );
           })}
         </div>
-      </div>
+        <div className="tiny faint" style={{ marginTop: '0.4rem' }}>
+          Tap for the week
+        </div>
+      </button>
+
+      {openWeek && <WeekSheet days={week} onClose={() => setOpenWeek(false)} />}
 
       {todayPlanned.length > 0 && <div className="section-title">Planned for today</div>}
       {todayPlanned.map((planned) => (

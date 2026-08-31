@@ -11,6 +11,7 @@ import {
   sessionWorkSec,
 } from '../domain/training';
 import type { LoggedSession } from '../domain/types';
+import type { PrEvent } from '../domain/training';
 
 /**
  * One line that describes any session, whatever it was made of. A lift reads as volume, a
@@ -63,7 +64,18 @@ export function sessionSummary(
   return parts.join(' · ');
 }
 
-export default function SessionCard({ session }: { session: LoggedSession }) {
+export default function SessionCard({
+  session,
+  prs = [],
+}: {
+  session: LoggedSession;
+  /**
+   * Bests this workout set on the day. Passed in rather than derived here: knowing whether a
+   * session beat anything means scanning every session that came before it, which is a
+   * once-per-list job, not a once-per-card one.
+   */
+  prs?: PrEvent[];
+}) {
   const { units, exerciseBySlug, profile } = useApp();
   const inProgress = !session.endedAt;
   const load = sessionLoad(session);
@@ -72,6 +84,11 @@ export default function SessionCard({ session }: { session: LoggedSession }) {
     <Link to={`/log/${session.id}`} className="card" style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
       <div className="card-head" style={{ marginBottom: '0.35rem' }}>
         <h3 className="truncate grow">{session.name}</h3>
+        {prs.length > 0 && (
+          <span className="pill good" title={prSummary(prs, exerciseBySlug)}>
+            {prs.length === 1 ? 'PR' : `${prs.length} PRs`}
+          </span>
+        )}
         {inProgress ? (
           <span className="pill accent">In progress</span>
         ) : (
@@ -86,6 +103,23 @@ export default function SessionCard({ session }: { session: LoggedSession }) {
         {session.durationMin ? ` · ${session.durationMin} min` : ''}
         {session.sessionRpe ? ` · effort ${session.sessionRpe}` : ''}
       </div>
+
+      {/* Named, not just counted. "PR" alone sends you into the workout to find out which. */}
+      {prs.length > 0 && (
+        <div className="tiny pr-line" style={{ marginTop: '0.2rem' }}>
+          🏅 {prSummary(prs, exerciseBySlug)}
+        </div>
+      )}
     </Link>
   );
+}
+
+/** "Kettlebell Swing", or "Kettlebell Swing + 2 more" — enough to know what happened. */
+function prSummary(
+  prs: PrEvent[],
+  bySlug: Map<string, { name: string }>,
+): string {
+  const names = [...new Set(prs.map((pr) => bySlug.get(pr.exerciseSlug)?.name ?? pr.exerciseSlug))];
+  const [first, ...rest] = names;
+  return rest.length === 0 ? first : `${first} + ${rest.length} more`;
 }

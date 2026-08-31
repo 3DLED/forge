@@ -2,14 +2,31 @@ import { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import PageHeader from '../../ui/PageHeader';
 import SessionCard from '../../ui/SessionCard';
-import { recentSessions } from '../../data/sessions';
+import { recentSessions, sessionsBetween } from '../../data/sessions';
 import { formatDayLabel, monthName } from '../../domain/dates';
+import { prEventsBySession, scanRecords } from '../../domain/training';
 
 const PAGE = 30;
 
 export default function HistoryView() {
   const [limit, setLimit] = useState(PAGE);
   const sessions = useLiveQuery(() => recentSessions(limit), [limit]);
+
+  /*
+   * Whether a workout beat anything is a fact about every workout before it, so the flags
+   * cannot be worked out from the page currently on screen — a March PR is only a PR in the
+   * light of January and February. The whole table is scanned once and indexed by session;
+   * paging in another thirty re-uses the same index rather than recomputing per card.
+   *
+   * Bodyweight is deliberately not loaded here. It only scales the relative-strength figure,
+   * which changes no verdict about whether a mark was beaten, and this view never shows it.
+   */
+  const allSessions = useLiveQuery(() => sessionsBetween('0000-01-01', '9999-12-31'), []);
+
+  const prsBySession = useMemo(
+    () => prEventsBySession(scanRecords(allSessions ?? []).events),
+    [allSessions],
+  );
 
   /** Grouped by month, because that is the unit people actually review training in. */
   const months = useMemo(() => {
@@ -45,7 +62,11 @@ export default function HistoryView() {
             {monthName(`${month}-01`)} {month.slice(0, 4)}
           </div>
           {(group ?? []).map((session) => (
-            <SessionCard key={session.id} session={session} />
+            <SessionCard
+              key={session.id}
+              session={session}
+              prs={prsBySession.get(session.id)}
+            />
           ))}
         </div>
       ))}

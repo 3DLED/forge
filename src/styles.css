@@ -449,6 +449,22 @@ input.field-static {
   cursor: pointer;
 }
 
+/* Same trick for the week strip on Today: a card you can press. */
+.week-strip {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* The movement a workout beat something in, under the summary line. */
+.pr-line {
+  color: var(--good);
+  font-weight: 600;
+}
+
 /* Solid and unmissable, but not wearing the accent. See the note in SessionLogger. */
 .finish-btn {
   background: var(--surface-3);
