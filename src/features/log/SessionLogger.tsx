@@ -510,7 +510,15 @@ export default function SessionLogger() {
 
   return (
     <>
-      {!readOnly && (
+      {/*
+        The strip belongs to a workout in progress, not to one being edited.
+        
+        Gated on the session being unfinished rather than on the screen being editable: in
+        edit mode its Start button would set a clock running on a workout that ended weeks
+        ago, and elapsed time is derived from that timestamp, so it would climb from then on.
+        There is nothing to time about correcting a number after the fact.
+      */}
+      {!finished && (
         <>
           <PinnedTimer
             session={session}
