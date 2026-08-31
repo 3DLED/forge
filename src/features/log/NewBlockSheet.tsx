@@ -1,8 +1,9 @@
 /**
  * Choosing the shape of a timed block.
  *
- * Used for both "add a block" and "turn this whole workout into one" — the settings are
- * identical, only the copy differs, so the two paths share this rather than drifting apart.
+ * Used for "add a block", "turn this whole workout into one", and "change the shape of the
+ * one I already have" — the settings are identical in all three, only the copy differs, so
+ * they share this rather than drifting apart.
  */
 
 import { useState } from 'react';
@@ -38,6 +39,7 @@ export default function NewBlockSheet({
   message,
   onCreate,
   onPickSaved,
+  initial,
   onClose,
 }: {
   title: string;
@@ -46,6 +48,8 @@ export default function NewBlockSheet({
   onCreate: (block: Omit<LoggedBlock, 'id'>) => void | Promise<void>;
   /** Offered only when creating a fresh block, not when converting an existing workout. */
   onPickSaved?: (template: SessionTemplate) => void | Promise<void>;
+  /** The block being edited, so the controls open on what it already is. */
+  initial?: Pick<LoggedBlock, 'style' | 'capSec' | 'intervalSec' | 'targetRounds'>;
   onClose: () => void;
 }) {
   // Timed only. A saved straight session has no clock and no rounds; offered here it would
@@ -54,10 +58,10 @@ export default function NewBlockSheet({
     async () => (onPickSaved ? (await savedWorkouts()).filter(isTimedWorkout) : []),
     [Boolean(onPickSaved)],
   );
-  const [style, setStyle] = useState<LoggedBlockStyle>('amrap');
-  const [capMin, setCapMin] = useState(12);
-  const [intervalSec, setIntervalSec] = useState(60);
-  const [targetRounds, setTargetRounds] = useState(10);
+  const [style, setStyle] = useState<LoggedBlockStyle>(initial?.style ?? 'amrap');
+  const [capMin, setCapMin] = useState(initial?.capSec ? Math.round(initial.capSec / 60) : 12);
+  const [intervalSec, setIntervalSec] = useState(initial?.intervalSec ?? 60);
+  const [targetRounds, setTargetRounds] = useState(initial?.targetRounds ?? 10);
   const [saving, setSaving] = useState(false);
 
   const create = async () => {

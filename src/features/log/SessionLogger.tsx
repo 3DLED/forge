@@ -120,6 +120,8 @@ export default function SessionLogger() {
   const [editing, setEditing] = useState(false);
   const [discarding, setDiscarding] = useState(false);
   const [creatingBlock, setCreatingBlock] = useState<'new' | 'convert' | null>(null);
+  /** The block whose shape is being changed — AMRAP to EMOM, a longer cap, more rounds. */
+  const [editingBlockId, setEditingBlockId] = useState<Id | null>(null);
   const [runningBlockId, setRunningBlockId] = useState<Id | null>(null);
   const [editingEquipment, setEditingEquipment] = useState(false);
   const [namingBlockId, setNamingBlockId] = useState<Id | null>(null);
@@ -590,6 +592,19 @@ export default function SessionLogger() {
                 >
                   {section.block.timeSec ? 'Open timer' : 'Start timer'}
                 </button>
+
+                {/*
+                  Second thoughts about the shape are common — you build a for-time piece,
+                  look at it, and decide it wants to be an AMRAP. Ungrouping and converting
+                  again is the long way round to the same place.
+                */}
+                <button
+                  className="btn sm block"
+                  style={{ marginTop: '0.5rem' }}
+                  onClick={() => setEditingBlockId(section.block.id)}
+                >
+                  ⏱ Edit timed workout
+                </button>
               </>
             )}
 
@@ -618,7 +633,24 @@ export default function SessionLogger() {
               <button
                 className="btn ghost sm block"
                 style={{ marginTop: '0.25rem' }}
-                onClick={() => void removeBlock(session, section.block.id)}
+                onClick={async () => {
+                  /*
+                   * Both halves matter.
+                   *
+                   * The sets on screen live in local state and are flushed on a debounce, so
+                   * the stored copy this reads from can be behind — passing it plain loses
+                   * whatever was typed in the last half second. And ungrouping has to be
+                   * mirrored locally, because everything that asks "is there loose work here"
+                   * counts local blockIds. Without it the movements detach visually while the
+                   * controls that act on loose sets — save as a workout, make this timed —
+                   * stay hidden, with nothing on screen explaining why.
+                   */
+                  const blockId = section.block.id;
+                  await removeBlock({ ...session, sets }, blockId);
+                  mutate(
+                    sets.map((set) => (set.blockId === blockId ? { ...set, blockId: undefined } : set)),
+                  );
+                }}
               >
                 Ungroup block
               </button>
@@ -850,6 +882,24 @@ export default function SessionLogger() {
           }}
         />
       )}
+
+      {editingBlockId && (() => {
+        const target = blocks.find((b) => b.id === editingBlockId);
+        if (!target) return null;
+        return (
+          <NewBlockSheet
+            title="Edit timed workout"
+            confirmLabel="Save changes"
+            message="Movements and anything already recorded stay as they are — only the shape of the clock changes."
+            initial={target}
+            onClose={() => setEditingBlockId(null)}
+            onCreate={async (draft) => {
+              await updateBlock({ ...session, sets }, editingBlockId, draft);
+              setEditingBlockId(null);
+            }}
+          />
+        );
+      })()}
 
       {runningBlock && (
         <WorkoutTimer
