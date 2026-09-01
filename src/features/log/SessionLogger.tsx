@@ -19,6 +19,7 @@ import AskSheet from '../../ui/AskSheet';
 import ExercisePicker from './ExercisePicker';
 import ExerciseGroup from './ExerciseGroup';
 import RestTimer, { type UpNext } from './RestTimer';
+import HoldTimer from './HoldTimer';
 import WorkoutTimer from './WorkoutTimer';
 import PinnedTimer from './PinnedTimer';
 import { useBlockTimer } from './useBlockTimer';
@@ -115,6 +116,15 @@ export default function SessionLogger() {
   const [restEndsAt, setRestEndsAt] = useState<number | null>(null);
   /** The movement the current rest follows, which is what makes "up next" answerable. */
   const [restingAfter, setRestingAfter] = useState<string | null>(null);
+  /**
+   * The set currently being held, by id alone.
+   *
+   * The id and not the target. Typing 45 into the time box and tapping straight through to
+   * Hold fires blur and click in the same turn, and the click handler was built in the render
+   * before the blur committed — so a target read at the tap is the one from before you typed
+   * it. Read at render, after both have flushed, it is the number on screen.
+   */
+  const [holding, setHolding] = useState<string | null>(null);
   /**
    * Opt-in editing of a workout that is already finished.
    *
@@ -385,36 +395,67 @@ export default function SessionLogger() {
     );
   };
 
+  /**
+   * Everything that follows from finishing a set, wherever it was finished from.
+   *
+   * Ticking the box and stopping a hold clock are the same event as far as the session is
+   * concerned, and having each one start its own rest and its own stopwatch is how the two
+   * drift apart.
+   */
+  const afterCompleting = (target: LoggedSet) => {
+      // This tap is the only user gesture in the rest flow, and browsers hand out an
+      // AudioContext nowhere else. Unlocking here is what lets the timer make a sound when
+      // it runs out — by then there is no gesture left to ask for one.
+    unlockAudio();
+    setRestEndsAt(Date.now() + (target.restSec ?? DEFAULT_REST_SEC) * 1000);
+    setRestingAfter(target.exerciseSlug);
+
+    /*
+     * Finishing your first set is starting the workout.
+     *
+     * The same argument the block timer already made for itself: a clock you have to remember
+     * to start separately is a clock that records zero. Nothing else in a straight strength
+     * session ever started it, so a session of nothing but sets came out with no duration and
+     * no training load.
+     *
+     * Only ever the first one. Once the clock has been touched at all, a later pause was a
+     * deliberate act — you racked the bar to take a call — and finishing the next set should
+     * not quietly undo it. Finished workouts are excluded outright: editing a session from
+     * March must not set its clock running today.
+     */
+    const clockUntouched = !session.runningSince && !session.elapsedSec;
+    if (!finished && clockUntouched) void startStopwatch(session);
+  };
+
   const toggleComplete = (setId: string) => {
     const target = sets.find((s) => s.id === setId);
     mutate(sets.map((set) => (set.id === setId ? { ...set, completed: !set.completed } : set)));
     // Completing a set starts the clock; un-completing one should not. The rest the set was
     // prescribed wins: telling you to rest three minutes and then handing you a ninety-second
     // timer is the app disagreeing with itself.
-    if (target && !target.completed) {
-      // This tap is the only user gesture in the rest flow, and browsers hand out an
-      // AudioContext nowhere else. Unlocking here is what lets the timer make a sound when
-      // it runs out — by then there is no gesture left to ask for one.
-      unlockAudio();
-      setRestEndsAt(Date.now() + (target.restSec ?? DEFAULT_REST_SEC) * 1000);
-      setRestingAfter(target.exerciseSlug);
+    if (target && !target.completed) afterCompleting(target);
+  };
 
-      /*
-       * Ticking your first set is starting the workout.
-       *
-       * The same argument the block timer already made for itself: a clock you have to
-       * remember to start separately is a clock that records zero. Nothing else in a straight
-       * strength session ever started it, so a session of nothing but sets came out with no
-       * duration and no training load.
-       *
-       * Only ever the first tick. Once the clock has been touched at all, a later pause was a
-       * deliberate act — you racked the bar to take a call — and completing the next set
-       * should not quietly undo it. Finished workouts are excluded outright: editing a
-       * session from March must not set its clock running today.
-       */
-      const clockUntouched = !session.runningSince && !session.elapsedSec;
-      if (!finished && clockUntouched) void startStopwatch(session);
-    }
+  /**
+   * A finished hold: the clock's number is the record.
+   *
+   * It overwrites whatever the set asked for, because what you held is what happened — 52
+   * seconds against a target of 45 is a better set, not a stray reading, and 30 is a worse
+   * one worth keeping honestly.
+   */
+  const completeHold = (setId: string, elapsedSec: number) => {
+    setHolding(null);
+    const target = sets.find((s) => s.id === setId);
+    if (!target) return;
+
+    mutate(
+      sets.map((set) =>
+        set.id === setId
+          ? { ...set, values: { ...set.values, timeSec: elapsedSec }, completed: true }
+          : set,
+      ),
+    );
+    afterCompleting(target);
   };
 
   const endRest = () => {
@@ -630,6 +671,11 @@ export default function SessionLogger() {
             onRemoveExercise={(slug) => removeExerciseFrom(slug)}
             onSwapExercise={setSwappingSlug}
             onShowInfo={setInfoSlug}
+            onStartHold={(setId) => {
+              // The tap that starts the hold is also the one that buys us audio.
+              unlockAudio();
+              setHolding(setId);
+            }}
           />
         ) : (
           <section className="card block-card" key={section.key}>
@@ -1038,7 +1084,16 @@ export default function SessionLogger() {
         />
       )}
 
-      {restEndsAt && (
+      {/* One panel at a time: a hold is running work, and rest has not started yet. */}
+      {holding && (
+        <HoldTimer
+          targetSec={sets.find((set) => set.id === holding)?.values.timeSec}
+          onDone={(elapsedSec) => completeHold(holding, elapsedSec)}
+          onCancel={() => setHolding(null)}
+        />
+      )}
+
+      {restEndsAt && !holding && (
         <RestTimer
           endsAt={restEndsAt}
           upNext={upNext}

@@ -7,6 +7,7 @@
  */
 
 import MetricInput, { metricLabel } from './MetricInput';
+import { isHold } from '../../domain/generator';
 import { plural } from '../../ui/text';
 import { useApp } from '../../ui/AppProvider';
 import { formatDayLabel } from '../../domain/dates';
@@ -36,6 +37,7 @@ export default function ExerciseGroup({
   onRemoveExercise,
   onSwapExercise,
   onShowInfo,
+  onStartHold,
 }: {
   /** Anchor for the rest panel's jump-to-next. */
   id?: string;
@@ -55,6 +57,8 @@ export default function ExerciseGroup({
   onSwapExercise: (slug: string) => void;
   /** Open the write-up: setup, cues, and the common fault. */
   onShowInfo: (slug: string) => void;
+  /** Start a count-up clock for a hold. Absent where holds cannot be timed. */
+  onStartHold?: (setId: string) => void;
 }) {
   /*
    * Effort is recorded once for the whole session unless asked for per set.
@@ -73,6 +77,13 @@ export default function ExerciseGroup({
   const metrics = (exercise?.metrics ?? (['reps', 'rpe'] as MetricKey[])).filter(
     (metric) => metric !== 'rpe' || perSetEffort,
   );
+
+  /*
+   * A plank is the one thing here you cannot log while doing it — both hands are busy and
+   * the number only exists once you stop. Inside a block the sets are a round's recipe rather
+   * than something you tick off, so there is nothing there to time.
+   */
+  const timeable = Boolean(onStartHold) && !nested && !readOnly && exercise && isHold(exercise);
 
   return (
     <section id={id} className={nested ? 'block-movement' : 'card'}>
@@ -123,6 +134,8 @@ export default function ExerciseGroup({
               {metricLabel(metric, units)}
             </span>
           ))}
+          {/* The button takes a column of the same grid, so it needs a label to sit under. */}
+          {timeable && <span className="field-label" />}
         </div>
         {/* Must match .set-check exactly, or the labels drift off their columns. */}
         <span style={{ width: 'var(--check-w)' }} />
@@ -143,6 +156,15 @@ export default function ExerciseGroup({
                   onChange={(value) => onSetValue(set.id, metric, value)}
                 />
               ))}
+              {timeable && (
+                <button
+                  className="btn sm hold-start"
+                  onClick={() => onStartHold!(set.id)}
+                  aria-label={`Time this hold of ${exercise?.name ?? slug}`}
+                >
+                  ▶ Hold
+                </button>
+              )}
             </div>
             {readOnly ? (
               /*

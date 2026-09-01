@@ -351,6 +351,14 @@ input[type='number']::-webkit-inner-spin-button {
   font-weight: 650;
 }
 
+/* Sits in the fields grid beside the time box, so it matches a field rather than a button. */
+.hold-start {
+  min-height: var(--field-h);
+  padding: 0.3rem 0.35rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .field-label {
   display: block;
   font-size: 0.65rem;

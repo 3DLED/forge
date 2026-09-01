@@ -88,7 +88,7 @@ function isLoaded(exercise: Exercise): boolean {
 }
 
 /** Scored by a clock rather than a rep count: planks, hangs, wall sits. */
-function isHold(exercise: Exercise): boolean {
+export function isHold(exercise: Exercise): boolean {
   return exercise.metrics.includes('timeSec') && !exercise.metrics.includes('reps');
 }
 
