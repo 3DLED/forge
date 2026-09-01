@@ -18,6 +18,7 @@
  */
 
 import Dexie, { type Table } from 'dexie';
+import type { Injury } from '../domain/injuries';
 import type {
   BodyMetric,
   CalendarException,
@@ -60,6 +61,7 @@ export class TrainingDb extends Dexie {
   plans!: Table<Plan, Id>;
   profiles!: Table<Profile, Id>;
   bodyMetrics!: Table<BodyMetric, Id>;
+  injuries!: Table<Injury & { createdAt: Instant; updatedAt: Instant }, Id>;
   changes!: Table<ChangeRow, number>;
   meta!: Table<MetaRow, string>;
 
@@ -84,6 +86,18 @@ export class TrainingDb extends Dexie {
       changes: '++seq, table, recordId, at',
       meta: 'key',
     });
+
+    /*
+     * Version 2: the injury log.
+     *
+     * A new table and nothing else, so there is no upgrade function — Dexie creates the store
+     * and every existing record is untouched. Additive migrations are the only safe kind on a
+     * device you cannot inspect, which is why the injury lives in its own table rather than
+     * as a field on the profile.
+     */
+    this.version(2).stores({
+      injuries: 'id, region, startDate, restUntil, resolvedDate, updatedAt',
+    });
   }
 }
 
@@ -100,6 +114,7 @@ export const DATA_TABLES = [
   'plans',
   'profiles',
   'bodyMetrics',
+  'injuries',
 ] as const;
 
 export type DataTableName = (typeof DATA_TABLES)[number];

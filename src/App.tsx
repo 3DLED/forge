@@ -9,6 +9,7 @@ import EquipmentView from './features/more/EquipmentView';
 import SettingsView from './features/more/SettingsView';
 import AppearanceView from './features/more/AppearanceView';
 import BodyView from './features/more/BodyView';
+import InjuryView from './features/more/InjuryView';
 
 const TABS = [
   { to: '/today', glyph: '🔥', label: 'Today' },
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/progress" element={<ProgressView />} />
           <Route path="/more" element={<MoreView />} />
           <Route path="/more/body" element={<BodyView />} />
+          <Route path="/more/injuries" element={<InjuryView />} />
           <Route path="/more/equipment" element={<EquipmentView />} />
           <Route path="/more/settings" element={<SettingsView />} />
           <Route path="/more/appearance" element={<AppearanceView />} />

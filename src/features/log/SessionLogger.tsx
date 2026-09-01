@@ -30,6 +30,9 @@ import VariationSheet from './VariationSheet';
 import ExerciseInfoSheet from './ExerciseInfoSheet';
 import SessionEquipmentSheet from './SessionEquipmentSheet';
 import { unlockAudio } from '../../ui/beep';
+import { allInjuries } from '../../data/injuries';
+import { injuriesAffecting } from '../../domain/injuries';
+import { SEVERITIES } from '../../domain/injuries';
 import { plural } from '../../ui/text';
 import {
   addBlock,
@@ -56,7 +59,7 @@ import {
   workoutToDraft,
 } from '../../data/namedWorkouts';
 import { ulid } from '../../domain/ids';
-import { formatDayLabel } from '../../domain/dates';
+import { formatDayLabel, todayKey } from '../../domain/dates';
 import { estimateDurationMin } from '../../domain/training';
 import { formatClock } from '../../domain/units';
 import { availableSlugs } from '../../domain/equipment';
@@ -170,6 +173,17 @@ export default function SessionLogger() {
   }, [sets, sessionId]);
 
   const blocks = useMemo(() => session?.blocks ?? [], [session]);
+
+  /*
+   * Anything currently sore. Read once for the screen rather than per movement, and turned
+   * into a note on the rows it touches — never into a restriction.
+   */
+  const injuries = useLiveQuery(() => allInjuries(), []);
+  const warningsFor = (slug: string): string[] =>
+    injuriesAffecting(injuries ?? [], exerciseBySlug.get(slug), todayKey()).map(
+      (injury) =>
+        `${injury.label} — ${SEVERITIES[injury.severity].label.toLowerCase()}, resting until ${formatDayLabel(injury.restUntil).toLowerCase()}`,
+    );
 
   const activeBlock = useMemo(
     () => blocks.find((b) => b.id === activeBlockId) ?? null,
@@ -664,6 +678,7 @@ export default function SessionLogger() {
             units={units}
             previous={history?.get(section.group.slug)}
             readOnly={readOnly}
+            warnings={warningsFor(section.group.slug)}
             onSetValue={setValue}
             onToggle={toggleComplete}
             onRemoveSet={removeSet}
@@ -727,6 +742,7 @@ export default function SessionLogger() {
                 units={units}
                 nested
                 readOnly={readOnly}
+                warnings={warningsFor(group.slug)}
                 onSetValue={setValue}
                 onToggle={toggleComplete}
                 onRemoveSet={removeSet}

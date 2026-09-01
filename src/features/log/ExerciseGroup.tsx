@@ -38,6 +38,7 @@ export default function ExerciseGroup({
   onSwapExercise,
   onShowInfo,
   onStartHold,
+  warnings = [],
 }: {
   /** Anchor for the rest panel's jump-to-next. */
   id?: string;
@@ -59,6 +60,8 @@ export default function ExerciseGroup({
   onShowInfo: (slug: string) => void;
   /** Start a count-up clock for a hold. Absent where holds cannot be timed. */
   onStartHold?: (setId: string) => void;
+  /** Current injuries this movement runs into. Flagged, never enforced. */
+  warnings?: string[];
 }) {
   /*
    * Effort is recorded once for the whole session unless asked for per set.
@@ -103,6 +106,15 @@ export default function ExerciseGroup({
               {summariseSets(previous.sets, metrics, units)}
             </div>
           )}
+          {/*
+            A note, not a barrier. Whether the shoulder can take a press today is something
+            only you know, and an app that refused would just be one you worked around.
+          */}
+          {warnings.map((warning) => (
+            <div className="tiny injury-note" key={warning}>
+              🩹 {warning}
+            </div>
+          ))}
         </div>
         {/* Next to the name, because "this is too hard today" is a thought you have while
             looking at the movement, not one you go hunting through a menu for. */}

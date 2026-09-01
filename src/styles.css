@@ -442,6 +442,13 @@ input.field-static {
   font-weight: 600;
 }
 
+/* An injury the movement runs into. Warm, not alarming — it is information, not a refusal. */
+.injury-note {
+  color: var(--warn);
+  font-weight: 600;
+  margin-top: 0.15rem;
+}
+
 .review-note {
   color: var(--muted);
   font-size: 0.85rem;

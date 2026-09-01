@@ -10,11 +10,17 @@ import { DEFAULT_THEME, THEMES } from '../../ui/themes';
 import { downloadBackup, restoreBackup, wipeAllData } from '../../data/backup';
 import { db } from '../../db/db';
 import { displayWeight, weightLabel } from '../../domain/units';
+import { allInjuries } from '../../data/injuries';
+import { activeInjuries } from '../../domain/injuries';
+import { todayKey } from '../../domain/dates';
 
 export default function MoreView() {
   const { activeEquipment, exercises, profile } = useApp();
   const fileInput = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<string | null>(null);
+  const today = todayKey();
+  const injuries = useLiveQuery(() => allInjuries(), []);
+  const currentInjuries = activeInjuries(injuries ?? [], today);
   const [erasing, setErasing] = useState(false);
   // Restore is a two-way choice, so the file waits here until the mode is picked.
   const [pendingRestore, setPendingRestore] = useState<File | null>(null);
@@ -66,6 +72,19 @@ export default function MoreView() {
           <br />
           <span className="tiny faint">
             {THEMES.find((t) => t.id === (profile.theme ?? DEFAULT_THEME))?.name ?? 'Forge'} · try the other directions
+          </span>
+        </span>
+        <span className="faint">›</span>
+      </Link>
+
+      <Link to="/more/injuries" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">
+          <strong>Injuries</strong>
+          <br />
+          <span className="tiny faint">
+            {currentInjuries.length > 0
+              ? `${currentInjuries.map((i) => i.label).join(', ')} — resting`
+              : 'Log something that hurts and the sessions that load it step aside'}
           </span>
         </span>
         <span className="faint">›</span>
