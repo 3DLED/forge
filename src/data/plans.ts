@@ -21,6 +21,7 @@ import type {
   PlanPhase,
   PlannedSession,
 } from '../domain/types';
+import type { ReshufflePlan } from '../domain/reshuffle';
 
 export async function activePlan(): Promise<Plan | undefined> {
   const plans = await planRepo.all();
@@ -142,6 +143,22 @@ export async function endPlan(plan: Plan): Promise<number> {
   );
   for (const session of upcoming) await plannedSessionRepo.remove(session.id);
   return upcoming.length;
+}
+
+/**
+ * Commits a reshuffle: moved sessions get their new date, dropped ones are removed.
+ *
+ * Deletes are soft, like every other delete here, so a dropped session is recoverable from
+ * the record rather than gone. Returns what it did, because the caller says so out loud.
+ */
+export async function applyReshuffle(plan: ReshufflePlan): Promise<{ moved: number; dropped: number }> {
+  for (const move of plan.moves) {
+    await plannedSessionRepo.update(move.session.id, { date: move.to });
+  }
+  for (const drop of plan.drops) {
+    await plannedSessionRepo.remove(drop.session.id);
+  }
+  return { moved: plan.moves.length, dropped: plan.drops.length };
 }
 
 export async function movePlannedSession(session: PlannedSession, to: DayKey): Promise<void> {

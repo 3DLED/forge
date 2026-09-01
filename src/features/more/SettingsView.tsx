@@ -1,9 +1,24 @@
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useLiveQuery } from 'dexie-react-hooks';
 import PageHeader from '../../ui/PageHeader';
+import ReshuffleSheet from './ReshuffleSheet';
+import { plural } from '../../ui/text';
 import { useApp } from '../../ui/AppProvider';
 import { profileRepo } from '../../data/repos';
-import { weekdayName } from '../../domain/dates';
+import { calendarExceptions } from '../../data/plans';
+import { plannedBetween } from '../../data/sessions';
+import { addDays, todayKey, weekdayName } from '../../domain/dates';
+import { planReshuffle } from '../../domain/reshuffle';
 import type { Modality, UnitSystem, Weekday } from '../../domain/types';
+
+/**
+ * How far ahead a change to your week is allowed to reach.
+ *
+ * Long enough to cover a plan you are actually running, short enough that editing a rest day
+ * does not silently rewrite a marathon block eleven months out.
+ */
+const HORIZON_DAYS = 120;
 
 const MODALITIES: { value: Modality; label: string }[] = [
   { value: 'strength', label: 'Strength' },
@@ -14,6 +29,28 @@ const MODALITIES: { value: Modality; label: string }[] = [
 
 export default function SettingsView() {
   const { profile } = useApp();
+  const [reviewing, setReviewing] = useState(false);
+  const [outcome, setOutcome] = useState<string | null>(null);
+
+  const today = todayKey();
+  const planned = useLiveQuery(() => plannedBetween(today, addDays(today, HORIZON_DAYS)), [today]);
+  const exceptions = useLiveQuery(() => calendarExceptions(), []);
+
+  /*
+   * Recomputed on every change to the week, which is what makes the notice appear the moment
+   * a day stops working rather than at some later checkpoint. It only ever reads.
+   */
+  const reshuffle = useMemo(
+    () =>
+      planReshuffle({
+        sessions: planned ?? [],
+        availability: profile.availability,
+        exceptions: exceptions ?? [],
+        from: today,
+        weekStartsOn: profile.weekStartsOn,
+      }),
+    [planned, exceptions, profile.availability, profile.weekStartsOn, today],
+  );
 
   const setUnits = (units: UnitSystem) => void profileRepo.update(profile.id, { units });
 
@@ -96,6 +133,35 @@ export default function SettingsView() {
       </p>
 
       <div className="section-title">Weekly availability</div>
+
+      {/*
+        Shown rather than prompted. Toggling four chips to rearrange a week would otherwise
+        raise four dialogs, so the mismatch waits here until the week looks the way you meant
+        it to and you go and deal with it.
+      */}
+      {!reshuffle.settled && (
+        <div className="card tight">
+          <div className="small">
+            <strong>{plural(reshuffle.moves.length + reshuffle.drops.length, 'planned session')}</strong>{' '}
+            no longer {reshuffle.moves.length + reshuffle.drops.length === 1 ? 'fits' : 'fit'} this
+            week.
+          </div>
+          <button
+            className="btn primary block"
+            style={{ marginTop: '0.5rem' }}
+            onClick={() => setReviewing(true)}
+          >
+            See what would move
+          </button>
+        </div>
+      )}
+
+      {outcome && (
+        <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
+          {outcome}
+        </p>
+      )}
+
       <div className="card">
         <p className="small muted">
           Which kinds of training each day can hold. Planning will respect this — a day with
@@ -124,6 +190,24 @@ export default function SettingsView() {
             </div>
           ))}
       </div>
+
+      {reviewing && (
+        <ReshuffleSheet
+          plan={reshuffle}
+          onClose={() => setReviewing(false)}
+          onApplied={({ moved, dropped }) => {
+            setReviewing(false);
+            setOutcome(
+              [
+                moved > 0 && `${plural(moved, 'session')} moved`,
+                dropped > 0 && `${plural(dropped, 'session')} dropped`,
+              ]
+                .filter(Boolean)
+                .join(' · ') || 'Nothing changed',
+            );
+          }}
+        />
+      )}
     </>
   );
 }
