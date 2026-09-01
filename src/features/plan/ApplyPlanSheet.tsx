@@ -9,6 +9,7 @@
 import { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import Sheet from '../../ui/Sheet';
+import GoalPicker from '../more/GoalPicker';
 import { useApp } from '../../ui/AppProvider';
 import { applyPlan, calendarExceptions } from '../../data/plans';
 import { SEED_SESSION_TEMPLATE_BY_SLUG } from '../../data/seed/sessionTemplates';
@@ -57,8 +58,19 @@ export default function ApplyPlanSheet({
         exerciseBySlug,
         available,
         sessionTemplateBySlug: SEED_SESSION_TEMPLATE_BY_SLUG,
+        primaryGoal: profile.primaryGoal,
       }),
-    [template, startDate, weeks, profile.availability, profile.weekStartsOn, exceptions, exerciseBySlug, available],
+    [
+      template,
+      startDate,
+      weeks,
+      profile.availability,
+      profile.weekStartsOn,
+      profile.primaryGoal,
+      exceptions,
+      exerciseBySlug,
+      available,
+    ],
   );
 
   /** One line per week: how many sessions, and the long run if there is one. */
@@ -106,6 +118,22 @@ export default function ApplyPlanSheet({
       }
     >
       <p className="small muted">{template.description}</p>
+
+      {/*
+        Asked here because it changes what the button at the bottom writes, and because
+        committing to twelve weeks is the moment the question is worth answering. It is the
+        same standing answer as Settings, not a per-plan one — picking it here changes it
+        everywhere, and the preview below re-runs as soon as it does.
+      */}
+      <div className="section-title">
+        {profile.primaryGoal ? 'Training for' : 'What are you training for?'}
+      </div>
+      <GoalPicker profile={profile} />
+      {!profile.primaryGoal && (
+        <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
+          Optional. Without it the plan is generated exactly as written.
+        </p>
+      )}
 
       {trainingDays < template.daysPerWeek && (
         <div className="card tight" style={{ borderColor: 'var(--warn)' }}>

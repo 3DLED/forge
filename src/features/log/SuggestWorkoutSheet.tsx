@@ -29,6 +29,7 @@ import {
   type TrainingGoal,
 } from '../../domain/generator';
 import { BUILDABLE_REGIONS, REGION_LABELS, type BodyRegion } from '../../domain/regions';
+import { goalSpec } from '../../domain/goals';
 import type { Exercise, SessionTemplate } from '../../domain/types';
 
 const MINUTE_OPTIONS = [20, 30, 45, 60];
@@ -53,7 +54,7 @@ export default function SuggestWorkoutSheet({
   onUseSaved: (template: SessionTemplate) => void | Promise<void>;
   onClose: () => void;
 }) {
-  const { exercises } = useApp();
+  const { exercises, profile } = useApp();
   const usage = useLiveQuery(() => exerciseUsage(), [], undefined);
 
   // Straight sessions only — timed pieces are added as blocks, from "Add block".
@@ -63,7 +64,12 @@ export default function SuggestWorkoutSheet({
   );
 
   const [regions, setRegions] = useState<BodyRegion[]>(['upper']);
-  const [goal, setGoal] = useState<TrainingGoal>('muscle');
+  /*
+   * Opens on whatever you are training for rather than on hypertrophy, which is what it
+   * assumed for everyone. Still a starting point: the chips below change it for this workout
+   * without touching the standing answer.
+   */
+  const [goal, setGoal] = useState<TrainingGoal>(() => goalSpec(profile.primaryGoal).lifting);
   const [minutes, setMinutes] = useState(45);
   const [variant, setVariant] = useState(0);
 

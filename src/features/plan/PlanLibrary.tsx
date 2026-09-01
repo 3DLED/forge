@@ -14,6 +14,7 @@ import { useApp } from '../../ui/AppProvider';
 import ApplyPlanSheet from './ApplyPlanSheet';
 import { SEED_PLAN_TEMPLATES, type SeedPlanTemplate } from '../../data/seed/planTemplates';
 import { activePlan, endPlan } from '../../data/plans';
+import { rankByGoal } from '../../domain/goals';
 
 const GROUPS: { label: string; blurb: string; match: (t: SeedPlanTemplate) => boolean }[] = [
   {
@@ -39,7 +40,7 @@ const GROUPS: { label: string; blurb: string; match: (t: SeedPlanTemplate) => bo
 ];
 
 export default function PlanLibrary({ onClose }: { onClose: () => void }) {
-  const { activeEquipment } = useApp();
+  const { activeEquipment, profile } = useApp();
   const [selected, setSelected] = useState<SeedPlanTemplate | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const current = useLiveQuery(() => activePlan(), []);
@@ -50,13 +51,15 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
   const grouped = useMemo(() => {
     const claimed = new Set<string>();
     return GROUPS.map((group) => {
-      const templates = SEED_PLAN_TEMPLATES.filter(
-        (t) => !claimed.has(t.slug) && group.match(t),
+      const templates = rankByGoal(
+        SEED_PLAN_TEMPLATES.filter((t) => !claimed.has(t.slug) && group.match(t)),
+        profile.primaryGoal,
       );
       for (const t of templates) claimed.add(t.slug);
       return { ...group, templates };
     }).filter((group) => group.templates.length > 0);
-  }, []);
+    // Ordering follows the goal, so the catalogue is rebuilt when it changes.
+  }, [profile.primaryGoal]);
 
   if (selected) {
     return (

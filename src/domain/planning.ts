@@ -27,6 +27,14 @@ import { addWeeks, startOfWeek, weekDays } from './dates';
 import { resolveExercise } from './equipment';
 import { placeSlotsInWeek, resolveWeekAvailability } from './scheduling';
 import { ulid } from './ids';
+import { GOAL_SCHEMES } from './generator';
+import {
+  CONDITIONING_MODALITY,
+  CONDITIONING_TEMPLATE_SLUG,
+  extraConditioningFor,
+  goalSpec,
+  type PrimaryGoal,
+} from './goals';
 
 /**
  * Volume multipliers for the final weeks of a race plan, indexed by how many weeks remain
@@ -53,6 +61,8 @@ export interface GenerateOptions {
   /** Exercise slugs the athlete's current equipment actually allows. */
   available: Set<string>;
   sessionTemplateBySlug: Map<string, SeedSessionTemplate>;
+  /** The athlete's standing goal, which biases the dose and the weekly shape. */
+  primaryGoal?: PrimaryGoal;
 }
 
 export interface GeneratedSession {
@@ -136,6 +146,48 @@ function toPrescribedItem(item: SeedItem, exerciseSlug: string): PrescribedItem 
 }
 
 /**
+ * Nudges a prescribed item toward the goal's dose.
+ *
+ * Deliberately a nudge and not a replacement. Overwriting every template's sets and reps with
+ * the scheme's would make a Full Body A identical to a Push day and throw away the reason
+ * anyone picked one plan over another; leaving them untouched would mean the goal does
+ * nothing. So it moves halfway, which shifts a five-rep squat toward eights for someone
+ * chasing size without turning the plan into a different programme.
+ *
+ * Only rep-based work is touched. Runs keep their distances and paces: a long run does not
+ * get shorter because you said "build muscle", and a session's conditioning is not the place
+ * the lifting goal expresses itself.
+ */
+function towards(value: number, target: number): number {
+  return Math.round(value + (target - value) / 2);
+}
+
+function shapeItem(item: PrescribedItem, goal: PrimaryGoal | undefined): PrescribedItem {
+  if (goal === undefined || goal === 'general') return item;
+  // A run, an erg, or anything else scored by ground covered.
+  if (item.distanceM != null || item.paceSecPerKm != null) return item;
+
+  const scheme = GOAL_SCHEMES[goalSpec(goal).lifting];
+  const shaped: PrescribedItem = { ...item };
+
+  if (item.repRange) {
+    shaped.repRange = [
+      Math.max(1, towards(item.repRange[0], scheme.reps[0])),
+      Math.max(1, towards(item.repRange[1], scheme.reps[1])),
+    ];
+  } else if (item.reps != null) {
+    shaped.reps = Math.max(1, towards(item.reps, scheme.reps[0]));
+  } else {
+    // A hold: nothing rep-shaped to move, and rest is the block's business.
+    return item;
+  }
+
+  if (item.restSec != null) shaped.restSec = Math.max(15, towards(item.restSec, scheme.restSec));
+
+  return shaped;
+}
+
+/**
  * Applies a week's volume multiplier.
  *
  * Where the scaling lands depends on how the block is structured: repeated blocks lose
@@ -181,6 +233,7 @@ export function materialisePrescription(
     progression?: SlotProgression;
     exerciseBySlug: Map<string, Exercise>;
     available: Set<string>;
+    primaryGoal?: PrimaryGoal;
   },
 ): MaterialiseResult {
   const substitutions: { from: string; to: string }[] = [];
@@ -198,12 +251,12 @@ export function materialisePrescription(
       const resolved = resolveExercise(seedItem.ex, options.exerciseBySlug, options.available);
       if (!resolved) {
         unavailable.push(seedItem.ex);
-        return toPrescribedItem(progressed, seedItem.ex);
+        return shapeItem(toPrescribedItem(progressed, seedItem.ex), options.primaryGoal);
       }
       if (resolved.slug !== seedItem.ex) {
         substitutions.push({ from: seedItem.ex, to: resolved.slug });
       }
-      return toPrescribedItem(progressed, resolved.slug);
+      return shapeItem(toPrescribedItem(progressed, resolved.slug), options.primaryGoal);
     });
 
     const block: Block = {
@@ -234,6 +287,27 @@ export function materialisePrescription(
 
 // --- generating a whole plan ----------------------------------------------
 
+/**
+ * The extra conditioning a goal asks for, as ordinary slots.
+ *
+ * Placed last in the week so they fill whatever the plan's own sessions did not want, and
+ * dropped silently when there is no day left — an added session is a preference, not part of
+ * the programme you chose, so it should never displace one or raise a conflict.
+ */
+function conditioningSlots(options: GenerateOptions): PlanSlot[] {
+  const count = extraConditioningFor(
+    options.primaryGoal,
+    options.template.goal,
+    options.template.tags,
+  );
+
+  return Array.from({ length: count }, (_, i) => ({
+    templateSlug: CONDITIONING_TEMPLATE_SLUG,
+    modality: CONDITIONING_MODALITY,
+    order: 100 + i,
+  }));
+}
+
 export function generatePlan(options: GenerateOptions): GeneratedPlan {
   const { template } = options;
   const totalWeeks = options.weeks ?? template.weeks ?? ONGOING_PLAN_WEEKS;
@@ -253,7 +327,11 @@ export function generatePlan(options: GenerateOptions): GeneratedPlan {
     const availability = resolveWeekAvailability(days, options.availability, options.exceptions);
     const factor = weekFactor(template, weekIndex, totalWeeks);
 
-    const slotsThisWeek = template.slots.filter((s) => (s.fromWeek ?? 1) <= weekIndex);
+    const added = conditioningSlots(options);
+    const slotsThisWeek = [
+      ...template.slots.filter((s) => (s.fromWeek ?? 1) <= weekIndex),
+      ...added,
+    ];
     const placements = placeSlotsInWeek(availability, slotsThisWeek);
 
     for (const placement of placements) {
@@ -262,12 +340,17 @@ export function generatePlan(options: GenerateOptions): GeneratedPlan {
       if (!seed) continue;
 
       if (!placement.date) {
-        conflicts.push({
-          weekIndex,
-          weekStart,
-          sessionName: seed.name,
-          reason: placement.reason ?? 'Could not be scheduled',
-        });
+        // A session the goal added is a preference, not part of the programme. When the week
+        // has no room for it, it simply does not happen — reporting it as a conflict would
+        // blame the plan for something the plan never asked for.
+        if (!added.includes(slot)) {
+          conflicts.push({
+            weekIndex,
+            weekStart,
+            sessionName: seed.name,
+            reason: placement.reason ?? 'Could not be scheduled',
+          });
+        }
         continue;
       }
 
@@ -277,6 +360,7 @@ export function generatePlan(options: GenerateOptions): GeneratedPlan {
         progression: slot.progression,
         exerciseBySlug: options.exerciseBySlug,
         available: options.available,
+        primaryGoal: options.primaryGoal,
       });
 
       for (const swap of result.substitutions) {

@@ -430,6 +430,8 @@ export interface Plan extends Entity {
 // Profile
 // ---------------------------------------------------------------------------
 
+import type { PrimaryGoal } from './goals';
+
 export type UnitSystem = 'imperial' | 'metric';
 
 export interface Profile extends Entity {
@@ -440,6 +442,14 @@ export interface Profile extends Entity {
   availability: AvailabilityRule[];
   /** First day of the week for calendar rendering. */
   weekStartsOn: Weekday;
+  /**
+   * What you are training for, standing until you change it.
+   *
+   * On the profile rather than on a plan because three things read it and only one of them is
+   * a plan: the session suggester, plan generation, and resolving a percentage of your max.
+   * Absent means nothing has been asked yet, which behaves as 'general' — no bias at all.
+   */
+  primaryGoal?: PrimaryGoal;
   /** Visual direction — see `src/ui/themes.ts`. Absent means the default. */
   theme?: string;
   /**

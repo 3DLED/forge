@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import PageHeader from '../../ui/PageHeader';
 import ReshuffleSheet from './ReshuffleSheet';
+import GoalPicker from './GoalPicker';
 import { plural } from '../../ui/text';
 import { useApp } from '../../ui/AppProvider';
 import { profileRepo } from '../../data/repos';
@@ -77,6 +78,14 @@ export default function SettingsView() {
         value={profile.displayName}
         onChange={(event) => void profileRepo.update(profile.id, { displayName: event.target.value })}
       />
+
+      <div className="section-title">Training for</div>
+      <GoalPicker profile={profile} />
+      <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
+        Orders the plan library, sets what ‘Suggest a workout’ opens on, and shapes the sets
+        and reps in plans you start from here. Plans already on your calendar keep what they
+        prescribed.
+      </p>
 
       <div className="section-title">Units</div>
       <div className="row" style={{ gap: '0.5rem' }}>
