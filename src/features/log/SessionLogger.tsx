@@ -917,10 +917,19 @@ export default function SessionLogger() {
           <ExerciseInfoSheet
             exercise={target}
             onClose={() => setInfoSlug(null)}
-            onSwap={() => {
-              setInfoSlug(null);
-              setSwappingSlug(infoSlug);
-            }}
+            /*
+             * The write-up is worth reading on a workout from last month; swapping a movement
+             * in it is not. The mutate guard already refuses the change, so offering the
+             * control anyway only produces a button that appears to do nothing.
+             */
+            onSwap={
+              readOnly
+                ? undefined
+                : () => {
+                    setInfoSlug(null);
+                    setSwappingSlug(infoSlug);
+                  }
+            }
           />
         );
       })()}

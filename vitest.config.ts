@@ -10,9 +10,14 @@ import { defineConfig } from 'vitest/config';
  */
 export default defineConfig({
   test: {
+    // Node by default; component tests opt into jsdom with a docblock, so a pure arithmetic
+    // test does not pay for a DOM it never touches.
     environment: 'node',
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    setupFiles: ['src/test/setup.ts'],
     // Dexie tests share one fake IndexedDB per file, so files must not interleave.
     fileParallelism: false,
+    // Booting the real AppProvider seeds the exercise library, which is not instant.
+    testTimeout: 20000,
   },
 });
