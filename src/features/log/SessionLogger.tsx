@@ -26,6 +26,7 @@ import { useBlockTimer } from './useBlockTimer';
 import { blockShape, blockTitle } from './blockLabels';
 import NewBlockSheet from './NewBlockSheet';
 import SuggestWorkoutSheet from './SuggestWorkoutSheet';
+import SavedWorkoutsSheet from './SavedWorkoutsSheet';
 import VariationSheet from './VariationSheet';
 import ExerciseInfoSheet from './ExerciseInfoSheet';
 import SessionEquipmentSheet from './SessionEquipmentSheet';
@@ -124,6 +125,7 @@ export default function SessionLogger() {
   /** Non-null while the picker is open; carries the block to add into, if any. */
   const [picking, setPicking] = useState<{ blockId?: Id } | null>(null);
   const [suggesting, setSuggesting] = useState(false);
+  const [browsingSaved, setBrowsingSaved] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [restEndsAt, setRestEndsAt] = useState<number | null>(null);
   /** The movement the current rest follows, which is what makes "up next" answerable. */
@@ -1016,6 +1018,14 @@ export default function SessionLogger() {
         </button>
       )}
 
+      <button
+        className="btn block"
+        style={{ marginTop: '0.5rem' }}
+        onClick={() => setBrowsingSaved(true)}
+      >
+        📂 Browse saved workouts
+      </button>
+
       {/* Names all three shapes, because the sheet behind it offers all three. */}
       {looseCount > 0 && !readOnly && (
         <button
@@ -1054,6 +1064,37 @@ export default function SessionLogger() {
           onPick={addExercise}
           onClose={() => setPicking(null)}
           available={sessionAvailable}
+        />
+      )}
+
+      {browsingSaved && (
+        <SavedWorkoutsSheet
+          onClose={() => setBrowsingSaved(false)}
+          onUse={async (template) => {
+            setBrowsingSaved(false);
+            /*
+             * A timed workout comes back as its block with the clock it was saved with; a
+             * straight one as a list of movements. Reusing the paths the suggester already
+             * takes keeps one way of bringing a saved workout in, not two.
+             */
+            const draft = workoutToDraft(template);
+            if (draft) {
+              const created = await addBlock({ ...session, sets }, draft.block);
+              mutate([
+                ...sets,
+                ...draft.items.map((item) => ({
+                  id: ulid(),
+                  exerciseSlug: item.exerciseSlug,
+                  blockId: created.id,
+                  setIndex: 0,
+                  values: item.values,
+                  completed: false,
+                })),
+              ]);
+            } else {
+              mutate([...sets, ...savedWorkoutToSets(template)]);
+            }
+          }}
         />
       )}
 

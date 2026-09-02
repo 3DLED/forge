@@ -152,6 +152,19 @@ export interface Exercise extends Entity {
    * of them, where added load stacks on top of bodyweight rather than replacing it.
    */
   bodyweightFactor: number;
+  /**
+   * How to perform it, for movements you added yourself.
+   *
+   * The seeded library keeps its write-ups in a static table rather than in the database —
+   * static reference material nobody edits, so it costs no storage and no migration when a
+   * cue is reworded. A movement you invented has nowhere in that table to live, so it carries
+   * its own. Absent on seeded entries, which still read from the table.
+   */
+  coaching?: {
+    setup: string;
+    cues: string[];
+    fault: string;
+  };
   notes?: string;
 }
 

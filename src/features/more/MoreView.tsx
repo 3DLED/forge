@@ -21,6 +21,7 @@ export default function MoreView() {
   const fileInput = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<string | null>(null);
   const today = todayKey();
+  const customCount = exercises.filter((exercise) => exercise.isCustom).length;
   const injuries = useLiveQuery(() => allInjuries(), []);
   const currentInjuries = activeInjuries(injuries ?? [], today);
   const testResults = useLiveQuery(() => allTestResults(), []);
@@ -78,6 +79,19 @@ export default function MoreView() {
           <br />
           <span className="tiny faint">
             {THEMES.find((t) => t.id === (profile.theme ?? DEFAULT_THEME))?.name ?? 'Forge'} · try the other directions
+          </span>
+        </span>
+        <span className="faint">›</span>
+      </Link>
+
+      <Link to="/more/movements" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">
+          <strong>Movements</strong>
+          <br />
+          <span className="tiny faint">
+            {customCount > 0
+              ? `${plural(exercises.length, 'movement')}, ${customCount} of them yours`
+              : `${plural(exercises.length, 'movement')} — add your own`}
           </span>
         </span>
         <span className="faint">›</span>

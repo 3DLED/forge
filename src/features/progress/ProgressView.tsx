@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { bodyweightEntries } from '../../data/body';
+import { savedWorkouts } from '../../data/namedWorkouts';
 import { bodyweightLookup } from '../../domain/bodyweight';
 import PageHeader from '../../ui/PageHeader';
 import BarChart, { type Bar } from '../../ui/BarChart';
@@ -12,6 +13,7 @@ import { addWeeks, monthName, startOfWeek, todayKey, weekDays } from '../../doma
 import {
   acuteChronicRatio,
   personalRecords,
+  workoutIdFromKey,
   sessionDistanceM,
   sessionLoad,
   sessionVolumeKg,
@@ -34,6 +36,16 @@ export default function ProgressView() {
   );
   const allSessions = useLiveQuery(() => sessionsBetween('0000-01-01', '9999-12-31'), []);
   const weighIns = useLiveQuery(() => bodyweightEntries(), [], undefined);
+  /* Round records are keyed by saved workout, so their names come from the templates. */
+  const saved = useLiveQuery(() => savedWorkouts(), []);
+
+  const nameFor = (key: string): string => {
+    const workoutId = workoutIdFromKey(key);
+    if (workoutId) {
+      return (saved ?? []).find((template) => template.id === workoutId)?.name ?? 'Saved workout';
+    }
+    return exerciseBySlug.get(key)?.name ?? key;
+  };
 
   /*
    * Each session is valued at what you weighed that week, not what you weigh now. Otherwise a
@@ -183,7 +195,6 @@ export default function ProgressView() {
         onto a line nobody finishes reading.
       */}
       {ranked.map(({ record, marks }) => {
-          const exercise = exerciseBySlug.get(record.exerciseSlug);
           const [headline] = marks;
           const extra = marks.length - 1;
 
@@ -194,7 +205,7 @@ export default function ProgressView() {
               onClick={() => setOpenPr(record.exerciseSlug)}
             >
               <div className="row between">
-                <span className="grow truncate">{exercise?.name ?? record.exerciseSlug}</span>
+                <span className="grow truncate">{nameFor(record.exerciseSlug)}</span>
                 <span className="small mono muted">{headline.value}</span>
               </div>
               <div className="tiny faint" style={{ marginTop: '0.15rem', textAlign: 'left' }}>
@@ -211,7 +222,7 @@ export default function ProgressView() {
         return (
           <PrSheet
             record={record}
-            name={exerciseBySlug.get(openPr)?.name ?? openPr}
+            name={nameFor(openPr)}
             units={units}
             onClose={() => setOpenPr(null)}
           />

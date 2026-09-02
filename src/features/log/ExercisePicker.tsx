@@ -13,6 +13,7 @@
 import { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import Sheet from '../../ui/Sheet';
+import ExerciseEditorSheet from '../more/ExerciseEditorSheet';
 import { useApp } from '../../ui/AppProvider';
 import { resolveExercise } from '../../domain/equipment';
 import { CATEGORY_LABELS, CATEGORY_ORDER, categoryOf } from '../../domain/categories';
@@ -50,6 +51,7 @@ export default function ExercisePicker({
   const { exercises, exerciseBySlug } = app;
 
   const [query, setQuery] = useState('');
+  const [creating, setCreating] = useState(false);
   const [category, setCategory] = useState<ExerciseCategory | 'all'>('all');
 
   const usage = useLiveQuery(() => exerciseUsage(), [], undefined);
@@ -148,7 +150,25 @@ export default function ExercisePicker({
         <div className="empty">
           <span className="glyph">🔍</span>
           <p className="small">No movement matches “{query}”.</p>
+          {/*
+            Offered exactly where the gap is felt. Searching for something the library does
+            not have is the moment you know you need it, and sending you to Settings to add it
+            means abandoning the workout you were building.
+          */}
+          <button className="btn primary block" onClick={() => setCreating(true)}>
+            + Add “{query.trim()}” as a movement
+          </button>
         </div>
+      )}
+
+      {creating && (
+        <ExerciseEditorSheet
+          onClose={() => setCreating(false)}
+          onSaved={(exercise) => {
+            setCreating(false);
+            onPick(exercise);
+          }}
+        />
       )}
 
       {searching ? (

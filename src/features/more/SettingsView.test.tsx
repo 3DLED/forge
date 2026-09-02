@@ -57,21 +57,52 @@ async function availabilityRow(weekday: string): Promise<HTMLElement> {
 
 type User = ReturnType<typeof userEvent.setup>;
 
-/** Turns every kind of training off for one weekday, the way you would by hand. */
-async function closeDay(user: User, weekday: string) {
-  const row = await availabilityRow(weekday);
-  for (const chip of [...row.querySelectorAll('.chip.on')]) {
-    await user.click(chip);
+const MODALITY_LABELS = ['Strength', 'Cardio', 'Mobility', 'Skill'];
+
+/**
+ * Switches one modality off, and waits for it to actually be off.
+ *
+ * The click writes to the profile without awaiting, and the row re-renders from a live query
+ * when that write lands. Firing the next click before then means re-reading a chip that still
+ * looks enabled and clicking it a second time — which toggles it straight back on. That
+ * ping-pong is the intermittent failure this suite had been showing: the day ended up only
+ * partly closed, so the notice under test never appeared.
+ *
+ * Waiting on the chip's own state rather than on a timeout makes it deterministic.
+ */
+async function turnOff(user: User, weekday: string, label: string): Promise<void> {
+  const chipFor = async () => {
+    const row = await availabilityRow(weekday);
+    return [...row.querySelectorAll('.chip')].find(
+      (chip) => chip.textContent?.trim() === label,
+    ) as HTMLElement | undefined;
+  };
+
+  const chip = await chipFor();
+  if (!chip || !chip.classList.contains('on')) return;
+
+  await user.click(chip);
+  await waitFor(async () => {
+    expect((await chipFor())?.classList.contains('on')).toBe(false);
+  });
+}
+
+async function clickChips(
+  user: User,
+  weekday: string,
+  wanted: (label: string) => boolean,
+): Promise<void> {
+  for (const label of MODALITY_LABELS.filter(wanted)) {
+    await turnOff(user, weekday, label);
   }
 }
 
+/** Turns every kind of training off for one weekday, the way you would by hand. */
+const closeDay = (user: User, weekday: string) => clickChips(user, weekday, () => true);
+
 /** Leaves one weekday lifting only, so a run has nowhere to go. */
-async function strengthOnly(user: User, weekday: string) {
-  const row = await availabilityRow(weekday);
-  for (const chip of [...row.querySelectorAll('.chip.on')]) {
-    if (chip.textContent?.trim() !== 'Strength') await user.click(chip);
-  }
-}
+const strengthOnly = (user: User, weekday: string) =>
+  clickChips(user, weekday, (label) => label !== 'Strength');
 
 const dateOf = async (id: string) => (await db.plannedSessions.get(id))!.date;
 

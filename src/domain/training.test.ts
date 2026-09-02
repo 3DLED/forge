@@ -8,6 +8,7 @@ import {
   sessionLoad,
   sessionVolumeKg,
   setVolumeKg,
+  workoutKey,
 } from './training';
 import type { Exercise, LoggedSession, LoggedSet } from './types';
 
@@ -292,21 +293,50 @@ describe('scanRecords', () => {
     expect(records.get('push-up')?.sources.reps?.sessionId).toBe('rep-day');
   });
 
-  it('takes rounds off the block, and keeps the window they were scored against', () => {
-    const amrap = {
+  it('takes rounds off the block, keyed by the workout they belong to', () => {
+    const run = (id: string, date: string, rounds: number) => ({
+      ...session(id, date, []),
+      blocks: [
+        { id: `${id}-b`, style: 'amrap' as const, capSec: 1200, rounds, sourceTemplateId: 'cindy' },
+      ],
+    });
+
+    const { records, events } = scanRecords([run('a', '2026-01-01', 9), run('b', '2026-01-08', 11)]);
+
+    expect(records.get(workoutKey('cindy'))?.bestRounds).toBe(11);
+    expect(records.get(workoutKey('cindy'))?.bestRoundsTimeSec).toBe(1200);
+    expect(events.map((e) => e.sessionId)).toEqual(['b']);
+  });
+
+  /**
+   * Nine rounds of one AMRAP and nine of another are not comparable results, so a single
+   * "best AMRAP" was a number nobody could honestly beat. Naming the workout is what makes
+   * its score a score.
+   */
+  it('records nothing for a timed block that was never named', () => {
+    const anonymous = {
       ...session('a', '2026-01-01', []),
       blocks: [{ id: 'b1', style: 'amrap' as const, capSec: 1200, rounds: 9 }],
     };
-    const better = {
-      ...session('b', '2026-01-08', []),
-      blocks: [{ id: 'b2', style: 'amrap' as const, capSec: 1200, rounds: 11 }],
-    };
 
-    const { records, events } = scanRecords([amrap, better]);
+    const { records } = scanRecords([anonymous]);
 
-    expect(records.get('amrap')?.bestRounds).toBe(11);
-    expect(records.get('amrap')?.bestRoundsTimeSec).toBe(1200);
-    expect(events.map((e) => e.sessionId)).toEqual(['b']);
+    expect(records.get('amrap')).toBeUndefined();
+    expect([...records.keys()]).toEqual([]);
+  });
+
+  it('keeps two named workouts entirely separate', () => {
+    const withTemplate = (id: string, templateId: string, rounds: number) => ({
+      ...session(id, '2026-01-01', []),
+      blocks: [
+        { id: `${id}-b`, style: 'amrap' as const, capSec: 1200, rounds, sourceTemplateId: templateId },
+      ],
+    });
+
+    const { records } = scanRecords([withTemplate('a', 'cindy', 9), withTemplate('b', 'murph', 3)]);
+
+    expect(records.get(workoutKey('cindy'))?.bestRounds).toBe(9);
+    expect(records.get(workoutKey('murph'))?.bestRounds).toBe(3);
   });
 
   it('values a 1RM against the bodyweight of the day it was set', () => {

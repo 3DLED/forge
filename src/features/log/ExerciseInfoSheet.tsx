@@ -11,7 +11,7 @@
  */
 
 import Sheet from '../../ui/Sheet';
-import { coachingFor } from '../../data/seed/coaching';
+import { coachingOf } from '../../domain/coaching';
 import { BAND_LABELS, bandOf, levelOf, levelPips } from '../../domain/difficulty';
 import { CATEGORY_LABELS, categoryOf } from '../../domain/categories';
 import { plural } from '../../ui/text';
@@ -27,7 +27,7 @@ export default function ExerciseInfoSheet({
   onSwap?: () => void;
   onClose: () => void;
 }) {
-  const coaching = coachingFor(exercise.slug);
+  const coaching = coachingOf(exercise);
   const level = levelOf(exercise);
 
   return (

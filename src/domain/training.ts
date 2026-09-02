@@ -295,12 +295,18 @@ export function scanRecords(
       }
     }
 
-    // Rounds live on the block, not on its movements, so blocks are scanned separately and
-    // attributed to the container entry for their style. Without this, moving rounds onto
-    // blocks would silently kill round tracking.
+    /*
+     * Rounds live on the block, not on its movements, so blocks are scanned separately — and
+     * attributed to the *named workout* they came from rather than to their style.
+     *
+     * A round count only means something against the same work. Nine rounds of Cindy and nine
+     * rounds of a burpee-and-swing AMRAP are not comparable results, so a single "best AMRAP"
+     * was a number that could not be beaten honestly. Naming a workout is what makes its score
+     * a score, and an unnamed block records rounds against nothing.
+     */
     for (const block of session.blocks ?? []) {
-      if (!block.rounds) continue;
-      offer(CONTAINER_SLUG[block.style], 'rounds', {
+      if (!block.rounds || !block.sourceTemplateId) continue;
+      offer(workoutKey(block.sourceTemplateId), 'rounds', {
         value: block.rounds,
         timeSec: block.capSec ?? block.timeSec,
       });
@@ -396,7 +402,27 @@ export function prEventsBySession(events: PrEvent[]): Map<Id, PrEvent[]> {
   return bySession;
 }
 
-/** Library entries that stand in for a timed block when recording a best. */
+/**
+ * How a saved workout's record is keyed.
+ *
+ * Namespaced so it cannot collide with a movement slug, and so anything reading the records
+ * can tell the two apart — a workout's name comes from the saved template, not the exercise
+ * library.
+ */
+export function workoutKey(templateId: Id): string {
+  return `workout:${templateId}`;
+}
+
+export function workoutIdFromKey(key: string): Id | undefined {
+  return key.startsWith('workout:') ? key.slice('workout:'.length) : undefined;
+}
+
+/**
+ * Library entries standing in for a timed block.
+ *
+ * They no longer carry records — a named workout does that now — but they remain so the
+ * picker can keep hiding them, and so any session already referencing one still resolves.
+ */
 const CONTAINER_SLUG: Record<string, string> = {
   amrap: 'amrap',
   emom: 'emom',
@@ -406,9 +432,8 @@ const CONTAINER_SLUG: Record<string, string> = {
 /**
  * The container entries themselves, for anything that browses the library.
  *
- * They are not movements. They exist so a block's rounds have something to record a best
- * against and so the Progress view has a name to print, which is why they are hidden rather
- * than deleted — removing the records would leave every AMRAP personal best nameless. Adding
- * one to a workout was never the way to start a timed piece; ‘Add block’ is.
+ * They are not movements, and they are hidden rather than deleted because sessions logged
+ * before rounds moved onto named workouts still point at them. Adding one to a workout was
+ * never the way to start a timed piece; ‘Add block’ is.
  */
 export const CONTAINER_SLUGS = new Set(Object.values(CONTAINER_SLUG));
