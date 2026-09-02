@@ -219,7 +219,12 @@ export default function SessionLogger() {
     });
     if (!suggestion) return null;
 
-    const source = suggestion.max.origin === 'test' ? 'your test' : 'your best set';
+    const source =
+      suggestion.max.origin === 'test'
+        ? 'your test'
+        : suggestion.max.origin === 'manual'
+          ? 'the max you entered'
+          : 'your best set';
     return {
       loadKg: suggestion.loadKg,
       label: `Try ${formatWeight(suggestion.loadKg, units)} · ${Math.round(

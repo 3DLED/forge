@@ -25,7 +25,7 @@ import { regionOf } from './regions';
 import { roundToAvailableLoad } from './equipment';
 import { addDays, daysBetween } from './dates';
 
-export type TestKind = 'reps' | 'threeRepMax' | 'hold';
+export type TestKind = 'reps' | 'threeRepMax' | 'hold' | 'maxLoad';
 
 export interface TestKindSpec {
   label: string;
@@ -37,6 +37,21 @@ export interface TestKindSpec {
 }
 
 export const TEST_KINDS: Record<TestKind, TestKindSpec> = {
+  /**
+   * A maximum you already knew.
+   *
+   * Not a protocol the app runs — there is nothing to guide when the number came from your
+   * own training. It exists because most people arrive with maxes they know perfectly well,
+   * and an app that made them re-test everything before it would suggest a load is an app
+   * they would work around.
+   */
+  maxLoad: {
+    label: 'Known max',
+    blurb: 'A max you already knew, entered by hand.',
+    unit: 'kg',
+    protocol:
+      'Whatever you lifted it for, and whenever. Treated exactly like a tested max until you test it, and it ages the same way.',
+  },
   reps: {
     label: 'Max reps',
     blurb: 'One set to technical failure.',
@@ -101,6 +116,8 @@ export interface TestResult {
   estimated1RMKg?: number;
   /** The workout it was performed in. */
   sessionId?: Id;
+  /** Absent means the app ran the protocol. 'manual' means you told it. */
+  entry?: 'manual';
   notes?: string;
 }
 

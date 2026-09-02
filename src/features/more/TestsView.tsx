@@ -12,6 +12,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import PageHeader from '../../ui/PageHeader';
 import AskSheet from '../../ui/AskSheet';
 import TestRunner from '../log/TestRunner';
+import KnownMaxSheet from './KnownMaxSheet';
 import ExercisePicker from '../log/ExercisePicker';
 import { plural } from '../../ui/text';
 import { useApp } from '../../ui/AppProvider';
@@ -34,6 +35,10 @@ export default function TestsView() {
   const results = useLiveQuery(() => allTestResults(), []);
   const [picking, setPicking] = useState(false);
   const [running, setRunning] = useState<Exercise | null>(null);
+  /** Non-null while entering a max by hand, rather than measuring one. */
+  const [entering, setEntering] = useState<Exercise | null>(null);
+  /** Which flow the picker is feeding. */
+  const [pickingFor, setPickingFor] = useState<'test' | 'entry'>('test');
   /**
    * Bumped every time a test is started, and used as the runner's key.
    *
@@ -66,6 +71,9 @@ export default function TestsView() {
 
   const show = (result: TestResult): string => {
     if (result.kind === 'threeRepMax') return `${formatWeight(result.value, units)} × 3`;
+    if (result.kind === 'maxLoad') {
+      return `${formatWeight(result.value, units)} × ${result.reps ?? 1}`;
+    }
     if (result.kind === 'hold') return `${result.value}s`;
     return plural(result.value, 'rep');
   };
@@ -100,6 +108,7 @@ export default function TestsView() {
           </div>
           <div className="small muted">
             {show(latest)} · {TEST_KINDS[latest.kind].label.toLowerCase()}
+            {latest.entry === 'manual' && ' · entered, not measured'}
           </div>
           <div className="tiny faint" style={{ marginTop: '0.2rem' }}>
             {formatDayLabel(latest.date)}
@@ -131,9 +140,27 @@ export default function TestsView() {
       <button
         className="btn primary block"
         style={{ marginTop: '1rem' }}
-        onClick={() => setPicking(true)}
+        onClick={() => {
+          setPickingFor('test');
+          setPicking(true);
+        }}
       >
         Test a movement
+      </button>
+
+      {/*
+        Offered beside testing rather than buried under it. Arriving with maxes you already
+        know is the normal case, not the exception.
+      */}
+      <button
+        className="btn block"
+        style={{ marginTop: '0.5rem' }}
+        onClick={() => {
+          setPickingFor('entry');
+          setPicking(true);
+        }}
+      >
+        Enter a max I already know
       </button>
 
       <p className="tiny faint" style={{ textAlign: 'center', marginTop: '0.5rem' }}>
@@ -146,7 +173,21 @@ export default function TestsView() {
           onClose={() => setPicking(false)}
           onPick={(exercise) => {
             setPicking(false);
-            startTest(exercise);
+            if (pickingFor === 'entry') setEntering(exercise);
+            else startTest(exercise);
+          }}
+        />
+      )}
+
+      {entering && (
+        <KnownMaxSheet
+          exercise={entering}
+          units={units}
+          onClose={() => setEntering(null)}
+          onSaved={(loadKg) => {
+            const name = entering.name;
+            setEntering(null);
+            setNotice(`${name}: ${formatWeight(loadKg, units)} saved. Used until you test it.`);
           }}
         />
       )}

@@ -10,6 +10,7 @@ import { db } from '../db/db';
 import { testResultRepo } from './repos';
 import { todayKey } from '../domain/dates';
 import { oneRepMaxFromThree } from '../domain/fitnessTests';
+import { estimate1RM } from '../domain/training';
 import type { TestKind, TestResult } from '../domain/fitnessTests';
 import type { DayKey, Id } from '../domain/types';
 
@@ -35,15 +36,24 @@ export async function recordTestResult(draft: {
   sessionId?: Id;
   notes?: string;
   date?: DayKey;
+  entry?: 'manual';
 }): Promise<TestResult> {
   const date = draft.date ?? todayKey();
 
   /*
    * The one-rep figure is derived now and stored, not computed on read. Improving the formula
    * later must not silently restate what a test in March said.
+   *
+   * A hand-entered max carries its own rep count — people know their five rep max as readily
+   * as their single — so it converts through the same Epley the rest of the app uses rather
+   * than assuming three.
    */
   const estimated1RMKg =
-    draft.kind === 'threeRepMax' ? oneRepMaxFromThree(draft.value) : undefined;
+    draft.kind === 'threeRepMax'
+      ? oneRepMaxFromThree(draft.value)
+      : draft.kind === 'maxLoad'
+        ? (estimate1RM(draft.value, draft.reps ?? 1) ?? undefined)
+        : undefined;
 
   return (await testResultRepo.create({
     ...draft,

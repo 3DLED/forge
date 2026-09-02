@@ -134,6 +134,57 @@ describe('knownMax', () => {
     expect(found?.oneRepMaxKg).toBe(110);
   });
 
+  /**
+   * A hand-entered max and a tested one are both deliberate statements about a maximum, so
+   * neither outranks the other on principle — recency decides.
+   */
+  it('uses a max you entered when there is nothing else', () => {
+    const entered = test({ id: 'm1', entry: 'manual', kind: 'maxLoad', estimated1RMKg: 95 });
+    expect(knownMax('back-squat', [entered], noRecords)).toMatchObject({
+      oneRepMaxKg: 95,
+      origin: 'manual',
+    });
+  });
+
+  it('prefers a newer test over an older entry', () => {
+    const entered = test({ id: 'm1', entry: 'manual', kind: 'maxLoad', date: '2026-01-01', estimated1RMKg: 200 });
+    const tested = test({ id: 't1', date: '2026-05-01', estimated1RMKg: 110 });
+    expect(knownMax('back-squat', [entered, tested], noRecords)).toMatchObject({
+      oneRepMaxKg: 110,
+      origin: 'test',
+    });
+  });
+
+  it('prefers a newer entry over an older test', () => {
+    const tested = test({ id: 't1', date: '2026-01-01', estimated1RMKg: 110 });
+    const entered = test({ id: 'm1', entry: 'manual', kind: 'maxLoad', date: '2026-05-01', estimated1RMKg: 130 });
+    expect(knownMax('back-squat', [tested, entered], noRecords)).toMatchObject({
+      oneRepMaxKg: 130,
+      origin: 'manual',
+    });
+  });
+
+  /** Same day, and one of them was actually performed. */
+  it('breaks a same-day tie toward the test', () => {
+    const tested = test({ id: 't1', date: '2026-05-01', estimated1RMKg: 110 });
+    const entered = test({ id: 'm1', entry: 'manual', kind: 'maxLoad', date: '2026-05-01', estimated1RMKg: 130 });
+    expect(knownMax('back-squat', [entered, tested], noRecords)).toMatchObject({
+      origin: 'test',
+    });
+  });
+
+  it('still yields to a logged set that is newer and heavier than an entry', () => {
+    const entered = test({ id: 'm1', entry: 'manual', kind: 'maxLoad', date: '2026-05-01', estimated1RMKg: 100 });
+    const newer = record({
+      best1RMKg: 125,
+      sources: { oneRm: { sessionId: 's2', date: '2026-05-20' } },
+    });
+    expect(knownMax('back-squat', [entered], new Map([['back-squat', newer]]))).toMatchObject({
+      oneRepMaxKg: 125,
+      origin: 'logged',
+    });
+  });
+
   it('never crosses movements', () => {
     expect(knownMax('bench-press', [test()], new Map([['back-squat', record()]]))).toBeUndefined();
   });
@@ -161,8 +212,8 @@ describe('suggestLoad', () => {
 
   /** Percentages come off 90% of the true max, not the max itself. */
   it('works from the training max rather than the true max', () => {
-    // 100 x 0.9 x 0.87 = 78.3, to the nearest half kilo.
-    expect(suggest()?.loadKg).toBeCloseTo(78.5);
+    // 100 x 0.9 x 0.87 = 78.3, down to the half kilo.
+    expect(suggest()?.loadKg).toBeCloseTo(78);
   });
 
   it('honours a different training max', () => {
@@ -184,6 +235,21 @@ describe('suggestLoad', () => {
     const bells = [16, 24, 32, 40];
     const suggestion = suggest({ loads: bells });
     expect(bells).toContain(suggestion?.loadKg);
+  });
+
+  /**
+   * Down, never up. Rounding to the nearest defeats the training max on a sparse rack: a
+   * target of 78.3 landing on an 80 prescribes more than the discount was there to allow, and
+   * overshooting means missed reps — the exact failure it exists to prevent.
+   */
+  it('never suggests more than the target it computed', () => {
+    const bells = [60, 70, 80, 90];
+    // 100 x 0.9 x 0.87 = 78.3, which is nearer 80 than 70.
+    expect(suggest({ loads: bells })!.loadKg).toBe(70);
+  });
+
+  it('offers the lightest thing you own when nothing is light enough', () => {
+    expect(suggest({ loads: [100, 120], max: max({ oneRepMaxKg: 50 }) })!.loadKg).toBe(100);
   });
 
   it('reports the percentage of the true max it landed on', () => {
@@ -219,9 +285,9 @@ describe('loadForPercent', () => {
     expect(loadForPercent({ percent: 0.75, max: max() })).toBeCloseTo(67.5);
   });
 
-  it('rounds to what you own', () => {
-    // 100 x 0.9 x 0.75 = 67.5, which is exactly between the 65 and the 70.
-    expect(loadForPercent({ percent: 0.75, max: max(), loads: [60, 65, 70] })).toBe(70);
+  it('rounds down to what you own', () => {
+    // 100 x 0.9 x 0.75 = 67.5, so the 65 rather than the 70.
+    expect(loadForPercent({ percent: 0.75, max: max(), loads: [60, 65, 70] })).toBe(65);
     expect(loadForPercent({ percent: 0.75, max: max(), loads: [16, 24, 32, 40] })).toBe(40);
   });
 

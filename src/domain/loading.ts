@@ -21,7 +21,7 @@
 import type { DayKey, Exercise } from './types';
 import type { PersonalRecord } from './training';
 import type { TestResult } from './fitnessTests';
-import { roundToAvailableLoad } from './equipment';
+import { roundDownToAvailableLoad } from './equipment';
 import { daysBetween } from './dates';
 
 /**
@@ -74,7 +74,7 @@ export function percentForReps(reps: number): number | undefined {
   return below[1] + (above[1] - below[1]) * along;
 }
 
-export type MaxOrigin = 'test' | 'logged';
+export type MaxOrigin = 'test' | 'manual' | 'logged';
 
 export interface KnownMax {
   exerciseSlug: string;
@@ -97,9 +97,19 @@ export function knownMax(
   testResults: TestResult[],
   records: Map<string, PersonalRecord>,
 ): KnownMax | undefined {
-  const test = testResults
+  /*
+   * A hand-entered max and a tested one are both deliberate statements about a maximum, so
+   * neither automatically outranks the other — recency decides, and a test wins a tie because
+   * it was performed rather than recalled.
+   */
+  const stated = testResults
     .filter((result) => result.exerciseSlug === exerciseSlug && result.estimated1RMKg)
-    .sort((a, b) => b.date.localeCompare(a.date))[0];
+    .sort(
+      (a, b) =>
+        b.date.localeCompare(a.date) ||
+        (a.entry === 'manual' ? 1 : 0) - (b.entry === 'manual' ? 1 : 0),
+    )[0];
+  const test = stated;
 
   const record = records.get(exerciseSlug);
   const logged =
@@ -116,7 +126,7 @@ export function knownMax(
   const fromTest: KnownMax = {
     exerciseSlug,
     oneRepMaxKg: test.estimated1RMKg!,
-    origin: 'test',
+    origin: test.entry === 'manual' ? 'manual' : 'test',
     date: test.date,
   };
 
@@ -165,7 +175,15 @@ export function suggestLoad(options: {
   const percent = percentForReps(reps);
   if (percent === undefined) return undefined;
 
-  const loadKg = roundToAvailableLoad(max.oneRepMaxKg * trainingMax * percent, loads);
+  /*
+   * Down to the next load you own, never up.
+   *
+   * Rounding to the nearest defeats the training max on a sparse rack: with bells eight kilos
+   * apart, a target of 36.5 rounds up to the 40 that *is* your five rep max, prescribing 100%
+   * of it for a set the discount existed to keep at 90. Overshooting means missed reps, which
+   * is the exact failure the training max is there to prevent.
+   */
+  const loadKg = roundDownToAvailableLoad(max.oneRepMaxKg * trainingMax * percent, loads);
   if (loadKg <= 0) return undefined;
 
   return {
@@ -186,5 +204,5 @@ export function loadForPercent(options: {
 }): number | undefined {
   const { percent, max, trainingMax = DEFAULT_TRAINING_MAX, loads } = options;
   if (!max || max.oneRepMaxKg <= 0) return undefined;
-  return roundToAvailableLoad(max.oneRepMaxKg * trainingMax * percent, loads);
+  return roundDownToAvailableLoad(max.oneRepMaxKg * trainingMax * percent, loads);
 }

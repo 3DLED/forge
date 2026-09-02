@@ -104,6 +104,14 @@ export function missingEquipment(
  * Ties go heavy. The alternative is a programme that quietly drifts light every time a
  * percentage lands between two bells.
  */
+export function roundDownToAvailableLoad(targetKg: number, availableKg?: number[]): number {
+  if (!availableKg || availableKg.length === 0) return Math.floor(targetKg * 2) / 2;
+
+  const under = availableKg.filter((load) => load <= targetKg);
+  // Nothing light enough: the lightest thing you own is the only honest answer.
+  return under.length > 0 ? Math.max(...under) : Math.min(...availableKg);
+}
+
 export function roundToAvailableLoad(targetKg: number, availableKg?: number[]): number {
   if (!availableKg || availableKg.length === 0) return Math.round(targetKg * 2) / 2;
 
