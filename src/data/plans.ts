@@ -12,11 +12,13 @@ import type { GeneratedPlan } from '../domain/planning';
 import type { SeedPlanTemplate } from './seed/planTemplates';
 import { todayKey } from '../domain/dates';
 import { ulid } from '../domain/ids';
+import { TEST_DAY_MARKER } from '../domain/fitnessTests';
 import type {
   CalendarException,
   DayKey,
   Goal,
   Id,
+  Modality,
   Plan,
   PlanPhase,
   PlannedSession,
@@ -89,6 +91,15 @@ export interface ApplyPlanOptions {
   equipmentProfileId?: Id;
   /** Wipe existing unstarted sessions in the plan's date range first. */
   replaceExisting?: boolean;
+  /**
+   * Bookend the plan with testing days, so the finish can be compared to the start.
+   *
+   * Opt-in: a maximal test is a session in its own right, and a plan that opens by demanding
+   * one from someone who just wanted to start training is a plan they abandon on day one.
+   */
+  includeTests?: boolean;
+  /** Movements the testing days measure, worked out by the caller from the plan itself. */
+  testMovements?: string[];
 }
 
 export async function applyPlan(options: ApplyPlanOptions): Promise<Plan> {
@@ -127,10 +138,57 @@ export async function applyPlan(options: ApplyPlanOptions): Promise<Plan> {
       planId: plan.id,
       prescription: session.prescription,
       status: 'planned',
-    } as Omit<PlannedSession, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>);
+      } as Omit<PlannedSession, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>);
+  }
+
+  if (options.includeTests && (options.testMovements?.length ?? 0) > 0) {
+    await addTestDays(plan.id, options.startDate, generated.endDate, options.testMovements!);
   }
 
   return plan;
+}
+
+/**
+ * A testing day at each end of the plan.
+ *
+ * Placed on the start and end dates themselves rather than fitted around the week's training:
+ * the whole value is that the two are the same test under the same conditions, and a test that
+ * drifts to whichever day was free is not that.
+ */
+async function addTestDays(
+  planId: Id,
+  startDate: DayKey,
+  endDate: DayKey,
+  movements: string[],
+): Promise<void> {
+  const prescription = {
+    name: 'Benchmark tests',
+    modalities: ['strength'] as Modality[],
+    estimatedMinutes: 20 + movements.length * 20,
+    sourceTemplateId: TEST_DAY_MARKER,
+    blocks: [
+      {
+        id: ulid(),
+        style: 'straight' as const,
+        label: 'Measure',
+        items: movements.map((slug) => ({
+          id: ulid(),
+          exerciseSlug: slug,
+          load: { kind: 'unspecified' } as const,
+          notes: 'Run this from Tests so the protocol is the same both times.',
+        })),
+      },
+    ],
+  };
+
+  for (const date of [startDate, endDate]) {
+    await plannedSessionRepo.create({
+      date,
+      planId,
+      prescription,
+      status: 'planned',
+    } as Omit<PlannedSession, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>);
+  }
 }
 
 /** Ends a plan and clears its remaining unstarted sessions from today forward. */

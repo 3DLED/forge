@@ -20,6 +20,7 @@ import {
   startDateForRace,
 } from '../../domain/planning';
 import { addDays, formatDayLabel, startOfWeek, todayKey } from '../../domain/dates';
+import { testDayMovements } from '../../domain/fitnessTests';
 import { formatDistance } from '../../domain/units';
 
 export default function ApplyPlanSheet({
@@ -41,6 +42,7 @@ export default function ApplyPlanSheet({
   const [manualStart, setManualStart] = useState(defaultStart);
   const [raceDate, setRaceDate] = useState('');
   const [saving, setSaving] = useState(false);
+  const [includeTests, setIncludeTests] = useState(false);
 
   // A race date pins the finish; everything else counts forward from a start date.
   const startDate =
@@ -92,6 +94,17 @@ export default function ApplyPlanSheet({
 
   const trainingDays = profile.availability.filter((r) => r.allowedModalities.length > 0).length;
 
+  const testMovements = useMemo(
+    () =>
+      testDayMovements(
+        generated.sessions.flatMap((session) =>
+          session.prescription.blocks.flatMap((block) => block.items.map((item) => item.exerciseSlug)),
+        ),
+        exerciseBySlug,
+      ),
+    [generated, exerciseBySlug],
+  );
+
   return (
     <Sheet
       title={template.name}
@@ -109,6 +122,8 @@ export default function ApplyPlanSheet({
               eventDate: isRace && raceDate ? raceDate : undefined,
               equipmentProfileId: activeEquipment?.id,
               replaceExisting: true,
+              includeTests,
+              testMovements,
             });
             onApplied();
           }}
@@ -133,6 +148,25 @@ export default function ApplyPlanSheet({
         <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
           Optional. Without it the plan is generated exactly as written.
         </p>
+      )}
+
+      {testMovements.length > 0 && (
+        <>
+          <div className="section-title">Testing days</div>
+          <button
+            className={`chip${includeTests ? ' on' : ''}`}
+            onClick={() => setIncludeTests((on) => !on)}
+          >
+            {includeTests ? '✓ Bookend with tests' : 'Bookend with tests'}
+          </button>
+          <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
+            {includeTests
+              ? `Adds a testing day at each end, measuring ${testMovements
+                  .map((slug) => exerciseBySlug.get(slug)?.name ?? slug)
+                  .join(', ')}. Same test both times, so the difference means something.`
+              : 'Optional. A testing day at each end of the plan, so you can see what changed.'}
+          </p>
+        </>
       )}
 
       {trainingDays < template.daysPerWeek && (

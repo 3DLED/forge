@@ -27,3 +27,4 @@ export const planRepo = createRepo(db.plans, 'plans');
 export const profileRepo = createRepo(db.profiles, 'profiles');
 export const bodyMetricRepo = createRepo(db.bodyMetrics, 'bodyMetrics');
 export const injuryRepo = createRepo(db.injuries, 'injuries');
+export const testResultRepo = createRepo(db.testResults, 'testResults');

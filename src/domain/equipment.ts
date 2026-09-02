@@ -92,3 +92,41 @@ export function missingEquipment(
 
   return new Map([...gaps].sort((a, b) => b[1] - a[1]));
 }
+
+/**
+ * The nearest load you can actually put on the bar, or pick up off the floor.
+ *
+ * A percentage is a number; a kettlebell is an object. Told to lift 72.5 kg with a rack of
+ * 24s and 32s, the honest answer is one of those two, and prescribing 72.5 is prescribing
+ * nothing. Where the loads owned are unknown, the target comes back rounded to the nearest
+ * half kilo rather than pretending to a precision nothing can deliver.
+ *
+ * Ties go heavy. The alternative is a programme that quietly drifts light every time a
+ * percentage lands between two bells.
+ */
+export function roundToAvailableLoad(targetKg: number, availableKg?: number[]): number {
+  if (!availableKg || availableKg.length === 0) return Math.round(targetKg * 2) / 2;
+
+  return availableKg.reduce((best, candidate) => {
+    const closer = Math.abs(candidate - targetKg) < Math.abs(best - targetKg);
+    const tied = Math.abs(candidate - targetKg) === Math.abs(best - targetKg);
+    return closer || (tied && candidate > best) ? candidate : best;
+  }, availableKg[0]);
+}
+
+/**
+ * Loads available for a movement, from an equipment profile.
+ *
+ * Only single-implement kit is meaningful here: a barbell's usable loads depend on which
+ * plates are paired with it, which is a different sum. Absent means "no constraint", and the
+ * caller rounds to the nearest half kilo instead.
+ */
+export function loadsForExercise(
+  exercise: Exercise,
+  availableWeightsKg?: Partial<Record<'kettlebell' | 'dumbbell' | 'plates', number[]>>,
+): number[] | undefined {
+  if (!availableWeightsKg) return undefined;
+  if (exercise.equipment.includes('kettlebell')) return availableWeightsKg.kettlebell;
+  if (exercise.equipment.includes('dumbbell')) return availableWeightsKg.dumbbell;
+  return undefined;
+}

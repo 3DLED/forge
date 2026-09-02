@@ -19,6 +19,7 @@
 
 import Dexie, { type Table } from 'dexie';
 import type { Injury } from '../domain/injuries';
+import type { TestResult } from '../domain/fitnessTests';
 import type {
   BodyMetric,
   CalendarException,
@@ -62,6 +63,7 @@ export class TrainingDb extends Dexie {
   profiles!: Table<Profile, Id>;
   bodyMetrics!: Table<BodyMetric, Id>;
   injuries!: Table<Injury & { createdAt: Instant; updatedAt: Instant }, Id>;
+  testResults!: Table<TestResult & { createdAt: Instant; updatedAt: Instant }, Id>;
   changes!: Table<ChangeRow, number>;
   meta!: Table<MetaRow, string>;
 
@@ -98,6 +100,17 @@ export class TrainingDb extends Dexie {
     this.version(2).stores({
       injuries: 'id, region, startDate, restUntil, resolvedDate, updatedAt',
     });
+
+    /*
+     * Version 3: benchmark test results.
+     *
+     * Additive again, for the same reason. Indexed by movement and date because every read is
+     * "what is the latest result for this movement" — the question both the retest warning and
+     * percentage-based loading ask.
+     */
+    this.version(3).stores({
+      testResults: 'id, exerciseSlug, kind, date, [exerciseSlug+date], updatedAt',
+    });
   }
 }
 
@@ -115,6 +128,7 @@ export const DATA_TABLES = [
   'profiles',
   'bodyMetrics',
   'injuries',
+  'testResults',
 ] as const;
 
 export type DataTableName = (typeof DATA_TABLES)[number];
