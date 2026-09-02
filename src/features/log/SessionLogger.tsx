@@ -31,6 +31,12 @@ import ExerciseInfoSheet from './ExerciseInfoSheet';
 import SessionEquipmentSheet from './SessionEquipmentSheet';
 import { unlockAudio } from '../../ui/beep';
 import { allInjuries } from '../../data/injuries';
+import { allTestResults } from '../../data/fitnessTests';
+import { knownMax, suggestLoad } from '../../domain/loading';
+import { scanRecords } from '../../domain/training';
+import { loadsForExercise } from '../../domain/equipment';
+import { formatWeight } from '../../domain/units';
+import { sessionsBetween } from '../../data/sessions';
 import { injuriesAffecting } from '../../domain/injuries';
 import { SEVERITIES } from '../../domain/injuries';
 import { plural } from '../../ui/text';
@@ -102,7 +108,7 @@ type Section =
 export default function SessionLogger() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
-  const { units, exerciseBySlug, exercises, available, activeEquipment } = useApp();
+  const { units, exerciseBySlug, exercises, available, activeEquipment, profile } = useApp();
 
   // Resolves to null when the session genuinely does not exist, so "loading" and "missing"
   // stay distinguishable — useLiveQuery reports undefined until the first read settles.
@@ -179,6 +185,60 @@ export default function SessionLogger() {
    * into a note on the rows it touches — never into a restriction.
    */
   const injuries = useLiveQuery(() => allInjuries(), []);
+  /*
+   * Everything needed to propose a working load: what you have tested, and what you have
+   * lifted. Both are read once for the screen rather than per movement.
+   */
+  const testResults = useLiveQuery(() => allTestResults(), []);
+  const pastSessions = useLiveQuery(() => sessionsBetween('0000-01-01', '9999-12-31'), []);
+  const records = useMemo(
+    () => scanRecords(pastSessions ?? []).records,
+    [pastSessions],
+  );
+
+  /**
+   * A load for the first unfilled set of a movement.
+   *
+   * Keyed off what the set already asks for: a prescribed rep count is what the chart maps.
+   * Nothing is proposed once a weight is entered — the number you chose outranks the average.
+   */
+  const suggestionFor = (slug: string, sets: LoggedSet[]) => {
+    const exercise = exerciseBySlug.get(slug);
+    if (!exercise || sets.every((set) => set.values.weightKg)) return null;
+
+    const reps = sets.find((set) => set.values.reps)?.values.reps;
+    if (!reps) return null;
+
+    const suggestion = suggestLoad({
+      exercise,
+      reps,
+      max: knownMax(slug, testResults ?? [], records),
+      today: todayKey(),
+      trainingMax: (profile.trainingMaxPercent ?? 90) / 100,
+      loads: loadsForExercise(exercise, activeEquipment?.availableWeightsKg),
+    });
+    if (!suggestion) return null;
+
+    const source = suggestion.max.origin === 'test' ? 'your test' : 'your best set';
+    return {
+      loadKg: suggestion.loadKg,
+      label: `Try ${formatWeight(suggestion.loadKg, units)} · ${Math.round(
+        suggestion.percentOfMax * 100,
+      )}% of ${source}${suggestion.stale ? ', which is getting old' : ''}`,
+    };
+  };
+
+  const applySuggestion = (slug: string, loadKg: number) => {
+    if (!sets) return;
+    mutate(
+      sets.map((set) =>
+        set.exerciseSlug === slug && !set.values.weightKg
+          ? { ...set, values: { ...set.values, weightKg: loadKg } }
+          : set,
+      ),
+    );
+  };
+
   const warningsFor = (slug: string): string[] =>
     injuriesAffecting(injuries ?? [], exerciseBySlug.get(slug), todayKey()).map(
       (injury) =>
@@ -679,6 +739,11 @@ export default function SessionLogger() {
             previous={history?.get(section.group.slug)}
             readOnly={readOnly}
             warnings={warningsFor(section.group.slug)}
+            suggestion={suggestionFor(section.group.slug, section.group.sets)}
+            onUseSuggestion={() => {
+              const suggestion = suggestionFor(section.group.slug, section.group.sets);
+              if (suggestion) applySuggestion(section.group.slug, suggestion.loadKg);
+            }}
             onSetValue={setValue}
             onToggle={toggleComplete}
             onRemoveSet={removeSet}

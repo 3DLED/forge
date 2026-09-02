@@ -39,6 +39,8 @@ export default function ExerciseGroup({
   onShowInfo,
   onStartHold,
   warnings = [],
+  suggestion,
+  onUseSuggestion,
 }: {
   /** Anchor for the rest panel's jump-to-next. */
   id?: string;
@@ -62,6 +64,10 @@ export default function ExerciseGroup({
   onStartHold?: (setId: string) => void;
   /** Current injuries this movement runs into. Flagged, never enforced. */
   warnings?: string[];
+  /** A working load worked out from your max, offered for the sets that have none. */
+  suggestion?: { label: string; loadKg: number } | null;
+  /** Puts the suggested load on every set of this movement that is still empty. */
+  onUseSuggestion?: () => void;
 }) {
   /*
    * Effort is recorded once for the whole session unless asked for per set.
@@ -115,6 +121,15 @@ export default function ExerciseGroup({
               🩹 {warning}
             </div>
           ))}
+          {/*
+            Offered, never written for you. The chart is a population average and knows
+            nothing about today, so the number goes in when you tap it and not before.
+          */}
+          {suggestion && !readOnly && (
+            <button className="tiny load-hint" onClick={onUseSuggestion}>
+              {suggestion.label}
+            </button>
+          )}
         </div>
         {/* Next to the name, because "this is too hard today" is a thought you have while
             looking at the movement, not one you go hunting through a menu for. */}

@@ -442,6 +442,23 @@ input.field-static {
   font-weight: 600;
 }
 
+/* A proposed working load. Reads as an offer you can take, not as a value already set. */
+.load-hint {
+  display: block;
+  margin-top: 0.2rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
 /* An injury the movement runs into. Warm, not alarming — it is information, not a refusal. */
 .injury-note {
   color: var(--warn);

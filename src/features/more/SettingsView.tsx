@@ -87,6 +87,25 @@ export default function SettingsView() {
         prescribed.
       </p>
 
+      <div className="section-title">Training max</div>
+      <div className="row wrap" style={{ gap: '0.4rem' }}>
+        {[85, 90, 95, 100].map((percent) => (
+          <button
+            key={percent}
+            className={`chip${(profile.trainingMaxPercent ?? 90) === percent ? ' on' : ''}`}
+            onClick={() => void profileRepo.update(profile.id, { trainingMaxPercent: percent })}
+          >
+            {percent}%
+          </button>
+        ))}
+      </div>
+      <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
+        Suggested loads are worked out from this share of your tested max, rather than from the
+        max itself. Ninety per cent is the usual convention: a number computed from your best
+        day is not makeable on an average one, and a programme you miss reps on is one you stop
+        running. At 100% the suggestions come straight off your max.
+      </p>
+
       <div className="section-title">Units</div>
       <div className="row" style={{ gap: '0.5rem' }}>
         <button

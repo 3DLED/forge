@@ -443,6 +443,11 @@ export interface Profile extends Entity {
   /** First day of the week for calendar rendering. */
   weekStartsOn: Weekday;
   /**
+   * The fraction of a true maximum that percentage-based loads are worked from, as a
+   * percentage. Ninety by default — see the note in `loading.ts`.
+   */
+  trainingMaxPercent?: number;
+  /**
    * What you are training for, standing until you change it.
    *
    * On the profile rather than on a plan because three things read it and only one of them is
