@@ -443,6 +443,9 @@ input.field-static {
 }
 
 /* A proposed working load. Reads as an offer you can take, not as a value already set. */
+/* Easing off reads as caution rather than as an offer of more. */
+.load-hint.easing { color: var(--warn); }
+
 .load-hint {
   display: block;
   margin-top: 0.2rem;

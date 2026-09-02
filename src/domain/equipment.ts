@@ -138,3 +138,23 @@ export function loadsForExercise(
   if (exercise.equipment.includes('dumbbell')) return availableWeightsKg.dumbbell;
   return undefined;
 }
+
+/**
+ * The lightest load heavier than this one, or undefined at the top of the rack.
+ *
+ * With no rack defined anything is loadable, so the NSCA increment applies instead: a couple
+ * of kilos, which sits inside their 2-10% guidance for a working weight.
+ */
+export function nextLoadAbove(kg: number, availableKg?: number[]): number | undefined {
+  if (!availableKg || availableKg.length === 0) return Math.round((kg + 2.5) * 2) / 2;
+  return availableKg.filter((load) => load > kg).sort((a, b) => a - b)[0];
+}
+
+/** The heaviest load lighter than this one, or undefined at the bottom of the rack. */
+export function nextLoadBelow(kg: number, availableKg?: number[]): number | undefined {
+  if (!availableKg || availableKg.length === 0) {
+    const lighter = Math.round((kg - 2.5) * 2) / 2;
+    return lighter > 0 ? lighter : undefined;
+  }
+  return availableKg.filter((load) => load < kg).sort((a, b) => b - a)[0];
+}

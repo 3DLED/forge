@@ -41,6 +41,8 @@ export default function ExerciseGroup({
   warnings = [],
   suggestion,
   onUseSuggestion,
+  progression,
+  onUseProgression,
 }: {
   /** Anchor for the rest panel's jump-to-next. */
   id?: string;
@@ -68,6 +70,9 @@ export default function ExerciseGroup({
   suggestion?: { label: string; loadKg: number } | null;
   /** Puts the suggested load on every set of this movement that is still empty. */
   onUseSuggestion?: () => void;
+  /** What last time says about today. Offered, never applied on your behalf. */
+  progression?: { direction: 'up' | 'down'; label: string } | null;
+  onUseProgression?: () => void;
 }) {
   /*
    * Effort is recorded once for the whole session unless asked for per set.
@@ -128,6 +133,14 @@ export default function ExerciseGroup({
           {suggestion && !readOnly && (
             <button className="tiny load-hint" onClick={onUseSuggestion}>
               {suggestion.label}
+            </button>
+          )}
+          {progression && !readOnly && (
+            <button
+              className={`tiny load-hint${progression.direction === 'down' ? ' easing' : ''}`}
+              onClick={onUseProgression}
+            >
+              {progression.direction === 'up' ? '↑' : '↓'} {progression.label}
             </button>
           )}
         </div>

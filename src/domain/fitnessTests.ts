@@ -22,7 +22,7 @@
 
 import type { DayKey, Exercise, Id } from './types';
 import { regionOf } from './regions';
-import { roundToAvailableLoad } from './equipment';
+import { nextLoadAbove, roundToAvailableLoad } from './equipment';
 import { addDays, daysBetween } from './dates';
 
 export type TestKind = 'reps' | 'threeRepMax' | 'hold' | 'maxLoad';
@@ -187,16 +187,7 @@ function stepFraction(exercise: Exercise): number {
   return regionOf(exercise) === 'lower' ? ATTEMPT_STEP.lower : ATTEMPT_STEP.upper;
 }
 
-/**
- * The lightest load heavier than this one, or null at the top of the rack.
- *
- * With no rack defined anything is loadable, so half a kilo up always exists.
- */
-function nextLoadAbove(kg: number, loads?: number[]): number | null {
-  if (!loads || loads.length === 0) return kg + 0.5;
-  const heavier = loads.filter((load) => load > kg).sort((a, b) => a - b);
-  return heavier[0] ?? null;
-}
+
 
 /**
  * The whole test, laid out before it starts.

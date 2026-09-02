@@ -33,6 +33,9 @@ import { unlockAudio } from '../../ui/beep';
 import { allInjuries } from '../../data/injuries';
 import { allTestResults } from '../../data/fitnessTests';
 import { knownMax, suggestLoad } from '../../domain/loading';
+import { suggestProgression } from '../../domain/progression';
+import { GOAL_SCHEMES } from '../../domain/generator';
+import { goalSpec } from '../../domain/goals';
 import { scanRecords } from '../../domain/training';
 import { loadsForExercise } from '../../domain/equipment';
 import { formatWeight } from '../../domain/units';
@@ -231,6 +234,58 @@ export default function SessionLogger() {
         suggestion.percentOfMax * 100,
       )}% of ${source}${suggestion.stale ? ', which is getting old' : ''}`,
     };
+  };
+
+  /**
+   * What last time says about this movement today.
+   *
+   * The rep range comes from your goal rather than from the template, because a logged set
+   * records the reps it asked for and not the range they sat in — and the goal is the app's
+   * standing answer to what range you are working in anyway.
+   */
+  const progressionFor = (slug: string, sets: LoggedSet[]) => {
+    const exercise = exerciseBySlug.get(slug);
+    // Nothing to propose about a movement you have already started logging today.
+    if (!exercise || sets.some((set) => set.completed)) return null;
+
+    const next = suggestProgression({
+      exercise,
+      sessions: (pastSessions ?? []).filter((past) => past.id !== sessionId),
+      repRange: GOAL_SCHEMES[goalSpec(profile.primaryGoal).lifting].reps,
+      loads: loadsForExercise(exercise, activeEquipment?.availableWeightsKg),
+    });
+    if (!next) return null;
+
+    /*
+     * Withdrawn once it has been taken. The suggestion is derived from history rather than
+     * from today's sets, so it would otherwise keep offering a change already made — a button
+     * that stays put after you press it reads as one that did nothing.
+     */
+    const alreadyThere = sets.every(
+      (set) =>
+        (next.reps === undefined || set.values.reps === next.reps) &&
+        (next.loadKg === undefined || set.values.weightKg === next.loadKg),
+    );
+
+    return alreadyThere ? null : next;
+  };
+
+  const applyProgression = (slug: string, reps?: number, loadKg?: number) => {
+    if (!sets) return;
+    mutate(
+      sets.map((set) =>
+        set.exerciseSlug === slug && !set.completed
+          ? {
+              ...set,
+              values: {
+                ...set.values,
+                ...(reps !== undefined ? { reps } : {}),
+                ...(loadKg !== undefined ? { weightKg: loadKg } : {}),
+              },
+            }
+          : set,
+      ),
+    );
   };
 
   const applySuggestion = (slug: string, loadKg: number) => {
@@ -748,6 +803,22 @@ export default function SessionLogger() {
             onUseSuggestion={() => {
               const suggestion = suggestionFor(section.group.slug, section.group.sets);
               if (suggestion) applySuggestion(section.group.slug, suggestion.loadKg);
+            }}
+            progression={(() => {
+              const next = progressionFor(section.group.slug, section.group.sets);
+              if (!next) return null;
+              const what =
+                next.change === 'load'
+                  ? `${formatWeight(next.loadKg!, units)}${next.reps ? ` × ${next.reps}` : ''}`
+                  : `${next.reps} reps`;
+              return {
+                direction: next.direction,
+                label: `${next.direction === 'up' ? 'Try' : 'Ease to'} ${what} · ${next.reason}`,
+              };
+            })()}
+            onUseProgression={() => {
+              const next = progressionFor(section.group.slug, section.group.sets);
+              if (next) applyProgression(section.group.slug, next.reps, next.loadKg);
             }}
             onSetValue={setValue}
             onToggle={toggleComplete}
