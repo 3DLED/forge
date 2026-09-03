@@ -43,6 +43,20 @@ export default function TodayView() {
   /** A session opened but never finished — resuming it beats starting another. */
   const inProgress = todaySessions.find((s) => !s.endedAt);
 
+  /**
+   * Sessions already spoken for by a planned card above.
+   *
+   * A planned session stays `planned` while it is being logged, so without this the one
+   * session appears twice: once as the plan offering to start it, once as a loose session
+   * underway. Two cards for one workout reads as having started it twice, which is exactly
+   * the mistake the pair of them invites you to actually make.
+   */
+  const shownByPlan = new Set(
+    todayPlanned
+      .map((planned) => planned.loggedSessionId)
+      .filter((id): id is string => Boolean(id) && todaySessions.some((s) => s.id === id && !s.endedAt)),
+  );
+
   const start = async () => {
     const session = await startSession({ name: defaultSessionName() });
     navigate(`/log/${session.id}`);
@@ -105,34 +119,45 @@ export default function TodayView() {
       {openWeek && <WeekSheet days={week} onClose={() => setOpenWeek(false)} />}
 
       {todayPlanned.length > 0 && <div className="section-title">Planned for today</div>}
-      {todayPlanned.map((planned) => (
-        <div className="card" key={planned.id}>
-          <div className="card-head" style={{ marginBottom: '0.35rem' }}>
-            <h3 className="truncate grow">{planned.prescription.name}</h3>
-            {planned.prescription.estimatedMinutes && (
-              <span className="pill">{planned.prescription.estimatedMinutes} min</span>
-            )}
+      {todayPlanned.map((planned) => {
+        const underway = planned.loggedSessionId != null && shownByPlan.has(planned.loggedSessionId);
+        return (
+          <div className="card" key={planned.id}>
+            <div className="card-head" style={{ marginBottom: '0.35rem' }}>
+              <h3 className="truncate grow">{planned.prescription.name}</h3>
+              {underway ? (
+                <span className="pill">In progress</span>
+              ) : (
+                planned.prescription.estimatedMinutes && (
+                  <span className="pill">{planned.prescription.estimatedMinutes} min</span>
+                )
+              )}
+            </div>
+            <div className="small muted">
+              {plural(planned.prescription.blocks.reduce((n, b) => n + b.items.length, 0), 'movement')}
+            </div>
+            <button
+              className="btn primary block"
+              style={{ marginTop: '0.6rem' }}
+              onClick={async () => {
+                const session = await startFromPlanned(planned);
+                navigate(`/log/${session.id}`);
+              }}
+            >
+              {underway ? 'Continue' : 'Start'}
+            </button>
           </div>
-          <div className="small muted">
-            {plural(planned.prescription.blocks.reduce((n, b) => n + b.items.length, 0), 'movement')}
-          </div>
-          <button
-            className="btn primary block"
-            style={{ marginTop: '0.6rem' }}
-            onClick={async () => {
-              const session = await startFromPlanned(planned);
-              navigate(`/log/${session.id}`);
-            }}
-          >
-            Start
-          </button>
-        </div>
-      ))}
+        );
+      })}
 
-      {todaySessions.length > 0 && <div className="section-title">Today's sessions</div>}
-      {todaySessions.map((session) => (
-        <SessionCard key={session.id} session={session} />
-      ))}
+      {todaySessions.some((s) => !shownByPlan.has(s.id)) && (
+        <div className="section-title">Today's sessions</div>
+      )}
+      {todaySessions
+        .filter((session) => !shownByPlan.has(session.id))
+        .map((session) => (
+          <SessionCard key={session.id} session={session} />
+        ))}
 
       {todaySessions.length === 0 && todayPlanned.length === 0 && (
         <div className="empty">
@@ -149,7 +174,7 @@ export default function TodayView() {
         already open, "Start a workout" as the loudest control quietly invites you to begin a
         second one and split the day's training across two records.
       */}
-      {inProgress && (
+      {inProgress && !shownByPlan.has(inProgress.id) && (
         <button
           className="btn primary block"
           style={{ marginTop: '0.5rem' }}

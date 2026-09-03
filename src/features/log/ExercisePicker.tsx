@@ -128,7 +128,31 @@ export default function ExercisePicker({
         autoFocus
       />
 
-      <div className="chip-row" style={{ margin: '0.6rem 0 0.75rem' }}>
+      {/*
+        Directly under the field you just typed into, and above everything else.
+
+        This is the one control that matters when nothing matched, and it used to sit below
+        the category chips inside a full empty state — which on a phone with the keyboard up
+        put it off the bottom of the screen, behind the keyboard, reachable only by scrolling
+        a list that had nothing in it. The moment you learn the library is missing something
+        is the moment the answer has to be in front of you.
+      */}
+      {searching && total === 0 && (
+        <button
+          className="btn primary block"
+          style={{ marginTop: '0.6rem' }}
+          onClick={() => setCreating(true)}
+        >
+          + Add “{query.trim()}” as a movement
+        </button>
+      )}
+
+      {/* Filtering nothing by category is noise, and costs the height the button needs. */}
+      <div
+        className="chip-row"
+        style={{ margin: '0.6rem 0 0.75rem' }}
+        hidden={searching && total === 0}
+      >
         <button
           className={`chip${category === 'all' ? ' on' : ''}`}
           onClick={() => setCategory('all')}
@@ -146,19 +170,16 @@ export default function ExercisePicker({
         ))}
       </div>
 
+      {/*
+        The explanation, under the button rather than above it. Adding it is the action; that
+        nothing matched is the reason, and the reason can wait its turn.
+      */}
       {total === 0 && (
-        <div className="empty">
-          <span className="glyph">🔍</span>
-          <p className="small">No movement matches “{query}”.</p>
-          {/*
-            Offered exactly where the gap is felt. Searching for something the library does
-            not have is the moment you know you need it, and sending you to Settings to add it
-            means abandoning the workout you were building.
-          */}
-          <button className="btn primary block" onClick={() => setCreating(true)}>
-            + Add “{query.trim()}” as a movement
-          </button>
-        </div>
+        <p className="tiny faint" style={{ marginTop: '0.5rem' }}>
+          {searching
+            ? `Nothing in the library matches “${query.trim()}”. Adding it here keeps you in the workout — it behaves like any other movement afterwards.`
+            : 'Nothing in this category yet.'}
+        </p>
       )}
 
       {creating && (

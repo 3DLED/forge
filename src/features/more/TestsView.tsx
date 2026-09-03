@@ -184,10 +184,10 @@ export default function TestsView() {
           exercise={entering}
           units={units}
           onClose={() => setEntering(null)}
-          onSaved={(loadKg) => {
+          onSaved={(summary) => {
             const name = entering.name;
             setEntering(null);
-            setNotice(`${name}: ${formatWeight(loadKg, units)} saved. Used until you test it.`);
+            setNotice(`${name}: ${summary} saved. Used until you test it.`);
           }}
         />
       )}

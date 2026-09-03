@@ -44,6 +44,15 @@ async function logChange(table: string, recordId: Id, op: 'put' | 'delete'): Pro
 export interface Repo<T extends Entity> {
   get(id: Id): Promise<T | undefined>;
   all(): Promise<T[]>;
+  /**
+   * Every row, tombstones included.
+   *
+   * For resolving what a stored reference *meant*, never for lists people choose from. A
+   * deleted movement has to stop being offered and go on rendering its name, because the
+   * sessions that used it still name it by slug — filtering it out of the lookup leaves a
+   * year-old workout displaying `custom-01m1hy…` where the exercise used to be.
+   */
+  allIncludingDeleted(): Promise<T[]>;
   create(draft: Draft<T>): Promise<T>;
   update(id: Id, patch: Patch<T>): Promise<T>;
   /** Insert or replace a whole record, preserving `createdAt` when it already exists. */
@@ -78,6 +87,10 @@ export function createRepo<T extends Entity>(
 
     async all() {
       return (await table.toArray()).filter(isLive);
+    },
+
+    async allIncludingDeleted() {
+      return table.toArray();
     },
 
     async create(draft) {

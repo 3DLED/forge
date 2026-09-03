@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
+import { lockScroll } from './scrollLock';
 
 /**
  * Bottom sheet. Everything modal in this app is a sheet rather than a centred dialog —
@@ -41,12 +42,11 @@ export default function Sheet({
     };
 
     document.addEventListener('keydown', onKey);
-    // Stop the page behind the sheet scrolling with it.
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    // Stop the page behind the sheet scrolling with it. Counted, because sheets stack.
+    const unlock = lockScroll();
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = previous;
+      unlock();
     };
   }, [onClose, confirmClose]);
 

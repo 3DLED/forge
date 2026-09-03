@@ -60,6 +60,7 @@ import {
 import { loggedSessionRepo } from '../../data/repos';
 import {
   describeMovements,
+  isTimedWorkout,
   nameBlock,
   saveSessionAsWorkout,
   savedWorkoutToSets,
@@ -211,8 +212,16 @@ export default function SessionLogger() {
     const exercise = exerciseBySlug.get(slug);
     if (!exercise || sets.every((set) => set.values.weightKg)) return null;
 
-    const reps = sets.find((set) => set.values.reps)?.values.reps;
-    if (!reps) return null;
+    /*
+     * A rep target is what the chart is read against, and a movement you have just added has
+     * not got one yet. Waiting for you to type one means the suggestion arrives only after
+     * you have already decided what to do, which is the moment it stops being worth anything.
+     *
+     * So the goal's rep range opens the bidding, at the bottom of it — where double
+     * progression starts anyway. Type a rep count and it re-reads the chart against that.
+     */
+    const entered = sets.find((set) => set.values.reps)?.values.reps;
+    const reps = entered ?? GOAL_SCHEMES[goalSpec(profile.primaryGoal).lifting].reps[0];
 
     const suggestion = suggestLoad({
       exercise,
@@ -232,9 +241,12 @@ export default function SessionLogger() {
           : 'your best set';
     return {
       loadKg: suggestion.loadKg,
-      label: `Try ${formatWeight(suggestion.loadKg, units)} · ${Math.round(
-        suggestion.percentOfMax * 100,
-      )}% of ${source}${suggestion.stale ? ', which is getting old' : ''}`,
+      // Says "for 8" only when the rep target was assumed, so the number is never a surprise.
+      label: `Try ${formatWeight(suggestion.loadKg, units)}${
+        entered ? '' : ` for ${reps}`
+      } · ${Math.round(suggestion.percentOfMax * 100)}% of ${source}${
+        suggestion.stale ? ', which is getting old' : ''
+      }`,
     };
   };
 
@@ -1018,13 +1030,19 @@ export default function SessionLogger() {
         </button>
       )}
 
-      <button
-        className="btn block"
-        style={{ marginTop: '0.5rem' }}
-        onClick={() => setBrowsingSaved(true)}
-      >
-        📂 Browse saved workouts
-      </button>
+      {/*
+        Unlike saving, browsing is only offered while the session can still take movements.
+        Bringing a saved workout into a finished one would silently rewrite what you did.
+      */}
+      {!readOnly && (
+        <button
+          className="btn block"
+          style={{ marginTop: '0.5rem' }}
+          onClick={() => setBrowsingSaved(true)}
+        >
+          📂 Browse saved workouts
+        </button>
+      )}
 
       {/* Names all three shapes, because the sheet behind it offers all three. */}
       {looseCount > 0 && !readOnly && (
@@ -1076,8 +1094,14 @@ export default function SessionLogger() {
              * A timed workout comes back as its block with the clock it was saved with; a
              * straight one as a list of movements. Reusing the paths the suggester already
              * takes keeps one way of bringing a saved workout in, not two.
+             *
+             * Which of the two is decided by `isTimedWorkout` and nothing else. Asking
+             * `workoutToDraft` instead reads as a shape test and is not one — it builds a
+             * draft from any template at all, and its style mapping treats everything that
+             * is not an EMOM or a For Time as an AMRAP. Every straight workout saved here
+             * came back wearing a clock it was never given.
              */
-            const draft = workoutToDraft(template);
+            const draft = isTimedWorkout(template) ? workoutToDraft(template) : null;
             if (draft) {
               const created = await addBlock({ ...session, sets }, draft.block);
               mutate([

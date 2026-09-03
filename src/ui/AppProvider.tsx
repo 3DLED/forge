@@ -49,6 +49,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const profiles = useLiveQuery(() => profileRepo.all(), [], undefined);
   const exercises = useLiveQuery(() => exerciseRepo.all(), [], undefined);
+  /*
+   * Names for movements that have been deleted, so history keeps reading in English. Kept
+   * apart from `exercises`, which is what every picker and list draws from — a deleted
+   * movement must stop being offered without taking its name out of the workouts that used
+   * it. See `allIncludingDeleted`.
+   */
+  const everyExercise = useLiveQuery(() => exerciseRepo.allIncludingDeleted(), [], undefined);
   const equipmentProfiles = useLiveQuery(() => equipmentProfileRepo.all(), [], undefined);
 
   // Paint the theme on <html> so it covers the whole document, including areas React does
@@ -71,12 +78,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       profile,
       units: profile.units,
       exercises,
-      exerciseBySlug: new Map(exercises.map((e) => [e.slug, e])),
+      exerciseBySlug: new Map((everyExercise ?? exercises).map((e) => [e.slug, e])),
       equipmentProfiles,
       activeEquipment,
       available: availableSlugs(exercises, activeEquipment?.items ?? []),
     };
-  }, [profiles, exercises, equipmentProfiles]);
+  }, [profiles, exercises, everyExercise, equipmentProfiles]);
 
   if (error) {
     return (

@@ -207,6 +207,15 @@ export default function TestRunner({
             )}
           </div>
 
+          {/*
+            Every control below is dead while the rest overlay is up.
+
+            The overlay covers this area but does not capture taps through it, so the hold
+            button underneath stayed live: a thumb landing there started the attempt and threw
+            the rest away, mid-countdown, with nothing said. Rest between attempts is part of
+            the protocol — an attempt taken early is not comparable to the one it is being
+            measured against.
+          */}
           {/* An open set — the count or the clock is the result. */}
           {step.role === 'attempt' && kind === 'reps' && (
             <>
@@ -225,7 +234,7 @@ export default function TestRunner({
               <button
                 className="btn primary block"
                 style={{ marginTop: '0.75rem' }}
-                disabled={saving || !Number(openResult)}
+                disabled={saving || resting != null || !Number(openResult)}
                 onClick={() => void finish(Number(openResult))}
               >
                 Record it
@@ -237,6 +246,7 @@ export default function TestRunner({
             <button
               className="btn primary block"
               style={{ marginTop: '0.5rem' }}
+              disabled={resting != null}
               onClick={() => {
                 unlockAudio();
                 setHolding(true);
@@ -248,10 +258,14 @@ export default function TestRunner({
 
           {step.role === 'attempt' && kind === 'threeRepMax' && (
             <div className="stack" style={{ marginTop: '0.5rem' }}>
-              <button className="btn primary block" onClick={attemptGood}>
+              <button
+                className="btn primary block"
+                disabled={resting != null}
+                onClick={attemptGood}
+              >
                 Made it — three good reps
               </button>
-              <button className="btn block" onClick={attemptFailed}>
+              <button className="btn block" disabled={resting != null} onClick={attemptFailed}>
                 Failed it — stop the test
               </button>
             </div>
@@ -261,6 +275,7 @@ export default function TestRunner({
             <button
               className="btn primary block"
               style={{ marginTop: '0.5rem' }}
+              disabled={resting != null}
               onClick={() => {
                 unlockAudio();
                 if (step.restSec) setResting(Date.now() + step.restSec * 1000);

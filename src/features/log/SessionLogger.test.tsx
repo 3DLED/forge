@@ -14,11 +14,13 @@
  * perfectly fine in the UI while being wrong in what was saved.
  */
 
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SessionLogger from './SessionLogger';
 import { renderRoute, resetDatabase, seedSession, set, storedSession } from '../../test/harness';
+import { db } from '../../db/db';
+import type { SessionTemplate } from '../../domain/types';
 
 /** Longer than the logger's 400ms write debounce, which is what undid an earlier fix. */
 const PAST_THE_DEBOUNCE = 900;
@@ -258,5 +260,109 @@ describe('a workout that is already finished', () => {
     const after = await storedSession();
     expect(after.sets).toEqual(before.sets);
     expect(after.endedAt).toBe(before.endedAt);
+  });
+});
+
+/**
+ * Bringing a saved workout back in.
+ *
+ * A saved workout is stored as an ordinary template, and the two kinds are not
+ * interchangeable: a timed piece comes back as a block with a clock, a straight session as
+ * loose sets carrying their set counts. The shape is decided by `isTimedWorkout` and nothing
+ * else — asking `workoutToDraft` instead reads like a shape test and is not one. It builds a
+ * draft from any template at all, and maps every style that is not an EMOM or a For Time to
+ * `amrap`, so every straight workout came back wearing a clock it was never given, collapsed
+ * to a single round.
+ */
+describe('running a saved workout again', () => {
+  const saveTemplate = async (over: Partial<SessionTemplate>): Promise<void> => {
+    await db.templates.put({
+      id: 'T1',
+      name: 'Saved workout',
+      modalities: ['strength'],
+      estimatedMinutes: 20,
+      isCustom: true,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      ...over,
+    } as never);
+  };
+
+  const straight = () =>
+    saveTemplate({
+      name: 'Straight sets workout',
+      blocks: [
+        {
+          id: 'B1',
+          style: 'straight',
+          label: 'Straight sets workout',
+          items: [
+            { id: 'I1', exerciseSlug: 'push-up', sets: 3, reps: 10, load: { kind: 'unspecified' } },
+            { id: 'I2', exerciseSlug: 'air-squat', sets: 3, reps: 12, load: { kind: 'unspecified' } },
+          ],
+        },
+      ],
+    } as Partial<SessionTemplate>);
+
+  const amrap = () =>
+    saveTemplate({
+      name: 'Timed workout',
+      blocks: [
+        {
+          id: 'B1',
+          style: 'amrap',
+          label: 'Timed workout',
+          capSec: 600,
+          items: [
+            { id: 'I1', exerciseSlug: 'push-up', reps: 10, load: { kind: 'unspecified' } },
+            { id: 'I2', exerciseSlug: 'air-squat', reps: 15, load: { kind: 'unspecified' } },
+          ],
+        },
+      ],
+    } as Partial<SessionTemplate>);
+
+  const browseAndUse = async (name: RegExp) => {
+    const user = userEvent.setup();
+    await seedSession([]);
+    await openLogger();
+
+    await user.click(await screen.findByRole('button', { name: /browse saved workouts/i }));
+    // Straight rows and timed rows are laid out differently; both sit in one of these.
+    const row = (await screen.findByText(name)).closest<HTMLElement>('.card, .suggest-row')!;
+    await user.click(within(row).getByRole('button', { name: /^use$|run it again/i }));
+    await settle();
+  };
+
+  afterEach(async () => {
+    await db.templates.where('id').equals('T1').delete();
+  });
+
+  it('brings a straight workout back as loose sets, with no clock on it', async () => {
+    await straight();
+    await browseAndUse(/straight sets workout/i);
+
+    const stored = await storedSession();
+    expect(stored.blocks ?? []).toHaveLength(0);
+    expect(stored.sets.every((s) => !s.blockId)).toBe(true);
+  });
+
+  /* Three sets of each, because that is what "four sets of eight" means in a template. */
+  it('keeps the set counts a straight workout was saved with', async () => {
+    await straight();
+    await browseAndUse(/straight sets workout/i);
+
+    const stored = await storedSession();
+    expect(stored.sets.filter((s) => s.exerciseSlug === 'push-up')).toHaveLength(3);
+    expect(stored.sets.filter((s) => s.exerciseSlug === 'air-squat')).toHaveLength(3);
+  });
+
+  it('still brings a saved AMRAP back as a timed block of one round', async () => {
+    await amrap();
+    await browseAndUse(/timed workout/i);
+
+    const stored = await storedSession();
+    expect(stored.blocks ?? []).toHaveLength(1);
+    expect((stored.blocks ?? [])[0]).toMatchObject({ style: 'amrap' });
+    expect(stored.sets.filter((s) => s.exerciseSlug === 'push-up')).toHaveLength(1);
   });
 });

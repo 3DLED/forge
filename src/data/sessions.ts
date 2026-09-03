@@ -92,8 +92,21 @@ export async function startSession(options: {
 /**
  * Begin logging against a planned session: the prescription becomes the starting set list,
  * every set unchecked, with the prescribed numbers pre-filled as the targets to beat.
+ *
+ * Starting one that is already underway resumes it rather than starting it again. A planned
+ * session keeps its `planned` status while being logged — there is no separate in-progress
+ * state, deliberately, because half the app filters on `planned` and a fourth status would
+ * have to be understood by all of it. That leaves the Start control on screen throughout, so
+ * the guard belongs here where every entry point passes through it, rather than in each of
+ * the three screens that offer to start a day.
  */
 export async function startFromPlanned(planned: PlannedSession): Promise<LoggedSession> {
+  if (planned.loggedSessionId) {
+    const existing = await loggedSessionRepo.get(planned.loggedSessionId);
+    // A finished one is history; starting the day again should open a fresh session.
+    if (existing && !existing.endedAt) return existing;
+  }
+
   const { blocks, sets } = expandPrescription(planned.prescription);
   const session = await loggedSessionRepo.create({
     date: planned.date,

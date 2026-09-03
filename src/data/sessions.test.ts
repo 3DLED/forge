@@ -10,7 +10,13 @@
 import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { db, type StoredLoggedSession } from '../db/db';
-import { convertSessionToBlock, finishSession, removeBlock, sessionElapsedSec } from './sessions';
+import {
+  convertSessionToBlock,
+  finishSession,
+  removeBlock,
+  sessionElapsedSec,
+  startFromPlanned,
+} from './sessions';
 import type { LoggedSession, LoggedSet } from '../domain/types';
 
 function set(id: string, exerciseSlug: string, over: Partial<LoggedSet> = {}): LoggedSet {
@@ -227,5 +233,86 @@ describe('finishSession', () => {
 
     const planned = await db.plannedSessions.get('P1');
     expect(planned).toMatchObject({ status: 'completed', loggedSessionId: 'S1' });
+  });
+});
+
+/**
+ * Starting a planned day twice.
+ *
+ * A planned session keeps its `planned` status the whole time it is being logged, so the
+ * Start control never goes away — on Today, in the day sheet, in the week sheet. Tapping it
+ * again used to build a second logged session over the top of the first and repoint the plan
+ * at it, quietly orphaning everything already recorded against the day.
+ */
+describe('starting a planned session', () => {
+  const plan = async (over: Record<string, unknown> = {}) => {
+    await db.plannedSessions.put({
+      id: 'P1',
+      date: '2026-01-05',
+      status: 'planned',
+      prescription: {
+        name: 'Full Body A',
+        modalities: ['strength'],
+        blocks: [
+          {
+            id: 'B1',
+            style: 'straight',
+            items: [{ id: 'I1', exerciseSlug: 'back-squat', sets: 3, reps: 5, load: { kind: 'unspecified' } }],
+          },
+        ],
+      },
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      ...over,
+    } as never);
+    return (await db.plannedSessions.get('P1'))!;
+  };
+
+  it('creates a session the first time', async () => {
+    const session = await startFromPlanned(await plan());
+
+    expect(session.plannedSessionId).toBe('P1');
+    expect(await db.loggedSessions.count()).toBe(1);
+    expect((await db.plannedSessions.get('P1'))!.loggedSessionId).toBe(session.id);
+  });
+
+  it('resumes the one already underway instead of starting a second', async () => {
+    const first = await startFromPlanned(await plan());
+    const again = await startFromPlanned((await db.plannedSessions.get('P1'))!);
+
+    expect(again.id).toBe(first.id);
+    expect(await db.loggedSessions.count()).toBe(1);
+  });
+
+  /* Everything logged so far has to survive being handed back. */
+  it('resumes with the sets that were already logged against it', async () => {
+    const first = await startFromPlanned(await plan());
+    await db.loggedSessions.update(first.id, {
+      sets: [set('done', 'back-squat', { completed: true, values: { reps: 5, weightKg: 100 } })],
+    });
+
+    const again = await startFromPlanned((await db.plannedSessions.get('P1'))!);
+
+    expect(again.sets).toHaveLength(1);
+    expect(again.sets[0]).toMatchObject({ id: 'done', completed: true });
+  });
+
+  /* A finished day is history; training it again is a new session, not a resumption. */
+  it('starts a fresh session when the previous one was finished', async () => {
+    const first = await startFromPlanned(await plan());
+    await db.loggedSessions.update(first.id, { endedAt: '2026-01-05T11:00:00.000Z' });
+
+    const again = await startFromPlanned((await db.plannedSessions.get('P1'))!);
+
+    expect(again.id).not.toBe(first.id);
+    expect(await db.loggedSessions.count()).toBe(2);
+  });
+
+  /* A dangling link must not stop the day being started at all. */
+  it('starts a fresh session when the link points at nothing', async () => {
+    const session = await startFromPlanned(await plan({ loggedSessionId: 'GONE' }));
+
+    expect(session.id).not.toBe('GONE');
+    expect(await db.loggedSessions.count()).toBe(1);
   });
 });
