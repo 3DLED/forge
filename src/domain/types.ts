@@ -380,8 +380,13 @@ export interface LoggedSession extends Entity {
 export interface EquipmentProfile extends Entity {
   name: string;
   items: EquipmentTag[];
-  /** Which loads you actually own, for kettlebells/dumbbells — drives real prescriptions. */
-  availableWeightsKg?: Partial<Record<'kettlebell' | 'dumbbell' | 'plates', number[]>>;
+  /** Which bells you actually own — drives real prescriptions. */
+  availableWeightsKg?: Partial<Record<'kettlebell' | 'dumbbell', number[]>>;
+  /**
+   * The bar and what goes on it. Kept apart from the bell lists because its loads are
+   * derived rather than owned — see `barbellLoads`.
+   */
+  barbell?: BarbellRack;
   isDefault: boolean;
 }
 
@@ -444,6 +449,7 @@ export interface Plan extends Entity {
 // ---------------------------------------------------------------------------
 
 import type { PrimaryGoal } from './goals';
+import type { BarbellRack } from './rack';
 
 export type UnitSystem = 'imperial' | 'metric';
 

@@ -11,6 +11,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageHeader from '../../ui/PageHeader';
 import AskSheet from '../../ui/AskSheet';
+import RackEditor from './RackEditor';
 import { useApp } from '../../ui/AppProvider';
 import { equipmentProfileRepo, profileRepo } from '../../data/repos';
 import { EQUIPMENT_GROUPS, EQUIPMENT_LABELS, ALWAYS_AVAILABLE } from '../../data/seed/equipment';
@@ -18,7 +19,7 @@ import { availableSlugs } from '../../domain/equipment';
 import type { EquipmentTag } from '../../domain/types';
 
 export default function EquipmentView() {
-  const { equipmentProfiles, activeEquipment, exercises, profile } = useApp();
+  const { equipmentProfiles, activeEquipment, exercises, profile, units } = useApp();
   const [editing, setEditing] = useState<string | null>(null);
   const [naming, setNaming] = useState(false);
 
@@ -134,6 +135,12 @@ export default function EquipmentView() {
               </div>
             </section>
           ))}
+
+          {/*
+            Which weights, not just which kit. Ticking "kettlebell" says a bell exists; this
+            says which ones, which is what every prescription in the app rounds to.
+          */}
+          <RackEditor target={target} units={units} />
 
           {upgrades.length > 0 && (
             <>

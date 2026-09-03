@@ -229,7 +229,7 @@ export default function SessionLogger() {
       max: knownMax(slug, testResults ?? [], records),
       today: todayKey(),
       trainingMax: (profile.trainingMaxPercent ?? 90) / 100,
-      loads: loadsForExercise(exercise, activeEquipment?.availableWeightsKg),
+      loads: loadsForExercise(exercise, activeEquipment),
     });
     if (!suggestion) return null;
 
@@ -266,7 +266,7 @@ export default function SessionLogger() {
       exercise,
       sessions: (pastSessions ?? []).filter((past) => past.id !== sessionId),
       repRange: GOAL_SCHEMES[goalSpec(profile.primaryGoal).lifting].reps,
-      loads: loadsForExercise(exercise, activeEquipment?.availableWeightsKg),
+      loads: loadsForExercise(exercise, activeEquipment),
     });
     if (!next) return null;
 

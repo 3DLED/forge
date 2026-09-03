@@ -10,7 +10,8 @@
  * having had to enumerate every fallback for every equipment profile.
  */
 
-import type { EquipmentTag, Exercise } from './types';
+import type { EquipmentProfile, EquipmentTag, Exercise } from './types';
+import { barbellLoads, hasBarbellLoads } from './rack';
 
 /** Every exercise needs these implicitly; profiles always contain them. */
 const UNIVERSAL: EquipmentTag[] = ['bodyweight', 'floor', 'wall', 'stairs'];
@@ -125,19 +126,41 @@ export function roundToAvailableLoad(targetKg: number, availableKg?: number[]): 
 /**
  * Loads available for a movement, from an equipment profile.
  *
- * Only single-implement kit is meaningful here: a barbell's usable loads depend on which
- * plates are paired with it, which is a different sum. Absent means "no constraint", and the
- * caller rounds to the nearest half kilo instead.
+ * Bells are owned and listed; a barbell's loads are summed from the bar and the plates on it.
+ * Absent means "no constraint", and the caller rounds to the nearest half kilo instead — so
+ * an empty list has to come back as `undefined` rather than `[]`, or every prescription
+ * collapses onto whatever the caller does with nothing to choose from.
  */
 export function loadsForExercise(
   exercise: Exercise,
-  availableWeightsKg?: Partial<Record<'kettlebell' | 'dumbbell' | 'plates', number[]>>,
+  profile?: Pick<EquipmentProfile, 'availableWeightsKg' | 'barbell'>,
 ): number[] | undefined {
-  if (!availableWeightsKg) return undefined;
-  if (exercise.equipment.includes('kettlebell')) return availableWeightsKg.kettlebell;
-  if (exercise.equipment.includes('dumbbell')) return availableWeightsKg.dumbbell;
+  if (!profile) return undefined;
+
+  const bells = (loads?: number[]) => (loads && loads.length > 0 ? loads : undefined);
+
+  if (exercise.equipment.includes('kettlebell')) {
+    return bells(profile.availableWeightsKg?.kettlebell);
+  }
+  if (exercise.equipment.includes('dumbbell')) {
+    return bells(profile.availableWeightsKg?.dumbbell);
+  }
+  if (exercise.equipment.includes('barbell') && hasBarbellLoads(profile.barbell)) {
+    return barbellLoads(profile.barbell);
+  }
   return undefined;
 }
+
+/**
+ * How much heavier a load has to be before it counts as a different load.
+ *
+ * Ten grams, which is nothing you could put on a bar and everything you need to survive a
+ * unit conversion. A weight typed in pounds and a rack computed in pounds both arrive here
+ * as kilos with different trailing digits — 225 lb is 102.0582 one way and 102.06 the other
+ * — and a bare `>` reads that as a step up, hands back the same weight, and stalls the
+ * ladder on the number it just did.
+ */
+const DISTINCT_KG = 0.01;
 
 /**
  * The lightest load heavier than this one, or undefined at the top of the rack.
@@ -147,7 +170,7 @@ export function loadsForExercise(
  */
 export function nextLoadAbove(kg: number, availableKg?: number[]): number | undefined {
   if (!availableKg || availableKg.length === 0) return Math.round((kg + 2.5) * 2) / 2;
-  return availableKg.filter((load) => load > kg).sort((a, b) => a - b)[0];
+  return availableKg.filter((load) => load > kg + DISTINCT_KG).sort((a, b) => a - b)[0];
 }
 
 /** The heaviest load lighter than this one, or undefined at the bottom of the rack. */
@@ -156,5 +179,5 @@ export function nextLoadBelow(kg: number, availableKg?: number[]): number | unde
     const lighter = Math.round((kg - 2.5) * 2) / 2;
     return lighter > 0 ? lighter : undefined;
   }
-  return availableKg.filter((load) => load < kg).sort((a, b) => b - a)[0];
+  return availableKg.filter((load) => load < kg - DISTINCT_KG).sort((a, b) => b - a)[0];
 }

@@ -27,7 +27,7 @@ import {
   testTiming,
 } from '../../domain/fitnessTests';
 import type { TestKind, TestResult } from '../../domain/fitnessTests';
-import { loadsForExercise } from '../../domain/equipment';
+import { loadsForExercise, nextLoadAbove } from '../../domain/equipment';
 import { displayWeight, formatWeight, inputWeightToKg, weightLabel } from '../../domain/units';
 import { formatDayLabel, todayKey } from '../../domain/dates';
 import type { Exercise } from '../../domain/types';
@@ -60,9 +60,13 @@ export default function TestRunner({
   /** The heaviest attempt completed with good form. */
   const [bestKg, setBestKg] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
+  /** Loads you set yourself, by step, overriding what the protocol laid out. */
+  const [chosenKg, setChosenKg] = useState<Record<number, number>>({});
+  const [editingLoad, setEditingLoad] = useState(false);
+  const [loadDraft, setLoadDraft] = useState('');
 
   const loads = useMemo(
-    () => loadsForExercise(exercise, activeEquipment?.availableWeightsKg),
+    () => loadsForExercise(exercise, activeEquipment),
     [exercise, activeEquipment],
   );
 
@@ -75,6 +79,22 @@ export default function TestRunner({
 
   const step = steps[stepIndex];
   const done = stepIndex >= steps.length;
+
+  /**
+   * What this step actually calls for, which is not always what the protocol laid out.
+   *
+   * The ladder is computed once, from the estimate, so a load you set yourself part-way up
+   * leaves everything after it stale — jump to 225 on attempt three and attempt four still
+   * says 195, which is asking you to go backwards. Rather than rebuilding the protocol
+   * around a number that was a one-off, the same rule the protocol already follows is
+   * applied on the way out: an attempt is never lighter than one you have already made.
+   */
+  const prescribedKg = step?.loadKg;
+  const loadKg =
+    chosenKg[stepIndex] ??
+    (step?.role === 'attempt' && bestKg != null && prescribedKg != null && prescribedKg <= bestKg
+      ? nextLoadAbove(bestKg, loads) ?? prescribedKg
+      : prescribedKg);
 
   const finish = async (value: number) => {
     setSaving(true);
@@ -89,10 +109,11 @@ export default function TestRunner({
 
   /** An attempt completed cleanly: bank it and offer the next load. */
   const attemptGood = () => {
-    if (step?.loadKg != null) setBestKg(step.loadKg);
+    if (loadKg != null) setBestKg(loadKg);
     unlockAudio();
     if (step?.restSec) setResting(Date.now() + step.restSec * 1000);
     setStepIndex((i) => i + 1);
+    setEditingLoad(false);
   };
 
   /** A failed attempt ends the test — everything after it would be measuring fatigue. */
@@ -189,7 +210,7 @@ export default function TestRunner({
           <div className="card">
             <div className="row between">
               <strong>
-                {step.loadKg != null && `${formatWeight(step.loadKg, units)} · `}
+                {loadKg != null && `${formatWeight(loadKg, units)} · `}
                 {step.reps != null
                   ? plural(step.reps, 'rep')
                   : step.holdSec != null
@@ -204,6 +225,57 @@ export default function TestRunner({
               <p className="tiny faint" style={{ margin: '0.4rem 0 0' }}>
                 {step.note}
               </p>
+            )}
+
+            {/*
+              The prescribed load is a suggestion, not an instruction.
+
+              Percentages off an estimate cannot know that today feels good, or that the jump
+              they picked is smaller than the one you want to take. What gets recorded is the
+              weight you actually lifted, so the screen has to let you say what that was.
+            */}
+            {loadKg != null && !resting && (
+              editingLoad ? (
+                <div className="row" style={{ gap: '0.4rem', marginTop: '0.5rem' }}>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    value={loadDraft}
+                    autoFocus
+                    aria-label={`Load for ${step.label} in ${weightLabel(units)}`}
+                    onChange={(event) => setLoadDraft(event.target.value)}
+                    style={{ maxWidth: '7rem' }}
+                  />
+                  <span className="muted small">{weightLabel(units)}</span>
+                  <button
+                    className="btn sm primary"
+                    disabled={!Number(loadDraft)}
+                    onClick={() => {
+                      setChosenKg((current) => ({
+                        ...current,
+                        [stepIndex]: inputWeightToKg(Number(loadDraft), units),
+                      }));
+                      setEditingLoad(false);
+                    }}
+                  >
+                    Use it
+                  </button>
+                  <button className="btn sm ghost" onClick={() => setEditingLoad(false)}>
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className="btn sm ghost"
+                  style={{ marginTop: '0.5rem' }}
+                  onClick={() => {
+                    setLoadDraft(String(Math.round(displayWeight(loadKg, units) * 10) / 10));
+                    setEditingLoad(true);
+                  }}
+                >
+                  Use a different weight
+                </button>
+              )
             )}
           </div>
 
