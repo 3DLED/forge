@@ -24,7 +24,7 @@ import {
 import type { CustomPlan } from '../../domain/types';
 import { SEED_PLAN_TEMPLATES, type SeedPlanTemplate } from '../../data/seed/planTemplates';
 import AskSheet from '../../ui/AskSheet';
-import { activePlan, allPlans, endPlan } from '../../data/plans';
+import { activePlans, allPlans, endPlan } from '../../data/plans';
 import { formatDayLabel, weekdayName } from '../../domain/dates';
 import type { Plan } from '../../domain/types';
 import { activateImportedPlan } from '../../data/share';
@@ -62,7 +62,7 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
   const [applying, setApplying] = useState<CustomPlan | null>(null);
   const [removing, setRemoving] = useState<CustomPlan | null>(null);
   const mine = useLiveQuery(() => allCustomPlans(), []);
-  const current = useLiveQuery(() => activePlan(), []);
+  const running = useLiveQuery(() => activePlans(), []);
   const everyPlan = useLiveQuery(() => allPlans(), []);
 
   /** On the calendar but not being followed — imported, or set aside for another. */
@@ -113,19 +113,20 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
   return (
     <>
       <Sheet title="Plans" onClose={onClose}>
-      {current && (
-        <div className="card tight">
+      {/* However many you are following. Ending one leaves the others alone. */}
+      {(running ?? []).map((item) => (
+        <div className="card tight" key={item.id}>
           <div className="row between">
             <div className="grow">
-              <strong>{current.name}</strong>
+              <strong>{item.name}</strong>
               <div className="tiny faint">Currently active</div>
             </div>
             <button
               className="btn sm ghost danger"
               onClick={async () => {
-                const removed = await endPlan(current);
+                const removed = await endPlan(item);
                 setNotice(
-                  `Plan ended — ${plural(removed, 'upcoming session')} removed. Anything already logged stays.`,
+                  `“${item.name}” ended — ${plural(removed, 'upcoming session')} removed. Anything already logged stays.`,
                 );
               }}
             >
@@ -133,7 +134,7 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
             </button>
           </div>
         </div>
-      )}
+      ))}
 
       {notice && (
         <div className="card tight">
@@ -283,21 +284,15 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
         <AskSheet
           title={`Start “${starting.name}”?`}
           message={
-            current
-              ? `“${current.name}” stops here. Its remaining sessions come off the calendar; everything you have logged stays.`
-              : 'Its sessions are already on your calendar — this makes it the plan you are following.'
+            (running ?? []).length > 0
+              ? `Its sessions are already on your calendar, and whatever you are already following keeps running. Some days may end up with two.`
+              : 'Its sessions are already on your calendar — this makes it a plan you are following.'
           }
           confirmLabel="Start it"
           onCancel={() => setStarting(null)}
           onConfirm={async () => {
-            const previous = current;
-            if (previous && previous.id !== starting.id) await endPlan(previous);
             await activateImportedPlan(starting.id);
-            setNotice(
-              previous && previous.id !== starting.id
-                ? `Following “${starting.name}”. “${previous.name}” has ended.`
-                : `Following “${starting.name}”.`,
-            );
+            setNotice(`Following “${starting.name}”.`);
             setStarting(null);
           }}
         />

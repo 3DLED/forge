@@ -254,3 +254,77 @@ describe('pinned weekdays', () => {
     expect(placements.map((p) => p.date)).toEqual([MONDAY, WEDNESDAY, '2026-01-09']);
   });
 });
+
+/**
+ * Running two plans at once.
+ *
+ * Three strength days and four runs is seven sessions, not a choice between them. The rule is
+ * to spread around what another plan already booked while anything is free, and to double up
+ * once nothing is — so a full week comes out one-a-day, and a narrower one produces the
+ * two-a-days deliberately rather than dropping sessions on the floor.
+ */
+describe('a second plan on the same calendar', () => {
+  const days = (rules: AvailabilityRule[], exceptions: CalendarException[] = []) =>
+    resolveWeekAvailability(WEEK, rules, exceptions);
+
+  const strength = (n: number) =>
+    Array.from({ length: n }, (_, i) => ({ modality: 'strength' as const, order: i + 1 }));
+
+  it('avoids the days the other plan is using while any are free', () => {
+    const busy = new Set([WEEK[0], WEEK[2], WEEK[4]]);
+    const placements = placeSlotsInWeek(days(openWeek()), strength(3), { busy });
+
+    expect(placements.every((p) => p.date && !busy.has(p.date))).toBe(true);
+  });
+
+  /* Seven sessions, seven days: nobody has to double up. */
+  it('fits three plus four across a full week without doubling', () => {
+    const first = placeSlotsInWeek(days(openWeek()), strength(3));
+    const busy = new Set(first.map((p) => p.date!).filter(Boolean));
+    const second = placeSlotsInWeek(days(openWeek()), strength(4), { busy });
+
+    const all = [...first, ...second].map((p) => p.date);
+    expect(all.every(Boolean)).toBe(true);
+    expect(new Set(all).size).toBe(7);
+  });
+
+  /* A four-day week with five sessions has to double once, and should — not drop one. */
+  it('doubles up rather than dropping a session when the week runs out', () => {
+    const rules = openWeek({ 0: [], 6: [] });
+    const first = placeSlotsInWeek(days(rules), strength(3));
+    const busy = new Set(first.map((p) => p.date!).filter(Boolean));
+    const second = placeSlotsInWeek(days(rules), strength(3), { busy });
+
+    expect(second.every((p) => p.date)).toBe(true);
+    const doubled = second.filter((p) => busy.has(p.date!));
+    expect(doubled.length).toBe(1);
+  });
+
+  /* A plan doubling up on itself is a bug, not a two-a-day. */
+  it('never puts two of the same plan on one day', () => {
+    const rules = openWeek({ 0: [], 1: [], 2: [], 3: [], 4: [] });
+    const placements = placeSlotsInWeek(days(rules), strength(3));
+
+    const placed = placements.map((p) => p.date).filter(Boolean);
+    expect(new Set(placed).size).toBe(placed.length);
+  });
+
+  it('places nothing differently when no other plan is running', () => {
+    const withEmpty = placeSlotsInWeek(days(openWeek()), strength(3), { busy: new Set() });
+    const without = placeSlotsInWeek(days(openWeek()), strength(3));
+
+    expect(withEmpty.map((p) => p.date)).toEqual(without.map((p) => p.date));
+  });
+
+  /* A day you chose yourself outranks tidiness — that is what pinning it meant. */
+  it('still honours a pinned day even when the other plan is already there', () => {
+    const busy = new Set([WEEK[3]]);
+    const [placement] = placeSlotsInWeek(
+      days(openWeek()),
+      [{ modality: 'strength', order: 1, weekday: 3 as Weekday }],
+      { busy },
+    );
+
+    expect(placement.date).toBe(WEEK[3]);
+  });
+});

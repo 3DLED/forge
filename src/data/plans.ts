@@ -10,7 +10,7 @@ import { db } from '../db/db';
 import { calendarExceptionRepo, planRepo, plannedSessionRepo } from './repos';
 import type { GeneratedPlan } from '../domain/planning';
 import type { SeedPlanTemplate } from './seed/planTemplates';
-import { todayKey } from '../domain/dates';
+import { daysBetween, todayKey } from '../domain/dates';
 import { ulid } from '../domain/ids';
 import { TEST_DAY_MARKER } from '../domain/fitnessTests';
 import type {
@@ -24,6 +24,18 @@ import type {
   PlannedSession,
 } from '../domain/types';
 import type { ReshufflePlan } from '../domain/reshuffle';
+
+/**
+ * Every plan you are currently following.
+ *
+ * Plural since a strength block and a running block are a normal pair to run together, and
+ * one of them having to stop for the other to start was an artificial choice. Ordered oldest
+ * first so the list does not reshuffle when one is edited.
+ */
+export async function activePlans(): Promise<Plan[]> {
+  const plans = await planRepo.all();
+  return plans.filter((p) => p.isActive).sort((a, b) => a.startDate.localeCompare(b.startDate));
+}
 
 export async function activePlan(): Promise<Plan | undefined> {
   const plans = await planRepo.all();
@@ -105,13 +117,14 @@ export interface ApplyPlanOptions {
 export async function applyPlan(options: ApplyPlanOptions): Promise<Plan> {
   const { template, generated } = options;
 
-  // One active plan at a time.
-  for (const plan of await planRepo.all()) {
-    if (plan.isActive) await planRepo.update(plan.id, { isActive: false });
-  }
-
+  /*
+   * Other plans are left running. Two plans are a normal thing to want — three strength days
+   * and four runs is seven sessions, not a choice between them — and the placement spreads
+   * them across the week before it doubles anything up.
+   */
   if (options.replaceExisting) {
     await clearPlannedRange(options.startDate, generated.endDate);
+    await retireEmptyPlans();
   }
 
   const goal: Goal = {
@@ -192,6 +205,28 @@ async function addTestDays(
 }
 
 /**
+ * Where a plan stands today, in words.
+ *
+ * Shared by the calendar card and the plan sheet so the two cannot disagree. A plan starting
+ * next month has not started, and calling that "week 1 of 12" reads as though you are already
+ * behind on something you have not begun.
+ */
+export function planWeekLabel(plan: Plan, today: DayKey): string {
+  const daysUntilStart = daysBetween(today, plan.startDate);
+  if (daysUntilStart > 0) {
+    return `Starts in ${daysUntilStart} day${daysUntilStart === 1 ? '' : 's'}`;
+  }
+
+  const totalWeeks = plan.endDate
+    ? Math.ceil((daysBetween(plan.startDate, plan.endDate) + 1) / 7)
+    : null;
+  const week = Math.floor(daysBetween(plan.startDate, today) / 7) + 1;
+
+  if (totalWeeks && week > totalWeeks) return 'Finished';
+  return totalWeeks ? `Week ${week} of ${totalWeeks}` : `Week ${week}`;
+}
+
+/**
  * How far through a plan you are, counted over the whole thing.
  *
  * Two questions, and they are not the same one. `ratio` is how much of the whole plan is
@@ -235,6 +270,30 @@ export async function planProgress(planId: Id): Promise<{
     // An empty plan is not nought per cent done; it has nothing to be done.
     ratio: rows.length > 0 ? completed / rows.length : 0,
   };
+}
+
+/**
+ * Stops following any plan that has nothing left to do.
+ *
+ * Run after a range is cleared. Clearing removes sessions, not plans, which used to leave a
+ * plan sitting on the calendar as an active card at nought per cent with an empty schedule
+ * behind it — following something that is no longer there. If you cleared everything a plan
+ * had, you replaced it, and the card should say so by going away.
+ *
+ * Only plans with nothing still planned. One part-way through, whose remaining weeks happened
+ * to fall outside the cleared range, is still a plan you are following.
+ */
+async function retireEmptyPlans(): Promise<void> {
+  const rows = (await db.plannedSessions.toArray()).filter((s) => !s.deletedAt);
+  const stillPlanned = new Set(
+    rows.filter((s) => s.status === 'planned').map((s) => s.planId).filter(Boolean),
+  );
+
+  for (const plan of await planRepo.all()) {
+    if (plan.isActive && !stillPlanned.has(plan.id)) {
+      await planRepo.update(plan.id, { isActive: false });
+    }
+  }
 }
 
 /** Ends a plan and clears its remaining unstarted sessions from today forward. */

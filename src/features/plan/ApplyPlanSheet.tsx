@@ -9,9 +9,11 @@
 import { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import Sheet from '../../ui/Sheet';
+import { plural } from '../../ui/text';
 import GoalPicker from '../more/GoalPicker';
 import { useApp } from '../../ui/AppProvider';
 import { applyPlan, calendarExceptions } from '../../data/plans';
+import { plannedBetween } from '../../data/sessions';
 import {
   SEED_SESSION_TEMPLATE_BY_SLUG,
   type SeedSessionTemplate,
@@ -57,6 +59,17 @@ export default function ApplyPlanSheet({
   const { profile, units, exerciseBySlug, available, activeEquipment } = useApp();
   const exceptions = useLiveQuery(() => calendarExceptions(), []);
 
+  /*
+   * Days another plan has already booked, so this one spreads around them before it doubles
+   * anything up. Read over a generous window rather than the plan's own range, since the
+   * range moves as the start date is adjusted and re-reading on every keystroke is wasteful.
+   */
+  const alreadyPlanned = useLiveQuery(() => plannedBetween('0000-01-01', '9999-12-31'), []);
+  const busyDates = useMemo(
+    () => new Set((alreadyPlanned ?? []).filter((s) => s.status === 'planned').map((s) => s.date)),
+    [alreadyPlanned],
+  );
+
   const isRace = template.goal === 'race';
   const defaultStart = startOfWeek(addDays(todayKey(), 7), profile.weekStartsOn);
 
@@ -65,6 +78,16 @@ export default function ApplyPlanSheet({
   const [raceDate, setRaceDate] = useState('');
   const [saving, setSaving] = useState(false);
   const [includeTests, setIncludeTests] = useState(false);
+  /*
+   * Off by default, which it did not used to be.
+   *
+   * Applying a plan cleared every unstarted session in its date range — correct when only one
+   * plan could be active, since a new plan replaced the old one. Now that two plans can run
+   * together, doing that silently deletes the other one's whole schedule. Clearing is a real
+   * thing to want when you are replacing a plan rather than adding to it, so it stays — as a
+   * choice, said out loud, rather than as what happens when you are not looking.
+   */
+  const [replaceExisting, setReplaceExisting] = useState(false);
 
   /* The athlete's own availability, with any day this plan calls a rest day shut. */
   const openDays = useMemo(() => {
@@ -92,6 +115,7 @@ export default function ApplyPlanSheet({
         available,
         sessionTemplateBySlug: sessionTemplates ?? SEED_SESSION_TEMPLATE_BY_SLUG,
         primaryGoal: profile.primaryGoal,
+        busyDates,
       }),
     [
       template,
@@ -103,7 +127,20 @@ export default function ApplyPlanSheet({
       exceptions,
       exerciseBySlug,
       available,
+      busyDates,
     ],
+  );
+
+  /** Unstarted sessions inside the range this plan is about to cover. */
+  const clashing = useMemo(
+    () =>
+      (alreadyPlanned ?? []).filter(
+        (session) =>
+          session.status === 'planned' &&
+          session.date >= startDate &&
+          session.date <= generated.endDate,
+      ).length,
+    [alreadyPlanned, startDate, generated.endDate],
   );
 
   /** One line per week: how many sessions, and the long run if there is one. */
@@ -152,7 +189,7 @@ export default function ApplyPlanSheet({
               startDate,
               eventDate: isRace && raceDate ? raceDate : undefined,
               equipmentProfileId: activeEquipment?.id,
-              replaceExisting: true,
+              replaceExisting,
               includeTests,
               testMovements,
             });
@@ -179,6 +216,29 @@ export default function ApplyPlanSheet({
         <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
           Optional. Without it the plan is generated exactly as written.
         </p>
+      )}
+
+      {/* Only worth asking when there is in fact something in the way. */}
+      {clashing > 0 && (
+        <>
+          <div className="section-title">Already planned</div>
+          <p className="tiny faint" style={{ marginTop: '-0.35rem' }}>
+            {plural(clashing, 'session')} in these weeks, from another plan or added by hand.
+          </p>
+          <button
+            className={`chip${replaceExisting ? ' on' : ''}`}
+            aria-pressed={replaceExisting}
+            style={{ marginTop: '0.4rem' }}
+            onClick={() => setReplaceExisting((on) => !on)}
+          >
+            {replaceExisting ? '✓ Clear them first' : 'Clear them first'}
+          </button>
+          <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
+            {replaceExisting
+              ? 'They come off the calendar and this plan takes their place. Anything you have already logged stays.'
+              : 'Left alone. This plan works around them, and doubles up on a day only where the week has no room left.'}
+          </p>
+        </>
       )}
 
       {testMovements.length > 0 && (

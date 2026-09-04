@@ -15,7 +15,7 @@ import PlanLibrary from './PlanLibrary';
 import PlanSheet from './PlanSheet';
 import ImportSheet from '../more/ImportSheet';
 import { plannedBetween, sessionsBetween } from '../../data/sessions';
-import { activePlan, calendarExceptions, planProgress } from '../../data/plans';
+import { activePlans, calendarExceptions, planProgress, planWeekLabel } from '../../data/plans';
 import {
   addDays,
   daysBetween,
@@ -27,7 +27,7 @@ import {
   weekdayName,
 } from '../../domain/dates';
 import { resolveDayAvailability } from '../../domain/scheduling';
-import type { DayKey, Weekday } from '../../domain/types';
+import type { DayKey, Plan, Weekday } from '../../domain/types';
 
 /** How far a finger has to travel across the grid before it counts as a month change. */
 const SWIPE_PX = 50;
@@ -49,7 +49,7 @@ export default function PlanView() {
   const [anchor, setAnchor] = useState(() => startOfMonth(today));
   const [openDay, setOpenDay] = useState<string | null>(null);
   const [browsing, setBrowsing] = useState(false);
-  const [openPlan, setOpenPlan] = useState(false);
+  const [openPlan, setOpenPlan] = useState<Plan | null>(null);
   const [importingPlan, setImportingPlan] = useState(false);
   /** Said out loud after a plan ends, because the card that was there has gone. */
   const [planNotice, setPlanNotice] = useState<string | null>(null);
@@ -150,39 +150,13 @@ export default function PlanView() {
   const planned = useLiveQuery(() => plannedBetween(from, to), [from, to]);
   const logged = useLiveQuery(() => sessionsBetween(from, to), [from, to]);
   const exceptions = useLiveQuery(() => calendarExceptions(), []);
-  const plan = useLiveQuery(() => activePlan(), []);
-  /*
-   * Counted over the whole plan by its id, not over the month on screen. The old figure moved
-   * as you paged the calendar, because its range ended at the last day of the visible grid.
-   */
-  const progress = useLiveQuery(
-    () => (plan ? planProgress(plan.id) : Promise.resolve(null)),
-    [plan?.id],
-  );
+  const plans = useLiveQuery(() => activePlans(), []);
+  const running = plans ?? [];
 
   const weekdayHeaders = Array.from(
     { length: 7 },
     (_, i) => ((profile.weekStartsOn + i) % 7) as Weekday,
   );
-
-  const planTotalWeeks = plan?.endDate
-    ? Math.ceil((daysBetween(plan.startDate, plan.endDate) + 1) / 7)
-    : null;
-
-  /**
-   * Where the plan stands today. A plan scheduled to begin next month has not started, and
-   * calling that "week 1 of 12" reads as though you are already behind on it.
-   */
-  const planStatus = (() => {
-    if (!plan) return null;
-    const daysUntilStart = daysBetween(today, plan.startDate);
-    if (daysUntilStart > 0) {
-      return `Starts in ${daysUntilStart} day${daysUntilStart === 1 ? '' : 's'}`;
-    }
-    const week = Math.floor(daysBetween(plan.startDate, today) / 7) + 1;
-    if (planTotalWeeks && week > planTotalWeeks) return 'Finished';
-    return planTotalWeeks ? `Week ${week} of ${planTotalWeeks}` : `Week ${week}`;
-  })();
 
   return (
     <>
@@ -232,31 +206,10 @@ export default function PlanView() {
         where it stands, stop it — used to live in the library you go to in order to start a
         different one.
       */}
-      {plan && (
-        <button
-          className="card tight plan-card"
-          onClick={() => setOpenPlan(true)}
-          aria-label={`Open ${plan.name}`}
-        >
-          <div className="row between">
-            <div className="grow">
-              <strong>{plan.name}</strong>
-              <div className="tiny faint">
-                {planStatus}
-                {plan.goal.eventDate && ` · ${daysBetween(today, plan.goal.eventDate)} days to race`}
-              </div>
-            </div>
-            {/*
-              Progress through the plan, not adherence to date. Next to "week 3 of 12" a
-              percentage is read as how far along you are, so that is what it now says; the
-              stricter question keeps its own labelled place inside.
-            */}
-            {progress != null && progress.total > 0 && (
-              <span className="pill">{Math.round(progress.ratio * 100)}% done</span>
-            )}
-          </div>
-        </button>
-      )}
+      {/* One card per plan being followed. Two is a normal number — see `activePlans`. */}
+      {running.map((item) => (
+        <PlanCard key={item.id} plan={item} today={today} onOpen={() => setOpenPlan(item)} />
+      ))}
 
       <div
         className="calendar"
@@ -340,7 +293,7 @@ export default function PlanView() {
         style={{ marginTop: '1rem' }}
         onClick={() => setBrowsing(true)}
       >
-        {plan ? 'Browse plans' : 'Start a plan'}
+        {running.length > 0 ? 'Browse plans' : 'Start a plan'}
       </button>
 
       {/* A plan someone sent you, or one you exported from another phone. */}
@@ -352,7 +305,7 @@ export default function PlanView() {
         📥 Import a plan
       </button>
 
-      {!plan && (
+      {running.length === 0 && (
         <p className="tiny faint" style={{ textAlign: 'center', marginTop: '0.5rem' }}>
           Or tap any day to add a single session.
         </p>
@@ -372,17 +325,54 @@ export default function PlanView() {
         />
       )}
 
-      {openPlan && plan && (
+      {openPlan && (
         <PlanSheet
-          plan={plan}
-          weekLabel={planStatus}
-          onClose={() => setOpenPlan(false)}
+          plan={openPlan}
+          weekLabel={planWeekLabel(openPlan, today)}
+          onClose={() => setOpenPlan(null)}
           onEnded={(message) => {
-            setOpenPlan(false);
+            setOpenPlan(null);
             setPlanNotice(message);
           }}
         />
       )}
     </>
+  );
+}
+
+/**
+ * One plan you are following, on the calendar.
+ *
+ * Its own component because there can be several, and each needs its own progress read. The
+ * percentage is progress through the plan rather than adherence to date — next to "week 3 of
+ * 12" that is what a percentage is taken to mean, and the stricter question keeps its own
+ * labelled place inside the sheet.
+ */
+function PlanCard({
+  plan,
+  today,
+  onOpen,
+}: {
+  plan: Plan;
+  today: string;
+  onOpen: () => void;
+}) {
+  const progress = useLiveQuery(() => planProgress(plan.id), [plan.id]);
+
+  return (
+    <button className="card tight plan-card" onClick={onOpen} aria-label={`Open ${plan.name}`}>
+      <div className="row between">
+        <div className="grow">
+          <strong>{plan.name}</strong>
+          <div className="tiny faint">
+            {planWeekLabel(plan, today)}
+            {plan.goal.eventDate && ` · ${daysBetween(today, plan.goal.eventDate)} days to race`}
+          </div>
+        </div>
+        {progress != null && progress.total > 0 && (
+          <span className="pill">{Math.round(progress.ratio * 100)}% done</span>
+        )}
+      </div>
+    </button>
   );
 }

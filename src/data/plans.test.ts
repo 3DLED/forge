@@ -10,7 +10,8 @@
 import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { db } from '../db/db';
-import { planProgress } from './plans';
+import { applyPlan, planProgress } from './plans';
+import { planRepo } from './repos';
 import { todayKey } from '../domain/dates';
 import type { PlannedStatus } from '../domain/types';
 
@@ -158,5 +159,109 @@ describe('what belongs to the plan', () => {
 
     const p = await planProgress('plan-1');
     expect(p.completed + p.skipped + p.remaining).toBe(p.total);
+  });
+});
+
+/**
+ * Clearing a range replaces whatever was in it.
+ *
+ * Sessions and plans are separate records, so clearing sessions used to leave the plan behind
+ * as an active card at nought per cent with nothing scheduled under it — following something
+ * that is no longer there.
+ */
+describe('applying a plan over the top of another', () => {
+  const emptyGenerated = (endDate: string) => ({
+    sessions: [],
+    conflicts: [],
+    substitutions: [],
+    unavailable: [],
+    weeks: 1,
+    endDate,
+  });
+
+  const template = {
+    slug: 'x',
+    name: 'Replacement',
+    description: '',
+    goal: 'general' as const,
+    weeks: 1,
+    daysPerWeek: 1,
+    slots: [],
+    tags: [],
+  };
+
+  beforeEach(async () => {
+    await db.plans.clear();
+  });
+
+  it('stops following a plan whose sessions were all cleared', async () => {
+    const old = await planRepo.create({
+      name: 'Outgoing',
+      goal: { kind: 'general', label: 'Outgoing' },
+      startDate: shiftDays(0),
+      endDate: shiftDays(6),
+      phases: [],
+      daysPerWeek: 1,
+      isActive: true,
+    } as never);
+    await seed([{ offset: 1, status: 'planned', planId: old.id }]);
+
+    await applyPlan({
+      template,
+      generated: emptyGenerated(shiftDays(6)),
+      startDate: shiftDays(0),
+      replaceExisting: true,
+    });
+
+    expect((await planRepo.get(old.id))?.isActive).toBe(false);
+  });
+
+  /* A plan with weeks left outside the cleared range is still one you are following. */
+  it('keeps following a plan that still has sessions of its own', async () => {
+    const other = await planRepo.create({
+      name: 'Ongoing',
+      goal: { kind: 'general', label: 'Ongoing' },
+      startDate: shiftDays(0),
+      endDate: shiftDays(60),
+      phases: [],
+      daysPerWeek: 1,
+      isActive: true,
+    } as never);
+    await seed([
+      { offset: 1, status: 'planned', planId: other.id },
+      { offset: 40, status: 'planned', planId: other.id },
+    ]);
+
+    await applyPlan({
+      template,
+      generated: emptyGenerated(shiftDays(6)),
+      startDate: shiftDays(0),
+      replaceExisting: true,
+    });
+
+    expect((await planRepo.get(other.id))?.isActive).toBe(true);
+  });
+
+  /* The default, and the whole point of stacking: adding a plan disturbs nothing. */
+  it('leaves everything alone when not asked to clear', async () => {
+    const other = await planRepo.create({
+      name: 'Ongoing',
+      goal: { kind: 'general', label: 'Ongoing' },
+      startDate: shiftDays(0),
+      endDate: shiftDays(6),
+      phases: [],
+      daysPerWeek: 1,
+      isActive: true,
+    } as never);
+    await seed([{ offset: 1, status: 'planned', planId: other.id }]);
+
+    await applyPlan({
+      template,
+      generated: emptyGenerated(shiftDays(6)),
+      startDate: shiftDays(0),
+    });
+
+    expect((await planRepo.get(other.id))?.isActive).toBe(true);
+    expect(await planProgress(other.id)).toMatchObject({ total: 1 });
   });
 });

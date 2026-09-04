@@ -64,6 +64,13 @@ export interface GenerateOptions {
   sessionTemplateBySlug: Map<string, SeedSessionTemplate>;
   /** The athlete's standing goal, which biases the dose and the weekly shape. */
   primaryGoal?: PrimaryGoal;
+  /**
+   * Days already holding a session from another plan.
+   *
+   * Avoided while anything else is free, used once nothing is. Running a strength plan and a
+   * running plan together should spread across the week before it starts doubling up.
+   */
+  busyDates?: Set<DayKey>;
 }
 
 export interface GeneratedSession {
@@ -335,7 +342,9 @@ export function generatePlan(options: GenerateOptions): GeneratedPlan {
       ...template.slots.filter((s) => (s.fromWeek ?? 1) <= weekIndex),
       ...added,
     ];
-    const placements = placeSlotsInWeek(availability, slotsThisWeek);
+    const placements = placeSlotsInWeek(availability, slotsThisWeek, {
+      busy: options.busyDates,
+    });
 
     for (const placement of placements) {
       const slot = placement.slot as PlanSlot;

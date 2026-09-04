@@ -440,12 +440,13 @@ export async function importPlan(
   };
 }
 
-/** Makes an imported plan the one you are following, retiring any other. */
+/**
+ * Starts following a plan that was sitting on the calendar unstarted.
+ *
+ * Leaves anything else running. It used to retire them, from back when only one plan could be
+ * active — now two plans is a thing you may well have meant, and taking one away because you
+ * started another would be deciding something you did not ask for.
+ */
 export async function activateImportedPlan(planId: Id): Promise<void> {
-  for (const other of await planRepo.all()) {
-    if (other.id !== planId && other.isActive) {
-      await planRepo.update(other.id, { isActive: false });
-    }
-  }
   await planRepo.update(planId, { isActive: true });
 }

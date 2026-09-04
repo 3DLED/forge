@@ -138,10 +138,18 @@ export interface Placement<T extends PlaceableSlot> {
  * Slots are honoured in `order`, each aiming for an evenly spread target day and walking
  * outward to the nearest free day that permits its modality. A strength day therefore does
  * not get stranded because the ideal Wednesday is marked cardio-only.
+ *
+ * `busy` names days that already hold a session from a plan that is not this one. Those are
+ * avoided while anything else is free and used once nothing is — which is what makes running
+ * a strength plan and a running plan together land seven sessions across seven days rather
+ * than stacking them onto three, while still allowing a two-a-day when the week is tighter
+ * than the training. Days this call has already filled stay off limits either way: a plan
+ * doubling up on *itself* is a bug, not a two-a-day.
  */
 export function placeSlotsInWeek<T extends PlaceableSlot>(
   days: DayAvailability[],
   slots: T[],
+  options: { busy?: Set<DayKey> } = {},
 ): Placement<T>[] {
   const eligible = days.filter((day) => !day.blocked);
   const ordered = [...slots].sort((a, b) => a.order - b.order);
@@ -182,22 +190,34 @@ export function placeSlotsInWeek<T extends PlaceableSlot>(
     ];
   }
 
+  const busy = options.busy ?? new Set<DayKey>();
   const targets = spreadIndices(eligible.length, floating.length);
 
   floating.forEach((slot, index) => {
     const target = targets[index] ?? Math.min(index, eligible.length - 1);
 
-    // Walk outward from the ideal day: target, target±1, target±2, …
-    let chosen: DayAvailability | undefined;
-    for (let offset = 0; offset < eligible.length && !chosen; offset++) {
-      for (const candidateIndex of offset === 0 ? [target] : [target - offset, target + offset]) {
-        const day = eligible[candidateIndex];
-        if (!day || taken.has(day.date)) continue;
-        if (!day.allowedModalities.includes(slot.modality)) continue;
-        chosen = day;
-        break;
+    /*
+     * Walk outward from the ideal day: target, target±1, target±2, …
+     *
+     * Twice, when another plan is already using days this week: once refusing them, then
+     * again allowing them. Preferring a free day is what spreads two plans across the week;
+     * accepting a busy one on the second pass is what lets them double up rather than one of
+     * them simply losing its session.
+     */
+    const walk = (allowBusy: boolean): DayAvailability | undefined => {
+      for (let offset = 0; offset < eligible.length; offset++) {
+        for (const candidateIndex of offset === 0 ? [target] : [target - offset, target + offset]) {
+          const day = eligible[candidateIndex];
+          if (!day || taken.has(day.date)) continue;
+          if (!allowBusy && busy.has(day.date)) continue;
+          if (!day.allowedModalities.includes(slot.modality)) continue;
+          return day;
+        }
       }
-    }
+      return undefined;
+    };
+
+    const chosen = walk(false) ?? walk(true);
 
     if (chosen) {
       taken.add(chosen.date);
