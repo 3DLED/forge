@@ -94,6 +94,95 @@ async function syncSeedFlags(): Promise<number> {
   return stale.length;
 }
 
+/**
+ * Cleans up duplicates left by restoring a backup onto a fresh install.
+ *
+ * `restoreBackup` no longer creates these — it reconciles seeded rows on their natural key
+ * rather than on an id that bootstrap mints afresh every install. This repairs the databases
+ * that were damaged before that fix, which is every device the reinstall-and-merge workflow
+ * has touched, and it cannot be done by the fix alone because the duplicate rows are already
+ * written.
+ *
+ * Kept rather than removed once everyone is clean: it is cheap, it runs on a table with a
+ * handful of rows, and a repair that quietly does nothing is the correct steady state.
+ *
+ * Exported for its tests. It deletes rows, so it is worth being able to aim at it directly.
+ */
+export async function dedupeEquipmentProfiles(): Promise<number> {
+  const all = (await db.equipmentProfiles.toArray()).filter((row) => !row.deletedAt);
+
+  const byName = new Map<string, typeof all>();
+  for (const item of all) {
+    if (!byName.has(item.name)) byName.set(item.name, []);
+    byName.get(item.name)!.push(item);
+  }
+
+  /* Configured beats blank. Two copies of "Home — kettlebells" and only one knows the bells. */
+  const richness = (item: (typeof all)[number]): number => {
+    const weights = Object.values(item.availableWeightsKg ?? {}).flat().length;
+    const plates = item.barbell?.plates?.length ?? 0;
+    return weights * 100 + plates * 100 + (item.barbell ? 50 : 0) + item.items.length;
+  };
+
+  const doomed: string[] = [];
+  const survivors = new Map<string, string>();
+
+  for (const group of byName.values()) {
+    if (group.length < 2) continue;
+    const keep = group
+      .slice()
+      .sort((a, b) => richness(b) - richness(a) || a.createdAt.localeCompare(b.createdAt))[0];
+    survivors.set(keep.name, keep.id);
+    doomed.push(...group.filter((item) => item.id !== keep.id).map((item) => item.id));
+  }
+
+  if (doomed.length === 0) return 0;
+  await db.equipmentProfiles.bulkDelete(doomed);
+
+  // A profile pointing at one of the copies we just removed would train as "no equipment".
+  const gone = new Set(doomed);
+  for (const profile of await db.profiles.toArray()) {
+    if (!profile.activeEquipmentProfileId || !gone.has(profile.activeEquipmentProfileId)) continue;
+    const replacement =
+      [...survivors.values()][0] ??
+      (await db.equipmentProfiles.toArray()).find((p) => p.isDefault)?.id;
+    await db.profiles.update(profile.id, { activeEquipmentProfileId: replacement });
+  }
+
+  return doomed.length;
+}
+
+/**
+ * Collapses duplicate athlete profiles, keeping the one that has actually been used.
+ *
+ * There is only ever meant to be one, and every screen reads `profiles[0]` — so a second one
+ * makes which settings apply a matter of which row Dexie hands back first. Same cause as the
+ * equipment duplicates, same repair.
+ */
+export async function dedupeProfiles(): Promise<number> {
+  const all = (await db.profiles.toArray()).filter((row) => !row.deletedAt);
+  if (all.length < 2) return 0;
+
+  const equipment = new Set((await db.equipmentProfiles.toArray()).map((p) => p.id));
+
+  /* Anything the athlete set themselves counts; a freshly seeded profile has none of it. */
+  const configured = (profile: Profile): number =>
+    (profile.bodyweightKg ? 1 : 0) +
+    (profile.primaryGoal ? 1 : 0) +
+    (profile.trainingMaxPercent ? 1 : 0) +
+    (profile.units === 'metric' ? 1 : 0) +
+    (profile.activeEquipmentProfileId && equipment.has(profile.activeEquipmentProfileId) ? 1 : 0) +
+    (profile.availability?.some((rule) => rule.allowedModalities.length === 0) ? 1 : 0);
+
+  const keep = all
+    .slice()
+    .sort((a, b) => configured(b) - configured(a) || a.createdAt.localeCompare(b.createdAt))[0];
+
+  const doomed = all.filter((profile) => profile.id !== keep.id).map((profile) => profile.id);
+  await db.profiles.bulkDelete(doomed);
+  return doomed.length;
+}
+
 async function seedExercises(): Promise<number> {
   const existing = await db.exercises.toArray();
   const known = new Set(existing.map((e) => e.slug));
@@ -205,6 +294,8 @@ async function runBootstrap(): Promise<BootstrapResult> {
   const firstRun = previousSeed === 0;
 
   await seedEquipmentProfiles();
+  await dedupeEquipmentProfiles();
+  await dedupeProfiles();
   await dedupeExercises();
   const exercisesAdded = await seedExercises();
   await syncSeedFlags();
