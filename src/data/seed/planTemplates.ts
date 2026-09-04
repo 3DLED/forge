@@ -11,17 +11,15 @@
  * to the athlete and the bar, not to a template guessing what you can lift in week nine.
  */
 
-import type { EquipmentTag, GoalKind, Modality, Weekday } from '../../domain/types';
+import type {
+  EquipmentTag,
+  GoalKind,
+  Modality,
+  SlotProgression,
+  Weekday,
+} from '../../domain/types';
 
-export interface SlotProgression {
-  /** Which movement inside the session template to scale. */
-  exerciseSlug: string;
-  metric: 'distanceM' | 'timeSec';
-  startValue: number;
-  /** Compounding weekly increase. 0.08 is the conventional 8-10% ceiling. */
-  weeklyRate: number;
-  maxValue?: number;
-}
+export type { SlotProgression } from '../../domain/types';
 
 export interface PlanSlot {
   templateSlug: string;

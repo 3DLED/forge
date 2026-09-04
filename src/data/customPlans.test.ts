@@ -11,6 +11,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { db } from '../db/db';
 import {
   allCustomPlans,
+  rampValueAt,
+  rampableMovements,
   dayLabel,
   daysPerWeek,
   duplicateCustomPlan,
@@ -306,5 +308,156 @@ describe('storing them', () => {
     const copiedBlock = copy.days.find((d) => d.kind === 'saved')!.workout!.blocks[0];
     const originalBlock = saved.days.find((d) => d.kind === 'saved')!.workout!.blocks[0];
     expect(copiedBlock.id).not.toBe(originalBlock.id);
+  });
+});
+
+/**
+ * The one kind of progression a plan carries itself.
+ *
+ * Load autoregulates from what you actually lifted; distance does not, because nothing about
+ * last Tuesday tells you how far to run in week nine. So a ramp is offered for distance and
+ * time and for nothing else.
+ */
+describe('what can be made to grow', () => {
+  it('finds the distance in a run session', () => {
+    const found = rampableMovements({ weekday: 1, kind: 'template', templateSlug: 'run-long' });
+
+    expect(found.length).toBeGreaterThan(0);
+    expect(found[0].metric).toBe('distanceM');
+    expect(found[0].value).toBeGreaterThan(0);
+  });
+
+  /**
+   * Sets and reps are never offered, whatever else the session holds.
+   *
+   * Those are what the logger progresses, from what you actually lifted — a plan ramping them
+   * too would be arguing with it every session. A timed hold in the same session is fair game,
+   * because nothing autoregulates a plank either.
+   */
+  it('offers the hold in a lifting session and none of the lifts', () => {
+    const found = rampableMovements({ weekday: 1, kind: 'template', templateSlug: 'full-body-a' });
+
+    expect(found.every((movement) => movement.metric === 'timeSec')).toBe(true);
+    expect(found.map((movement) => movement.exerciseSlug)).not.toContain('back-squat');
+  });
+
+  it('finds nothing on a rest day', () => {
+    expect(rampableMovements({ weekday: 1, kind: 'rest' })).toEqual([]);
+  });
+
+  it('looks inside a workout of your own', () => {
+    const found = rampableMovements({
+      weekday: 1,
+      kind: 'saved',
+      workout: {
+        name: 'Ruck',
+        modalities: ['cardio'],
+        blocks: [
+          {
+            id: 'B1',
+            style: 'straight',
+            items: [
+              { id: 'I1', exerciseSlug: 'ruck', distanceM: 5000, load: { kind: 'unspecified' } },
+            ],
+          },
+        ],
+      },
+    });
+
+    expect(found).toEqual([{ exerciseSlug: 'ruck', metric: 'distanceM', value: 5000 }]);
+  });
+});
+
+describe('how a ramp climbs', () => {
+  const ramp = { exerciseSlug: 'long-run', metric: 'distanceM' as const, startValue: 5000, weeklyRate: 0.1 };
+
+  it('starts where it says it starts', () => {
+    expect(rampValueAt(ramp, 1)).toBe(5000);
+  });
+
+  /* Compounding, not linear — which is how distance is built and how the ceiling is quoted. */
+  it('compounds rather than adding a flat amount', () => {
+    expect(rampValueAt(ramp, 2)).toBe(5500);
+    expect(rampValueAt(ramp, 3)).toBe(6050);
+  });
+
+  it('holds at the cap instead of running away', () => {
+    const capped = { ...ramp, maxValue: 6000 };
+    expect(rampValueAt(capped, 3)).toBe(6000);
+    expect(rampValueAt(capped, 12)).toBe(6000);
+  });
+
+  /* Eight per cent sounds modest and doubles in nine weeks, which is why the UI previews it. */
+  it('roughly doubles in nine weeks at eight per cent', () => {
+    const eight = { ...ramp, weeklyRate: 0.08 };
+    expect(rampValueAt(eight, 10) / rampValueAt(eight, 1)).toBeGreaterThan(1.9);
+  });
+});
+
+describe('a ramp, through the generator', () => {
+  it('grows the distance week by week in the sessions it produces', () => {
+    const { template, sessionTemplateBySlug } = translateCustomPlan(
+      plan({
+        weeks: 4,
+        days: week({
+          2: {
+            kind: 'template',
+            templateSlug: 'run-long',
+            ramp: {
+              exerciseSlug: 'long-run',
+              metric: 'distanceM',
+              startValue: 5000,
+              weeklyRate: 0.1,
+            },
+          },
+        }),
+      }),
+    );
+
+    const generated = generatePlan({
+      template,
+      startDate: '2026-03-02',
+      availability: Array.from({ length: 7 }, (_, weekday) => ({
+        weekday: weekday as Weekday,
+        allowedModalities: ['strength', 'cardio', 'mobility', 'skill'],
+      })) as never,
+      exceptions: [],
+      weekStartsOn: 0,
+      exerciseBySlug: new Map(),
+      available: new Set(),
+      sessionTemplateBySlug,
+    });
+
+    const distances = generated.sessions.map(
+      (session) => session.prescription.blocks[0].items[0].distanceM,
+    );
+
+    expect(distances).toEqual([5000, 5500, 6050, 6655]);
+  });
+
+  it('leaves a day without a ramp exactly as written', () => {
+    const { template, sessionTemplateBySlug } = translateCustomPlan(
+      plan({ weeks: 3, days: week({ 2: { kind: 'template', templateSlug: 'run-long' } }) }),
+    );
+
+    const generated = generatePlan({
+      template,
+      startDate: '2026-03-02',
+      availability: Array.from({ length: 7 }, (_, weekday) => ({
+        weekday: weekday as Weekday,
+        allowedModalities: ['strength', 'cardio', 'mobility', 'skill'],
+      })) as never,
+      exceptions: [],
+      weekStartsOn: 0,
+      exerciseBySlug: new Map(),
+      available: new Set(),
+      sessionTemplateBySlug,
+    });
+
+    const distances = generated.sessions.map(
+      (session) => session.prescription.blocks[0].items[0].distanceM,
+    );
+
+    expect(new Set(distances).size).toBe(1);
   });
 });

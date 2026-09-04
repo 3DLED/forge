@@ -15,13 +15,27 @@ import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import Sheet from '../../ui/Sheet';
 import AskSheet from '../../ui/AskSheet';
+import RampEditor from './RampEditor';
 import { plural } from '../../ui/text';
-import { emptyWeek, isTrainingDay, dayLabel, saveCustomPlan } from '../../data/customPlans';
+import {
+  dayLabel,
+  emptyWeek,
+  isTrainingDay,
+  rampableMovements,
+  saveCustomPlan,
+} from '../../data/customPlans';
 import { savedWorkouts } from '../../data/namedWorkouts';
 import { SEED_SESSION_TEMPLATES } from '../../data/seed/sessionTemplates';
 import { weekdayName } from '../../domain/dates';
 import { useApp } from '../../ui/AppProvider';
-import type { CustomPlan, CustomPlanDay, GoalKind, Weekday } from '../../domain/types';
+import type {
+  CustomPlan,
+  CustomPlanDay,
+  GoalKind,
+  SlotProgression,
+  UnitSystem,
+  Weekday,
+} from '../../domain/types';
 
 /** Offered lengths. Ongoing is last because a plan with an end is the commoner intent. */
 const WEEK_OPTIONS: (number | null)[] = [4, 6, 8, 12, 16, null];
@@ -142,6 +156,7 @@ export default function CustomPlanBuilder({
               <br />
               <span className={`tiny${isTrainingDay(day) ? '' : ' faint'}`}>
                 {dayLabel(day)}
+                {day.ramp && ` · grows weekly`}
               </span>
             </span>
             <span className="faint">›</span>
@@ -160,7 +175,10 @@ export default function CustomPlanBuilder({
           weekday={picking}
           current={days.find((day) => day.weekday === picking)!}
           saved={saved ?? []}
+          units={profile.units}
+          weeks={weeks}
           onClose={() => setPicking(null)}
+          onSetRamp={(ramp) => setDay(picking, { ramp })}
           onPick={(next) => {
             setDay(picking, next);
             setPicking(null);
@@ -181,17 +199,26 @@ function DayPicker({
   weekday,
   current,
   saved,
+  units,
+  weeks,
   onClose,
   onPick,
+  onSetRamp,
 }: {
   weekday: Weekday;
   current: CustomPlanDay;
   saved: { id: string; name: string; blocks: unknown[]; modalities: string[]; estimatedMinutes?: number }[];
+  units: UnitSystem;
+  weeks: number | null;
   onClose: () => void;
   onPick: (day: Partial<CustomPlanDay>) => void;
+  /** Kept apart from onPick: setting a ramp adjusts the day rather than replacing it. */
+  onSetRamp: (ramp: SlotProgression | undefined) => void;
 }) {
   const [query, setQuery] = useState('');
   const [confirmClear, setConfirmClear] = useState(false);
+
+  const rampable = rampableMovements(current);
 
   const term = query.trim().toLowerCase();
   const matches = SEED_SESSION_TEMPLATES.filter(
@@ -203,7 +230,7 @@ function DayPicker({
     <>
       <Sheet title={weekdayName(weekday)} onClose={onClose}>
         <div className="row" style={{ gap: '0.5rem' }}>
-          <button className="btn grow" onClick={() => onPick({ kind: 'rest', templateSlug: undefined, workout: undefined })}>
+          <button className="btn grow" onClick={() => onPick({ kind: 'rest', templateSlug: undefined, workout: undefined, ramp: undefined })}>
             😴 Rest day
           </button>
           {current.kind !== 'open' && (
@@ -212,6 +239,20 @@ function DayPicker({
             </button>
           )}
         </div>
+
+        {/*
+          Only once there is a session to ramp, and only for what can sensibly grow. See the
+          note in RampEditor for why load is left out of it.
+        */}
+        {rampable.length > 0 && (
+          <RampEditor
+            movements={rampable}
+            ramp={current.ramp}
+            units={units}
+            weeks={weeks ?? 12}
+            onChange={onSetRamp}
+          />
+        )}
 
         <input
           type="search"
@@ -234,6 +275,7 @@ function DayPicker({
                 kind: 'saved',
                 templateSlug: undefined,
                 // Copied in, not linked. See the note on CustomPlanDay.
+                ramp: undefined,
                 workout: {
                   name: workout.name,
                   modalities: workout.modalities as never,
@@ -285,7 +327,7 @@ function DayPicker({
           onCancel={() => setConfirmClear(false)}
           onConfirm={() => {
             setConfirmClear(false);
-            onPick({ kind: 'open', templateSlug: undefined, workout: undefined });
+            onPick({ kind: 'open', templateSlug: undefined, workout: undefined, ramp: undefined });
           }}
         />
       )}

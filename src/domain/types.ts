@@ -391,6 +391,28 @@ export interface EquipmentProfile extends Entity {
 }
 
 /**
+ * A movement inside a plan that grows week by week.
+ *
+ * The one kind of progression a plan has to carry itself. Load autoregulates — the logger
+ * reads what you actually lifted and suggests more — but you cannot autoregulate your way to
+ * a twenty kilometre long run. That distance is scheduled, weeks in advance, and the schedule
+ * is the plan's job.
+ *
+ * Compounding rather than linear, because that is how distance is actually built and how the
+ * conventional ceiling is expressed: eight to ten per cent a week, with a cap so the curve
+ * levels off at the distance you were aiming for rather than running away.
+ */
+export interface SlotProgression {
+  /** Which movement inside the session to scale. */
+  exerciseSlug: string;
+  metric: 'distanceM' | 'timeSec';
+  startValue: number;
+  /** Compounding weekly increase. 0.08 is the conventional 8-10% ceiling. */
+  weeklyRate: number;
+  maxValue?: number;
+}
+
+/**
  * A plan you laid out yourself, kept to be used again.
  *
  * Stored as a week rather than as a calendar: seven days, each either a session or not, and a
@@ -424,6 +446,13 @@ export interface CustomPlanDay {
     estimatedMinutes?: number;
     blocks: Block[];
   };
+  /**
+   * A distance or time on this day that grows each week.
+   *
+   * Set per day rather than per plan, because it is a fact about one session: the long run
+   * builds, the strength day does not, and both live in the same week.
+   */
+  ramp?: SlotProgression;
 }
 
 export interface CustomPlan extends Entity {

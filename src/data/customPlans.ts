@@ -17,7 +17,14 @@
 import { customPlanRepo } from './repos';
 import { SEED_SESSION_TEMPLATE_BY_SLUG, type SeedSessionTemplate } from './seed/sessionTemplates';
 import { ulid } from '../domain/ids';
-import type { CustomPlan, CustomPlanDay, Id, Modality, Weekday } from '../domain/types';
+import type {
+  CustomPlan,
+  CustomPlanDay,
+  Id,
+  Modality,
+  SlotProgression,
+  Weekday,
+} from '../domain/types';
 import type { SeedPlanTemplate, PlanSlot } from './seed/planTemplates';
 
 /** A week with nothing on it, which is what the builder opens on. */
@@ -100,6 +107,57 @@ function asSessionTemplate(day: CustomPlanDay): SeedSessionTemplate | null {
   };
 }
 
+/**
+ * Movements on a day that could be made to grow, with what they currently ask for.
+ *
+ * Only distance and time: reps and load are what the logger already autoregulates from what
+ * you actually did, and a plan that also ramped them would be arguing with it every session.
+ * A distance is different — nothing about last Tuesday tells you how far to run in week nine.
+ */
+export interface RampableMovement {
+  exerciseSlug: string;
+  metric: 'distanceM' | 'timeSec';
+  /** What the session asks for today, which is where a ramp sensibly starts. */
+  value: number;
+}
+
+export function rampableMovements(day: CustomPlanDay): RampableMovement[] {
+  const blocks =
+    day.kind === 'saved'
+      ? (day.workout?.blocks ?? []).map((block) => ({
+          items: block.items.map((item) => ({
+            ex: item.exerciseSlug,
+            distanceM: item.distanceM,
+            timeSec: item.timeSec,
+          })),
+        }))
+      : (SEED_SESSION_TEMPLATE_BY_SLUG.get(day.templateSlug ?? '')?.blocks ?? []).map((block) => ({
+          items: block.items.map((item) => ({
+            ex: item.ex,
+            distanceM: item.distanceM,
+            timeSec: item.timeSec,
+          })),
+        }));
+
+  const found: RampableMovement[] = [];
+  for (const block of blocks) {
+    for (const item of block.items) {
+      if (item.distanceM != null) {
+        found.push({ exerciseSlug: item.ex, metric: 'distanceM', value: item.distanceM });
+      } else if (item.timeSec != null) {
+        found.push({ exerciseSlug: item.ex, metric: 'timeSec', value: item.timeSec });
+      }
+    }
+  }
+  return found;
+}
+
+/** What a ramp reaches in a given week, so a builder can show the curve before committing. */
+export function rampValueAt(ramp: SlotProgression, week: number): number {
+  const raw = ramp.startValue * (1 + ramp.weeklyRate) ** (week - 1);
+  return Math.round(ramp.maxValue ? Math.min(raw, ramp.maxValue) : raw);
+}
+
 export interface TranslatedCustomPlan {
   template: SeedPlanTemplate;
   /**
@@ -141,6 +199,7 @@ export function translateCustomPlan(plan: CustomPlan): TranslatedCustomPlan {
         modality: modalityOfDay(day),
         order: day.weekday,
         weekday: day.weekday,
+        progression: day.ramp,
       });
       continue;
     }
@@ -155,6 +214,7 @@ export function translateCustomPlan(plan: CustomPlan): TranslatedCustomPlan {
       modality: modalityOfDay(day),
       order: day.weekday,
       weekday: day.weekday,
+      progression: day.ramp,
     });
   }
 
@@ -213,6 +273,7 @@ export async function duplicateCustomPlan(plan: CustomPlan): Promise<CustomPlan>
       workout: day.workout
         ? { ...day.workout, blocks: day.workout.blocks.map((b) => ({ ...b, id: ulid() })) }
         : undefined,
+      ramp: day.ramp ? { ...day.ramp } : undefined,
     })),
     notes: plan.notes,
   });

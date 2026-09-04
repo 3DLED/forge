@@ -22,7 +22,8 @@ import type {
   Weekday,
 } from './types';
 import type { SeedItem, SeedSessionTemplate } from '../data/seed/sessionTemplates';
-import type { PlanSlot, SeedPlanTemplate, SlotProgression } from '../data/seed/planTemplates';
+import type { PlanSlot, SeedPlanTemplate } from '../data/seed/planTemplates';
+import type { SlotProgression } from './types';
 import { addWeeks, startOfWeek, weekDays } from './dates';
 import { resolveExercise } from './equipment';
 import { placeSlotsInWeek, resolveWeekAvailability } from './scheduling';
