@@ -11,7 +11,7 @@
  * backwards into a plan you already started.
  */
 
-import type { BlockStyle, LoadSpec, Modality } from '../../domain/types';
+import type { BlockStyle, LoadSpec, Modality, SuggestSpec } from '../../domain/types';
 
 export interface SeedItem {
   ex: string;
@@ -44,6 +44,13 @@ export interface SeedSessionTemplate {
   estimatedMinutes: number;
   blocks: SeedBlock[];
   notes?: string;
+  /**
+   * A session with no movements, to be filled on the day it happens.
+   *
+   * Never used by the seeded library — every template here names what it wants. Custom plans
+   * synthesise one of these for a day left open deliberately.
+   */
+  suggest?: SuggestSpec;
 }
 
 // --- block helpers ---------------------------------------------------------

@@ -33,6 +33,7 @@ import {
   conditioningMinutesFor,
 } from '../../domain/goals';
 import type { PrimaryGoal } from '../../domain/goals';
+import type { SuggestSpec } from '../../domain/types';
 import type { Exercise, SessionTemplate } from '../../domain/types';
 
 const MINUTE_OPTIONS = [20, 30, 45, 60];
@@ -40,6 +41,7 @@ const MINUTE_OPTIONS = [20, 30, 45, 60];
 export default function SuggestWorkoutSheet({
   available,
   existingSlugs,
+  opening,
   onAdd,
   onUseSaved,
   onClose,
@@ -48,6 +50,13 @@ export default function SuggestWorkoutSheet({
   available: Set<string>;
   /** Already in the workout — never suggested twice. */
   existingSlugs: Set<string>;
+  /**
+   * What the plan asked for, when this day was laid out as "decide on the day".
+   *
+   * A starting point rather than a constraint: the chips still change it. The plan said what
+   * it wanted eight weeks ago, and you are the one standing here now.
+   */
+  opening?: SuggestSpec;
   /**
    * Hand the draft to the session. `timed` asks for it to land as one timed block —
    * an AMRAP, an EMOM, or a for-time piece — rather than as straight sets.
@@ -66,14 +75,14 @@ export default function SuggestWorkoutSheet({
     [],
   );
 
-  const [regions, setRegions] = useState<BodyRegion[]>(['upper']);
+  const [regions, setRegions] = useState<BodyRegion[]>(opening?.regions ?? ['upper']);
   /*
    * Opens on whatever you are training for rather than on hypertrophy, which is what it
    * assumed for everyone. Still a starting point: the chips below change it for this workout
    * without touching the standing answer.
    */
   const [goal, setGoal] = useState<PrimaryGoal>(() => profile.primaryGoal ?? 'general');
-  const [minutes, setMinutes] = useState(45);
+  const [minutes, setMinutes] = useState(opening?.minutes ?? 45);
   const [variant, setVariant] = useState(0);
 
   /** Deliberate replacements, keyed by pattern. Reset whenever the inputs change. */

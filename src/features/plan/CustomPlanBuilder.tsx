@@ -27,12 +27,12 @@ import {
 import { savedWorkouts } from '../../data/namedWorkouts';
 import { SEED_SESSION_TEMPLATES } from '../../data/seed/sessionTemplates';
 import { weekdayName } from '../../domain/dates';
+import { BUILDABLE_REGIONS, REGION_LABELS } from '../../domain/regions';
 import { useApp } from '../../ui/AppProvider';
 import type {
   CustomPlan,
   CustomPlanDay,
   GoalKind,
-  SlotProgression,
   UnitSystem,
   Weekday,
 } from '../../domain/types';
@@ -178,7 +178,7 @@ export default function CustomPlanBuilder({
           units={profile.units}
           weeks={weeks}
           onClose={() => setPicking(null)}
-          onSetRamp={(ramp) => setDay(picking, { ramp })}
+          onUpdate={(patch) => setDay(picking, patch)}
           onPick={(next) => {
             setDay(picking, next);
             setPicking(null);
@@ -203,7 +203,7 @@ function DayPicker({
   weeks,
   onClose,
   onPick,
-  onSetRamp,
+  onUpdate,
 }: {
   weekday: Weekday;
   current: CustomPlanDay;
@@ -213,7 +213,14 @@ function DayPicker({
   onClose: () => void;
   onPick: (day: Partial<CustomPlanDay>) => void;
   /** Kept apart from onPick: setting a ramp adjusts the day rather than replacing it. */
-  onSetRamp: (ramp: SlotProgression | undefined) => void;
+  /**
+   * Changes the day without closing the sheet.
+   *
+   * Kept apart from `onPick`, which settles the day and gets out of the way. Turning a ramp on
+   * or narrowing what a suggested day asks for are adjustments to a choice already made, and
+   * closing the sheet under someone mid-adjustment is how you end up reopening it three times.
+   */
+  onUpdate: (patch: Partial<CustomPlanDay>) => void;
 }) {
   const [query, setQuery] = useState('');
   const [confirmClear, setConfirmClear] = useState(false);
@@ -230,7 +237,18 @@ function DayPicker({
     <>
       <Sheet title={weekdayName(weekday)} onClose={onClose}>
         <div className="row" style={{ gap: '0.5rem' }}>
-          <button className="btn grow" onClick={() => onPick({ kind: 'rest', templateSlug: undefined, workout: undefined, ramp: undefined })}>
+          <button
+            className="btn grow"
+            onClick={() =>
+              onPick({
+                kind: 'rest',
+                templateSlug: undefined,
+                workout: undefined,
+                ramp: undefined,
+                suggest: undefined,
+              })
+            }
+          >
             😴 Rest day
           </button>
           {current.kind !== 'open' && (
@@ -250,7 +268,7 @@ function DayPicker({
             ramp={current.ramp}
             units={units}
             weeks={weeks ?? 12}
-            onChange={onSetRamp}
+            onChange={(ramp) => onUpdate({ ramp })}
           />
         )}
 
@@ -262,6 +280,78 @@ function DayPicker({
           style={{ marginTop: '0.6rem' }}
           onChange={(event) => setQuery(event.target.value)}
         />
+
+        {/*
+          A day described rather than specified. Choosing the movements eight weeks out means
+          choosing them without knowing what you own that week or how the last one went.
+        */}
+        <div className="section-title">Decide on the day</div>
+        <button
+          className={`pick${current.kind === 'suggest' ? ' selected' : ''}`}
+          onClick={() =>
+            onUpdate({
+              kind: 'suggest',
+              templateSlug: undefined,
+              workout: undefined,
+              ramp: undefined,
+              suggest: current.suggest ?? { regions: ['upper', 'lower'], minutes: 45 },
+            })
+          }
+        >
+          <span className="grow">
+            <strong>✨ Suggest a session</strong>
+            <br />
+            <span className="tiny faint">
+              Filled in when the day arrives, from your kit and what you have been training.
+            </span>
+          </span>
+        </button>
+
+        {current.kind === 'suggest' && current.suggest && (
+          <div className="card tight">
+            <div className="section-title" style={{ marginTop: 0 }}>Train</div>
+            <div className="row wrap" style={{ gap: '0.4rem' }}>
+              {BUILDABLE_REGIONS.map((region) => {
+                const on = current.suggest!.regions.includes(region);
+                return (
+                  <button
+                    key={region}
+                    className={`chip${on ? ' on' : ''}`}
+                    aria-pressed={on}
+                    onClick={() => {
+                      const next = on
+                        ? current.suggest!.regions.filter((r) => r !== region)
+                        : [...current.suggest!.regions, region];
+                      // Turning the last one off would leave nothing to generate from.
+                      onUpdate({
+                        suggest: {
+                          ...current.suggest!,
+                          regions: next.length > 0 ? next : current.suggest!.regions,
+                        },
+                      });
+                    }}
+                  >
+                    {REGION_LABELS[region]}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="section-title">For about</div>
+            <div className="row wrap" style={{ gap: '0.4rem' }}>
+              {[20, 30, 45, 60].map((minutes) => (
+                <button
+                  key={minutes}
+                  className={`chip${current.suggest!.minutes === minutes ? ' on' : ''}`}
+                  aria-pressed={current.suggest!.minutes === minutes}
+                  onClick={() => onUpdate({ suggest: { ...current.suggest!, minutes } })}
+                >
+                  {minutes} min
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {mine.length > 0 && <div className="section-title">Your saved workouts</div>}
         {mine.map((workout) => (

@@ -10,9 +10,10 @@
  * train today; anything finer belongs in the pattern, which is still there underneath.
  */
 
-import type { Exercise, MovementPattern } from './types';
+import type { BodyRegion, Exercise, MovementPattern } from './types';
 
-export type BodyRegion = 'upper' | 'lower' | 'core' | 'conditioning' | 'cardio';
+// Defined in `types` so a prescription can name one without importing this module back.
+export type { BodyRegion };
 
 const REGION_OF: Record<MovementPattern, BodyRegion> = {
   squat: 'lower',

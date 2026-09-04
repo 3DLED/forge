@@ -461,3 +461,91 @@ describe('a ramp, through the generator', () => {
     expect(new Set(distances).size).toBe(1);
   });
 });
+
+/**
+ * A day the plan describes rather than specifies.
+ *
+ * The point is that it is *not* resolved when the plan is built. Choosing movements eight
+ * weeks out means choosing them without knowing what you own that week, what you have already
+ * trained, or how the last one went — so the plan carries the terms and the day answers them.
+ */
+describe('a day left to be decided on the day', () => {
+  const suggested = (over = {}) =>
+    plan({
+      days: week({
+        2: { kind: 'suggest', suggest: { regions: ['upper'], minutes: 30 }, ...over },
+      }),
+    });
+
+  it('counts as a training day', () => {
+    expect(daysPerWeek(suggested())).toBe(1);
+  });
+
+  it('says what it will ask for', () => {
+    expect(dayLabel(suggested().days[2])).toBe('Suggested · Upper body · 30 min');
+  });
+
+  it('becomes a session with no movements in it', () => {
+    const { template, sessionTemplateBySlug } = translateCustomPlan(suggested());
+    const seed = sessionTemplateBySlug.get(template.slots[0].templateSlug)!;
+
+    expect(seed.blocks).toEqual([]);
+    expect(seed.estimatedMinutes).toBe(30);
+  });
+
+  /* Carried, not resolved — a plan that picked the movements now would defeat the point. */
+  it('carries the terms through to the prescription rather than resolving them', () => {
+    const { template, sessionTemplateBySlug } = translateCustomPlan(suggested());
+
+    const generated = generatePlan({
+      template,
+      startDate: '2026-03-02',
+      availability: Array.from({ length: 7 }, (_, weekday) => ({
+        weekday: weekday as Weekday,
+        allowedModalities: ['strength', 'cardio', 'mobility', 'skill'],
+      })) as never,
+      exceptions: [],
+      weekStartsOn: 0,
+      exerciseBySlug: new Map(),
+      available: new Set(),
+      sessionTemplateBySlug,
+    });
+
+    expect(generated.sessions[0].prescription.suggest).toEqual({
+      regions: ['upper'],
+      minutes: 30,
+    });
+    expect(generated.sessions[0].prescription.blocks).toEqual([]);
+  });
+
+  it('lands on the weekday it was put on, like any other day', () => {
+    const { template } = translateCustomPlan(suggested());
+    expect(template.slots[0].weekday).toBe(2);
+  });
+
+  it('falls back to something sensible when the terms went missing', () => {
+    const { template, sessionTemplateBySlug } = translateCustomPlan(
+      plan({ days: week({ 2: { kind: 'suggest' } }) }),
+    );
+
+    expect(sessionTemplateBySlug.get(template.slots[0].templateSlug)?.suggest).toBeDefined();
+  });
+
+  /* Nothing to ramp on a day whose movements do not exist yet. */
+  it('offers no ramp', () => {
+    expect(rampableMovements(suggested().days[2])).toEqual([]);
+  });
+
+  it('gives two suggested days slugs that do not collide', () => {
+    const { template } = translateCustomPlan(
+      plan({
+        days: week({
+          1: { kind: 'suggest', suggest: { regions: ['upper'], minutes: 30 } },
+          4: { kind: 'suggest', suggest: { regions: ['lower'], minutes: 45 } },
+        }),
+      }),
+    );
+
+    expect(new Set(template.slots.map((slot) => slot.templateSlug)).size).toBe(2);
+  });
+});

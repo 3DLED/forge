@@ -249,6 +249,14 @@ export interface Prescription {
   notes?: string;
   /** Which template it came from, for provenance only. Never read back for content. */
   sourceTemplateId?: Id;
+  /**
+   * Set when this day was planned as "suggest something", and is still waiting to be filled.
+   *
+   * The logger reads it when the session is started and opens the suggester against these
+   * terms. It stays on the prescription rather than being resolved at plan time on purpose —
+   * resolving early would throw away the whole point, which is deciding on the day.
+   */
+  suggest?: SuggestSpec;
 }
 
 export type PlannedStatus = 'planned' | 'completed' | 'skipped' | 'moved';
@@ -390,6 +398,25 @@ export interface EquipmentProfile extends Entity {
   isDefault: boolean;
 }
 
+/** Which part of the body a movement trains. See `regions.ts` for how it is derived. */
+export type BodyRegion = 'upper' | 'lower' | 'core' | 'conditioning' | 'cardio';
+
+/**
+ * A session left to be worked out on the day.
+ *
+ * A plan that names every movement eight weeks out is deciding, in advance, with none of the
+ * information that matters — what you own that week, what you have already trained, how the
+ * last one went. Some days are better described than specified: "an upper body session, about
+ * forty minutes", resolved against the day it actually happens on.
+ *
+ * What it is not is vagueness. The shape of the week is still fixed; it is the contents of one
+ * day that stay open, and the suggester fills them from the same rules it uses anywhere else.
+ */
+export interface SuggestSpec {
+  regions: BodyRegion[];
+  minutes: number;
+}
+
 /**
  * A movement inside a plan that grows week by week.
  *
@@ -430,7 +457,7 @@ export interface CustomPlanDay {
    * `open` was never filled in, `rest` was chosen. Nothing is scheduled for either — the
    * difference is whether reopening the plan should look like a decision or a gap.
    */
-  kind: 'open' | 'rest' | 'template' | 'saved';
+  kind: 'open' | 'rest' | 'template' | 'saved' | 'suggest';
   /** For `template`: one of the built-in session templates, by slug. */
   templateSlug?: string;
   /**
@@ -446,6 +473,8 @@ export interface CustomPlanDay {
     estimatedMinutes?: number;
     blocks: Block[];
   };
+  /** For `suggest`: what to ask the suggester for when the day arrives. */
+  suggest?: SuggestSpec;
   /**
    * A distance or time on this day that grows each week.
    *

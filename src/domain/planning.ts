@@ -280,6 +280,8 @@ export function materialisePrescription(
       estimatedMinutes: Math.round(seed.estimatedMinutes * Math.max(options.factor, 0.5)),
       blocks,
       notes: seed.notes,
+      // Carried through unresolved: the point of it is to be answered on the day.
+      suggest: seed.suggest,
     },
     substitutions,
     unavailable,

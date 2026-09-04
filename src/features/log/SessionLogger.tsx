@@ -57,7 +57,7 @@ import {
   updateBlock,
   updateSets,
 } from '../../data/sessions';
-import { loggedSessionRepo } from '../../data/repos';
+import { loggedSessionRepo, plannedSessionRepo } from '../../data/repos';
 import {
   describeMovements,
   isTimedWorkout,
@@ -229,6 +229,17 @@ export default function SessionLogger() {
    */
   const testResults = useLiveQuery(() => allTestResults(), []);
   const pastSessions = useLiveQuery(() => sessionsBetween('0000-01-01', '9999-12-31'), []);
+
+  /*
+   * The plan day this session came from, read only for what it asked to be decided on the day.
+   * A plan can leave a day described rather than specified — "upper body, about 45 minutes" —
+   * and this is where that gets answered.
+   */
+  const plannedFrom = useLiveQuery(
+    async () => (session?.plannedSessionId ? plannedSessionRepo.get(session.plannedSessionId) : undefined),
+    [session?.plannedSessionId],
+  );
+  const askedFor = plannedFrom?.prescription.suggest;
   const scan = useMemo(() => scanRecords(pastSessions ?? []), [pastSessions]);
   const records = scan.records;
 
@@ -495,6 +506,23 @@ export default function SessionLogger() {
    * and a scroll fired before that silently does nothing. `landed` rather than clearing the
    * query string, so a reload still goes where the link said.
    */
+  /*
+   * Opened once per visit, and only while the session is still empty.
+   *
+   * Emptiness is the real condition, not the dismissal: a plan day that says "decide on the
+   * day" and still has nothing in it is a question that has not been answered, and you cannot
+   * train from it. So closing the sheet and coming back later asks again, which is help
+   * rather than nagging. Put anything in the session — from the suggester or by hand — and it
+   * stops, because the question is then answered however you chose to answer it.
+   */
+  const askedOnce = useRef(false);
+  useEffect(() => {
+    if (!askedFor || askedOnce.current || session?.endedAt) return;
+    if (sets == null || sets.length > 0) return;
+    askedOnce.current = true;
+    setSuggesting(true);
+  }, [askedFor, sets, session?.endedAt]);
+
   const landed = useRef(false);
   useEffect(() => {
     if (!wanted || landed.current || !sets?.length) return;
@@ -1258,6 +1286,7 @@ export default function SessionLogger() {
       {suggesting && (
         <SuggestWorkoutSheet
           available={sessionAvailable}
+          opening={askedFor}
           existingSlugs={loggedSlugs}
           onAdd={addSuggested}
           onUseSaved={useSavedSession}

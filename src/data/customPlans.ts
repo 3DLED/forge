@@ -17,12 +17,14 @@
 import { customPlanRepo } from './repos';
 import { SEED_SESSION_TEMPLATE_BY_SLUG, type SeedSessionTemplate } from './seed/sessionTemplates';
 import { ulid } from '../domain/ids';
+import { REGION_LABELS } from '../domain/regions';
 import type {
   CustomPlan,
   CustomPlanDay,
   Id,
   Modality,
   SlotProgression,
+  SuggestSpec,
   Weekday,
 } from '../domain/types';
 import type { SeedPlanTemplate, PlanSlot } from './seed/planTemplates';
@@ -36,7 +38,7 @@ export function emptyWeek(): CustomPlanDay[] {
 }
 
 export function isTrainingDay(day: CustomPlanDay): boolean {
-  return day.kind === 'template' || day.kind === 'saved';
+  return day.kind === 'template' || day.kind === 'saved' || day.kind === 'suggest';
 }
 
 /** How many sessions a week this plan asks for. */
@@ -50,8 +52,17 @@ export function daysPerWeek(plan: CustomPlan): number {
  * The builder, the library row and the apply preview all want to say what is on Wednesday,
  * and none of them should be reaching into two different optional fields to find out.
  */
+/** The regions a suggested day asks for, in the words the picker offered them in. */
+export function describeSuggest(spec: SuggestSpec): string {
+  const named = spec.regions.map((region) => REGION_LABELS[region]).join(' + ');
+  return `${named || 'Anything'} · ${spec.minutes} min`;
+}
+
 export function dayLabel(day: CustomPlanDay): string {
   if (day.kind === 'rest') return 'Rest';
+  if (day.kind === 'suggest') {
+    return day.suggest ? `Suggested · ${describeSuggest(day.suggest)}` : 'Suggested';
+  }
   if (day.kind === 'saved') return day.workout?.name ?? 'Saved workout';
   if (day.kind === 'template') {
     return SEED_SESSION_TEMPLATE_BY_SLUG.get(day.templateSlug ?? '')?.name ?? 'Session';
@@ -61,6 +72,7 @@ export function dayLabel(day: CustomPlanDay): string {
 
 /** The modality a day trains, which is what the scheduler matches days against. */
 function modalityOfDay(day: CustomPlanDay): Modality {
+  if (day.kind === 'suggest') return 'strength';
   if (day.kind === 'saved') return day.workout?.modalities[0] ?? 'strength';
   return SEED_SESSION_TEMPLATE_BY_SLUG.get(day.templateSlug ?? '')?.modalities[0] ?? 'strength';
 }
@@ -190,6 +202,31 @@ export function translateCustomPlan(plan: CustomPlan): TranslatedCustomPlan {
   const missing: string[] = [];
 
   for (const day of plan.days.filter(isTrainingDay)) {
+    /*
+     * A day to be decided on the day becomes a session with no movements, carrying what to
+     * ask for. Deliberately not resolved here: choosing eight weeks early, with none of the
+     * information that matters, is the thing this exists to avoid.
+     */
+    if (day.kind === 'suggest') {
+      const spec = day.suggest ?? { regions: ['upper', 'lower'], minutes: 45 };
+      const slug = `custom-suggest-${day.weekday}`;
+      sessionTemplateBySlug.set(slug, {
+        slug,
+        name: 'Suggested session',
+        modalities: ['strength'],
+        estimatedMinutes: spec.minutes,
+        blocks: [],
+        suggest: spec,
+      });
+      slots.push({
+        templateSlug: slug,
+        modality: 'strength',
+        order: day.weekday,
+        weekday: day.weekday,
+      });
+      continue;
+    }
+
     if (day.kind === 'saved') {
       const synthetic = asSessionTemplate(day);
       if (!synthetic) continue;
@@ -274,6 +311,7 @@ export async function duplicateCustomPlan(plan: CustomPlan): Promise<CustomPlan>
         ? { ...day.workout, blocks: day.workout.blocks.map((b) => ({ ...b, id: ulid() })) }
         : undefined,
       ramp: day.ramp ? { ...day.ramp } : undefined,
+      suggest: day.suggest ? { ...day.suggest, regions: [...day.suggest.regions] } : undefined,
     })),
     notes: plan.notes,
   });
