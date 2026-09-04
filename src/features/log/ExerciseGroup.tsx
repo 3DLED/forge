@@ -6,7 +6,7 @@
  * ticked off. Duplicating this markup for the nested case would guarantee the two drift.
  */
 
-import MetricInput, { metricLabel } from './MetricInput';
+import MetricInput, { metricLabel, SHORT_DISTANCE_M } from './MetricInput';
 import { isHold } from '../../domain/generator';
 import { plural } from '../../ui/text';
 import { useApp } from '../../ui/AppProvider';
@@ -99,6 +99,28 @@ export default function ExerciseGroup({
    */
   const timeable = Boolean(onStartHold) && !nested && !readOnly && exercise && isHold(exercise);
 
+  /*
+   * Whether this movement's distances read in metres.
+   *
+   * `MetricInput` already showed anything under 800 m as metres — a 40 m carry is interval
+   * work, not 0.02 of a mile — while the column header, the field's own label and its
+   * placeholder all said miles regardless. All four have to agree, or the number underneath
+   * reads as a different quantity than it is.
+   *
+   * Logged distances answer it when there are any. With none yet, the movement does: a carry
+   * is measured in paces and a run is not, and an empty carry offering "3.1" is offering
+   * three miles of it.
+   */
+  const recorded = sets
+    .map((set) => set.values.distanceM)
+    .filter((distance): distance is number => distance != null);
+
+  const metres =
+    metrics.includes('distanceM') &&
+    (recorded.length > 0
+      ? recorded.every((distance) => distance < SHORT_DISTANCE_M)
+      : exercise?.pattern === 'carry');
+
   return (
     <section id={id} className={nested ? 'block-movement' : 'card'}>
       <div className="card-head">
@@ -171,11 +193,9 @@ export default function ExerciseGroup({
         <div className="set-fields">
           {metrics.map((metric) => (
             <span className="field-label" key={metric}>
-              {metricLabel(metric, units)}
+              {metricLabel(metric, units, metres)}
             </span>
           ))}
-          {/* The button takes a column of the same grid, so it needs a label to sit under. */}
-          {timeable && <span className="field-label" />}
         </div>
         {/* Must match .set-check exactly, or the labels drift off their columns. */}
         <span style={{ width: 'var(--check-w)' }} />
@@ -193,20 +213,31 @@ export default function ExerciseGroup({
                   units={units}
                   value={set.values[metric]}
                   readOnly={readOnly}
+                  metres={metres}
                   onChange={(value) => onSetValue(set.id, metric, value)}
                 />
               ))}
-              {timeable && (
-                <button
-                  className="btn sm hold-start"
-                  onClick={() => onStartHold!(set.id)}
-                  aria-label={`Time this hold of ${exercise?.name ?? slug}`}
-                >
-                  ▶ Hold
-                </button>
-              )}
             </div>
-            {readOnly ? (
+            {/*
+              A hold takes the tick's column rather than a sixth of its own.
+
+              A carry row was carrying five columns — load, distance, time, a Hold button and a
+              checkbox — squeezed across a phone, and the distance was the one that lost, so
+              "40 m" read as an unlabelled fragment. The two controls are the same decision
+              anyway: you press one to start the effort and the other to say it happened, and
+              the clock ticks the set off when it stops. So they share a column, and finishing
+              the hold turns the button into the tick it would have set.
+            */}
+            {timeable && !set.completed ? (
+              <button
+                className="set-check hold-start"
+                onClick={() => onStartHold!(set.id)}
+                title="Time this hold"
+                aria-label={`Time this hold of ${exercise?.name ?? slug}`}
+              >
+                ▶
+              </button>
+            ) : readOnly ? (
               /*
                * Still a tick, still in the same column — a finished workout should look like
                * what you logged, not like a different screen. It just no longer answers to a

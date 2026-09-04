@@ -11,7 +11,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useApp } from '../../ui/AppProvider';
 import Sheet from '../../ui/Sheet';
@@ -37,9 +37,9 @@ import { knownMax, suggestLoad } from '../../domain/loading';
 import { suggestProgression } from '../../domain/progression';
 import { GOAL_SCHEMES } from '../../domain/generator';
 import { goalSpec } from '../../domain/goals';
-import { scanRecords } from '../../domain/training';
+import { scanRecords, type PrEvent } from '../../domain/training';
 import { loadsForExercise } from '../../domain/equipment';
-import { formatWeight } from '../../domain/units';
+import { formatDistance, formatDuration, formatPace, formatWeight } from '../../domain/units';
 import { sessionsBetween } from '../../data/sessions';
 import { injuriesAffecting } from '../../domain/injuries';
 import { SEVERITIES } from '../../domain/injuries';
@@ -72,7 +72,7 @@ import {
 import { ulid } from '../../domain/ids';
 import { formatDayLabel, todayKey } from '../../domain/dates';
 import { estimateDurationMin } from '../../domain/training';
-import { formatClock } from '../../domain/units';
+import { formatClock, weightLabel } from '../../domain/units';
 import { availableSlugs } from '../../domain/equipment';
 import type { SuggestedItem } from '../../domain/generator';
 import type {
@@ -84,6 +84,7 @@ import type {
   LoggedSet,
   MetricKey,
   SessionTemplate,
+  UnitSystem,
 } from '../../domain/types';
 
 /** Used only when nothing prescribed a rest — a movement added by hand. */
@@ -110,9 +111,40 @@ type Section =
   | { kind: 'exercise'; key: string; group: Group }
   | { kind: 'block'; key: string; block: LoggedBlock; groups: Group[] };
 
+/**
+ * A personal best in one phrase: what it is now, and what it beat.
+ *
+ * The margin is the half people care about — "up from 92 kg" is the reason to look, where a
+ * bare number is just a number. Every kind is stored in its own currency, so each formats
+ * through the same converter the rest of the screen uses.
+ */
+function describePr(event: PrEvent, units: UnitSystem): string {
+  const show = (value: number): string => {
+    switch (event.kind) {
+      case 'oneRm':
+        return formatWeight(value, units);
+      case 'reps':
+        return plural(value, 'rep');
+      case 'rounds':
+        return plural(value, 'round');
+      case 'time':
+        return formatDuration(value);
+      case 'distance':
+        return formatDistance(value, units);
+      case 'pace':
+        return formatPace(value, units);
+    }
+  };
+
+  return `${show(event.value)}, up from ${show(event.previous)}`;
+}
+
 export default function SessionLogger() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
+  const [search] = useSearchParams();
+  /** Set when a link asked for one movement in particular — see the PR sheet. */
+  const wanted = search.get('movement');
   const { units, exerciseBySlug, exercises, available, activeEquipment, profile } = useApp();
 
   // Resolves to null when the session genuinely does not exist, so "loading" and "missing"
@@ -197,9 +229,19 @@ export default function SessionLogger() {
    */
   const testResults = useLiveQuery(() => allTestResults(), []);
   const pastSessions = useLiveQuery(() => sessionsBetween('0000-01-01', '9999-12-31'), []);
-  const records = useMemo(
-    () => scanRecords(pastSessions ?? []).records,
-    [pastSessions],
+  const scan = useMemo(() => scanRecords(pastSessions ?? []), [pastSessions]);
+  const records = scan.records;
+
+  /**
+   * What this session was a best at.
+   *
+   * History flags a workout as carrying a personal record, and until now opening it left you
+   * to work out which movement earned the badge by reading the whole thing. The scan already
+   * knows; it just had nowhere to say so.
+   */
+  const sessionPrs = useMemo(
+    () => scan.events.filter((event) => event.sessionId === sessionId),
+    [scan, sessionId],
   );
 
   /**
@@ -439,6 +481,75 @@ export default function SessionLogger() {
     return new Map(entries);
   }, [allSlugs, sessionId]);
 
+  /** Brings a movement into view. `scroll-margin-top` keeps it clear of the pinned strip. */
+  const scrollToMovement = (slug: string, block: ScrollLogicalPosition = 'start') => {
+    requestAnimationFrame(() => {
+      document.getElementById(`movement-${slug}`)?.scrollIntoView({ behavior: 'smooth', block });
+    });
+  };
+
+  /*
+   * Land on the movement a link asked for.
+   *
+   * Once, and only after the sets are on screen — the element does not exist until they are,
+   * and a scroll fired before that silently does nothing. `landed` rather than clearing the
+   * query string, so a reload still goes where the link said.
+   */
+  const landed = useRef(false);
+  useEffect(() => {
+    if (!wanted || landed.current || !sets?.length) return;
+    if (!sets.some((set) => set.exerciseSlug === wanted)) return;
+    landed.current = true;
+    scrollToMovement(wanted);
+  }, [wanted, sets]);
+
+  /**
+   * Loaded movements you ticked off without saying what you lifted.
+   *
+   * A set with no weight is not a small gap: it scores no volume, sets no estimated max, and
+   * cannot be progressed from, so the movement quietly drops out of half the app. Easy to do
+   * — you tick the box and move on — and almost impossible to reconstruct a week later, which
+   * is why it is worth one question at the point you would otherwise walk away.
+   */
+  const missingLoads = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const set of sets ?? []) {
+      if (!set.completed) continue;
+      const exercise = exerciseBySlug.get(set.exerciseSlug);
+      if (!exercise?.metrics.includes('weightKg')) continue;
+      if (set.values.weightKg) continue;
+      counts.set(set.exerciseSlug, (counts.get(set.exerciseSlug) ?? 0) + 1);
+    }
+    return [...counts].map(([slug, count]) => ({
+      slug,
+      count,
+      name: exerciseBySlug.get(slug)?.name ?? slug,
+    }));
+  }, [sets, exerciseBySlug]);
+
+  /**
+   * Timed pieces built but never named.
+   *
+   * A round count means nothing on its own — it depends entirely on what was in the round and
+   * how long the clock ran — so the app only ever compares a timed workout against itself,
+   * matched on its name. An unnamed AMRAP therefore records a score that can never be beaten,
+   * because there is nothing for the next one to attach to.
+   *
+   * Keyed off the block having movements rather than a score, because at the moment the finish
+   * sheet opens the score usually is not written yet: the running clock holds its rounds in
+   * component state and banks them when the block stops. Finishing a workout with the clock
+   * still going is exactly the case worth catching, so the condition cannot depend on the
+   * write having already happened.
+   */
+  const unnamedTimed = useMemo(
+    () =>
+      blocks.filter(
+        (block) => !block.label?.trim() && (sets ?? []).some((set) => set.blockId === block.id),
+      ),
+    [blocks, sets],
+  );
+
+
   if (!sessionId) return null;
   if (session === undefined) return <p className="muted">Loading…</p>;
   if (session === null || !sets) {
@@ -675,11 +786,7 @@ export default function SessionLogger() {
     endRest();
     if (!slug) return;
     // After the panel has gone, or the scroll lands under where it used to be.
-    requestAnimationFrame(() => {
-      document
-        .getElementById(`movement-${slug}`)
-        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    });
+    scrollToMovement(slug, 'center');
   };
 
   /** "10 × Burpee" lines for the timer, so a round can be read off the screen mid-effort. */
@@ -746,6 +853,32 @@ export default function SessionLogger() {
           </button>
         )}
       </header>
+
+      {/*
+        Top of the workout, above the review note, because it is the reason you opened it.
+        Tapping a line goes to the movement that earned it rather than making you hunt.
+      */}
+      {finished && sessionPrs.length > 0 && (
+        <div className="card tight pr-banner">
+          <div className="row between" style={{ marginBottom: '0.35rem' }}>
+            <strong className="grow">🏅 {plural(sessionPrs.length, 'personal best')} here</strong>
+          </div>
+          {sessionPrs.map((event) => (
+            <button
+              key={`${event.exerciseSlug}-${event.kind}-${event.value}`}
+              className="name-link block"
+              style={{ textAlign: 'left', padding: '0.15rem 0' }}
+              onClick={() => scrollToMovement(event.exerciseSlug)}
+            >
+              <span className="small">
+                <strong>{exerciseBySlug.get(event.exerciseSlug)?.name ?? event.exerciseSlug}</strong>
+                {' · '}
+                {describePr(event, units)}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {readOnly ? (
         <div className="card tight">
@@ -1359,6 +1492,16 @@ export default function SessionLogger() {
           }}
           suggestedMinutes={estimateDurationMin({ ...session, sets })}
           existing={session}
+          missingLoads={missingLoads}
+          unnamedTimed={unnamedTimed}
+          units={units}
+          onGoToMovement={(slug) => {
+            setFinishing(false);
+            scrollToMovement(slug);
+          }}
+          onNameBlock={async (blockId, label) => {
+            await nameBlock({ ...session, sets }, blockId, label);
+          }}
         />
       )}
     </>
@@ -1371,6 +1514,11 @@ function FinishSheet({
   suggestedMinutes,
   existing,
   finished,
+  missingLoads,
+  unnamedTimed,
+  units,
+  onGoToMovement,
+  onNameBlock,
 }: {
   onClose: () => void;
   onSave: (details: {
@@ -1384,12 +1532,30 @@ function FinishSheet({
   existing: LoggedSession;
   /** Already finished: this is an edit of the details, not the end of a workout. */
   finished: boolean;
+  /** Loaded movements ticked off with no weight against them. */
+  missingLoads: { slug: string; name: string; count: number }[];
+  /** Timed blocks with movements in them but no name to compare their score under. */
+  unnamedTimed: LoggedBlock[];
+  units: UnitSystem;
+  onGoToMovement: (slug: string) => void;
+  onNameBlock: (blockId: Id, label: string) => Promise<void>;
 }) {
   const [rpe, setRpe] = useState<number | undefined>(existing.sessionRpe);
   const [feel, setFeel] = useState<Feel | undefined>(existing.feel);
   const [notes, setNotes] = useState(existing.notes ?? '');
   const [minutes, setMinutes] = useState(String(existing.durationMin ?? suggestedMinutes));
   const [saving, setSaving] = useState(false);
+  const [names, setNames] = useState<Record<string, string>>({});
+
+  /*
+   * Raised once, at the end, and never enforced.
+   *
+   * Both of these are things you can only fix now and will not remember later, which is worth
+   * a prompt — but a workout you actually did is worth more than a tidy record of it, so
+   * neither blocks the save. Only on a workout being finished, not on one being edited
+   * months later, where the answer is almost certainly "I no longer know".
+   */
+  const asking = !finished && (missingLoads.length > 0 || unnamedTimed.length > 0);
 
   const load = rpe ? Math.round(rpe * (Number(minutes) || 0)) : null;
 
@@ -1415,6 +1581,59 @@ function FinishSheet({
         </button>
       }
     >
+      {asking && (
+        <div className="card tight" style={{ borderColor: 'var(--warn)' }}>
+          <strong className="small">Worth doing before you save</strong>
+
+          {missingLoads.map((row) => (
+            <div className="row between" key={row.slug} style={{ marginTop: '0.4rem' }}>
+              <span className="grow small">
+                <strong>{row.name}</strong>
+                <br />
+                <span className="tiny faint">
+                  {plural(row.count, 'set')} ticked with no weight in {weightLabel(units)}
+                </span>
+              </span>
+              <button className="btn sm" onClick={() => onGoToMovement(row.slug)}>
+                Add
+              </button>
+            </div>
+          ))}
+
+          {unnamedTimed.map((block) => (
+            <div key={block.id} style={{ marginTop: '0.5rem' }}>
+              <span className="tiny faint">
+                This {blockShape(block)} has no name. Name it and its score becomes something to
+                beat next time — unnamed, there is nothing for the next one to be compared
+                against, because a round count only means anything against the same workout.
+              </span>
+              {/* Naming it takes it off this list, so there is no confirmed state to show. */}
+              <div className="row" style={{ gap: '0.4rem', marginTop: '0.35rem' }}>
+                <input
+                  value={names[block.id] ?? ''}
+                  placeholder="Cindy, Tuesday burner…"
+                  aria-label="Name this workout"
+                  onChange={(event) =>
+                    setNames((current) => ({ ...current, [block.id]: event.target.value }))
+                  }
+                />
+                <button
+                  className="btn sm"
+                  disabled={!(names[block.id] ?? '').trim()}
+                  onClick={() => void onNameBlock(block.id, (names[block.id] ?? '').trim())}
+                >
+                  Name it
+                </button>
+              </div>
+            </div>
+          ))}
+
+          <div className="tiny faint" style={{ marginTop: '0.5rem' }}>
+            Optional — saving without them is fine.
+          </div>
+        </div>
+      )}
+
       <p className="small muted">
         How hard was the whole session? This is what makes running and lifting comparable —
         effort × minutes is the one load number that spans both.

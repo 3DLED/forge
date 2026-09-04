@@ -131,7 +131,15 @@ export default function PrSheet({
                   what surrounded it — what you did first, how the session felt — than as a
                   number standing on its own.
                 */}
-                <Link to={`/log/${source.sessionId}`} onClick={onClose}>
+                {/*
+                  Carries the movement, not just the workout. A best is worth seeing next to
+                  what surrounded it, but landing at the top of a twelve-movement session and
+                  scrolling to find the one that earned the badge is its own small chore.
+                */}
+                <Link
+                  to={`/log/${source.sessionId}?movement=${encodeURIComponent(record.exerciseSlug)}`}
+                  onClick={onClose}
+                >
                   Set {formatDayLabel(source.date)} — open this workout →
                 </Link>
               </div>

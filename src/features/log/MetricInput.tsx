@@ -21,12 +21,25 @@ import {
   weightLabel,
 } from '../../domain/units';
 
-export function metricLabel(metric: MetricKey, units: UnitSystem): string {
+/**
+ * Distances under this are shown as metres rather than converted.
+ *
+ * A 40 m carry is interval work, and 0.02 mi is not a number anyone writes down. Shared with
+ * the caller, which has to label the column the same way the field fills it.
+ */
+export const SHORT_DISTANCE_M = 800;
+
+export function metricLabel(
+  metric: MetricKey,
+  units: UnitSystem,
+  /** Distances here are metres — see SHORT_DISTANCE_M. */
+  metres = false,
+): string {
   switch (metric) {
     case 'weightKg': return weightLabel(units);
     case 'reps': return 'reps';
     case 'timeSec': return 'time';
-    case 'distanceM': return distanceLabel(units);
+    case 'distanceM': return metres ? 'm' : distanceLabel(units);
     case 'rpe': return 'effort';
     case 'rounds': return 'rounds';
   }
@@ -42,7 +55,7 @@ function toDraft(metric: MetricKey, value: number | undefined, units: UnitSystem
     }
     case 'distanceM': {
       // Sub-half-mile efforts are interval work; show them in metres, as they were entered.
-      if (value < 800) return `${Math.round(value)}m`;
+      if (value < SHORT_DISTANCE_M) return `${Math.round(value)}m`;
       return String(Math.round(displayDistance(value, units) * 100) / 100);
     }
     case 'timeSec':
@@ -84,10 +97,11 @@ function inputModeFor(metric: MetricKey): 'decimal' | 'numeric' | 'text' {
   return 'numeric';
 }
 
-function placeholderFor(metric: MetricKey): string {
+function placeholderFor(metric: MetricKey, metres: boolean): string {
   switch (metric) {
     case 'timeSec': return '8:30';
-    case 'distanceM': return '3.1';
+    // A carry suggesting 3.1 is suggesting three miles of it.
+    case 'distanceM': return metres ? '40m' : '3.1';
     case 'rpe': return '1-10';
     default: return '—';
   }
@@ -100,6 +114,7 @@ export default function MetricInput({
   onChange,
   showLabel = false,
   readOnly = false,
+  metres = false,
 }: {
   metric: MetricKey;
   value: number | undefined;
@@ -108,6 +123,8 @@ export default function MetricInput({
   showLabel?: boolean;
   /** Reviewing a finished workout: the number is shown, not offered for editing. */
   readOnly?: boolean;
+  /** This movement's distances read in metres, so the label and the hint say so too. */
+  metres?: boolean;
 }) {
   const [draft, setDraft] = useState(() => toDraft(metric, value, units));
   const [focused, setFocused] = useState(false);
@@ -126,15 +143,15 @@ export default function MetricInput({
 
   return (
     <div>
-      {showLabel && <span className="field-label">{metricLabel(metric, units)}</span>}
+      {showLabel && <span className="field-label">{metricLabel(metric, units, metres)}</span>}
       <input
         type="text"
         inputMode={inputModeFor(metric)}
         className={readOnly ? 'field-static' : undefined}
         value={draft}
         readOnly={readOnly}
-        placeholder={readOnly ? '' : placeholderFor(metric)}
-        aria-label={metricLabel(metric, units)}
+        placeholder={readOnly ? '' : placeholderFor(metric, metres)}
+        aria-label={metricLabel(metric, units, metres)}
         onFocus={(event) => {
           if (readOnly) return;
           setFocused(true);

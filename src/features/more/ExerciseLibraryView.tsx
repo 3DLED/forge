@@ -15,7 +15,12 @@ import ExerciseInfoSheet from '../log/ExerciseInfoSheet';
 import { plural } from '../../ui/text';
 import { useApp } from '../../ui/AppProvider';
 import { exerciseRepo } from '../../data/repos';
-import { CATEGORY_LABELS, categoryOf } from '../../domain/categories';
+import {
+  CATEGORY_LABELS,
+  CATEGORY_ORDER,
+  categoryOf,
+  type ExerciseCategory,
+} from '../../domain/categories';
 import { CONTAINER_SLUGS } from '../../domain/training';
 import type { Exercise } from '../../domain/types';
 
@@ -26,12 +31,14 @@ export default function ExerciseLibraryView() {
   const [adding, setAdding] = useState(false);
   const [showing, setShowing] = useState<Exercise | null>(null);
   const [deleting, setDeleting] = useState<Exercise | null>(null);
+  const [category, setCategory] = useState<ExerciseCategory | 'all'>('all');
 
   const { mine, seeded } = useMemo(() => {
     const term = query.trim().toLowerCase();
     const matches = exercises
       // The AMRAP/EMOM placeholders are not movements; they were never meant to be browsed.
       .filter((exercise) => !CONTAINER_SLUGS.has(exercise.slug))
+      .filter((exercise) => category === 'all' || categoryOf(exercise) === category)
       .filter((exercise) => !term || exercise.name.toLowerCase().includes(term))
       .sort((a, b) => a.name.localeCompare(b.name));
 
@@ -39,7 +46,24 @@ export default function ExerciseLibraryView() {
       mine: matches.filter((exercise) => exercise.isCustom),
       seeded: matches.filter((exercise) => !exercise.isCustom),
     };
-  }, [exercises, query]);
+  }, [exercises, category, query]);
+
+  /**
+   * How many movements sit in each category, before the search box narrows anything.
+   *
+   * Browsing is the point of this screen — "what does this app actually know about pulling"
+   * — and a filter that does not say how much is behind it is a filter you have to tap to
+   * find out. The counts come from the whole library so they stay put while you type.
+   */
+  const countByCategory = useMemo(() => {
+    const counts = new Map<ExerciseCategory, number>();
+    for (const exercise of exercises) {
+      if (CONTAINER_SLUGS.has(exercise.slug)) continue;
+      const key = categoryOf(exercise);
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    return counts;
+  }, [exercises]);
 
   const row = (exercise: Exercise, editable: boolean) => (
     <div className="card tight" key={exercise.id}>
@@ -78,6 +102,26 @@ export default function ExerciseLibraryView() {
         onChange={(event) => setQuery(event.target.value)}
       />
 
+      <div className="chip-row" style={{ margin: '0.6rem 0 0.25rem' }}>
+        <button
+          className={`chip${category === 'all' ? ' on' : ''}`}
+          aria-pressed={category === 'all'}
+          onClick={() => setCategory('all')}
+        >
+          All
+        </button>
+        {CATEGORY_ORDER.filter((value) => (countByCategory.get(value) ?? 0) > 0).map((value) => (
+          <button
+            key={value}
+            className={`chip${category === value ? ' on' : ''}`}
+            aria-pressed={category === value}
+            onClick={() => setCategory(value)}
+          >
+            {CATEGORY_LABELS[value]} <span className="faint">{countByCategory.get(value)}</span>
+          </button>
+        ))}
+      </div>
+
       <button
         className="btn primary block"
         style={{ marginTop: '0.5rem' }}
@@ -95,8 +139,15 @@ export default function ExerciseLibraryView() {
       {mine.length + seeded.length === 0 && (
         <div className="empty">
           <span className="glyph">🔍</span>
-          <p>Nothing matches “{query}”.</p>
-          <p className="small faint">Add it yourself and it behaves like any other movement.</p>
+          <p>
+            {query.trim() ? `Nothing matches “${query.trim()}”` : 'Nothing here'}
+            {category !== 'all' && ` in ${CATEGORY_LABELS[category]}`}.
+          </p>
+          <p className="small faint">
+            {category === 'all'
+              ? 'Add it yourself and it behaves like any other movement.'
+              : 'Try All, or add it yourself — it behaves like any other movement.'}
+          </p>
         </div>
       )}
 

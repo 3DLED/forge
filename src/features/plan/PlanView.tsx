@@ -60,26 +60,78 @@ export default function PlanView() {
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const swiped = useRef(false);
 
+  /**
+   * The grid itself, moved directly rather than through state.
+   *
+   * A swipe that does nothing until you lift your finger reads as a swipe that did not
+   * register, so the calendar tracks the drag. It does so by writing to the node: re-rendering
+   * forty-two day cells on every touchmove is a great deal of work to move one element, and it
+   * shows on a phone.
+   */
+  const gridRef = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
+
+  /** Damped, so it reads as attached to the finger rather than sliding loose. */
+  const FOLLOW = 0.55;
+
+  const settle = (animate: boolean) => {
+    const node = gridRef.current;
+    if (!node) return;
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    node.style.transition = animate && !reduced ? 'transform 180ms ease-out, opacity 180ms ease-out' : 'none';
+    node.style.transform = '';
+    node.style.opacity = '';
+  };
+
   const onTouchStart = (event: React.TouchEvent) => {
     const point = event.touches[0];
     touchStart.current = { x: point.clientX, y: point.clientY };
     swiped.current = false;
+    dragging.current = false;
+  };
+
+  const onTouchMove = (event: React.TouchEvent) => {
+    const start = touchStart.current;
+    const node = gridRef.current;
+    if (!start || !node) return;
+
+    const point = event.touches[0];
+    const dx = point.clientX - start.x;
+    const dy = point.clientY - start.y;
+
+    // Leave vertical drags alone; the page still has to scroll.
+    if (!dragging.current && Math.abs(dx) <= Math.abs(dy)) return;
+    dragging.current = true;
+
+    node.style.transition = 'none';
+    node.style.transform = `translateX(${dx * FOLLOW}px)`;
+    // Fading towards the edge says the month is leaving, not that the grid came loose.
+    node.style.opacity = String(1 - Math.min(Math.abs(dx) / 500, 0.4));
   };
 
   const onTouchEnd = (event: React.TouchEvent) => {
     const start = touchStart.current;
     touchStart.current = null;
-    if (!start) return;
+    dragging.current = false;
+    if (!start) {
+      settle(true);
+      return;
+    }
 
     const point = event.changedTouches[0];
     const dx = point.clientX - start.x;
     const dy = point.clientY - start.y;
 
     // Comfortably horizontal, or it was a page scroll that drifted sideways on the way.
-    if (Math.abs(dx) < SWIPE_PX || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    if (Math.abs(dx) < SWIPE_PX || Math.abs(dx) < Math.abs(dy) * 1.5) {
+      settle(true);
+      return;
+    }
 
     swiped.current = true;
     setAnchor((current) => shiftMonth(current, dx < 0 ? 1 : -1));
+    // The new month arrives in place rather than sliding back from where the old one went.
+    settle(false);
   };
 
   const grid = useMemo(
@@ -171,9 +223,17 @@ export default function PlanView() {
 
       <div
         className="calendar"
-        style={{ marginTop: '0.5rem' }}
+        ref={gridRef}
+        // pan-y keeps vertical scrolling with the browser while we take the horizontal axis.
+        style={{ marginTop: '0.5rem', touchAction: 'pan-y' }}
         onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
+        onTouchCancel={() => {
+          touchStart.current = null;
+          dragging.current = false;
+          settle(true);
+        }}
       >
         {weekdayHeaders.map((weekday) => (
           <div className="cal-weekday" key={weekday}>

@@ -11,19 +11,37 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageHeader from '../../ui/PageHeader';
 import AskSheet from '../../ui/AskSheet';
+import Sheet from '../../ui/Sheet';
 import RackEditor from './RackEditor';
 import { useApp } from '../../ui/AppProvider';
 import { equipmentProfileRepo, profileRepo } from '../../data/repos';
 import { EQUIPMENT_GROUPS, EQUIPMENT_LABELS, ALWAYS_AVAILABLE } from '../../data/seed/equipment';
 import { availableSlugs } from '../../domain/equipment';
-import type { EquipmentTag } from '../../domain/types';
+import type { EquipmentProfile, EquipmentTag } from '../../domain/types';
 
 export default function EquipmentView() {
   const { equipmentProfiles, activeEquipment, exercises, profile, units } = useApp();
   const [editing, setEditing] = useState<string | null>(null);
   const [naming, setNaming] = useState(false);
+  const [managing, setManaging] = useState<EquipmentProfile | null>(null);
+  const [renaming, setRenaming] = useState<EquipmentProfile | null>(null);
+  const [deleting, setDeleting] = useState<EquipmentProfile | null>(null);
+
+  /**
+   * Kit changes are staged, not applied as you tap.
+   *
+   * Ticking a tag changes what the whole app will offer you — the suggester, plan generation,
+   * the movement picker — so the old behaviour meant tapping a chip to find out what it
+   * unlocked had already committed you to it. Holding a draft turns the same taps into a
+   * question you can ask and then decline, with the movement count answering live as you go.
+   *
+   * The rack below stays immediate on purpose: which bells you own is a fact about your
+   * garage, not a plan you are trying out.
+   */
+  const [draft, setDraft] = useState<EquipmentTag[] | null>(null);
 
   const target = equipmentProfiles.find((p) => p.id === editing) ?? activeEquipment;
+  const shown = draft ?? target?.items ?? [];
 
   /** How many movements each profile makes available — the honest measure of a kit. */
   const unlockCounts = useMemo(() => {
@@ -53,12 +71,25 @@ export default function EquipmentView() {
       .slice(0, 6);
   }, [exercises, target]);
 
-  const toggleTag = async (tag: EquipmentTag) => {
-    if (!target) return;
-    const items = target.items.includes(tag)
-      ? target.items.filter((t) => t !== tag)
-      : [...target.items, tag];
-    await equipmentProfileRepo.update(target.id, { items });
+  const toggleTag = (tag: EquipmentTag) => {
+    if (!draft) return;
+    setDraft(draft.includes(tag) ? draft.filter((t) => t !== tag) : [...draft, tag]);
+  };
+
+  /** What the staged kit would make available, so the count answers before you commit. */
+  const draftUnlocks = useMemo(() => availableSlugs(exercises, shown).size, [exercises, shown]);
+
+  const removeProfile = async (victim: EquipmentProfile) => {
+    const remaining = equipmentProfiles.filter((p) => p.id !== victim.id);
+    await equipmentProfileRepo.remove(victim.id);
+
+    // Never leave the app pointing at a profile that is gone.
+    if (profile.activeEquipmentProfileId === victim.id) {
+      const next = remaining.find((p) => p.isDefault) ?? remaining[0];
+      await profileRepo.update(profile.id, { activeEquipmentProfileId: next?.id });
+    }
+    if (editing === victim.id) setEditing(null);
+    setDraft(null);
   };
 
   return (
@@ -73,23 +104,32 @@ export default function EquipmentView() {
       {equipmentProfiles.map((item) => {
         const active = item.id === activeEquipment?.id;
         return (
-          <button
-            key={item.id}
-            className={`pick${active ? ' selected' : ''}`}
-            onClick={async () => {
-              await profileRepo.update(profile.id, { activeEquipmentProfileId: item.id });
-              setEditing(item.id);
-            }}
-          >
-            <span className="grow">
-              <strong>{item.name}</strong>
-              <br />
-              <span className="tiny faint">
-                {unlockCounts.get(item.id) ?? 0} movements available
+          <div className="row" key={item.id} style={{ gap: '0.4rem', alignItems: 'stretch' }}>
+            <button
+              className={`pick grow${active ? ' selected' : ''}`}
+              onClick={async () => {
+                await profileRepo.update(profile.id, { activeEquipmentProfileId: item.id });
+                setEditing(item.id);
+                setDraft(null);
+              }}
+            >
+              <span className="grow">
+                <strong>{item.name}</strong>
+                <br />
+                <span className="tiny faint">
+                  {unlockCounts.get(item.id) ?? 0} movements available
+                </span>
               </span>
-            </span>
-            {active && <span className="pill accent">Active</span>}
-          </button>
+              {active && <span className="pill accent">Active</span>}
+            </button>
+            <button
+              className="btn ghost sm"
+              aria-label={`Rename or delete ${item.name}`}
+              onClick={() => setManaging(item)}
+            >
+              ✎
+            </button>
+          </div>
         );
       })}
 
@@ -116,9 +156,75 @@ export default function EquipmentView() {
         />
       )}
 
+      {managing && (
+        <Sheet title={managing.name} onClose={() => setManaging(null)}>
+          <button
+            className="btn block"
+            onClick={() => {
+              setRenaming(managing);
+              setManaging(null);
+            }}
+          >
+            Rename
+          </button>
+          <button
+            className="btn block ghost danger"
+            style={{ marginTop: '0.5rem' }}
+            disabled={equipmentProfiles.length < 2}
+            onClick={() => {
+              setDeleting(managing);
+              setManaging(null);
+            }}
+          >
+            Delete
+          </button>
+          {equipmentProfiles.length < 2 && (
+            <p className="tiny faint" style={{ marginTop: '0.5rem' }}>
+              This is your only profile. Make another before deleting this one — the app has to
+              know what you can train with.
+            </p>
+          )}
+        </Sheet>
+      )}
+
+      {renaming && (
+        <AskSheet
+          title={`Rename “${renaming.name}”`}
+          input={{ label: 'Name', defaultValue: renaming.name, required: true }}
+          confirmLabel="Save"
+          onCancel={() => setRenaming(null)}
+          onConfirm={async (name) => {
+            await equipmentProfileRepo.update(renaming.id, { name: name.trim() });
+            setRenaming(null);
+          }}
+        />
+      )}
+
+      {deleting && (
+        <AskSheet
+          title={`Delete “${deleting.name}”?`}
+          message="Workouts you logged with it are untouched — this only removes the profile, so it stops being somewhere you can train from."
+          confirmLabel="Delete"
+          danger
+          onCancel={() => setDeleting(null)}
+          onConfirm={async () => {
+            await removeProfile(deleting);
+            setDeleting(null);
+          }}
+        />
+      )}
+
       {target && (
         <>
-          <div className="section-title">What's in “{target.name}”</div>
+          <div className="row between" style={{ alignItems: 'baseline' }}>
+            <div className="section-title grow">What's in “{target.name}”</div>
+            {!draft && (
+              <button className="btn sm ghost" onClick={() => setDraft([...target.items])}>
+                ✎ Edit kit
+              </button>
+            )}
+          </div>
+
           {EQUIPMENT_GROUPS.map((group) => (
             <section className="card" key={group.label}>
               <h3 style={{ marginBottom: '0.5rem' }}>{group.label}</h3>
@@ -126,8 +232,10 @@ export default function EquipmentView() {
                 {group.tags.map((tag) => (
                   <button
                     key={tag}
-                    className={`chip${target.items.includes(tag) ? ' on' : ''}`}
-                    onClick={() => void toggleTag(tag)}
+                    className={`chip${shown.includes(tag) ? ' on' : ''}`}
+                    aria-pressed={shown.includes(tag)}
+                    disabled={!draft}
+                    onClick={() => toggleTag(tag)}
                   >
                     {EQUIPMENT_LABELS[tag]}
                   </button>
@@ -135,6 +243,37 @@ export default function EquipmentView() {
               </div>
             </section>
           ))}
+
+          {draft && (
+            <div className="card tight">
+              <div className="row between" style={{ marginBottom: '0.5rem' }}>
+                <span className="grow small">
+                  {draftUnlocks} movements
+                  {draftUnlocks !== (unlockCounts.get(target.id) ?? 0) && (
+                    <span className="faint">
+                      {' '}
+                      ({draftUnlocks > (unlockCounts.get(target.id) ?? 0) ? '+' : ''}
+                      {draftUnlocks - (unlockCounts.get(target.id) ?? 0)})
+                    </span>
+                  )}
+                </span>
+              </div>
+              <div className="row" style={{ gap: '0.5rem' }}>
+                <button
+                  className="btn primary grow"
+                  onClick={async () => {
+                    await equipmentProfileRepo.update(target.id, { items: draft });
+                    setDraft(null);
+                  }}
+                >
+                  Save kit
+                </button>
+                <button className="btn grow" onClick={() => setDraft(null)}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
 
           {/*
             Which weights, not just which kit. Ticking "kettlebell" says a bell exists; this
