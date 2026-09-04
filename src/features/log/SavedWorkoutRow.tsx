@@ -18,11 +18,17 @@ export default function SavedWorkoutRow({
   template,
   subtitle,
   onUse,
+  onShare,
   onDelete,
 }: {
   template: SessionTemplate;
   subtitle: string;
   onUse: () => void | Promise<void>;
+  /**
+   * Offered where you are browsing your own library, and left off where you are picking a
+   * workout to run — mid-session is not the moment to be handing files to people.
+   */
+  onShare?: () => void | Promise<void>;
   onDelete: () => void | Promise<void>;
 }) {
   const [armed, setArmed] = useState(false);
@@ -44,6 +50,16 @@ export default function SavedWorkoutRow({
       <button className="btn sm" onClick={() => void onUse()}>
         Use
       </button>
+
+      {onShare && (
+        <button
+          className="btn ghost sm"
+          aria-label={`Share ${template.name}`}
+          onClick={() => void onShare()}
+        >
+          ↗
+        </button>
+      )}
 
       <button
         className={`btn ghost sm danger${armed ? ' on' : ''}`}

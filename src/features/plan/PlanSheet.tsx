@@ -18,6 +18,7 @@ import Sheet from '../../ui/Sheet';
 import AskSheet from '../../ui/AskSheet';
 import { plural } from '../../ui/text';
 import { endPlan, planProgress } from '../../data/plans';
+import { buildPlanFile, downloadShareFile } from '../../data/share';
 import { daysBetween, formatDayLabel, todayKey } from '../../domain/dates';
 import type { Plan } from '../../domain/types';
 
@@ -39,6 +40,7 @@ export default function PlanSheet({
 }) {
   const progress = useLiveQuery(() => planProgress(plan.id), [plan.id]);
   const [ending, setEnding] = useState(false);
+  const [shared, setShared] = useState<string | null>(null);
 
   const today = todayKey();
   const done = progress?.completed ?? 0;
@@ -133,9 +135,30 @@ export default function PlanSheet({
           </>
         )}
 
+        {/*
+          A plan is a shape someone else can follow — weeks and day offsets, not your dates.
+          The file carries any movements you invented and leaves your race date out of it.
+        */}
+        <button
+          className="btn block"
+          style={{ marginTop: '0.9rem' }}
+          onClick={async () => {
+            const name = downloadShareFile(await buildPlanFile(plan));
+            setShared(`Saved ${name}. Anyone with Forge can import it and pick their own start date.`);
+          }}
+        >
+          ↗ Share this plan
+        </button>
+
+        {shared && (
+          <p className="tiny faint" style={{ marginTop: '0.4rem' }}>
+            {shared}
+          </p>
+        )}
+
         <button
           className="btn block ghost danger"
-          style={{ marginTop: '0.9rem' }}
+          style={{ marginTop: '0.6rem' }}
           onClick={() => setEnding(true)}
         >
           End this plan

@@ -13,7 +13,11 @@ import { plural } from '../../ui/text';
 import { useApp } from '../../ui/AppProvider';
 import ApplyPlanSheet from './ApplyPlanSheet';
 import { SEED_PLAN_TEMPLATES, type SeedPlanTemplate } from '../../data/seed/planTemplates';
-import { activePlan, endPlan } from '../../data/plans';
+import AskSheet from '../../ui/AskSheet';
+import { activePlan, allPlans, endPlan } from '../../data/plans';
+import { formatDayLabel } from '../../domain/dates';
+import type { Plan } from '../../domain/types';
+import { activateImportedPlan } from '../../data/share';
 import { rankByGoal } from '../../domain/goals';
 
 const GROUPS: { label: string; blurb: string; match: (t: SeedPlanTemplate) => boolean }[] = [
@@ -43,7 +47,12 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
   const { activeEquipment, profile } = useApp();
   const [selected, setSelected] = useState<SeedPlanTemplate | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [starting, setStarting] = useState<Plan | null>(null);
   const current = useLiveQuery(() => activePlan(), []);
+  const everyPlan = useLiveQuery(() => allPlans(), []);
+
+  /** On the calendar but not being followed — imported, or set aside for another. */
+  const waiting = (everyPlan ?? []).filter((item) => !item.isActive);
 
   // First match wins. A Hyrox plan is tagged both 'hybrid' and 'hyrox', and listing it under
   // two headings makes the catalogue look longer than it is and the groups look arbitrary.
@@ -74,7 +83,8 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
   const owned = new Set(activeEquipment?.items ?? []);
 
   return (
-    <Sheet title="Plans" onClose={onClose}>
+    <>
+      <Sheet title="Plans" onClose={onClose}>
       {current && (
         <div className="card tight">
           <div className="row between">
@@ -101,6 +111,33 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
         <div className="card tight">
           <p className="small" style={{ margin: 0 }}>{notice}</p>
         </div>
+      )}
+
+      {/*
+        Plans that are here but not running — imported from a file, or set aside when another
+        was started. Without this they would sit on the calendar with no way to pick them up,
+        which is what importing one used to produce.
+      */}
+      {waiting.length > 0 && (
+        <>
+          <div className="section-title">Yours, not running</div>
+          {waiting.map((item) => (
+            <div className="card tight" key={item.id}>
+              <div className="row between">
+                <div className="grow">
+                  <strong>{item.name}</strong>
+                  <div className="tiny faint">
+                    Starts {formatDayLabel(item.startDate)}
+                    {item.endDate && ` · ends ${formatDayLabel(item.endDate)}`}
+                  </div>
+                </div>
+                <button className="btn sm primary" onClick={() => setStarting(item)}>
+                  Start
+                </button>
+              </div>
+            </div>
+          ))}
+        </>
       )}
 
       <p className="small muted">
@@ -141,5 +178,35 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
         );
       })}
     </Sheet>
+
+      {/*
+        Starting one retires whatever was running and clears its future sessions, exactly as
+        ending a plan does — two plans laying sessions on the same days is the thing stacking
+        would have to solve properly, and quietly producing it here is worse than saying so.
+      */}
+      {starting && (
+        <AskSheet
+          title={`Start “${starting.name}”?`}
+          message={
+            current
+              ? `“${current.name}” stops here. Its remaining sessions come off the calendar; everything you have logged stays.`
+              : 'Its sessions are already on your calendar — this makes it the plan you are following.'
+          }
+          confirmLabel="Start it"
+          onCancel={() => setStarting(null)}
+          onConfirm={async () => {
+            const previous = current;
+            if (previous && previous.id !== starting.id) await endPlan(previous);
+            await activateImportedPlan(starting.id);
+            setNotice(
+              previous && previous.id !== starting.id
+                ? `Following “${starting.name}”. “${previous.name}” has ended.`
+                : `Following “${starting.name}”.`,
+            );
+            setStarting(null);
+          }}
+        />
+      )}
+    </>
   );
 }

@@ -15,6 +15,8 @@ import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import Sheet from '../../ui/Sheet';
 import SavedWorkoutRow from './SavedWorkoutRow';
+import ImportSheet from '../more/ImportSheet';
+import { buildWorkoutFile, downloadShareFile } from '../../data/share';
 import { plural } from '../../ui/text';
 import { deleteSavedWorkout, isTimedWorkout, savedWorkouts, workoutHistory } from '../../data/namedWorkouts';
 import { formatClock } from '../../domain/units';
@@ -31,6 +33,13 @@ export default function SavedWorkoutsSheet({
 }) {
   const saved = useLiveQuery(() => savedWorkouts(), []);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const share = async (template: SessionTemplate) => {
+    const name = downloadShareFile(await buildWorkoutFile(template));
+    setNotice(`Saved ${name}. Send it to anyone with Forge and they can import it.`);
+  };
 
   const all = saved ?? [];
   const timed = all.filter(isTimedWorkout);
@@ -38,6 +47,21 @@ export default function SavedWorkoutsSheet({
 
   return (
     <Sheet title="Your saved workouts" onClose={onClose}>
+      {notice && (
+        <div className="card tight">
+          <p className="small" style={{ margin: 0 }}>
+            {notice}
+          </p>
+          <button
+            className="btn sm ghost"
+            style={{ marginTop: '0.4rem' }}
+            onClick={() => setNotice(null)}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {all.length === 0 && (
         <div className="empty">
           <span className="glyph">💾</span>
@@ -55,6 +79,7 @@ export default function SavedWorkoutsSheet({
           key={template.id}
           template={template}
           onUse={() => void onUse(template)}
+          onShare={() => void share(template)}
           onDelete={() => setDeleting(template.id)}
           confirming={deleting === template.id}
           onCancelDelete={() => setDeleting(null)}
@@ -71,9 +96,33 @@ export default function SavedWorkoutsSheet({
             (template.estimatedMinutes ? ` · about ${template.estimatedMinutes} min` : '')
           }
           onUse={() => void onUse(template)}
+          onShare={() => void share(template)}
           onDelete={() => deleteSavedWorkout(template.id)}
         />
       ))}
+
+      {/*
+        A workout is a thing you can hand to someone. The file carries any movements you
+        invented, so it does not arrive on their phone referring to something they lack.
+      */}
+      <button
+        className="btn block"
+        style={{ marginTop: '0.75rem' }}
+        onClick={() => setImporting(true)}
+      >
+        📥 Import a workout
+      </button>
+
+      {importing && (
+        <ImportSheet
+          expecting="workout"
+          onClose={() => setImporting(false)}
+          onImported={(message) => {
+            setImporting(false);
+            setNotice(message);
+          }}
+        />
+      )}
     </Sheet>
   );
 }
@@ -87,12 +136,14 @@ export default function SavedWorkoutsSheet({
 function TimedRow({
   template,
   onUse,
+  onShare,
   onDelete,
   confirming,
   onCancelDelete,
 }: {
   template: SessionTemplate;
   onUse: () => void;
+  onShare: () => void;
   onDelete: () => void;
   confirming: boolean;
   onCancelDelete: () => void;
@@ -138,6 +189,9 @@ function TimedRow({
         <div className="row" style={{ gap: '0.5rem', marginTop: '0.5rem' }}>
           <button className="btn sm primary grow" onClick={onUse}>
             Run it again
+          </button>
+          <button className="btn sm ghost" aria-label={`Share ${template.name}`} onClick={onShare}>
+            ↗
           </button>
           <button className="btn sm ghost" onClick={onDelete}>
             ✕

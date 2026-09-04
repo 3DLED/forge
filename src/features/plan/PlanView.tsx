@@ -13,6 +13,7 @@ import { useApp } from '../../ui/AppProvider';
 import DaySheet from './DaySheet';
 import PlanLibrary from './PlanLibrary';
 import PlanSheet from './PlanSheet';
+import ImportSheet from '../more/ImportSheet';
 import { plannedBetween, sessionsBetween } from '../../data/sessions';
 import { activePlan, calendarExceptions, planProgress } from '../../data/plans';
 import {
@@ -49,6 +50,7 @@ export default function PlanView() {
   const [openDay, setOpenDay] = useState<string | null>(null);
   const [browsing, setBrowsing] = useState(false);
   const [openPlan, setOpenPlan] = useState(false);
+  const [importingPlan, setImportingPlan] = useState(false);
   /** Said out loud after a plan ends, because the card that was there has gone. */
   const [planNotice, setPlanNotice] = useState<string | null>(null);
 
@@ -341,6 +343,15 @@ export default function PlanView() {
         {plan ? 'Browse plans' : 'Start a plan'}
       </button>
 
+      {/* A plan someone sent you, or one you exported from another phone. */}
+      <button
+        className="btn block"
+        style={{ marginTop: '0.5rem' }}
+        onClick={() => setImportingPlan(true)}
+      >
+        📥 Import a plan
+      </button>
+
       {!plan && (
         <p className="tiny faint" style={{ textAlign: 'center', marginTop: '0.5rem' }}>
           Or tap any day to add a single session.
@@ -349,6 +360,17 @@ export default function PlanView() {
 
       {openDay && <DaySheet date={openDay} onClose={() => setOpenDay(null)} />}
       {browsing && <PlanLibrary onClose={() => setBrowsing(false)} />}
+
+      {importingPlan && (
+        <ImportSheet
+          expecting="plan"
+          onClose={() => setImportingPlan(false)}
+          onImported={(message) => {
+            setImportingPlan(false);
+            setPlanNotice(message);
+          }}
+        />
+      )}
 
       {openPlan && plan && (
         <PlanSheet
