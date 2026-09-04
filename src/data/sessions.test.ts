@@ -67,20 +67,25 @@ describe('convertSessionToBlock', () => {
     expect(after.sets.map((s) => s.exerciseSlug)).toEqual(['push-up', 'row', 'pike-push-up']);
   });
 
-  it('puts every surviving row inside the new block', async () => {
+  it('puts the round recipe inside the new block', async () => {
     const session = await seed(threeByFour());
     const { block } = await convertSessionToBlock(session, { style: 'amrap', capSec: 720 });
 
     const after = await reread();
     expect(after.sets.every((s) => s.blockId === block.id)).toBe(true);
+    expect(after.sets.every((s) => !s.completed)).toBe(true);
     expect(await blocksOf()).toHaveLength(1);
   });
 
   /**
    * Collapsing is a tidying rule, and it must never apply to work that happened. A ticked-off
    * set is a fact about the training; the empty rows below it are only a plan.
+   *
+   * Work already done also stays *out* of the block. Two sets of push-ups you finished before
+   * deciding to make the rest an AMRAP are two sets of push-ups, not a line of a round, and
+   * filing them inside the block attributes them to a score they had no part in.
    */
-  it('keeps completed sets even where that leaves a movement with several rows', async () => {
+  it('leaves completed sets loose, and gives the block a clean recipe row', async () => {
     const session = await seed([
       set('a', 'push-up', { completed: true, values: { reps: 12 } }),
       set('b', 'push-up', { completed: true, values: { reps: 10 } }),
@@ -88,12 +93,50 @@ describe('convertSessionToBlock', () => {
       set('d', 'push-up'),
     ]);
 
+    const { block } = await convertSessionToBlock(session, { style: 'amrap', capSec: 720 });
+
+    const after = await reread();
+    const loose = after.sets.filter((s) => !s.blockId);
+    const inBlock = after.sets.filter((s) => s.blockId === block.id);
+
+    expect(loose.map((s) => s.values.reps)).toEqual([12, 10]);
+    expect(loose.every((s) => s.completed)).toBe(true);
+    expect(inBlock).toHaveLength(1);
+    expect(inBlock[0]).toMatchObject({ exerciseSlug: 'push-up', completed: false });
+  });
+
+  /* The completed work has to come first, or it renders below the block it happened before. */
+  it('orders the finished work above the block', async () => {
+    const session = await seed([
+      set('a', 'push-up', { completed: true }),
+      set('b', 'push-up'),
+      set('c', 'row'),
+    ]);
+
     await convertSessionToBlock(session, { style: 'amrap', capSec: 720 });
 
     const after = await reread();
-    expect(after.sets).toHaveLength(2);
-    expect(after.sets.every((s) => s.completed)).toBe(true);
-    expect(after.sets.map((s) => s.values.reps)).toEqual([12, 10]);
+    expect(after.sets.map((s) => Boolean(s.blockId))).toEqual([false, true, true]);
+  });
+
+  /* Nothing done yet is the ordinary case: no stray loose section, just the round. */
+  it('leaves nothing loose when no set was completed', async () => {
+    const session = await seed(threeByFour());
+    await convertSessionToBlock(session, { style: 'amrap', capSec: 720 });
+
+    expect((await reread()).sets.filter((s) => !s.blockId)).toHaveLength(0);
+  });
+
+  it('takes the round target from the first row of each movement', async () => {
+    const session = await seed([
+      set('a', 'push-up', { completed: true, values: { reps: 15 } }),
+      set('b', 'push-up', { values: { reps: 8 } }),
+    ]);
+
+    const { block } = await convertSessionToBlock(session, { style: 'amrap', capSec: 720 });
+
+    const recipe = (await reread()).sets.find((s) => s.blockId === block.id)!;
+    expect(recipe.values.reps).toBe(15);
   });
 
   /**
@@ -123,7 +166,8 @@ describe('convertSessionToBlock', () => {
 
     const after = await reread();
     expect(after.sets.find((s) => s.id === 'x')?.blockId).toBe('existing');
-    expect(after.sets.find((s) => s.id === 'a')?.blockId).toBe(block.id);
+    // The loose push-ups become one recipe row in the new block; the EMOM is not touched.
+    expect(after.sets.filter((s) => s.blockId === block.id)).toHaveLength(1);
     expect(await blocksOf()).toHaveLength(2);
   });
 });

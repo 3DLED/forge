@@ -22,14 +22,17 @@ import VariationSheet from './VariationSheet';
 import { formatClock } from '../../domain/units';
 import { plural } from '../../ui/text';
 import {
-  GOAL_ORDER,
   GOAL_SCHEMES,
   suggestWorkout,
   type SuggestedItem,
-  type TrainingGoal,
 } from '../../domain/generator';
 import { BUILDABLE_REGIONS, REGION_LABELS, type BodyRegion } from '../../domain/regions';
-import { goalSpec } from '../../domain/goals';
+import {
+  PRIMARY_GOALS,
+  PRIMARY_GOAL_ORDER,
+  conditioningMinutesFor,
+} from '../../domain/goals';
+import type { PrimaryGoal } from '../../domain/goals';
 import type { Exercise, SessionTemplate } from '../../domain/types';
 
 const MINUTE_OPTIONS = [20, 30, 45, 60];
@@ -69,7 +72,7 @@ export default function SuggestWorkoutSheet({
    * assumed for everyone. Still a starting point: the chips below change it for this workout
    * without touching the standing answer.
    */
-  const [goal, setGoal] = useState<TrainingGoal>(() => goalSpec(profile.primaryGoal).lifting);
+  const [goal, setGoal] = useState<PrimaryGoal>(() => profile.primaryGoal ?? 'general');
   const [minutes, setMinutes] = useState(45);
   const [variant, setVariant] = useState(0);
 
@@ -84,11 +87,14 @@ export default function SuggestWorkoutSheet({
     setDropped([]);
   }, [regions, goal, minutes, variant]);
 
+  const spec = PRIMARY_GOALS[goal];
+
   const suggestion = useMemo(
     () =>
       suggestWorkout({
         regions,
-        goal,
+        goal: spec.lifting,
+        conditioningMin: conditioningMinutesFor(goal),
         minutes,
         exercises,
         available,
@@ -96,7 +102,7 @@ export default function SuggestWorkoutSheet({
         exclude: existingSlugs,
         variant,
       }),
-    [regions, goal, minutes, exercises, available, usage, existingSlugs, variant],
+    [regions, goal, spec.lifting, minutes, exercises, available, usage, existingSlugs, variant],
   );
 
   /** The proposal after the athlete's own swaps and removals. */
@@ -129,7 +135,7 @@ export default function SuggestWorkoutSheet({
     });
   };
 
-  const scheme = GOAL_SCHEMES[goal];
+  const scheme = GOAL_SCHEMES[spec.lifting];
   const allSelected = BUILDABLE_REGIONS.every((r) => regions.includes(r));
 
   return (
@@ -187,7 +193,8 @@ export default function SuggestWorkoutSheet({
       )}
 
       <div className="section-title">Train</div>
-      <div className="chip-row">
+      {/* Wrapped for the same reason as the goals: "Full body" was off the right edge. */}
+      <div className="row wrap" style={{ gap: '0.4rem' }}>
         {BUILDABLE_REGIONS.map((region) => (
           <button
             key={region}
@@ -205,22 +212,39 @@ export default function SuggestWorkoutSheet({
         </button>
       </div>
 
+      {/*
+        The same five the profile asks for, not the three rep schemes underneath them. Those
+        were an implementation detail leaking through a label: Settings offered five goals and
+        this offered three differently-named ones, and no screen said how they related.
+
+        Wrapped rather than scrolled — a row you have to drag sideways hides the two options
+        at the end, which happened to be the two that were missing here in the first place.
+      */}
       <div className="section-title">Goal</div>
-      <div className="chip-row">
-        {GOAL_ORDER.map((option) => (
+      <div className="row wrap" style={{ gap: '0.4rem' }}>
+        {PRIMARY_GOAL_ORDER.map((option) => (
           <button
             key={option}
             className={`chip${goal === option ? ' on' : ''}`}
+            aria-pressed={goal === option}
             onClick={() => setGoal(option)}
           >
-            {GOAL_SCHEMES[option].label}
+            {PRIMARY_GOALS[option].short}
           </button>
         ))}
       </div>
       <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
-        {scheme.blurb} · {scheme.sets} sets of {scheme.reps[0]}–{scheme.reps[1]} · effort{' '}
+        {spec.blurb} · {scheme.sets} sets of {scheme.reps[0]}–{scheme.reps[1]} · effort{' '}
         {scheme.rpe} · rest {formatClock(scheme.restSec)}
+        {conditioningMinutesFor(goal) > 0 &&
+          `, then ${conditioningMinutesFor(goal)} min of conditioning`}
       </p>
+      {/* Said where the choice is made, because heavy triples under "lose fat" look wrong. */}
+      {spec.note && (
+        <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
+          {spec.note}
+        </p>
+      )}
 
       <div className="section-title">Time</div>
       <div className="chip-row">

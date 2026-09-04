@@ -30,6 +30,14 @@ export type PrimaryGoal = 'strength' | 'muscle' | 'endurance' | 'fatLoss' | 'gen
 
 export interface PrimaryGoalSpec {
   label: string;
+  /**
+   * The label with the verb taken off, for a row of chips.
+   *
+   * "Build muscle" and "Build endurance" side by side spend most of their width saying the
+   * same word, and on a phone that is the difference between five options fitting and having
+   * to scroll a row to find out what the other two are.
+   */
+  short: string;
   /** One line under the option, describing the training. */
   blurb: string;
   /** Which of the three lifting doses this goal trains at. */
@@ -45,6 +53,7 @@ export interface PrimaryGoalSpec {
 export const PRIMARY_GOALS: Record<PrimaryGoal, PrimaryGoalSpec> = {
   strength: {
     label: 'Get stronger',
+    short: 'Strength',
     blurb: 'Heavy, low reps, long rest.',
     lifting: 'strength',
     extraConditioning: 0,
@@ -52,6 +61,7 @@ export const PRIMARY_GOALS: Record<PrimaryGoal, PrimaryGoalSpec> = {
   },
   muscle: {
     label: 'Build muscle',
+    short: 'Muscle',
     blurb: 'Moderate loads and rep ranges, with enough rest to repeat them.',
     lifting: 'muscle',
     extraConditioning: 0,
@@ -59,6 +69,7 @@ export const PRIMARY_GOALS: Record<PrimaryGoal, PrimaryGoalSpec> = {
   },
   endurance: {
     label: 'Build endurance',
+    short: 'Endurance',
     blurb: 'Lighter, higher reps, short rest, and more time on your feet.',
     lifting: 'endurance',
     extraConditioning: 1,
@@ -66,6 +77,7 @@ export const PRIMARY_GOALS: Record<PrimaryGoal, PrimaryGoalSpec> = {
   },
   fatLoss: {
     label: 'Lose fat',
+    short: 'Fat loss',
     blurb: 'Heavy lifting kept intact, with conditioning added around it.',
     lifting: 'strength',
     extraConditioning: 1,
@@ -74,12 +86,26 @@ export const PRIMARY_GOALS: Record<PrimaryGoal, PrimaryGoalSpec> = {
   },
   general: {
     label: 'General fitness',
+    short: 'General',
     blurb: 'No particular bias. Plans and suggestions are left as written.',
     lifting: 'muscle',
     extraConditioning: 0,
     prefers: ['general'],
   },
 };
+
+/**
+ * Minutes of conditioning a single session should finish with, for this goal.
+ *
+ * The session-level counterpart to `extraConditioning`, which says how many conditioning
+ * *sessions* a week a plan should gain. Ten minutes is short enough to actually get done at
+ * the end of a lift and long enough to be worth logging.
+ */
+export const CONDITIONING_FINISHER_MIN = 10;
+
+export function conditioningMinutesFor(goal: PrimaryGoal | undefined): number {
+  return goalSpec(goal).extraConditioning > 0 ? CONDITIONING_FINISHER_MIN : 0;
+}
 
 export const PRIMARY_GOAL_ORDER: PrimaryGoal[] = [
   'strength',

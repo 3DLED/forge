@@ -321,8 +321,20 @@ export async function convertSessionToBlock(
 ): Promise<{ block: LoggedBlock; sets: LoggedSet[] }> {
   const created: LoggedBlock = { ...block, id: ulid() };
 
+  /*
+   * Work already done stays out of the block.
+   *
+   * Three sets of front squats you actually finished are not one line of a round — they are
+   * three sets of front squats, and pulling them into an AMRAP files them as part of a score
+   * they had nothing to do with. So a completed set keeps its place in the session, above the
+   * block, and the block gets a clean recipe row per movement with nothing ticked on it.
+   *
+   * The empty rows below a completed set were only ever a plan, so they go: the rounds are
+   * the sets now, which is the whole point of converting.
+   */
   const kept: LoggedSet[] = [];
-  const recipeFor = new Set<string>();
+  const recipes: LoggedSet[] = [];
+  const seen = new Map<string, LoggedSet>();
 
   for (const set of session.sets) {
     // Already inside some other block: left exactly as it is.
@@ -331,23 +343,35 @@ export async function convertSessionToBlock(
       continue;
     }
 
-    if (!recipeFor.has(set.exerciseSlug)) {
-      recipeFor.add(set.exerciseSlug);
-      kept.push({ ...set, blockId: created.id, setIndex: 0 });
-    } else if (set.completed) {
-      kept.push({ ...set, blockId: created.id });
-    }
+    // The first loose row of a movement says what a round of it asks for.
+    if (!seen.has(set.exerciseSlug)) seen.set(set.exerciseSlug, set);
+    if (set.completed) kept.push(set);
   }
+
+  for (const [slug, first] of seen) {
+    recipes.push({
+      id: ulid(),
+      exerciseSlug: slug,
+      setIndex: 0,
+      blockId: created.id,
+      values: { ...first.values },
+      restSec: first.restSec,
+      completed: false,
+    });
+  }
+
+  // Recipe rows last, so the block renders below the work that was already done.
+  const sets = [...kept, ...recipes];
 
   await loggedSessionRepo.update(session.id, {
     blocks: [...(session.blocks ?? []), created],
-    sets: kept,
+    sets,
   });
 
   // The sets go back to the caller because the logger holds its own copy and flushes it on a
   // debounce. Left to re-parent what it already had, it writes the un-collapsed list straight
   // back over this a moment later.
-  return { block: created, sets: kept };
+  return { block: created, sets };
 }
 
 // --- session stopwatch ----------------------------------------------------

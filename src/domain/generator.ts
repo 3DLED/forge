@@ -126,6 +126,19 @@ export interface SuggestOptions {
   exclude?: Set<string>;
   /** Bumped by "shuffle" to walk further down each ranked list. Deterministic. */
   variant?: number;
+  /**
+   * Minutes of conditioning to finish on, from the athlete's goal.
+   *
+   * This is what makes "lose fat" a different session from "get stronger" rather than the
+   * same one wearing a different label. The evidence says the lifting stays heavy in a
+   * deficit — load is what protects muscle — and that the fat loss comes from the
+   * conditioning and the eating. So the scheme is untouched and the work is added on the end,
+   * which is exactly what `extraConditioning` on the goal has always meant for plans.
+   *
+   * Taken out of the time budget rather than added to it: a finisher that quietly makes every
+   * session ten minutes longer is a finisher people stop doing.
+   */
+  conditioningMin?: number;
 }
 
 /**
@@ -240,11 +253,45 @@ export function suggestWorkout(options: SuggestOptions): Suggestion {
   // reporting the second as the first sends you off hunting for equipment you already have.
   const uncovered = patterns.length - items.length;
 
+  /*
+   * Conditioning is chosen before the trim so its minutes come out of the budget, and it is
+   * appended after, so trimming for time never eats the thing the goal asked for.
+   */
+  const conditioningMin = options.conditioningMin ?? 0;
+  const finisher =
+    conditioningMin > 0
+      ? exercises
+          .filter(
+            (exercise) =>
+              exercise.modality === 'cardio' &&
+              available.has(exercise.slug) &&
+              !exclude.has(exercise.slug) &&
+              !used.has(exercise.slug),
+          )
+          .sort(
+            (a, b) =>
+              (usage?.get(a.slug) ?? 0) - (usage?.get(b.slug) ?? 0) || a.name.localeCompare(b.name),
+          )[0]
+      : undefined;
+
   // Trim to the time budget from the end, where the accessories are. Cutting sets instead
   // would keep every movement and make none of them a real stimulus.
   const covered = items.length;
-  while (items.length > 1 && estimateMinutes(items) > minutes) items.pop();
+  const liftingBudget = finisher ? Math.max(1, minutes - conditioningMin) : minutes;
+  while (items.length > 1 && estimateMinutes(items) > liftingBudget) items.pop();
   const trimmed = covered - items.length;
+
+  if (finisher) {
+    items.push({
+      exercise: finisher,
+      pattern: finisher.pattern,
+      sets: 1,
+      values: { timeSec: conditioningMin * 60 },
+      target: `${conditioningMin} min`,
+      restSec: 0,
+      alternatives: [],
+    });
+  }
 
   if (uncovered > 0) {
     notes.push(
@@ -254,6 +301,11 @@ export function suggestWorkout(options: SuggestOptions): Suggestion {
   if (trimmed > 0) {
     notes.push(
       `${trimmed === 1 ? 'One movement was' : `${trimmed} movements were`} dropped to fit ${minutes} minutes — this goal's rest periods are long.`,
+    );
+  }
+  if (conditioningMin > 0 && !finisher) {
+    notes.push(
+      "No conditioning was added — nothing in the library runs, rows or rides with today's equipment.",
     );
   }
   if (progressed > 0) {
