@@ -12,10 +12,20 @@ import Sheet from '../../ui/Sheet';
 import { plural } from '../../ui/text';
 import { useApp } from '../../ui/AppProvider';
 import ApplyPlanSheet from './ApplyPlanSheet';
+import CustomPlanBuilder from './CustomPlanBuilder';
+import {
+  allCustomPlans,
+  dayLabel,
+  daysPerWeek,
+  deleteCustomPlan,
+  isTrainingDay,
+  translateCustomPlan,
+} from '../../data/customPlans';
+import type { CustomPlan } from '../../domain/types';
 import { SEED_PLAN_TEMPLATES, type SeedPlanTemplate } from '../../data/seed/planTemplates';
 import AskSheet from '../../ui/AskSheet';
 import { activePlan, allPlans, endPlan } from '../../data/plans';
-import { formatDayLabel } from '../../domain/dates';
+import { formatDayLabel, weekdayName } from '../../domain/dates';
 import type { Plan } from '../../domain/types';
 import { activateImportedPlan } from '../../data/share';
 import { rankByGoal } from '../../domain/goals';
@@ -48,6 +58,10 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
   const [selected, setSelected] = useState<SeedPlanTemplate | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [starting, setStarting] = useState<Plan | null>(null);
+  const [building, setBuilding] = useState<CustomPlan | 'new' | null>(null);
+  const [applying, setApplying] = useState<CustomPlan | null>(null);
+  const [removing, setRemoving] = useState<CustomPlan | null>(null);
+  const mine = useLiveQuery(() => allCustomPlans(), []);
   const current = useLiveQuery(() => activePlan(), []);
   const everyPlan = useLiveQuery(() => allPlans(), []);
 
@@ -75,6 +89,20 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
       <ApplyPlanSheet
         template={selected}
         onClose={() => setSelected(null)}
+        onApplied={onClose}
+      />
+    );
+  }
+
+  /* A plan you built goes through the same apply sheet, carrying its own session library. */
+  if (applying) {
+    const translated = translateCustomPlan(applying);
+    return (
+      <ApplyPlanSheet
+        template={translated.template}
+        sessionTemplates={translated.sessionTemplateBySlug}
+        closedWeekdays={translated.restDays}
+        onClose={() => setApplying(null)}
         onApplied={onClose}
       />
     );
@@ -140,7 +168,49 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
         </>
       )}
 
-      <p className="small muted">
+      {/*
+        Plans you built. Above the catalogue, because a plan you wrote is the one you meant
+        to come here for; the built-in ones are what you browse when you have not.
+      */}
+      <div className="section-title">Built by you</div>
+      {(mine ?? []).map((item) => (
+        <div className="card tight" key={item.id}>
+          <div className="row between">
+            <div className="grow">
+              <strong>{item.name}</strong>
+              <div className="tiny faint">
+                {plural(daysPerWeek(item), 'day')} a week ·{' '}
+                {item.weeks ? `${item.weeks} weeks` : 'ongoing'}
+              </div>
+            </div>
+            <button className="btn sm primary" onClick={() => setApplying(item)}>
+              Use
+            </button>
+          </div>
+
+          <div className="tiny faint" style={{ marginTop: '0.35rem' }}>
+            {item.days
+              .filter(isTrainingDay)
+              .map((day) => `${weekdayName(day.weekday, true)} ${dayLabel(day)}`)
+              .join(' · ')}
+          </div>
+
+          <div className="row" style={{ gap: '0.5rem', marginTop: '0.5rem' }}>
+            <button className="btn sm grow" onClick={() => setBuilding(item)}>
+              Edit
+            </button>
+            <button className="btn sm ghost danger" onClick={() => setRemoving(item)}>
+              Delete
+            </button>
+          </div>
+        </div>
+      ))}
+
+      <button className="btn block" style={{ marginTop: '0.5rem' }} onClick={() => setBuilding('new')}>
+        + Build a plan
+      </button>
+
+      <p className="small muted" style={{ marginTop: '1rem' }}>
         Every plan is a starting point — once it is on your calendar you can move, skip, or
         rewrite any session in it.
       </p>
@@ -184,6 +254,31 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
         ending a plan does — two plans laying sessions on the same days is the thing stacking
         would have to solve properly, and quietly producing it here is worse than saying so.
       */}
+      {building && (
+        <CustomPlanBuilder
+          existing={building === 'new' ? undefined : building}
+          onClose={() => setBuilding(null)}
+          onSaved={(plan) => {
+            setBuilding(null);
+            setNotice(`“${plan.name}” saved. Tap Use when you want it on the calendar.`);
+          }}
+        />
+      )}
+
+      {removing && (
+        <AskSheet
+          title={`Delete “${removing.name}”?`}
+          message="Only the plan you built. Anything already on your calendar from it stays exactly where it is."
+          confirmLabel="Delete"
+          danger
+          onCancel={() => setRemoving(null)}
+          onConfirm={async () => {
+            await deleteCustomPlan(removing.id);
+            setRemoving(null);
+          }}
+        />
+      )}
+
       {starting && (
         <AskSheet
           title={`Start “${starting.name}”?`}

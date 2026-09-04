@@ -28,6 +28,7 @@ import type {
   Id,
   Instant,
   LoggedSession,
+  CustomPlan,
   Plan,
   PlannedSession,
   Profile,
@@ -60,6 +61,7 @@ export class TrainingDb extends Dexie {
   equipmentProfiles!: Table<EquipmentProfile, Id>;
   calendarExceptions!: Table<CalendarException, Id>;
   plans!: Table<Plan, Id>;
+  customPlans!: Table<CustomPlan, Id>;
   profiles!: Table<Profile, Id>;
   bodyMetrics!: Table<BodyMetric, Id>;
   injuries!: Table<Injury & { createdAt: Instant; updatedAt: Instant }, Id>;
@@ -111,6 +113,17 @@ export class TrainingDb extends Dexie {
     this.version(3).stores({
       testResults: 'id, exerciseSlug, kind, date, [exerciseSlug+date], updatedAt',
     });
+
+    /*
+     * Version 4: plans you built yourself.
+     *
+     * Additive again. These are templates rather than plans on a calendar — the thing you
+     * pick from the library — so they sit apart from `plans`, which holds the one you are
+     * following and the dates it runs between.
+     */
+    this.version(4).stores({
+      customPlans: 'id, name, updatedAt',
+    });
   }
 }
 
@@ -125,6 +138,7 @@ export const DATA_TABLES = [
   'equipmentProfiles',
   'calendarExceptions',
   'plans',
+  'customPlans',
   'profiles',
   'bodyMetrics',
   'injuries',

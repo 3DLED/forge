@@ -24,6 +24,7 @@ export const loggedSessionRepo = createRepo(db.loggedSessions, 'loggedSessions',
 export const equipmentProfileRepo = createRepo(db.equipmentProfiles, 'equipmentProfiles');
 export const calendarExceptionRepo = createRepo(db.calendarExceptions, 'calendarExceptions');
 export const planRepo = createRepo(db.plans, 'plans');
+export const customPlanRepo = createRepo(db.customPlans, 'customPlans');
 export const profileRepo = createRepo(db.profiles, 'profiles');
 export const bodyMetricRepo = createRepo(db.bodyMetrics, 'bodyMetrics');
 export const injuryRepo = createRepo(db.injuries, 'injuries');

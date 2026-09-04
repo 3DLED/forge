@@ -12,8 +12,12 @@ import Sheet from '../../ui/Sheet';
 import GoalPicker from '../more/GoalPicker';
 import { useApp } from '../../ui/AppProvider';
 import { applyPlan, calendarExceptions } from '../../data/plans';
-import { SEED_SESSION_TEMPLATE_BY_SLUG } from '../../data/seed/sessionTemplates';
+import {
+  SEED_SESSION_TEMPLATE_BY_SLUG,
+  type SeedSessionTemplate,
+} from '../../data/seed/sessionTemplates';
 import type { SeedPlanTemplate } from '../../data/seed/planTemplates';
+import type { Weekday } from '../../domain/types';
 import {
   ONGOING_PLAN_WEEKS,
   generatePlan,
@@ -25,10 +29,28 @@ import { formatDistance } from '../../domain/units';
 
 export default function ApplyPlanSheet({
   template,
+  sessionTemplates,
+  closedWeekdays,
   onClose,
   onApplied,
 }: {
   template: SeedPlanTemplate;
+  /**
+   * The session library to draw from, when it is not just the built-in one.
+   *
+   * A plan you built yourself can hold your own saved workouts, snapshotted into it. Those
+   * arrive as extra entries here rather than as a second code path — the preview, the
+   * conflicts, the substitutions and the apply are the same for both kinds of plan.
+   */
+  sessionTemplates?: Map<string, SeedSessionTemplate>;
+  /**
+   * Weekdays this plan says are rest, closing them to everything.
+   *
+   * Stronger than leaving the day empty: the generator places conditioning the goal asked for
+   * into whatever day is free, and a plan whose author said Wednesday is off should not come
+   * back with a run on Wednesday.
+   */
+  closedWeekdays?: Weekday[];
   onClose: () => void;
   onApplied: () => void;
 }) {
@@ -44,6 +66,15 @@ export default function ApplyPlanSheet({
   const [saving, setSaving] = useState(false);
   const [includeTests, setIncludeTests] = useState(false);
 
+  /* The athlete's own availability, with any day this plan calls a rest day shut. */
+  const openDays = useMemo(() => {
+    const closed = new Set(closedWeekdays ?? []);
+    if (closed.size === 0) return profile.availability;
+    return profile.availability.map((rule) =>
+      closed.has(rule.weekday) ? { ...rule, allowedModalities: [] } : rule,
+    );
+  }, [profile.availability, closedWeekdays]);
+
   // A race date pins the finish; everything else counts forward from a start date.
   const startDate =
     isRace && raceDate ? startDateForRace(raceDate, weeks, profile.weekStartsOn) : manualStart;
@@ -54,19 +85,19 @@ export default function ApplyPlanSheet({
         template,
         startDate,
         weeks,
-        availability: profile.availability,
+        availability: openDays,
         exceptions: exceptions ?? [],
         weekStartsOn: profile.weekStartsOn,
         exerciseBySlug,
         available,
-        sessionTemplateBySlug: SEED_SESSION_TEMPLATE_BY_SLUG,
+        sessionTemplateBySlug: sessionTemplates ?? SEED_SESSION_TEMPLATE_BY_SLUG,
         primaryGoal: profile.primaryGoal,
       }),
     [
       template,
       startDate,
       weeks,
-      profile.availability,
+      openDays,
       profile.weekStartsOn,
       profile.primaryGoal,
       exceptions,
@@ -92,7 +123,7 @@ export default function ApplyPlanSheet({
     return [...rows.entries()].sort((a, b) => a[0] - b[0]);
   }, [generated]);
 
-  const trainingDays = profile.availability.filter((r) => r.allowedModalities.length > 0).length;
+  const trainingDays = openDays.filter((r) => r.allowedModalities.length > 0).length;
 
   const testMovements = useMemo(
     () =>

@@ -390,6 +390,52 @@ export interface EquipmentProfile extends Entity {
   isDefault: boolean;
 }
 
+/**
+ * A plan you laid out yourself, kept to be used again.
+ *
+ * Stored as a week rather than as a calendar: seven days, each either a session or not, and a
+ * number of times to repeat it. That is the same shape the seeded plans already have — a
+ * weekly pattern the generator lays onto dates — so a custom plan goes through exactly the
+ * machinery everything else does, and gets equipment substitution, deload weeks and conflict
+ * reporting without any of it being written twice.
+ *
+ * What differs is that its days are pinned. A seeded plan says "three strength days" and lets
+ * the app find room; yours says Wednesday.
+ */
+export interface CustomPlanDay {
+  weekday: Weekday;
+  /**
+   * `open` was never filled in, `rest` was chosen. Nothing is scheduled for either — the
+   * difference is whether reopening the plan should look like a decision or a gap.
+   */
+  kind: 'open' | 'rest' | 'template' | 'saved';
+  /** For `template`: one of the built-in session templates, by slug. */
+  templateSlug?: string;
+  /**
+   * For `saved`: a copy of one of your saved workouts, taken when the plan was built.
+   *
+   * Snapshotted rather than referenced, which is what saving a workout already does. A plan
+   * cannot then be broken by deleting the workout it was built from, and editing that workout
+   * later does not silently redefine a plan you have been following for six weeks.
+   */
+  workout?: {
+    name: string;
+    modalities: Modality[];
+    estimatedMinutes?: number;
+    blocks: Block[];
+  };
+}
+
+export interface CustomPlan extends Entity {
+  name: string;
+  goal: GoalKind;
+  /** null means ongoing — repeats until you stop it. */
+  weeks: number | null;
+  /** Always seven, one per weekday, so the builder and the record are the same thing. */
+  days: CustomPlanDay[];
+  notes?: string;
+}
+
 /** Weekday, 0 = Sunday, matching Date.getDay(). */
 export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 

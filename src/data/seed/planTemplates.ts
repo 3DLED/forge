@@ -11,7 +11,7 @@
  * to the athlete and the bar, not to a template guessing what you can lift in week nine.
  */
 
-import type { EquipmentTag, GoalKind, Modality } from '../../domain/types';
+import type { EquipmentTag, GoalKind, Modality, Weekday } from '../../domain/types';
 
 export interface SlotProgression {
   /** Which movement inside the session template to scale. */
@@ -32,6 +32,13 @@ export interface PlanSlot {
   progression?: SlotProgression;
   /** Slot only appears from this week onward (1-indexed). */
   fromWeek?: number;
+  /**
+   * Pinned to this weekday, for a plan whose days were chosen rather than fitted.
+   *
+   * Unused by the seeded plans, which say how many days they want and let the app find room.
+   * See `placeSlotsInWeek` for what a pinned day does and does not override.
+   */
+  weekday?: Weekday;
 }
 
 export interface SeedPlanTemplate {
