@@ -20,6 +20,7 @@ import type {
   CalendarException,
   DayKey,
   Modality,
+  Weekday,
 } from './types';
 import { weekdayOf } from './dates';
 
@@ -29,6 +30,14 @@ export interface DayAvailability {
   allowedModalities: Modality[];
   /** True when nothing at all may be scheduled. */
   blocked: boolean;
+  /**
+   * Blocked by a date you blacked out, rather than by your weekday rules.
+   *
+   * The two are different in kind and only one of them is negotiable. A weekday you usually
+   * rest on is a habit, and a plan you laid out by hand may override it. A holiday is a fact
+   * about that particular date, and nothing overrides it.
+   */
+  blackout?: boolean;
   /** Why it is blocked or restricted, for display. */
   reason?: string;
   maxMinutes?: number;
@@ -56,7 +65,13 @@ export function resolveDayAvailability(
     if (!coversDay(exception, date)) continue;
 
     if (exception.kind === 'blackout') {
-      return { date, allowedModalities: [], blocked: true, reason: exception.reason ?? 'Blocked' };
+      return {
+        date,
+        allowedModalities: [],
+        blocked: true,
+        blackout: true,
+        reason: exception.reason ?? 'Blocked',
+      };
     }
 
     const permitted = exception.allowedModalities ?? [];
@@ -99,6 +114,15 @@ export interface PlaceableSlot {
   modality: Modality;
   /** Lower goes earlier in the week. */
   order: number;
+  /**
+   * Pinned to this weekday, for a plan whose days you chose yourself.
+   *
+   * A pinned slot is an instruction rather than a preference: it lands on its day even where
+   * your weekday rules say you would usually rest, because saying "Wednesday" in a plan you
+   * built *is* the decision. What it does not override is a blacked-out date — a holiday is
+   * a fact about the calendar, not a habit, and quietly training through one would be wrong.
+   */
+  weekday?: Weekday;
 }
 
 export interface Placement<T extends PlaceableSlot> {
@@ -122,15 +146,45 @@ export function placeSlotsInWeek<T extends PlaceableSlot>(
   const eligible = days.filter((day) => !day.blocked);
   const ordered = [...slots].sort((a, b) => a.order - b.order);
 
-  if (eligible.length === 0) {
-    return ordered.map((slot) => ({ slot, date: null, reason: 'No available days this week' }));
+  const placements: Placement<T>[] = [];
+  const taken = new Set<string>();
+
+  /*
+   * Pinned days are settled first, and they take their day out of circulation before anything
+   * is spread. Doing it the other way round lets a floating slot land on Wednesday and push
+   * the slot that actually asked for Wednesday somewhere else.
+   */
+  const pinned = ordered.filter((slot) => slot.weekday != null);
+  const floating = ordered.filter((slot) => slot.weekday == null);
+
+  for (const slot of pinned) {
+    const day = days.find((candidate) => weekdayOf(candidate.date) === slot.weekday);
+    if (!day) {
+      // The first week of a plan can start mid-week, so its earlier days do not exist yet.
+      placements.push({ slot, date: null, reason: 'That day has already passed this week' });
+      continue;
+    }
+    // Only a blacked-out date refuses a pinned slot; a weekday rule is a habit, not a fact.
+    if (day.blackout) {
+      placements.push({ slot, date: null, reason: day.reason ?? 'That day is blocked out' });
+      continue;
+    }
+    taken.add(day.date);
+    placements.push({ slot, date: day.date });
   }
 
-  const targets = spreadIndices(eligible.length, ordered.length);
-  const taken = new Set<string>();
-  const placements: Placement<T>[] = [];
+  if (floating.length === 0) return placements;
 
-  ordered.forEach((slot, index) => {
+  if (eligible.length === 0) {
+    return [
+      ...placements,
+      ...floating.map((slot) => ({ slot, date: null, reason: 'No available days this week' })),
+    ];
+  }
+
+  const targets = spreadIndices(eligible.length, floating.length);
+
+  floating.forEach((slot, index) => {
     const target = targets[index] ?? Math.min(index, eligible.length - 1);
 
     // Walk outward from the ideal day: target, target±1, target±2, …

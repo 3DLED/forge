@@ -170,3 +170,87 @@ describe('placeSlotsInWeek', () => {
     expect(placements[0].date! < placements[1].date!).toBe(true);
   });
 });
+
+/**
+ * Days you pinned yourself, for a plan you laid out rather than one the app fitted in.
+ *
+ * The difference from a floating slot is that a pinned one is an instruction. Saying
+ * "Wednesday" in a plan you built is the decision — it should not be talked out of it by the
+ * weekday rules, which describe your habits rather than this plan.
+ */
+describe('pinned weekdays', () => {
+  const days = (rules: AvailabilityRule[], exceptions: CalendarException[] = []) =>
+    resolveWeekAvailability(WEEK, rules, exceptions);
+
+  // WEEK starts Sunday 2026-01-04, so weekday 1 is Monday the 5th and 3 is Wednesday the 7th.
+  const MONDAY = '2026-01-05';
+  const WEDNESDAY = '2026-01-07';
+
+  it('puts a pinned slot on its day', () => {
+    const [placement] = placeSlotsInWeek(days(openWeek()), [
+      { modality: 'strength', order: 1, weekday: 3 as Weekday },
+    ]);
+
+    expect(placement.date).toBe(WEDNESDAY);
+  });
+
+  it('honours the day even where the weekday rules say you rest', () => {
+    const rules = openWeek({ 3: [] });
+    const [placement] = placeSlotsInWeek(days(rules), [
+      { modality: 'strength', order: 1, weekday: 3 as Weekday },
+    ]);
+
+    expect(placement.date).toBe(WEDNESDAY);
+  });
+
+  /* A holiday is a fact about the calendar, not a habit — training through one would be wrong. */
+  it('will not schedule through a blacked-out day', () => {
+    const [placement] = placeSlotsInWeek(days(openWeek(), [blackout(WEDNESDAY, WEDNESDAY)]), [
+      { modality: 'strength', order: 1, weekday: 3 as Weekday },
+    ]);
+
+    expect(placement.date).toBeNull();
+    expect(placement.reason).toBeTruthy();
+  });
+
+  /* The first week of a plan can begin mid-week, and its earlier days simply are not there. */
+  it('reports a day that is not in this week at all', () => {
+    const partial = resolveWeekAvailability(WEEK.slice(4), openWeek(), []);
+    const [placement] = placeSlotsInWeek(partial, [
+      { modality: 'strength', order: 1, weekday: 1 as Weekday },
+    ]);
+
+    expect(placement.date).toBeNull();
+  });
+
+  it('keeps a floating slot off a day something is pinned to', () => {
+    const placements = placeSlotsInWeek(days(openWeek()), [
+      { modality: 'strength', order: 1, weekday: 3 as Weekday },
+      { modality: 'cardio', order: 2 },
+      { modality: 'cardio', order: 3 },
+    ]);
+
+    const floating = placements.filter((p) => p.slot.weekday == null).map((p) => p.date);
+    expect(floating).not.toContain(WEDNESDAY);
+    expect(new Set(placements.map((p) => p.date)).size).toBe(3);
+  });
+
+  it('settles pinned days before spreading, whatever order they arrive in', () => {
+    const placements = placeSlotsInWeek(days(openWeek()), [
+      { modality: 'cardio', order: 1 },
+      { modality: 'strength', order: 2, weekday: 1 as Weekday },
+    ]);
+
+    expect(placements.find((p) => p.slot.weekday === 1)?.date).toBe(MONDAY);
+  });
+
+  it('places a whole week you laid out by hand exactly as written', () => {
+    const placements = placeSlotsInWeek(days(openWeek()), [
+      { modality: 'strength', order: 1, weekday: 1 as Weekday },
+      { modality: 'cardio', order: 2, weekday: 3 as Weekday },
+      { modality: 'strength', order: 3, weekday: 5 as Weekday },
+    ]);
+
+    expect(placements.map((p) => p.date)).toEqual([MONDAY, WEDNESDAY, '2026-01-09']);
+  });
+});
