@@ -12,8 +12,9 @@ import PageHeader from '../../ui/PageHeader';
 import { useApp } from '../../ui/AppProvider';
 import DaySheet from './DaySheet';
 import PlanLibrary from './PlanLibrary';
+import PlanSheet from './PlanSheet';
 import { plannedBetween, sessionsBetween } from '../../data/sessions';
-import { activePlan, calendarExceptions, planAdherence } from '../../data/plans';
+import { activePlan, calendarExceptions, planProgress } from '../../data/plans';
 import {
   addDays,
   daysBetween,
@@ -47,6 +48,9 @@ export default function PlanView() {
   const [anchor, setAnchor] = useState(() => startOfMonth(today));
   const [openDay, setOpenDay] = useState<string | null>(null);
   const [browsing, setBrowsing] = useState(false);
+  const [openPlan, setOpenPlan] = useState(false);
+  /** Said out loud after a plan ends, because the card that was there has gone. */
+  const [planNotice, setPlanNotice] = useState<string | null>(null);
 
   /*
    * Swipe state.
@@ -145,9 +149,13 @@ export default function PlanView() {
   const logged = useLiveQuery(() => sessionsBetween(from, to), [from, to]);
   const exceptions = useLiveQuery(() => calendarExceptions(), []);
   const plan = useLiveQuery(() => activePlan(), []);
-  const adherence = useLiveQuery(
-    () => (plan ? planAdherence(plan.startDate, plan.endDate ?? to) : Promise.resolve(null)),
-    [plan?.id, plan?.startDate, plan?.endDate, to],
+  /*
+   * Counted over the whole plan by its id, not over the month on screen. The old figure moved
+   * as you paged the calendar, because its range ended at the last day of the visible grid.
+   */
+  const progress = useLiveQuery(
+    () => (plan ? planProgress(plan.id) : Promise.resolve(null)),
+    [plan?.id],
   );
 
   const weekdayHeaders = Array.from(
@@ -202,8 +210,32 @@ export default function PlanView() {
         }
       />
 
-      {plan && (
+      {planNotice && (
         <div className="card tight">
+          <p className="small" style={{ margin: 0 }}>
+            {planNotice}
+          </p>
+          <button
+            className="btn sm ghost"
+            style={{ marginTop: '0.5rem' }}
+            onClick={() => setPlanNotice(null)}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/*
+        The card is the way in to the plan. Everything you might want to do to a plan — read
+        where it stands, stop it — used to live in the library you go to in order to start a
+        different one.
+      */}
+      {plan && (
+        <button
+          className="card tight plan-card"
+          onClick={() => setOpenPlan(true)}
+          aria-label={`Open ${plan.name}`}
+        >
           <div className="row between">
             <div className="grow">
               <strong>{plan.name}</strong>
@@ -212,13 +244,16 @@ export default function PlanView() {
                 {plan.goal.eventDate && ` · ${daysBetween(today, plan.goal.eventDate)} days to race`}
               </div>
             </div>
-            {adherence?.ratio != null && (
-              <span className={`pill ${adherence.ratio >= 0.8 ? 'good' : adherence.ratio >= 0.5 ? 'warn' : ''}`}>
-                {Math.round(adherence.ratio * 100)}% done
-              </span>
+            {/*
+              Progress through the plan, not adherence to date. Next to "week 3 of 12" a
+              percentage is read as how far along you are, so that is what it now says; the
+              stricter question keeps its own labelled place inside.
+            */}
+            {progress != null && progress.total > 0 && (
+              <span className="pill">{Math.round(progress.ratio * 100)}% done</span>
             )}
           </div>
-        </div>
+        </button>
       )}
 
       <div
@@ -314,6 +349,18 @@ export default function PlanView() {
 
       {openDay && <DaySheet date={openDay} onClose={() => setOpenDay(null)} />}
       {browsing && <PlanLibrary onClose={() => setBrowsing(false)} />}
+
+      {openPlan && plan && (
+        <PlanSheet
+          plan={plan}
+          weekLabel={planStatus}
+          onClose={() => setOpenPlan(false)}
+          onEnded={(message) => {
+            setOpenPlan(false);
+            setPlanNotice(message);
+          }}
+        />
+      )}
     </>
   );
 }

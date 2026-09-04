@@ -554,6 +554,16 @@ section[id^='movement-'] {
   scroll-margin-top: calc(var(--safe-top) + clamp(84px, 19dvh, 148px) + 0.75rem);
 }
 
+/* The plan card is a button now; strip the button chrome so it still reads as a card. */
+.plan-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
 .pinned-spacer {
   height: clamp(84px, 19dvh, 148px);
 }

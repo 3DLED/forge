@@ -74,14 +74,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
       equipmentProfiles.find((p) => p.isDefault) ??
       equipmentProfiles[0];
 
+    /*
+     * One row per slug, defensively.
+     *
+     * A picker once showed three of every movement, and a restart cleared it — which rules
+     * out duplicated rows, and leaves no mechanism I have been able to find or reproduce.
+     * This is a guard rather than a diagnosis: two rows sharing a slug is never a legitimate
+     * state, `exerciseBySlug` already collapses them silently, and every list that does not
+     * would show the duplicate. If it happens again it will now happen somewhere else, which
+     * is itself worth knowing.
+     */
+    const unique = [...new Map(exercises.map((e) => [e.slug, e])).values()];
+
     return {
       profile,
       units: profile.units,
-      exercises,
+      exercises: unique,
       exerciseBySlug: new Map((everyExercise ?? exercises).map((e) => [e.slug, e])),
       equipmentProfiles,
       activeEquipment,
-      available: availableSlugs(exercises, activeEquipment?.items ?? []),
+      available: availableSlugs(unique, activeEquipment?.items ?? []),
     };
   }, [profiles, exercises, everyExercise, equipmentProfiles]);
 

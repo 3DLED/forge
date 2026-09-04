@@ -10,13 +10,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import Sheet from '../../ui/Sheet';
-import AskSheet from '../../ui/AskSheet';
+import BlockOutSheet from './BlockOutSheet';
 import { plural } from '../../ui/text';
 import { useApp } from '../../ui/AppProvider';
 import { plannedOnDay, sessionsOnDay, startFromPlanned, startSession } from '../../data/sessions';
 import { plannedSessionRepo, calendarExceptionRepo } from '../../data/repos';
 import {
-  addBlackout,
   calendarExceptions,
   movePlannedSession,
   skipPlannedSession,
@@ -26,7 +25,7 @@ import { SEED_SESSION_TEMPLATES } from '../../data/seed/sessionTemplates';
 import { savedWorkouts } from '../../data/namedWorkouts';
 import { materialisePrescription } from '../../domain/planning';
 import { resolveDayAvailability } from '../../domain/scheduling';
-import { formatDayLabel, todayKey } from '../../domain/dates';
+import { daysBetween, formatDayLabel, todayKey } from '../../domain/dates';
 import type { DayKey, PlannedSession } from '../../domain/types';
 
 const MODALITY_LABEL: Record<string, string> = {
@@ -277,8 +276,14 @@ export default function DaySheet({ date, onClose }: { date: DayKey; onClose: () 
         </button>
 
         {blackout ? (
+          /*
+            One record covers the whole stretch, so removing it unblocks all of it. The label
+            has to say so — "unblock this day" on a fortnight quietly reopens the fortnight.
+          */
           <button className="btn block" onClick={() => void calendarExceptionRepo.remove(blackout.id)}>
-            Unblock this day
+            {blackout.startDate === blackout.endDate
+              ? 'Unblock this day'
+              : `Unblock all ${plural(daysBetween(blackout.startDate, blackout.endDate) + 1, 'day')}`}
           </button>
         ) : (
           <button className="btn ghost block" onClick={() => setBlocking(true)}>
@@ -288,16 +293,10 @@ export default function DaySheet({ date, onClose }: { date: DayKey; onClose: () 
       </div>
 
       {blocking && (
-        <AskSheet
-          title="Block this day out"
-          message="Nothing will be scheduled here, and applying a plan will route around it."
-          input={{ label: 'Reason (optional)', placeholder: 'Travel, rest, work…' }}
-          confirmLabel="Block it"
-          onCancel={() => setBlocking(false)}
-          onConfirm={async (reason) => {
-            await addBlackout(date, date, reason.trim() || undefined);
-            setBlocking(false);
-          }}
+        <BlockOutSheet
+          from={date}
+          onClose={() => setBlocking(false)}
+          onBlocked={() => setBlocking(false)}
         />
       )}
     </Sheet>

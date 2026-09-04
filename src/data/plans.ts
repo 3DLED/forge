@@ -191,6 +191,52 @@ async function addTestDays(
   }
 }
 
+/**
+ * How far through a plan you are, counted over the whole thing.
+ *
+ * Two questions, and they are not the same one. `ratio` is how much of the whole plan is
+ * behind you — what a percentage next to "week 3 of 12" is read as meaning. `adherence` is
+ * how much of what was due you actually did, which is the stricter and more uncomfortable
+ * question: you can be part-way through a plan having missed most of it. The calendar shows
+ * the first; the plan sheet shows both, labelled, because either alone gets mistaken for
+ * the other.
+ *
+ * Counted by `planId` rather than by date range, so it does not change as you page the
+ * calendar around, and sessions moved outside the original window still belong to it.
+ */
+export async function planProgress(planId: Id): Promise<{
+  total: number;
+  completed: number;
+  skipped: number;
+  remaining: number;
+  /** Sessions dated today or earlier — the denominator adherence uses. */
+  due: number;
+  /** Of what was due, how much was done. Null before anything is due. */
+  adherence: number | null;
+  /** Of the whole plan, how much is done. */
+  ratio: number;
+}> {
+  const rows = (await db.plannedSessions.where('planId').equals(planId).toArray()).filter(
+    (session) => !session.deletedAt,
+  );
+
+  const today = todayKey();
+  const completed = rows.filter((s) => s.status === 'completed').length;
+  const skipped = rows.filter((s) => s.status === 'skipped').length;
+  const due = rows.filter((s) => s.date <= today).length;
+
+  return {
+    total: rows.length,
+    completed,
+    skipped,
+    remaining: rows.length - completed - skipped,
+    due,
+    adherence: due > 0 ? completed / due : null,
+    // An empty plan is not nought per cent done; it has nothing to be done.
+    ratio: rows.length > 0 ? completed / rows.length : 0,
+  };
+}
+
 /** Ends a plan and clears its remaining unstarted sessions from today forward. */
 export async function endPlan(plan: Plan): Promise<number> {
   await planRepo.update(plan.id, { isActive: false });
@@ -239,25 +285,3 @@ export async function addBlackout(
   return calendarExceptionRepo.create({ startDate, endDate, kind: 'blackout', reason });
 }
 
-/**
- * Adherence over a window: how much of what was planned actually happened. The number that
- * tells you whether the plan is working or whether the plan is fiction.
- */
-export async function planAdherence(
-  from: DayKey,
-  to: DayKey,
-): Promise<{ planned: number; completed: number; skipped: number; ratio: number | null }> {
-  const rows = (await db.plannedSessions.where('date').between(from, to, true, true).toArray())
-    .filter((s) => !s.deletedAt);
-
-  const completed = rows.filter((s) => s.status === 'completed').length;
-  const skipped = rows.filter((s) => s.status === 'skipped').length;
-  const due = rows.filter((s) => s.date <= todayKey()).length;
-
-  return {
-    planned: rows.length,
-    completed,
-    skipped,
-    ratio: due > 0 ? completed / due : null,
-  };
-}
