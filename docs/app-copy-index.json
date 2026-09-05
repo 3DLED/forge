@@ -1,0 +1,2822 @@
+{
+ "TODAY-001": {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 72,
+  "kind": "on screen",
+  "text": "This week"
+ },
+ "TODAY-002": {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 100,
+  "kind": "on screen",
+  "text": "Tap for the week"
+ },
+ "TODAY-003": {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 107,
+  "kind": "on screen",
+  "text": "Planned for today"
+ },
+ "TODAY-004": {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 115,
+  "kind": "on screen",
+  "text": "In progress"
+ },
+ "TODAY-005": {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 140,
+  "kind": "on screen",
+  "text": "Today's sessions"
+ },
+ "TODAY-006": {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 151,
+  "kind": "on screen",
+  "text": "Nothing logged today."
+ },
+ "TODAY-007": {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 152,
+  "kind": "on screen",
+  "text": "Training as"
+ },
+ "TODAY-008": {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 178,
+  "kind": "on screen",
+  "text": "🏃 Log a run"
+ },
+ "LOG-001": {
+  "file": "src/features/log/ExercisePicker.tsx",
+  "line": 102,
+  "kind": "on screen",
+  "text": "Add anyway"
+ },
+ "LOG-002": {
+  "file": "src/features/log/ExercisePicker.tsx",
+  "line": 110,
+  "kind": "title",
+  "text": "Add exercise"
+ },
+ "LOG-003": {
+  "file": "src/features/log/ExercisePicker.tsx",
+  "line": 113,
+  "kind": "placeholder",
+  "text": "Search movements, muscles, patterns…"
+ },
+ "LOG-004": {
+  "file": "src/features/log/ExercisePicker.tsx",
+  "line": 178,
+  "kind": "on screen",
+  "text": "You train these"
+ },
+ "LOG-005": {
+  "file": "src/features/log/ExercisePicker.tsx",
+  "line": 208,
+  "kind": "on screen",
+  "text": "Everything else"
+ },
+ "LOG-006": {
+  "file": "src/features/log/ExerciseGroup.tsx",
+  "line": 185,
+  "kind": "title",
+  "text": "Time this hold"
+ },
+ "LOG-007": {
+  "file": "src/features/log/ExerciseGroup.tsx",
+  "line": 238,
+  "kind": "on screen",
+  "text": "+ Set"
+ },
+ "LOG-008": {
+  "file": "src/features/log/ExerciseGroup.tsx",
+  "line": 242,
+  "kind": "on screen",
+  "text": "− Set"
+ },
+ "LOG-009": {
+  "file": "src/features/log/LogRunSheet.tsx",
+  "line": 88,
+  "kind": "title",
+  "text": "Log a run"
+ },
+ "LOG-010": {
+  "file": "src/features/log/LogRunSheet.tsx",
+  "line": 176,
+  "kind": "on screen",
+  "text": "1 is a walk, 10 is everything you had. This is what your training load is built from, so it is worth a moment's thought."
+ },
+ "LOG-011": {
+  "file": "src/features/log/LogRunSheet.tsx",
+  "line": 184,
+  "kind": "placeholder",
+  "text": "Felt flat, humid, new shoes…"
+ },
+ "LOG-012": {
+  "file": "src/features/log/ExerciseInfoSheet.tsx",
+  "line": 29,
+  "kind": "on screen",
+  "text": "Swap for another version"
+ },
+ "LOG-013": {
+  "file": "src/features/log/ExerciseInfoSheet.tsx",
+  "line": 42,
+  "kind": "on screen",
+  "text": "Set up"
+ },
+ "LOG-014": {
+  "file": "src/features/log/ExerciseInfoSheet.tsx",
+  "line": 45,
+  "kind": "on screen",
+  "text": "How to do it"
+ },
+ "LOG-015": {
+  "file": "src/features/log/ExerciseInfoSheet.tsx",
+  "line": 52,
+  "kind": "on screen",
+  "text": "Watch for"
+ },
+ "LOG-016": {
+  "file": "src/features/log/ExerciseInfoSheet.tsx",
+  "line": 56,
+  "kind": "on screen",
+  "text": "No write-up for this one yet — it is likely a movement you added yourself."
+ },
+ "LOG-017": {
+  "file": "src/features/log/ExerciseInfoSheet.tsx",
+  "line": 84,
+  "kind": "on screen",
+  "text": "Trained one side at a time — log both sides, or double the sets."
+ },
+ "LOG-018": {
+  "file": "src/features/log/SavedWorkoutsSheet.tsx",
+  "line": 17,
+  "kind": "on screen",
+  "text": "void | Promise"
+ },
+ "LOG-019": {
+  "file": "src/features/log/SavedWorkoutsSheet.tsx",
+  "line": 27,
+  "kind": "title",
+  "text": "Your saved workouts"
+ },
+ "LOG-020": {
+  "file": "src/features/log/SavedWorkoutsSheet.tsx",
+  "line": 31,
+  "kind": "on screen",
+  "text": "Nothing saved yet."
+ },
+ "LOG-021": {
+  "file": "src/features/log/SavedWorkoutsSheet.tsx",
+  "line": 32,
+  "kind": "on screen",
+  "text": "Name a workout you have built and it comes back here, ready to run again — and, if it is timed, with its own best to beat."
+ },
+ "LOG-022": {
+  "file": "src/features/log/SavedWorkoutsSheet.tsx",
+  "line": 48,
+  "kind": "on screen",
+  "text": "Straight sets"
+ },
+ "LOG-023": {
+  "file": "src/features/log/SavedWorkoutsSheet.tsx",
+  "line": 61,
+  "kind": "on screen",
+  "text": "Share, import or tidy these up in More → Saved workouts."
+ },
+ "LOG-024": {
+  "file": "src/features/log/SavedWorkoutsSheet.tsx",
+  "line": 98,
+  "kind": "on screen",
+  "text": "Run it again"
+ },
+ "LOG-025": {
+  "file": "src/features/log/PinnedTimer.tsx",
+  "line": 98,
+  "kind": "aria-label",
+  "text": "Open the full timer"
+ },
+ "LOG-026": {
+  "file": "src/features/log/PinnedTimer.tsx",
+  "line": 117,
+  "kind": "aria-label",
+  "text": "Record a completed round"
+ },
+ "LOG-027": {
+  "file": "src/features/log/TestRunner.tsx",
+  "line": 126,
+  "kind": "on screen",
+  "text": "Recently tested"
+ },
+ "LOG-028": {
+  "file": "src/features/log/TestRunner.tsx",
+  "line": 153,
+  "kind": "on screen",
+  "text": "What can you do for three?"
+ },
+ "LOG-029": {
+  "file": "src/features/log/TestRunner.tsx",
+  "line": 168,
+  "kind": "on screen",
+  "text": "A rough guess is fine. Everything is worked out from it, and a wrong one costs an extra attempt rather than the result — what gets recorded is the heaviest set you actually finish."
+ },
+ "LOG-030": {
+  "file": "src/features/log/TestRunner.tsx",
+  "line": 178,
+  "kind": "on screen",
+  "text": "Lay out the test"
+ },
+ "LOG-031": {
+  "file": "src/features/log/TestRunner.tsx",
+  "line": 235,
+  "kind": "on screen",
+  "text": "Use it"
+ },
+ "LOG-032": {
+  "file": "src/features/log/TestRunner.tsx",
+  "line": 250,
+  "kind": "on screen",
+  "text": "Use a different weight"
+ },
+ "LOG-033": {
+  "file": "src/features/log/TestRunner.tsx",
+  "line": 261,
+  "kind": "on screen",
+  "text": "How many did you get?"
+ },
+ "LOG-034": {
+  "file": "src/features/log/TestRunner.tsx",
+  "line": 267,
+  "kind": "aria-label",
+  "text": "Reps completed"
+ },
+ "LOG-035": {
+  "file": "src/features/log/TestRunner.tsx",
+  "line": 278,
+  "kind": "on screen",
+  "text": "Record it"
+ },
+ "LOG-036": {
+  "file": "src/features/log/TestRunner.tsx",
+  "line": 293,
+  "kind": "on screen",
+  "text": "▶ Start the hold"
+ },
+ "LOG-037": {
+  "file": "src/features/log/TestRunner.tsx",
+  "line": 304,
+  "kind": "on screen",
+  "text": "Made it — three good reps"
+ },
+ "LOG-038": {
+  "file": "src/features/log/TestRunner.tsx",
+  "line": 307,
+  "kind": "on screen",
+  "text": "Failed it — stop the test"
+ },
+ "LOG-039": {
+  "file": "src/features/log/TestRunner.tsx",
+  "line": 341,
+  "kind": "on screen",
+  "text": "No attempt was completed, so there is nothing to record. Nothing is saved."
+ },
+ "LOG-040": {
+  "file": "src/features/log/SavedWorkoutRow.tsx",
+  "line": 12,
+  "kind": "on screen",
+  "text": "void | Promise"
+ },
+ "LOG-041": {
+  "file": "src/features/log/SessionEquipmentSheet.tsx",
+  "line": 20,
+  "kind": "on screen",
+  "text": "void | Promise"
+ },
+ "LOG-042": {
+  "file": "src/features/log/SessionEquipmentSheet.tsx",
+  "line": 36,
+  "kind": "title",
+  "text": "Equipment for this workout"
+ },
+ "LOG-043": {
+  "file": "src/features/log/SessionEquipmentSheet.tsx",
+  "line": 41,
+  "kind": "on screen",
+  "text": "Use my default"
+ },
+ "LOG-044": {
+  "file": "src/features/log/SessionEquipmentSheet.tsx",
+  "line": 45,
+  "kind": "on screen",
+  "text": "Use for this workout"
+ },
+ "LOG-045": {
+  "file": "src/features/log/SessionEquipmentSheet.tsx",
+  "line": 56,
+  "kind": "on screen",
+  "text": "Start from a profile"
+ },
+ "LOG-046": {
+  "file": "src/features/log/SessionEquipmentSheet.tsx",
+  "line": 67,
+  "kind": "on screen",
+  "text": "Nothing but bodyweight"
+ },
+ "LOG-047": {
+  "file": "src/features/log/SuggestWorkoutSheet.tsx",
+  "line": 45,
+  "kind": "on screen",
+  "text": "void | Promise"
+ },
+ "LOG-048": {
+  "file": "src/features/log/SuggestWorkoutSheet.tsx",
+  "line": 128,
+  "kind": "title",
+  "text": "Suggest a workout"
+ },
+ "LOG-049": {
+  "file": "src/features/log/SuggestWorkoutSheet.tsx",
+  "line": 148,
+  "kind": "on screen",
+  "text": "⏱ Add as a timed workout"
+ },
+ "LOG-050": {
+  "file": "src/features/log/SuggestWorkoutSheet.tsx",
+  "line": 158,
+  "kind": "on screen",
+  "text": "Your saved sessions"
+ },
+ "LOG-051": {
+  "file": "src/features/log/SuggestWorkoutSheet.tsx",
+  "line": 170,
+  "kind": "on screen",
+  "text": "Or build a new one"
+ },
+ "LOG-052": {
+  "file": "src/features/log/SuggestWorkoutSheet.tsx",
+  "line": 189,
+  "kind": "on screen",
+  "text": "Full body"
+ },
+ "LOG-053": {
+  "file": "src/features/log/SuggestWorkoutSheet.tsx",
+  "line": 241,
+  "kind": "on screen",
+  "text": "Nothing available for that combination."
+ },
+ "LOG-054": {
+  "file": "src/features/log/SuggestWorkoutSheet.tsx",
+  "line": 242,
+  "kind": "on screen",
+  "text": "Try another region, or add equipment for this session."
+ },
+ "LOG-055": {
+  "file": "src/features/log/SuggestWorkoutSheet.tsx",
+  "line": 257,
+  "kind": "title",
+  "text": "Swap for an easier or harder version"
+ },
+ "LOG-056": {
+  "file": "src/features/log/SuggestWorkoutSheet.tsx",
+  "line": 264,
+  "kind": "title",
+  "text": "Drop this movement"
+ },
+ "LOG-057": {
+  "file": "src/features/log/SuggestWorkoutSheet.tsx",
+  "line": 283,
+  "kind": "on screen",
+  "text": "🎲 Suggest something else"
+ },
+ "LOG-058": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 86,
+  "kind": "label",
+  "text": "💪 Great"
+ },
+ "LOG-059": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 87,
+  "kind": "label",
+  "text": "🙂 Good"
+ },
+ "LOG-060": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 88,
+  "kind": "label",
+  "text": "😐 OK"
+ },
+ "LOG-061": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 89,
+  "kind": "label",
+  "text": "😮‍💨 Rough"
+ },
+ "LOG-062": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 90,
+  "kind": "label",
+  "text": "🥴 Bad"
+ },
+ "LOG-063": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 460,
+  "kind": "on screen",
+  "text": "That session is gone."
+ },
+ "LOG-064": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 461,
+  "kind": "on screen",
+  "text": "Back to today"
+ },
+ "LOG-065": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 685,
+  "kind": "aria-label",
+  "text": "Session name"
+ },
+ "LOG-066": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 725,
+  "kind": "on screen",
+  "text": "Finished workout — reviewing. Tap Edit to change anything."
+ },
+ "LOG-067": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 748,
+  "kind": "on screen",
+  "text": "Editing a finished workout. Changes save as you make them."
+ },
+ "LOG-068": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 752,
+  "kind": "on screen",
+  "text": "⏱ Add block"
+ },
+ "LOG-069": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 772,
+  "kind": "on screen",
+  "text": "Add a movement, or start an AMRAP or EMOM block."
+ },
+ "LOG-070": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 862,
+  "kind": "on screen",
+  "text": "Each round"
+ },
+ "LOG-071": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 890,
+  "kind": "on screen",
+  "text": "+ Add movement to this block"
+ },
+ "LOG-072": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 910,
+  "kind": "on screen",
+  "text": "⏱ Edit timed workout"
+ },
+ "LOG-073": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 949,
+  "kind": "on screen",
+  "text": "Ungroup block"
+ },
+ "LOG-074": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 963,
+  "kind": "on screen",
+  "text": "+ Add exercise"
+ },
+ "LOG-075": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 971,
+  "kind": "on screen",
+  "text": "✨ Suggest a workout"
+ },
+ "LOG-076": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 983,
+  "kind": "on screen",
+  "text": "💾 Save as a workout"
+ },
+ "LOG-077": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 994,
+  "kind": "on screen",
+  "text": "📂 Browse saved workouts"
+ },
+ "LOG-078": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1005,
+  "kind": "on screen",
+  "text": "⏱ Make this a timed workout"
+ },
+ "LOG-079": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1023,
+  "kind": "on screen",
+  "text": "Discard session"
+ },
+ "LOG-080": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1110,
+  "kind": "title",
+  "text": "Save this workout"
+ },
+ "LOG-081": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1115,
+  "kind": "placeholder",
+  "text": "Upper A"
+ },
+ "LOG-082": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1223,
+  "kind": "title",
+  "text": "Edit timed workout"
+ },
+ "LOG-083": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1275,
+  "kind": "title",
+  "text": "Discard this session?"
+ },
+ "LOG-084": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1382,
+  "kind": "on screen",
+  "text": "Worth doing before you save"
+ },
+ "LOG-085": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1410,
+  "kind": "placeholder",
+  "text": "Cindy, Tuesday burner…"
+ },
+ "LOG-086": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1411,
+  "kind": "aria-label",
+  "text": "Name this workout"
+ },
+ "LOG-087": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1420,
+  "kind": "on screen",
+  "text": "Name it"
+ },
+ "LOG-088": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1427,
+  "kind": "on screen",
+  "text": "Optional — saving without them is fine."
+ },
+ "LOG-089": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1433,
+  "kind": "on screen",
+  "text": "How hard was the whole session? This is what makes running and lifting comparable — effort × minutes is the one load number that spans both."
+ },
+ "LOG-090": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1451,
+  "kind": "on screen",
+  "text": "1 = barely moved · 5 = solid work · 8 = hard · 10 = everything you had"
+ },
+ "LOG-091": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1463,
+  "kind": "aria-label",
+  "text": "Duration in minutes"
+ },
+ "LOG-092": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1469,
+  "kind": "on screen",
+  "text": "How did it feel?"
+ },
+ "LOG-093": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1486,
+  "kind": "placeholder",
+  "text": "Anything worth remembering next time…"
+ },
+ "LOG-094": {
+  "file": "src/features/log/NewBlockSheet.tsx",
+  "line": 16,
+  "kind": "blurb",
+  "text": "As many rounds as possible before the cap. Tap a big button for each round."
+ },
+ "LOG-095": {
+  "file": "src/features/log/NewBlockSheet.tsx",
+  "line": 21,
+  "kind": "blurb",
+  "text": "Every minute on the minute — a cue at each interval, for a set number of rounds."
+ },
+ "LOG-096": {
+  "file": "src/features/log/NewBlockSheet.tsx",
+  "line": 25,
+  "kind": "label",
+  "text": "For time"
+ },
+ "LOG-097": {
+  "file": "src/features/log/NewBlockSheet.tsx",
+  "line": 26,
+  "kind": "blurb",
+  "text": "Fixed work, clock running. The score is how long it took."
+ },
+ "LOG-098": {
+  "file": "src/features/log/NewBlockSheet.tsx",
+  "line": 42,
+  "kind": "on screen",
+  "text": "void | Promise"
+ },
+ "LOG-099": {
+  "file": "src/features/log/NewBlockSheet.tsx",
+  "line": 86,
+  "kind": "on screen",
+  "text": "Your saved timed workouts"
+ },
+ "LOG-100": {
+  "file": "src/features/log/NewBlockSheet.tsx",
+  "line": 95,
+  "kind": "on screen",
+  "text": "Or build a new one"
+ },
+ "LOG-101": {
+  "file": "src/features/log/VariationSheet.tsx",
+  "line": 25,
+  "kind": "on screen",
+  "text": "void | Promise"
+ },
+ "LOG-102": {
+  "file": "src/features/log/WorkoutTimer.tsx",
+  "line": 22,
+  "kind": "on screen",
+  "text": "void | Promise"
+ },
+ "LOG-103": {
+  "file": "src/features/log/WorkoutTimer.tsx",
+  "line": 79,
+  "kind": "on screen",
+  "text": "The clock keeps running in the strip at the top — closing this does not stop it."
+ },
+ "LOG-104": {
+  "file": "src/features/log/WorkoutTimer.tsx",
+  "line": 86,
+  "kind": "on screen",
+  "text": "Each round"
+ },
+ "LOG-105": {
+  "file": "src/features/log/WorkoutTimer.tsx",
+  "line": 101,
+  "kind": "aria-label",
+  "text": "Record a completed round"
+ },
+ "LOG-106": {
+  "file": "src/features/log/WorkoutTimer.tsx",
+  "line": 112,
+  "kind": "on screen",
+  "text": "Undo round"
+ },
+ "LOG-107": {
+  "file": "src/features/log/WorkoutTimer.tsx",
+  "line": 139,
+  "kind": "on screen",
+  "text": "This browser has no audio support — the timer still runs, silently."
+ },
+ "PLAN-001": {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 96,
+  "kind": "title",
+  "text": "Add a session"
+ },
+ "PLAN-002": {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 99,
+  "kind": "placeholder",
+  "text": "Search workouts…"
+ },
+ "PLAN-003": {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 110,
+  "kind": "on screen",
+  "text": "Your saved workouts"
+ },
+ "PLAN-004": {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 129,
+  "kind": "on screen",
+  "text": "From the library"
+ },
+ "PLAN-005": {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 160,
+  "kind": "on screen",
+  "text": "Rest day"
+ },
+ "PLAN-006": {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 171,
+  "kind": "on screen",
+  "text": "Nothing scheduled or logged on this day."
+ },
+ "PLAN-007": {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 202,
+  "kind": "aria-label",
+  "text": "Move to date"
+ },
+ "PLAN-008": {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 253,
+  "kind": "on screen",
+  "text": "+ Add a planned session"
+ },
+ "PLAN-009": {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 276,
+  "kind": "on screen",
+  "text": "Block this day out"
+ },
+ "PLAN-010": {
+  "file": "src/features/plan/PlanSheet.tsx",
+  "line": 90,
+  "kind": "on screen",
+  "text": "Race day"
+ },
+ "PLAN-011": {
+  "file": "src/features/plan/PlanSheet.tsx",
+  "line": 101,
+  "kind": "on screen",
+  "text": "Keeping up"
+ },
+ "PLAN-012": {
+  "file": "src/features/plan/PlanSheet.tsx",
+  "line": 115,
+  "kind": "on screen",
+  "text": "A different question to the one above — you can be part-way through a plan and have missed most of what it asked for."
+ },
+ "PLAN-013": {
+  "file": "src/features/plan/PlanSheet.tsx",
+  "line": 131,
+  "kind": "on screen",
+  "text": "↗ Share this plan"
+ },
+ "PLAN-014": {
+  "file": "src/features/plan/PlanSheet.tsx",
+  "line": 145,
+  "kind": "on screen",
+  "text": "End this plan"
+ },
+ "PLAN-015": {
+  "file": "src/features/plan/BlockOutSheet.tsx",
+  "line": 50,
+  "kind": "on screen",
+  "text": "Nothing new gets scheduled in a blocked stretch, and applying a plan routes around it."
+ },
+ "PLAN-016": {
+  "file": "src/features/plan/BlockOutSheet.tsx",
+  "line": 64,
+  "kind": "aria-label",
+  "text": "Last day to block"
+ },
+ "PLAN-017": {
+  "file": "src/features/plan/BlockOutSheet.tsx",
+  "line": 76,
+  "kind": "placeholder",
+  "text": "Travel, rest, work…"
+ },
+ "PLAN-018": {
+  "file": "src/features/plan/BlockOutSheet.tsx",
+  "line": 77,
+  "kind": "aria-label",
+  "text": "Reason (optional)"
+ },
+ "PLAN-019": {
+  "file": "src/features/plan/BlockOutSheet.tsx",
+  "line": 86,
+  "kind": "on screen",
+  "text": "They stay where they are — blocking stops new scheduling, it does not throw away work you had already planned. Skip or move them from their own days if you are not doing them."
+ },
+ "PLAN-020": {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 29,
+  "kind": "label",
+  "text": "Race training"
+ },
+ "PLAN-021": {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 30,
+  "kind": "blurb",
+  "text": "Set a race date and the plan counts backwards to it."
+ },
+ "PLAN-022": {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 34,
+  "kind": "label",
+  "text": "Obstacle & hybrid racing"
+ },
+ "PLAN-023": {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 35,
+  "kind": "blurb",
+  "text": "Running and strength in one plan, with grip work that matters on a rig."
+ },
+ "PLAN-024": {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 39,
+  "kind": "label",
+  "text": "Strength & muscle"
+ },
+ "PLAN-025": {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 40,
+  "kind": "blurb",
+  "text": "Ongoing splits with no end date. Pick the one that matches your week."
+ },
+ "PLAN-026": {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 44,
+  "kind": "label",
+  "text": "Everything at once"
+ },
+ "PLAN-027": {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 45,
+  "kind": "blurb",
+  "text": "Stay strong and keep a running base without training for anything in particular."
+ },
+ "PLAN-028": {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 115,
+  "kind": "on screen",
+  "text": "Currently active"
+ },
+ "PLAN-029": {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 125,
+  "kind": "on screen",
+  "text": "End plan"
+ },
+ "PLAN-030": {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 141,
+  "kind": "on screen",
+  "text": "Yours, not running"
+ },
+ "PLAN-031": {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 162,
+  "kind": "on screen",
+  "text": "Built by you"
+ },
+ "PLAN-032": {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 196,
+  "kind": "on screen",
+  "text": "+ Build a plan"
+ },
+ "PLAN-033": {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 200,
+  "kind": "on screen",
+  "text": "Every plan is a starting point — once it is on your calendar you can move, skip, or rewrite any session in it."
+ },
+ "PLAN-034": {
+  "file": "src/features/plan/CustomPlanBuilder.tsx",
+  "line": 98,
+  "kind": "aria-label",
+  "text": "Plan name"
+ },
+ "PLAN-035": {
+  "file": "src/features/plan/CustomPlanBuilder.tsx",
+  "line": 99,
+  "kind": "placeholder",
+  "text": "Winter base"
+ },
+ "PLAN-036": {
+  "file": "src/features/plan/CustomPlanBuilder.tsx",
+  "line": 103,
+  "kind": "on screen",
+  "text": "What it is for"
+ },
+ "PLAN-037": {
+  "file": "src/features/plan/CustomPlanBuilder.tsx",
+  "line": 117,
+  "kind": "on screen",
+  "text": "How long"
+ },
+ "PLAN-038": {
+  "file": "src/features/plan/CustomPlanBuilder.tsx",
+  "line": 131,
+  "kind": "on screen",
+  "text": "Your week"
+ },
+ "PLAN-039": {
+  "file": "src/features/plan/CustomPlanBuilder.tsx",
+  "line": 132,
+  "kind": "on screen",
+  "text": "This repeats. The weights climb from what you actually lift, not from the plan."
+ },
+ "PLAN-040": {
+  "file": "src/features/plan/CustomPlanBuilder.tsx",
+  "line": 229,
+  "kind": "on screen",
+  "text": "😴 Rest day"
+ },
+ "PLAN-041": {
+  "file": "src/features/plan/CustomPlanBuilder.tsx",
+  "line": 253,
+  "kind": "placeholder",
+  "text": "Search sessions"
+ },
+ "PLAN-042": {
+  "file": "src/features/plan/CustomPlanBuilder.tsx",
+  "line": 260,
+  "kind": "on screen",
+  "text": "Decide on the day"
+ },
+ "PLAN-043": {
+  "file": "src/features/plan/CustomPlanBuilder.tsx",
+  "line": 274,
+  "kind": "on screen",
+  "text": "✨ Suggest a session"
+ },
+ "PLAN-044": {
+  "file": "src/features/plan/CustomPlanBuilder.tsx",
+  "line": 276,
+  "kind": "on screen",
+  "text": "Filled in when the day arrives, from your kit and what you have been training."
+ },
+ "PLAN-045": {
+  "file": "src/features/plan/CustomPlanBuilder.tsx",
+  "line": 312,
+  "kind": "on screen",
+  "text": "For about"
+ },
+ "PLAN-046": {
+  "file": "src/features/plan/CustomPlanBuilder.tsx",
+  "line": 328,
+  "kind": "on screen",
+  "text": "Your saved workouts"
+ },
+ "PLAN-047": {
+  "file": "src/features/plan/CustomPlanBuilder.tsx",
+  "line": 353,
+  "kind": "on screen",
+  "text": "Yours · copied into the plan"
+ },
+ "PLAN-048": {
+  "file": "src/features/plan/CustomPlanBuilder.tsx",
+  "line": 358,
+  "kind": "on screen",
+  "text": "Built in"
+ },
+ "PLAN-049": {
+  "file": "src/features/plan/RampEditor.tsx",
+  "line": 54,
+  "kind": "on screen",
+  "text": "📈 Make it grow each week"
+ },
+ "PLAN-050": {
+  "file": "src/features/plan/RampEditor.tsx",
+  "line": 72,
+  "kind": "on screen",
+  "text": "Grows each week"
+ },
+ "PLAN-051": {
+  "file": "src/features/plan/RampEditor.tsx",
+  "line": 73,
+  "kind": "on screen",
+  "text": "Turn off"
+ },
+ "PLAN-052": {
+  "file": "src/features/plan/RampEditor.tsx",
+  "line": 100,
+  "kind": "on screen",
+  "text": "Start at"
+ },
+ "PLAN-053": {
+  "file": "src/features/plan/RampEditor.tsx",
+  "line": 107,
+  "kind": "aria-label",
+  "text": "Starting value"
+ },
+ "PLAN-054": {
+  "file": "src/features/plan/RampEditor.tsx",
+  "line": 115,
+  "kind": "on screen",
+  "text": "By how much"
+ },
+ "PLAN-055": {
+  "file": "src/features/plan/RampEditor.tsx",
+  "line": 128,
+  "kind": "on screen",
+  "text": "Ten per cent a week is the conventional ceiling for adding distance. Past it the injuries tend to arrive before the fitness does."
+ },
+ "PLAN-056": {
+  "file": "src/features/plan/RampEditor.tsx",
+  "line": 133,
+  "kind": "on screen",
+  "text": "Stop at"
+ },
+ "PLAN-057": {
+  "file": "src/features/plan/RampEditor.tsx",
+  "line": 138,
+  "kind": "aria-label",
+  "text": "Maximum value"
+ },
+ "PLAN-058": {
+  "file": "src/features/plan/RampEditor.tsx",
+  "line": 139,
+  "kind": "placeholder",
+  "text": "no limit"
+ },
+ "PLAN-059": {
+  "file": "src/features/plan/RampEditor.tsx",
+  "line": 149,
+  "kind": "on screen",
+  "text": "Where the build-up levels off. Without one it keeps climbing for the whole plan."
+ },
+ "PLAN-060": {
+  "file": "src/features/plan/RampEditor.tsx",
+  "line": 155,
+  "kind": "on screen",
+  "text": "Week 1"
+ },
+ "PLAN-061": {
+  "file": "src/features/plan/ApplyPlanSheet.tsx",
+  "line": 180,
+  "kind": "on screen",
+  "text": "Optional. Without it the plan is generated exactly as written."
+ },
+ "PLAN-062": {
+  "file": "src/features/plan/ApplyPlanSheet.tsx",
+  "line": 188,
+  "kind": "on screen",
+  "text": "Already planned"
+ },
+ "PLAN-063": {
+  "file": "src/features/plan/ApplyPlanSheet.tsx",
+  "line": 210,
+  "kind": "on screen",
+  "text": "Testing days"
+ },
+ "PLAN-064": {
+  "file": "src/features/plan/ApplyPlanSheet.tsx",
+  "line": 229,
+  "kind": "on screen",
+  "text": "Heads up"
+ },
+ "PLAN-065": {
+  "file": "src/features/plan/ApplyPlanSheet.tsx",
+  "line": 240,
+  "kind": "on screen",
+  "text": "Race day"
+ },
+ "PLAN-066": {
+  "file": "src/features/plan/ApplyPlanSheet.tsx",
+  "line": 246,
+  "kind": "aria-label",
+  "text": "Race date"
+ },
+ "PLAN-067": {
+  "file": "src/features/plan/ApplyPlanSheet.tsx",
+  "line": 263,
+  "kind": "aria-label",
+  "text": "Start date"
+ },
+ "PLAN-068": {
+  "file": "src/features/plan/ApplyPlanSheet.tsx",
+  "line": 273,
+  "kind": "on screen",
+  "text": "How many weeks to lay down"
+ },
+ "PLAN-069": {
+  "file": "src/features/plan/ApplyPlanSheet.tsx",
+  "line": 285,
+  "kind": "on screen",
+  "text": "This plan has no end. Lay down a stretch now and extend it whenever you like."
+ },
+ "PLAN-070": {
+  "file": "src/features/plan/ApplyPlanSheet.tsx",
+  "line": 291,
+  "kind": "on screen",
+  "text": "What you'll get"
+ },
+ "PLAN-071": {
+  "file": "src/features/plan/ApplyPlanSheet.tsx",
+  "line": 312,
+  "kind": "on screen",
+  "text": "Swapped for your equipment"
+ },
+ "PLAN-072": {
+  "file": "src/features/plan/ApplyPlanSheet.tsx",
+  "line": 315,
+  "kind": "on screen",
+  "text": ". These movements were replaced with the closest thing you can actually do."
+ },
+ "PLAN-073": {
+  "file": "src/features/plan/ApplyPlanSheet.tsx",
+  "line": 333,
+  "kind": "on screen",
+  "text": "No substitute"
+ },
+ "PLAN-074": {
+  "file": "src/features/plan/ApplyPlanSheet.tsx",
+  "line": 346,
+  "kind": "on screen",
+  "text": "Couldn't be scheduled"
+ },
+ "PLAN-075": {
+  "file": "src/features/plan/PlanView.tsx",
+  "line": 141,
+  "kind": "aria-label",
+  "text": "Previous month"
+ },
+ "PLAN-076": {
+  "file": "src/features/plan/PlanView.tsx",
+  "line": 151,
+  "kind": "aria-label",
+  "text": "Next month"
+ },
+ "PLAN-077": {
+  "file": "src/features/plan/PlanView.tsx",
+  "line": 251,
+  "kind": "on screen",
+  "text": "Striped = blocked out"
+ },
+ "PLAN-078": {
+  "file": "src/features/plan/PlanView.tsx",
+  "line": 254,
+  "kind": "on screen",
+  "text": "Swipe the calendar to change month."
+ },
+ "PLAN-079": {
+  "file": "src/features/plan/PlanView.tsx",
+  "line": 271,
+  "kind": "on screen",
+  "text": "📥 Import a plan"
+ },
+ "PLAN-080": {
+  "file": "src/features/plan/PlanView.tsx",
+  "line": 276,
+  "kind": "on screen",
+  "text": "Or tap any day to add a single session."
+ },
+ "HIST-001": {
+  "file": "src/features/history/HistoryView.tsx",
+  "line": 46,
+  "kind": "on screen",
+  "text": "No sessions yet."
+ },
+ "HIST-002": {
+  "file": "src/features/history/HistoryView.tsx",
+  "line": 47,
+  "kind": "on screen",
+  "text": "Everything you log shows up here, newest first."
+ },
+ "HIST-003": {
+  "file": "src/features/history/HistoryView.tsx",
+  "line": 67,
+  "kind": "on screen",
+  "text": "Load more"
+ },
+ "PROG-001": {
+  "file": "src/features/progress/PrSheet.tsx",
+  "line": 25,
+  "kind": "label",
+  "text": "Estimated 1RM"
+ },
+ "PROG-002": {
+  "file": "src/features/progress/PrSheet.tsx",
+  "line": 27,
+  "kind": "note",
+  "text": "Calculated from the heaviest set you completed, not a single you actually lifted."
+ },
+ "PROG-003": {
+  "file": "src/features/progress/PrSheet.tsx",
+  "line": 35,
+  "kind": "label",
+  "text": "Relative strength"
+ },
+ "PROG-004": {
+  "file": "src/features/progress/PrSheet.tsx",
+  "line": 37,
+  "kind": "note",
+  "text": "Against what you weighed that day, so it stays honest across a bulk or a cut."
+ },
+ "PROG-005": {
+  "file": "src/features/progress/PrSheet.tsx",
+  "line": 42,
+  "kind": "label",
+  "text": "Most reps in a set"
+ },
+ "PROG-006": {
+  "file": "src/features/progress/PrSheet.tsx",
+  "line": 48,
+  "kind": "label",
+  "text": "Most rounds"
+ },
+ "PROG-007": {
+  "file": "src/features/progress/PrSheet.tsx",
+  "line": 52,
+  "kind": "note",
+  "text": "Only comparable against the same window — 9 rounds in 20 minutes is not a better score than 7 in 12."
+ },
+ "PROG-008": {
+  "file": "src/features/progress/PrSheet.tsx",
+  "line": 57,
+  "kind": "label",
+  "text": "Longest hold"
+ },
+ "PROG-009": {
+  "file": "src/features/progress/PrSheet.tsx",
+  "line": 71,
+  "kind": "label",
+  "text": "Fastest pace"
+ },
+ "PROG-010": {
+  "file": "src/features/progress/PrSheet.tsx",
+  "line": 73,
+  "kind": "note",
+  "text": "Over at least a kilometre."
+ },
+ "PROG-011": {
+  "file": "src/features/progress/PrSheet.tsx",
+  "line": 127,
+  "kind": "on screen",
+  "text": "Nothing recorded for this movement yet."
+ },
+ "PROG-012": {
+  "file": "src/features/progress/ProgressView.tsx",
+  "line": 100,
+  "kind": "on screen",
+  "text": "Nothing to chart yet."
+ },
+ "PROG-013": {
+  "file": "src/features/progress/ProgressView.tsx",
+  "line": 101,
+  "kind": "on screen",
+  "text": "Log a few sessions and this fills in — load, mileage, volume, and every personal best."
+ },
+ "PROG-014": {
+  "file": "src/features/progress/ProgressView.tsx",
+  "line": 130,
+  "kind": "on screen",
+  "text": "Training load"
+ },
+ "PROG-015": {
+  "file": "src/features/progress/ProgressView.tsx",
+  "line": 147,
+  "kind": "on screen",
+  "text": "Weekly distance"
+ },
+ "PROG-016": {
+  "file": "src/features/progress/ProgressView.tsx",
+  "line": 157,
+  "kind": "on screen",
+  "text": "Weekly volume"
+ },
+ "PROG-017": {
+  "file": "src/features/progress/ProgressView.tsx",
+  "line": 173,
+  "kind": "on screen",
+  "text": "Log your bodyweight"
+ },
+ "PROG-018": {
+  "file": "src/features/progress/ProgressView.tsx",
+  "line": 173,
+  "kind": "on screen",
+  "text": "and push-ups, pull-ups and lunges start counting toward volume instead of reading as no work."
+ },
+ "PROG-019": {
+  "file": "src/features/progress/ProgressView.tsx",
+  "line": 178,
+  "kind": "on screen",
+  "text": "Personal bests"
+ },
+ "PROG-020": {
+  "file": "src/features/progress/ProgressView.tsx",
+  "line": 179,
+  "kind": "on screen",
+  "text": "Complete some sets and PRs land here."
+ },
+ "MORE-001": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 24,
+  "kind": "label",
+  "text": "Pull-up bar"
+ },
+ "MORE-002": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 28,
+  "kind": "label",
+  "text": "Jump rope"
+ },
+ "MORE-003": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 36,
+  "kind": "label",
+  "text": "Push (forward)"
+ },
+ "MORE-004": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 37,
+  "kind": "label",
+  "text": "Push (overhead)"
+ },
+ "MORE-005": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 38,
+  "kind": "label",
+  "text": "Pull (row)"
+ },
+ "MORE-006": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 39,
+  "kind": "label",
+  "text": "Pull (chin)"
+ },
+ "MORE-007": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 42,
+  "kind": "label",
+  "text": "Full body"
+ },
+ "MORE-008": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 43,
+  "kind": "label",
+  "text": "Run / walk"
+ },
+ "MORE-009": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 47,
+  "kind": "blurb",
+  "text": "A loaded lift."
+ },
+ "MORE-010": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 47,
+  "kind": "label",
+  "text": "Weight & reps"
+ },
+ "MORE-011": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 48,
+  "kind": "blurb",
+  "text": "Bodyweight, counted."
+ },
+ "MORE-012": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 49,
+  "kind": "blurb",
+  "text": "A plank, a hang, a wall sit."
+ },
+ "MORE-013": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 49,
+  "kind": "label",
+  "text": "Time held"
+ },
+ "MORE-014": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 50,
+  "kind": "blurb",
+  "text": "A run, a row, a carry."
+ },
+ "MORE-015": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 50,
+  "kind": "label",
+  "text": "Distance & time"
+ },
+ "MORE-016": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 147,
+  "kind": "placeholder",
+  "text": "Bulgarian bag spin"
+ },
+ "MORE-017": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 148,
+  "kind": "aria-label",
+  "text": "Movement name"
+ },
+ "MORE-018": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 152,
+  "kind": "on screen",
+  "text": "What it needs"
+ },
+ "MORE-019": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 164,
+  "kind": "on screen",
+  "text": "Everything selected has to be in an equipment profile for this to be offered there."
+ },
+ "MORE-020": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 168,
+  "kind": "on screen",
+  "text": "How it moves"
+ },
+ "MORE-021": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 181,
+  "kind": "on screen",
+  "text": "What it records"
+ },
+ "MORE-022": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 198,
+  "kind": "on screen",
+  "text": "How hard"
+ },
+ "MORE-023": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 216,
+  "kind": "on screen",
+  "text": "Files as"
+ },
+ "MORE-024": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 220,
+  "kind": "on screen",
+  "text": "Worked out from the kit and the pattern, so filtering, suggestions and the injury log all understand it without being told separately."
+ },
+ "MORE-025": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 226,
+  "kind": "on screen",
+  "text": "What it trains"
+ },
+ "MORE-026": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 229,
+  "kind": "placeholder",
+  "text": "shoulders, core"
+ },
+ "MORE-027": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 230,
+  "kind": "aria-label",
+  "text": "Muscles trained"
+ },
+ "MORE-028": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 234,
+  "kind": "on screen",
+  "text": "Set up"
+ },
+ "MORE-029": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 238,
+  "kind": "placeholder",
+  "text": "Where you and the kit start. Optional."
+ },
+ "MORE-030": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 243,
+  "kind": "on screen",
+  "text": "How to do it"
+ },
+ "MORE-031": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 247,
+  "kind": "placeholder",
+  "text": "One cue per line, in the order they happen."
+ },
+ "MORE-032": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 252,
+  "kind": "on screen",
+  "text": "Watch for"
+ },
+ "MORE-033": {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 256,
+  "kind": "placeholder",
+  "text": "The one thing that usually goes wrong. Optional."
+ },
+ "MORE-034": {
+  "file": "src/features/more/AppearanceView.tsx",
+  "line": 21,
+  "kind": "on screen",
+  "text": "These are four different directions, not four palettes. Each one changes the shape of things, the type, and how tightly the screen is packed."
+ },
+ "MORE-035": {
+  "file": "src/features/more/AppearanceView.tsx",
+  "line": 73,
+  "kind": "on screen",
+  "text": "Nothing here touches your data — it is a display setting stored with your profile, so it travels in your backup."
+ },
+ "MORE-036": {
+  "file": "src/features/more/BodyView.tsx",
+  "line": 52,
+  "kind": "on screen",
+  "text": "This is the load in every push-up, pull-up and lunge you do. Without it those sets show as no work at all on your volume chart. Sessions are valued at what you weighed that week, so logging it today does not rewrite last spring."
+ },
+ "MORE-037": {
+  "file": "src/features/more/BodyView.tsx",
+  "line": 58,
+  "kind": "on screen",
+  "text": "Log today"
+ },
+ "MORE-038": {
+  "file": "src/features/more/BodyView.tsx",
+  "line": 112,
+  "kind": "on screen",
+  "text": "No weigh-ins yet."
+ },
+ "MORE-039": {
+  "file": "src/features/more/BodyView.tsx",
+  "line": 113,
+  "kind": "on screen",
+  "text": "Once a week is plenty. Daily readings mostly measure lunch."
+ },
+ "MORE-040": {
+  "file": "src/features/more/BodyView.tsx",
+  "line": 119,
+  "kind": "title",
+  "text": "Delete this weigh-in?"
+ },
+ "MORE-041": {
+  "file": "src/features/more/KnownMaxSheet.tsx",
+  "line": 106,
+  "kind": "on screen",
+  "text": "The lift"
+ },
+ "MORE-042": {
+  "file": "src/features/more/KnownMaxSheet.tsx",
+  "line": 128,
+  "kind": "on screen",
+  "text": "A single, a triple, whatever you know it as. One rep means you are giving a true max."
+ },
+ "MORE-043": {
+  "file": "src/features/more/KnownMaxSheet.tsx",
+  "line": 136,
+  "kind": "on screen",
+  "text": "Your best set"
+ },
+ "MORE-044": {
+  "file": "src/features/more/KnownMaxSheet.tsx",
+  "line": 147,
+  "kind": "on screen",
+  "text": "reps, unbroken"
+ },
+ "MORE-045": {
+  "file": "src/features/more/KnownMaxSheet.tsx",
+  "line": 149,
+  "kind": "on screen",
+  "text": "The most you can do in one set with good form, stopping when the form goes — not a total across a session."
+ },
+ "MORE-046": {
+  "file": "src/features/more/KnownMaxSheet.tsx",
+  "line": 158,
+  "kind": "on screen",
+  "text": "Your best hold"
+ },
+ "MORE-047": {
+  "file": "src/features/more/KnownMaxSheet.tsx",
+  "line": 171,
+  "kind": "on screen",
+  "text": "The longest you can hold the position before it breaks down."
+ },
+ "MORE-048": {
+  "file": "src/features/more/KnownMaxSheet.tsx",
+  "line": 185,
+  "kind": "on screen",
+  "text": "Dating it honestly matters — an old result is still used, and the app says when it is getting stale rather than quietly trusting it forever."
+ },
+ "MORE-049": {
+  "file": "src/features/more/KnownMaxSheet.tsx",
+  "line": 200,
+  "kind": "on screen",
+  "text": "Works out at"
+ },
+ "MORE-050": {
+  "file": "src/features/more/KnownMaxSheet.tsx",
+  "line": 202,
+  "kind": "on screen",
+  "text": "for one"
+ },
+ "MORE-051": {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 118,
+  "kind": "on screen",
+  "text": "+ New profile"
+ },
+ "MORE-052": {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 124,
+  "kind": "title",
+  "text": "New equipment profile"
+ },
+ "MORE-053": {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 126,
+  "kind": "placeholder",
+  "text": "Hotel gym"
+ },
+ "MORE-054": {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 164,
+  "kind": "on screen",
+  "text": "This is your only profile. Make another before deleting this one — the app has to know what you can train with."
+ },
+ "MORE-055": {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 204,
+  "kind": "on screen",
+  "text": "✎ Edit kit"
+ },
+ "MORE-056": {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 250,
+  "kind": "on screen",
+  "text": "Save kit"
+ },
+ "MORE-057": {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 265,
+  "kind": "on screen",
+  "text": "Biggest gaps"
+ },
+ "MORE-058": {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 267,
+  "kind": "on screen",
+  "text": "What one more piece of kit would unlock, on top of this profile."
+ },
+ "MORE-059": {
+  "file": "src/features/more/ImportSheet.tsx",
+  "line": 53,
+  "kind": "message",
+  "text": "That file could not be read. It may have been altered or truncated."
+ },
+ "MORE-060": {
+  "file": "src/features/more/ImportSheet.tsx",
+  "line": 93,
+  "kind": "message",
+  "text": "That import did not work."
+ },
+ "MORE-061": {
+  "file": "src/features/more/ImportSheet.tsx",
+  "line": 120,
+  "kind": "aria-label",
+  "text": "Choose a file"
+ },
+ "MORE-062": {
+  "file": "src/features/more/ImportSheet.tsx",
+  "line": 144,
+  "kind": "on screen",
+  "text": "What is in it"
+ },
+ "MORE-063": {
+  "file": "src/features/more/ImportSheet.tsx",
+  "line": 168,
+  "kind": "on screen",
+  "text": "They will be added so this works. Anything you already have is left alone."
+ },
+ "MORE-064": {
+  "file": "src/features/more/ImportSheet.tsx",
+  "line": 200,
+  "kind": "on screen",
+  "text": "Start it on"
+ },
+ "MORE-065": {
+  "file": "src/features/more/ImportSheet.tsx",
+  "line": 204,
+  "kind": "aria-label",
+  "text": "Plan start date"
+ },
+ "MORE-066": {
+  "file": "src/features/more/ImportSheet.tsx",
+  "line": 207,
+  "kind": "on screen",
+  "text": "Sessions are spaced the way the plan author laid them out, counted from this day. It comes in switched off — starting it is a separate choice."
+ },
+ "MORE-067": {
+  "file": "src/features/more/LibraryRow.tsx",
+  "line": 20,
+  "kind": "on screen",
+  "text": "void | Promise"
+ },
+ "MORE-068": {
+  "file": "src/features/more/LibraryRow.tsx",
+  "line": 47,
+  "kind": "on screen",
+  "text": "↗ Export / Share"
+ },
+ "MORE-069": {
+  "file": "src/features/more/LibraryRow.tsx",
+  "line": 51,
+  "kind": "on screen",
+  "text": "✎ Edit"
+ },
+ "MORE-070": {
+  "file": "src/features/more/InjurySheet.tsx",
+  "line": 70,
+  "kind": "title",
+  "text": "Log an injury"
+ },
+ "MORE-071": {
+  "file": "src/features/more/InjurySheet.tsx",
+  "line": 86,
+  "kind": "on screen",
+  "text": "What hurts"
+ },
+ "MORE-072": {
+  "file": "src/features/more/InjurySheet.tsx",
+  "line": 102,
+  "kind": "placeholder",
+  "text": "Left shoulder"
+ },
+ "MORE-073": {
+  "file": "src/features/more/InjurySheet.tsx",
+  "line": 103,
+  "kind": "aria-label",
+  "text": "What hurts, in your words"
+ },
+ "MORE-074": {
+  "file": "src/features/more/InjurySheet.tsx",
+  "line": 107,
+  "kind": "on screen",
+  "text": "How bad"
+ },
+ "MORE-075": {
+  "file": "src/features/more/InjurySheet.tsx",
+  "line": 123,
+  "kind": "on screen",
+  "text": "Rest until"
+ },
+ "MORE-076": {
+  "file": "src/features/more/InjurySheet.tsx",
+  "line": 137,
+  "kind": "on screen",
+  "text": "How it happened"
+ },
+ "MORE-077": {
+  "file": "src/features/more/InjurySheet.tsx",
+  "line": 140,
+  "kind": "placeholder",
+  "text": "Optional — third set of overhead press"
+ },
+ "MORE-078": {
+  "file": "src/features/more/InjurySheet.tsx",
+  "line": 164,
+  "kind": "on screen",
+  "text": "Skipped, not deleted — mark the injury healed early and you can take them back."
+ },
+ "MORE-079": {
+  "file": "src/features/more/ReshuffleSheet.tsx",
+  "line": 28,
+  "kind": "title",
+  "text": "Fit the plan to your week"
+ },
+ "MORE-080": {
+  "file": "src/features/more/ReshuffleSheet.tsx",
+  "line": 42,
+  "kind": "on screen",
+  "text": "Leave the plan alone"
+ },
+ "MORE-081": {
+  "file": "src/features/more/ReshuffleSheet.tsx",
+  "line": 48,
+  "kind": "on screen",
+  "text": "Your availability no longer matches where these sessions sit. Completed and skipped sessions are never touched, and nothing before today moves."
+ },
+ "MORE-082": {
+  "file": "src/features/more/ReshuffleSheet.tsx",
+  "line": 84,
+  "kind": "on screen",
+  "text": "Dropped sessions are removed from the plan, not from your history. Your adherence is measured against what remains."
+ },
+ "MORE-083": {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 74,
+  "kind": "on screen",
+  "text": "Training for"
+ },
+ "MORE-084": {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 76,
+  "kind": "on screen",
+  "text": "Orders the plan library, sets what ‘Suggest a workout’ opens on, and shapes the sets and reps in plans you start from here. Plans already on your calendar keep what they prescribed."
+ },
+ "MORE-085": {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 82,
+  "kind": "on screen",
+  "text": "Training max"
+ },
+ "MORE-086": {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 94,
+  "kind": "on screen",
+  "text": "Suggested loads are worked out from this share of your tested max, rather than from the max itself. Ninety per cent is the usual convention: a number computed from your best day is not makeable on an average one, and a programme you miss reps on is one you stop running. At 100% the suggestions come straight off your max."
+ },
+ "MORE-087": {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 106,
+  "kind": "on screen",
+  "text": "lb / miles"
+ },
+ "MORE-088": {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 112,
+  "kind": "on screen",
+  "text": "kg / km"
+ },
+ "MORE-089": {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 116,
+  "kind": "on screen",
+  "text": "Stored data does not change — this only affects how numbers are shown, so switching back and forth never rounds your history away."
+ },
+ "MORE-090": {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 121,
+  "kind": "on screen",
+  "text": "Week starts on"
+ },
+ "MORE-091": {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 134,
+  "kind": "on screen",
+  "text": "Effort per set"
+ },
+ "MORE-092": {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 139,
+  "kind": "on screen",
+  "text": "Once per session"
+ },
+ "MORE-093": {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 145,
+  "kind": "on screen",
+  "text": "Every set"
+ },
+ "MORE-094": {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 149,
+  "kind": "on screen",
+  "text": "Per-set effort is how autoregulated strength work picks its loads — a 9 on a triple you wanted at 8 means the next set comes down. It is worth the extra box on every row only if you act on it between sets. Training load uses the session figure either way."
+ },
+ "MORE-095": {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 155,
+  "kind": "on screen",
+  "text": "Weekly availability"
+ },
+ "MORE-096": {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 169,
+  "kind": "on screen",
+  "text": "See what would move"
+ },
+ "MORE-097": {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 182,
+  "kind": "on screen",
+  "text": "Which kinds of training each day can hold. Planning will respect this — a day with nothing selected is a rest day."
+ },
+ "MORE-098": {
+  "file": "src/features/more/TestsView.tsx",
+  "line": 83,
+  "kind": "on screen",
+  "text": "Nothing measured yet."
+ },
+ "MORE-099": {
+  "file": "src/features/more/TestsView.tsx",
+  "line": 84,
+  "kind": "on screen",
+  "text": "A test gives the app a real number to program from instead of a guess — and gives you something to beat."
+ },
+ "MORE-100": {
+  "file": "src/features/more/TestsView.tsx",
+  "line": 96,
+  "kind": "on screen",
+  "text": "Just tested"
+ },
+ "MORE-101": {
+  "file": "src/features/more/TestsView.tsx",
+  "line": 115,
+  "kind": "on screen",
+  "text": "Test it again"
+ },
+ "MORE-102": {
+  "file": "src/features/more/TestsView.tsx",
+  "line": 123,
+  "kind": "on screen",
+  "text": "Remove this result"
+ },
+ "MORE-103": {
+  "file": "src/features/more/TestsView.tsx",
+  "line": 136,
+  "kind": "on screen",
+  "text": "Test a movement"
+ },
+ "MORE-104": {
+  "file": "src/features/more/TestsView.tsx",
+  "line": 148,
+  "kind": "on screen",
+  "text": "Enter a max I already know"
+ },
+ "MORE-105": {
+  "file": "src/features/more/TestsView.tsx",
+  "line": 198,
+  "kind": "title",
+  "text": "Remove this result?"
+ },
+ "MORE-106": {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 52,
+  "kind": "message",
+  "text": "Could not read that file."
+ },
+ "MORE-107": {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 121,
+  "kind": "on screen",
+  "text": "Saved workouts"
+ },
+ "MORE-108": {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 171,
+  "kind": "on screen",
+  "text": "Your data"
+ },
+ "MORE-109": {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 173,
+  "kind": "on screen",
+  "text": "Everything lives in this browser on this device. Nothing is uploaded, and no account exists — which also means a cleared browser takes your history with it. Export regularly and keep the file somewhere that syncs."
+ },
+ "MORE-110": {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 186,
+  "kind": "on screen",
+  "text": "Export backup"
+ },
+ "MORE-111": {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 205,
+  "kind": "on screen",
+  "text": "Restore from backup"
+ },
+ "MORE-112": {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 213,
+  "kind": "on screen",
+  "text": "Start over"
+ },
+ "MORE-113": {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 214,
+  "kind": "on screen",
+  "text": "Erases every session, plan, and setting on this device and reseeds the movement library from scratch. Export a backup first if there is anything you want."
+ },
+ "MORE-114": {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 221,
+  "kind": "on screen",
+  "text": "Erase all data"
+ },
+ "MORE-115": {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 226,
+  "kind": "on screen",
+  "text": "Forge · offline training tracker"
+ },
+ "MORE-116": {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 231,
+  "kind": "title",
+  "text": "Restore backup"
+ },
+ "MORE-117": {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 233,
+  "kind": "on screen",
+  "text": ". Merging keeps what is already on this device and lets the newer copy of each record win — the right choice when you have trained since the export. Replacing wipes first, for moving to a new phone."
+ },
+ "MORE-118": {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 245,
+  "kind": "on screen",
+  "text": "Merge (recommended)"
+ },
+ "MORE-119": {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 255,
+  "kind": "on screen",
+  "text": "Replace everything"
+ },
+ "MORE-120": {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 266,
+  "kind": "label",
+  "text": "Type ERASE to confirm"
+ },
+ "MORE-121": {
+  "file": "src/features/more/InjuryView.tsx",
+  "line": 47,
+  "kind": "on screen",
+  "text": "Nothing logged."
+ },
+ "MORE-122": {
+  "file": "src/features/more/InjuryView.tsx",
+  "line": 48,
+  "kind": "on screen",
+  "text": "Log something that hurts and the sessions that load it step aside — the rest of your training carries on."
+ },
+ "MORE-123": {
+  "file": "src/features/more/InjuryView.tsx",
+  "line": 74,
+  "kind": "on screen",
+  "text": "Mark it healed"
+ },
+ "MORE-124": {
+  "file": "src/features/more/InjuryView.tsx",
+  "line": 98,
+  "kind": "on screen",
+  "text": "Remove from the log"
+ },
+ "MORE-125": {
+  "file": "src/features/more/InjuryView.tsx",
+  "line": 108,
+  "kind": "on screen",
+  "text": "Log an injury"
+ },
+ "MORE-126": {
+  "file": "src/features/more/InjuryView.tsx",
+  "line": 128,
+  "kind": "title",
+  "text": "Healed already?"
+ },
+ "MORE-127": {
+  "file": "src/features/more/InjuryView.tsx",
+  "line": 150,
+  "kind": "title",
+  "text": "Remove this from the log?"
+ },
+ "MORE-128": {
+  "file": "src/features/more/ExerciseLibraryView.tsx",
+  "line": 88,
+  "kind": "placeholder",
+  "text": "Search movements"
+ },
+ "MORE-129": {
+  "file": "src/features/more/ExerciseLibraryView.tsx",
+  "line": 117,
+  "kind": "on screen",
+  "text": "+ Add a movement"
+ },
+ "MORE-130": {
+  "file": "src/features/more/ExerciseLibraryView.tsx",
+  "line": 124,
+  "kind": "on screen",
+  "text": "Built in"
+ },
+ "MORE-131": {
+  "file": "src/features/more/RackEditor.tsx",
+  "line": 166,
+  "kind": "on screen",
+  "text": "+ Another size"
+ },
+ "MORE-132": {
+  "file": "src/features/more/RackEditor.tsx",
+  "line": 187,
+  "kind": "on screen",
+  "text": "Weights you own"
+ },
+ "MORE-133": {
+  "file": "src/features/more/RackEditor.tsx",
+  "line": 188,
+  "kind": "on screen",
+  "text": "Suggested loads, progressions and test ladders all snap to these. Leave a section empty and that movement falls back to round numbers."
+ },
+ "MORE-134": {
+  "file": "src/features/more/RackEditor.tsx",
+  "line": 204,
+  "kind": "on screen",
+  "text": "The bar"
+ },
+ "MORE-135": {
+  "file": "src/features/more/RackEditor.tsx",
+  "line": 221,
+  "kind": "on screen",
+  "text": "Plates, in pairs"
+ },
+ "MORE-136": {
+  "file": "src/features/more/PlansView.tsx",
+  "line": 74,
+  "kind": "on screen",
+  "text": "No plans of your own yet."
+ },
+ "MORE-137": {
+  "file": "src/features/more/PlansView.tsx",
+  "line": 75,
+  "kind": "on screen",
+  "text": "Lay out a week — which days you train and what you do on them — and it repeats for as long as you set it to."
+ },
+ "MORE-138": {
+  "file": "src/features/more/PlansView.tsx",
+  "line": 82,
+  "kind": "on screen",
+  "text": "+ Build a plan"
+ },
+ "MORE-139": {
+  "file": "src/features/more/PlansView.tsx",
+  "line": 86,
+  "kind": "on screen",
+  "text": "📥 Import a plan"
+ },
+ "MORE-140": {
+  "file": "src/features/more/SavedWorkoutsView.tsx",
+  "line": 48,
+  "kind": "title",
+  "text": "Saved workouts"
+ },
+ "MORE-141": {
+  "file": "src/features/more/SavedWorkoutsView.tsx",
+  "line": 80,
+  "kind": "on screen",
+  "text": "Nothing saved yet."
+ },
+ "MORE-142": {
+  "file": "src/features/more/SavedWorkoutsView.tsx",
+  "line": 81,
+  "kind": "on screen",
+  "text": "Name a workout you have built and it comes back here, ready to run again — and, if it is timed, with its own best to beat."
+ },
+ "MORE-143": {
+  "file": "src/features/more/SavedWorkoutsView.tsx",
+  "line": 88,
+  "kind": "on screen",
+  "text": "📥 Import a workout"
+ },
+ "SHARED-001": {
+  "file": "src/ui/AppProvider.tsx",
+  "line": 83,
+  "kind": "on screen",
+  "text": "Could not open your training data"
+ },
+ "SHARED-002": {
+  "file": "src/ui/AppProvider.tsx",
+  "line": 85,
+  "kind": "on screen",
+  "text": "Private browsing blocks local storage in some browsers. Try a normal window."
+ },
+ "SHARED-003": {
+  "file": "src/ui/AskSheet.tsx",
+  "line": 31,
+  "kind": "on screen",
+  "text": "void | Promise"
+ },
+ "SHARED-004": {
+  "file": "src/ui/SessionCard.tsx",
+  "line": 78,
+  "kind": "on screen",
+  "text": "In progress"
+ },
+ "LIB-001": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 71,
+  "kind": "name",
+  "text": "Full Body, 3× a week"
+ },
+ "LIB-002": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 73,
+  "kind": "description",
+  "text": "Three rotating full-body days. The best return per hour if you train three times a week, and the easiest plan to miss a day of without derailing."
+ },
+ "LIB-003": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 88,
+  "kind": "name",
+  "text": "Upper / Lower, 4× a week"
+ },
+ "LIB-004": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 90,
+  "kind": "description",
+  "text": "Two upper days and two lower days. More volume per muscle than full body without the six-day commitment of a full split."
+ },
+ "LIB-005": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 106,
+  "kind": "name",
+  "text": "Push / Pull / Legs, 6× a week"
+ },
+ "LIB-006": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 108,
+  "kind": "description",
+  "text": "The classic six-day split, run twice through. High volume and high commitment — it falls apart fast if you can only train four days."
+ },
+ "LIB-007": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 126,
+  "kind": "name",
+  "text": "Push / Pull / Legs, 3× a week"
+ },
+ "LIB-008": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 128,
+  "kind": "description",
+  "text": "The same split at a sustainable cadence — each day comes round once a week. A good landing spot when six days stops being realistic."
+ },
+ "LIB-009": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 143,
+  "kind": "name",
+  "text": "Bodyweight Only, 3× a week"
+ },
+ "LIB-010": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 145,
+  "kind": "description",
+  "text": "No equipment at all. Progress comes from the movement ladder — harder leverage and less assistance — rather than from adding load."
+ },
+ "LIB-011": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 160,
+  "kind": "name",
+  "text": "Kettlebell Only, 3× a week"
+ },
+ "LIB-012": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 162,
+  "kind": "description",
+  "text": "Built for one or two bells and a floor. Swings, get-ups, presses and carries, with a grip finisher on every day."
+ },
+ "LIB-013": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 179,
+  "kind": "name",
+  "text": "First 5K"
+ },
+ "LIB-014": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 181,
+  "kind": "description",
+  "text": "Nine weeks from not running to running five kilometres. Every run is easy — the only thing that increases is how long you go."
+ },
+ "LIB-015": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 198,
+  "kind": "name",
+  "text": "5K — Get Faster"
+ },
+ "LIB-016": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 200,
+  "kind": "description",
+  "text": "Eight weeks of speed work on top of an easy-running base. Assumes you can already run 5K without stopping."
+ },
+ "LIB-017": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 218,
+  "kind": "name",
+  "text": "Half Marathon"
+ },
+ "LIB-018": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 260,
+  "kind": "name",
+  "text": "Hybrid — Run & Lift"
+ },
+ "LIB-019": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 262,
+  "kind": "description",
+  "text": "Two full-body strength days and two runs a week, indefinitely. For staying strong and keeping a running base without training for anything in particular."
+ },
+ "LIB-020": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 278,
+  "kind": "name",
+  "text": "Obstacle Course Race"
+ },
+ "LIB-021": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 280,
+  "kind": "description",
+  "text": "Twelve weeks for obstacle racing. Hills and trail instead of track, grip work on every strength day, and burpees on tired legs — because that is when they actually happen."
+ },
+ "LIB-022": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 297,
+  "kind": "name",
+  "text": "Hybrid Fitness Race"
+ },
+ "LIB-023": {
+  "file": "src/data/seed/planTemplates.ts",
+  "line": 299,
+  "kind": "description",
+  "text": "Twelve weeks of compromised running — the thing that actually decides a hybrid fitness race. Strength, a race simulation, intervals, and one long run each week."
+ },
+ "LIB-024": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 16,
+  "kind": "notes",
+  "text": "Three seconds down, one second pause, three seconds up. Load without weight."
+ },
+ "LIB-025": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 76,
+  "kind": "notes",
+  "text": "Hold a doorframe or counter for balance, or sit back to a box."
+ },
+ "LIB-026": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 110,
+  "kind": "notes",
+  "text": "Hip snap, not a squat. The single best conditioning tool for one bell."
+ },
+ "LIB-027": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 183,
+  "kind": "notes",
+  "text": "Heels on towels or furniture sliders. Works on any smooth floor."
+ },
+ "LIB-028": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 224,
+  "kind": "notes",
+  "text": "A chair, couch, or bed step works as the rear-foot elevation."
+ },
+ "LIB-029": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 240,
+  "kind": "notes",
+  "text": "A hybrid-race staple. Tall box, over the top, alternating."
+ },
+ "LIB-030": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 259,
+  "kind": "notes",
+  "text": "Hands on a counter or stair. The regression that actually works."
+ },
+ "LIB-031": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 397,
+  "kind": "notes",
+  "text": "Brutal grip and shoulder-stability work with a light bell."
+ },
+ "LIB-032": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 426,
+  "kind": "notes",
+  "text": "A sturdy table is the no-equipment answer to horizontal pulling."
+ },
+ "LIB-033": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 494,
+  "kind": "notes",
+  "text": "Jump to the top, lower for five seconds. The fastest route to a first pull-up."
+ },
+ "LIB-034": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 526,
+  "kind": "notes",
+  "text": "Anchor a band overhead. The only vertical pull available with no bar."
+ },
+ "LIB-035": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 560,
+  "kind": "notes",
+  "text": "One bell only. The anti-lateral-flexion demand is the whole point."
+ },
+ "LIB-036": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 566,
+  "kind": "notes",
+  "text": "Grip work disguised as a carry. A light bell is plenty."
+ },
+ "LIB-037": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 573,
+  "kind": "notes",
+  "text": "A common obstacle-race carry. A five-gallon bucket of gravel is the honest rehearsal."
+ },
+ "LIB-038": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 583,
+  "kind": "notes",
+  "text": "The single best predictor of holding on to an obstacle."
+ },
+ "LIB-039": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 671,
+  "kind": "notes",
+  "text": "Five minutes of get-ups is a full-body session when you own one bell."
+ },
+ "LIB-040": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 679,
+  "kind": "notes",
+  "text": "The OCR tax. Every failed obstacle costs 30 of these."
+ },
+ "LIB-041": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 695,
+  "kind": "notes",
+  "text": "Burpee into a snatch. Miserable, and extremely effective with one bell."
+ },
+ "LIB-042": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 715,
+  "kind": "notes",
+  "text": "Clean, press, squat, row, swing without setting the bell down."
+ },
+ "LIB-043": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 722,
+  "kind": "notes",
+  "text": "As many rounds as possible inside a time cap."
+ },
+ "LIB-044": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 726,
+  "kind": "notes",
+  "text": "Every minute on the minute. The rest is whatever the minute leaves you."
+ },
+ "LIB-045": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 730,
+  "kind": "notes",
+  "text": "Fixed work, clock running. The score is the time."
+ },
+ "LIB-046": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 736,
+  "kind": "notes",
+  "text": "Conversational. Most of your weekly mileage belongs here."
+ },
+ "LIB-047": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 740,
+  "kind": "notes",
+  "text": "The single most important session in any distance plan."
+ },
+ "LIB-048": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 743,
+  "kind": "notes",
+  "text": "Comfortably hard, roughly one-hour race effort."
+ },
+ "LIB-049": {
+  "file": "src/data/seed/exercises.ts",
+  "line": 751,
+  "kind": "notes",
+  "text": "Where OCR fitness actually gets built — uneven ground and real vert."
+ },
+ "LIB-050": {
+  "file": "src/data/seed/equipment.ts",
+  "line": 63,
+  "kind": "label",
+  "text": "Free weights"
+ },
+ "LIB-051": {
+  "file": "src/data/seed/equipment.ts",
+  "line": 64,
+  "kind": "label",
+  "text": "Hanging & bars"
+ },
+ "LIB-052": {
+  "file": "src/data/seed/equipment.ts",
+  "line": 70,
+  "kind": "label",
+  "text": "Odd objects"
+ },
+ "LIB-053": {
+  "file": "src/data/seed/equipment.ts",
+  "line": 72,
+  "kind": "label",
+  "text": "Places to train"
+ },
+ "LIB-054": {
+  "file": "src/data/seed/equipment.ts",
+  "line": 83,
+  "kind": "name",
+  "text": "Bodyweight only"
+ },
+ "LIB-055": {
+  "file": "src/data/seed/equipment.ts",
+  "line": 88,
+  "kind": "name",
+  "text": "Road & bodyweight"
+ },
+ "LIB-056": {
+  "file": "src/data/seed/equipment.ts",
+  "line": 93,
+  "kind": "name",
+  "text": "Home — kettlebells"
+ },
+ "LIB-057": {
+  "file": "src/data/seed/equipment.ts",
+  "line": 99,
+  "kind": "name",
+  "text": "Full gym"
+ },
+ "WORDS-001": {
+  "file": "src/data/customPlans.ts",
+  "line": 165,
+  "kind": "name",
+  "text": "Suggested session"
+ },
+ "WORDS-002": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 22,
+  "kind": "label",
+  "text": "Known max"
+ },
+ "WORDS-003": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 23,
+  "kind": "blurb",
+  "text": "A max you already knew, entered by hand."
+ },
+ "WORDS-004": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 26,
+  "kind": "protocol",
+  "text": "Whatever you lifted it for, and whenever. Treated exactly like a tested max until you test it, and it ages the same way."
+ },
+ "WORDS-005": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 29,
+  "kind": "label",
+  "text": "Max reps"
+ },
+ "WORDS-006": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 30,
+  "kind": "blurb",
+  "text": "One set to technical failure."
+ },
+ "WORDS-007": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 33,
+  "kind": "protocol",
+  "text": "Warm up, then one set for as many reps as you can hold form for. Stop when depth, alignment or tempo goes — not when the muscle gives out. Those are different numbers, and only the first one is comparable next time."
+ },
+ "WORDS-008": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 36,
+  "kind": "label",
+  "text": "3 rep max"
+ },
+ "WORDS-009": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 37,
+  "kind": "blurb",
+  "text": "Work up in threes to the heaviest you can hold form for."
+ },
+ "WORDS-010": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 40,
+  "kind": "protocol",
+  "text": "Two warm-up sets, then up to five attempts of three, resting two to four minutes between them. It stops at five: past that you are measuring how tired you are rather than how strong."
+ },
+ "WORDS-011": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 43,
+  "kind": "label",
+  "text": "Max hold"
+ },
+ "WORDS-012": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 44,
+  "kind": "blurb",
+  "text": "One hold to form failure."
+ },
+ "WORDS-013": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 47,
+  "kind": "protocol",
+  "text": "Warm up briefly, then hold for as long as the position stays honest. The clock stops when the shape goes, not when it hurts."
+ },
+ "WORDS-014": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 160,
+  "kind": "label",
+  "text": "Easy set"
+ },
+ "WORDS-015": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 163,
+  "kind": "note",
+  "text": "Well short of failure. Enough to be warm, not enough to cost you reps."
+ },
+ "WORDS-016": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 169,
+  "kind": "note",
+  "text": "Stop at technical failure — when depth, alignment or tempo goes, not when it burns."
+ },
+ "WORDS-017": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 178,
+  "kind": "label",
+  "text": "Short hold"
+ },
+ "WORDS-018": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 181,
+  "kind": "note",
+  "text": "Find the position. Nowhere near failure."
+ },
+ "WORDS-019": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 187,
+  "kind": "note",
+  "text": "Hold while the shape stays honest. The clock stops when the position goes."
+ },
+ "WORDS-020": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 198,
+  "kind": "label",
+  "text": "Warm-up 1"
+ },
+ "WORDS-021": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 202,
+  "kind": "note",
+  "text": "Light. Moving well is the only goal."
+ },
+ "WORDS-022": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 206,
+  "kind": "label",
+  "text": "Warm-up 2"
+ },
+ "WORDS-023": {
+  "file": "src/domain/fitnessTests.ts",
+  "line": 210,
+  "kind": "note",
+  "text": "Getting heavy, still comfortable."
+ },
+ "WORDS-024": {
+  "file": "src/domain/generator.ts",
+  "line": 24,
+  "kind": "label",
+  "text": "Build strength"
+ },
+ "WORDS-025": {
+  "file": "src/domain/generator.ts",
+  "line": 25,
+  "kind": "blurb",
+  "text": "Heavy, low reps, long rest. Or a harder variation when there is nothing to load."
+ },
+ "WORDS-026": {
+  "file": "src/domain/generator.ts",
+  "line": 33,
+  "kind": "label",
+  "text": "Build muscle"
+ },
+ "WORDS-027": {
+  "file": "src/domain/generator.ts",
+  "line": 34,
+  "kind": "blurb",
+  "text": "Moderate load, moderate reps, enough rest to repeat it. A rep or two left in the tank."
+ },
+ "WORDS-028": {
+  "file": "src/domain/generator.ts",
+  "line": 42,
+  "kind": "label",
+  "text": "Build endurance"
+ },
+ "WORDS-029": {
+  "file": "src/domain/generator.ts",
+  "line": 43,
+  "kind": "blurb",
+  "text": "Lighter, higher reps, short rest. The point is to keep going."
+ },
+ "WORDS-030": {
+  "file": "src/domain/goals.ts",
+  "line": 26,
+  "kind": "label",
+  "text": "Get stronger"
+ },
+ "WORDS-031": {
+  "file": "src/domain/goals.ts",
+  "line": 28,
+  "kind": "blurb",
+  "text": "Heavy, low reps, long rest."
+ },
+ "WORDS-032": {
+  "file": "src/domain/goals.ts",
+  "line": 34,
+  "kind": "label",
+  "text": "Build muscle"
+ },
+ "WORDS-033": {
+  "file": "src/domain/goals.ts",
+  "line": 36,
+  "kind": "blurb",
+  "text": "Moderate loads and rep ranges, with enough rest to repeat them."
+ },
+ "WORDS-034": {
+  "file": "src/domain/goals.ts",
+  "line": 42,
+  "kind": "label",
+  "text": "Build endurance"
+ },
+ "WORDS-035": {
+  "file": "src/domain/goals.ts",
+  "line": 44,
+  "kind": "blurb",
+  "text": "Lighter, higher reps, short rest, and more time on your feet."
+ },
+ "WORDS-036": {
+  "file": "src/domain/goals.ts",
+  "line": 50,
+  "kind": "label",
+  "text": "Lose fat"
+ },
+ "WORDS-037": {
+  "file": "src/domain/goals.ts",
+  "line": 52,
+  "kind": "blurb",
+  "text": "Heavy lifting kept intact, with conditioning added around it."
+ },
+ "WORDS-038": {
+  "file": "src/domain/goals.ts",
+  "line": 56,
+  "kind": "note",
+  "text": "The lifting stays heavy on purpose — load is what protects muscle while you are losing weight, and light high-rep circuits give that up for nothing. The conditioning and the eating do the fat loss."
+ },
+ "WORDS-039": {
+  "file": "src/domain/goals.ts",
+  "line": 59,
+  "kind": "label",
+  "text": "General fitness"
+ },
+ "WORDS-040": {
+  "file": "src/domain/goals.ts",
+  "line": 61,
+  "kind": "blurb",
+  "text": "No particular bias. Plans and suggestions are left as written."
+ },
+ "WORDS-041": {
+  "file": "src/domain/injuries.ts",
+  "line": 21,
+  "kind": "blurb",
+  "text": "Noticeable, but it does not stop you."
+ },
+ "WORDS-042": {
+  "file": "src/domain/injuries.ts",
+  "line": 26,
+  "kind": "blurb",
+  "text": "It limits what you can do with the area."
+ },
+ "WORDS-043": {
+  "file": "src/domain/injuries.ts",
+  "line": 30,
+  "kind": "label",
+  "text": "Cannot use it"
+ },
+ "WORDS-044": {
+  "file": "src/domain/injuries.ts",
+  "line": 31,
+  "kind": "blurb",
+  "text": "Training this area is off the table for now."
+ },
+ "WORDS-045": {
+  "file": "src/data/plans.ts",
+  "line": 148,
+  "kind": "name",
+  "text": "Benchmark tests"
+ },
+ "WORDS-046": {
+  "file": "src/data/plans.ts",
+  "line": 161,
+  "kind": "notes",
+  "text": "Run this from Tests so the protocol is the same both times."
+ },
+ "WORDS-047": {
+  "file": "src/domain/scheduling.ts",
+  "line": 120,
+  "kind": "reason",
+  "text": "That day has already passed this week"
+ },
+ "WORDS-048": {
+  "file": "src/domain/scheduling.ts",
+  "line": 137,
+  "kind": "reason",
+  "text": "No available days this week"
+ }
+}
