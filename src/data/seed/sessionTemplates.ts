@@ -387,7 +387,7 @@ export const SEED_SESSION_TEMPLATES: SeedSessionTemplate[] = [
     steady({ ex: 'trail-run', distanceM: 8000, rpe: 5 }),
   ], 'Uneven ground and real climbing — where OCR fitness actually gets built.'),
 
-  // --- hybrid, OCR and Hyrox ----------------------------------------------
+  // --- hybrid and obstacle racing -----------------------------------------
   tpl('ocr-grip-finisher', 'Grip & Hang Finisher', ['strength', 'skill'], 15, [
     circuit(
       3,
@@ -419,7 +419,7 @@ export const SEED_SESSION_TEMPLATES: SeedSessionTemplate[] = [
     ),
   ], 'Obstacles come at mile eight, not mile zero. This rehearses that.'),
 
-  tpl('hyrox-sim', 'Hyrox Simulation', ['cardio', 'strength'], 70, [
+  tpl('hybrid-race-sim', 'Race Simulation', ['cardio', 'strength'], 70, [
     intervals(
       4,
       [
@@ -433,7 +433,7 @@ export const SEED_SESSION_TEMPLATES: SeedSessionTemplate[] = [
     ),
   ], 'Run a kilometre, hit a station, repeat. The compromised running is the whole event.'),
 
-  tpl('hyrox-strength', 'Hyrox Strength', ['strength'], 50, [
+  tpl('hybrid-race-strength', 'Race Strength', ['strength'], 50, [
     straight([{ ex: 'back-squat', sets: 4, reps: [6, 8], rpe: 8, restSec: 150 }], 'Main'),
     circuit(
       4,

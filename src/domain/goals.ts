@@ -131,7 +131,7 @@ export function goalSpec(goal: PrimaryGoal | undefined): PrimaryGoalSpec {
  */
 export function acceptsExtraConditioning(templateGoal: GoalKind, tags: string[] = []): boolean {
   if (templateGoal === 'race') return false;
-  return !tags.includes('hyrox') && !tags.includes('ocr');
+  return !tags.includes('hybridRace') && !tags.includes('ocr');
 }
 
 /** How many conditioning sessions a week should gain, given the goal and the plan. */

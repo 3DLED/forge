@@ -151,8 +151,8 @@ describe('the goal shaping a week', () => {
   });
 
   it('leaves a hybrid-race plan alone too', () => {
-    const without = build(plan('strength', ['hyrox']), 'strength');
-    const with_ = build(plan('strength', ['hyrox']), 'fatLoss');
+    const without = build(plan('strength', ['hybridRace']), 'strength');
+    const with_ = build(plan('strength', ['hybridRace']), 'fatLoss');
 
     expect(with_.sessions).toHaveLength(without.sessions.length);
   });

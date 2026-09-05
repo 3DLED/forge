@@ -12,6 +12,8 @@ import BodyView from './features/more/BodyView';
 import InjuryView from './features/more/InjuryView';
 import TestsView from './features/more/TestsView';
 import ExerciseLibraryView from './features/more/ExerciseLibraryView';
+import PlansView from './features/more/PlansView';
+import SavedWorkoutsView from './features/more/SavedWorkoutsView';
 
 const TABS = [
   { to: '/today', glyph: '🔥', label: 'Today' },
@@ -37,6 +39,8 @@ export default function App() {
           <Route path="/more/injuries" element={<InjuryView />} />
           <Route path="/more/tests" element={<TestsView />} />
           <Route path="/more/movements" element={<ExerciseLibraryView />} />
+          <Route path="/more/plans" element={<PlansView />} />
+          <Route path="/more/workouts" element={<SavedWorkoutsView />} />
           <Route path="/more/equipment" element={<EquipmentView />} />
           <Route path="/more/settings" element={<SettingsView />} />
           <Route path="/more/appearance" element={<AppearanceView />} />

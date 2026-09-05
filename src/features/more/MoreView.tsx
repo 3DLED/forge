@@ -12,6 +12,8 @@ import { db } from '../../db/db';
 import { displayWeight, weightLabel } from '../../domain/units';
 import { allInjuries } from '../../data/injuries';
 import { allTestResults } from '../../data/fitnessTests';
+import { allCustomPlans } from '../../data/customPlans';
+import { savedWorkouts } from '../../data/namedWorkouts';
 import { testTiming } from '../../domain/fitnessTests';
 import { activeInjuries } from '../../domain/injuries';
 import { todayKey } from '../../domain/dates';
@@ -22,7 +24,11 @@ export default function MoreView() {
   const [status, setStatus] = useState<string | null>(null);
   const today = todayKey();
   const customCount = exercises.filter((exercise) => exercise.isCustom).length;
-  const injuries = useLiveQuery(() => allInjuries(), []);
+
+  const customPlans = useLiveQuery(() => allCustomPlans(), []);
+  const planCount = customPlans?.length ?? 0;
+  const workouts = useLiveQuery(() => savedWorkouts(), []);
+  const workoutCount = workouts?.length ?? 0;  const injuries = useLiveQuery(() => allInjuries(), []);
   const currentInjuries = activeInjuries(injuries ?? [], today);
   const testResults = useLiveQuery(() => allTestResults(), []);
   const dueTests = [...new Set((testResults ?? []).map((r) => r.exerciseSlug))].filter(
@@ -92,6 +98,32 @@ export default function MoreView() {
             {customCount > 0
               ? `${plural(exercises.length, 'movement')}, ${customCount} of them yours`
               : `${plural(exercises.length, 'movement')} — add your own`}
+          </span>
+        </span>
+        <span className="faint">›</span>
+      </Link>
+
+      <Link to="/more/plans" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">
+          <strong>Plans</strong>
+          <br />
+          <span className="tiny faint">
+            {planCount > 0
+              ? `${plural(planCount, 'plan')} of your own — build, share, import`
+              : 'Build your own week, or open a plan someone sent'}
+          </span>
+        </span>
+        <span className="faint">›</span>
+      </Link>
+
+      <Link to="/more/workouts" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">
+          <strong>Saved workouts</strong>
+          <br />
+          <span className="tiny faint">
+            {workoutCount > 0
+              ? `${plural(workoutCount, 'workout')} — share, import, tidy up`
+              : 'Workouts you have named come back here'}
           </span>
         </span>
         <span className="faint">›</span>

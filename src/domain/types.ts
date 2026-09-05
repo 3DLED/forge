@@ -521,7 +521,7 @@ export type GoalKind = 'race' | 'strength' | 'physique' | 'general';
 
 export interface Goal {
   kind: GoalKind;
-  /** "5k", "marathon", "hyrox", "spartan-beast", "back-squat-315" — free-form. */
+  /** "5k", "marathon", "hybrid race", "back-squat-315" — free-form. */
   label: string;
   eventDate?: DayKey;
   targetMetric?: { metric: MetricKey; value: number; exerciseSlug?: string };

@@ -34,12 +34,12 @@ const GROUPS: { label: string; blurb: string; match: (t: SeedPlanTemplate) => bo
   {
     label: 'Race training',
     blurb: 'Set a race date and the plan counts backwards to it.',
-    match: (t) => t.goal === 'race' && !t.tags.includes('hyrox') && !t.tags.includes('ocr'),
+    match: (t) => t.goal === 'race' && !t.tags.includes('hybridRace') && !t.tags.includes('ocr'),
   },
   {
     label: 'Obstacle & hybrid racing',
     blurb: 'Running and strength in one plan, with grip work that matters on a rig.',
-    match: (t) => t.tags.includes('ocr') || t.tags.includes('hyrox'),
+    match: (t) => t.tags.includes('ocr') || t.tags.includes('hybridRace'),
   },
   {
     label: 'Strength & muscle',
@@ -68,7 +68,7 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
   /** On the calendar but not being followed — imported, or set aside for another. */
   const waiting = (everyPlan ?? []).filter((item) => !item.isActive);
 
-  // First match wins. A Hyrox plan is tagged both 'hybrid' and 'hyrox', and listing it under
+  // First match wins. A hybrid race plan carries both 'hybrid' and 'hybridRace', and listing
   // two headings makes the catalogue look longer than it is and the groups look arbitrary.
   // Must stay above the early return below — hooks cannot sit behind a conditional.
   const grouped = useMemo(() => {

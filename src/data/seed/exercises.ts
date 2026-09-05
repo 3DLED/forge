@@ -252,7 +252,7 @@ const LIBRARY: SeedExercise[] = [
   }),
   ex('box-step-over', 'Box Step-Over', 'lunge', ['box'], {
     unilateral: true,
-    notes: 'Hyrox staple. Tall box, over the top, alternating.',
+    notes: 'A hybrid-race staple. Tall box, over the top, alternating.',
   }),
   ex('lateral-lunge', 'Lateral Lunge', 'lunge', ['bodyweight'], {
     unilateral: true,
@@ -565,7 +565,7 @@ const LIBRARY: SeedExercise[] = [
   }),
 
   // -------------------------------------------------------------------------
-  // Carry and grip — the OCR and Hyrox backbone
+  // Carry and grip — the backbone of obstacle and hybrid racing
   // -------------------------------------------------------------------------
   ex('farmers-carry', "Farmer's Carry", 'carry', ['kettlebell'], {
     subs: ['db-farmers-carry', 'bucket-carry'],
@@ -590,7 +590,7 @@ const LIBRARY: SeedExercise[] = [
   }),
   ex('bucket-carry', 'Bucket Carry', 'carry', ['sandbag'], {
     subs: ['farmers-carry'],
-    notes: 'Spartan obstacle. A five-gallon bucket of gravel is the honest rehearsal.',
+    notes: 'A common obstacle-race carry. A five-gallon bucket of gravel is the honest rehearsal.',
   }),
   ex('sled-push', 'Sled Push', 'carry', ['sled'], { subs: ['hill-sprint'] }),
   ex('sled-pull', 'Sled Pull', 'carry', ['sled'], { subs: ['band-row'] }),

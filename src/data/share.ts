@@ -22,9 +22,12 @@
 import { db } from '../db/db';
 import { exerciseRepo, planRepo, plannedSessionRepo, templateRepo } from './repos';
 import { ulid } from '../domain/ids';
+import { translateCustomPlan } from './customPlans';
+import { ONGOING_PLAN_WEEKS, generatePlan } from '../domain/planning';
 import { addDays, daysBetween, todayKey } from '../domain/dates';
 import type {
   Block,
+  CustomPlan,
   DayKey,
   Exercise,
   Goal,
@@ -33,6 +36,7 @@ import type {
   Plan,
   Prescription,
   SessionTemplate,
+  Weekday,
 } from '../domain/types';
 
 export const SHARE_FORMAT = 1;
@@ -110,7 +114,7 @@ function freshBlocks(blocks: Block[]): Block[] {
 /**
  * A goal with the personal parts taken out.
  *
- * A race date is yours, not the plan's — sharing a Hyrox block should not tell everyone when
+ * A race date is yours, not the plan's — sharing a race block should not tell everyone when
  * you are racing, and it should certainly not schedule their training around your event.
  */
 function stripGoal(goal: Goal): Goal {
@@ -169,6 +173,62 @@ export async function buildPlanFile(plan: Plan): Promise<ShareFile> {
       notes: plan.notes,
     },
     exercises: await customExercisesFor(blocks),
+  };
+}
+
+/**
+ * A plan you built, as a file, without ever putting it on a calendar.
+ *
+ * A custom plan is a week and a repeat count; the share format is a run of sessions at day
+ * offsets. Rather than inventing a second format for the same idea, the week is laid out onto
+ * a notional start date by the ordinary generator and the resulting dates are converted back
+ * into offsets. One format, and the ramps and deloads come out already applied.
+ *
+ * The start date is arbitrary and never travels — a Sunday is chosen so weekday offsets read
+ * naturally — and the exercise library is deliberately left empty, so movements are written
+ * out as the plan named them rather than substituted for whatever this device happens to own.
+ * Substitution is the importer's business, against their kit.
+ */
+export async function buildCustomPlanFile(plan: CustomPlan): Promise<ShareFile> {
+  const { template, sessionTemplateBySlug } = translateCustomPlan(plan);
+  const start = '2026-01-04'; // a Sunday
+
+  const generated = generatePlan({
+    template,
+    startDate: start,
+    weeks: plan.weeks ?? ONGOING_PLAN_WEEKS,
+    availability: Array.from({ length: 7 }, (_, weekday) => ({
+      weekday: weekday as Weekday,
+      allowedModalities: ['strength', 'cardio', 'mobility', 'skill'],
+    })),
+    exceptions: [],
+    weekStartsOn: 0,
+    exerciseBySlug: new Map(),
+    available: new Set(),
+    sessionTemplateBySlug,
+  });
+
+  const sessions: SharedPlanSession[] = generated.sessions.map((session) => ({
+    dayOffset: daysBetween(start, session.date),
+    prescription: { ...session.prescription, sourceTemplateId: undefined },
+  }));
+
+  return {
+    format: SHARE_FORMAT,
+    app: 'forge',
+    kind: 'plan',
+    exportedAt: new Date().toISOString(),
+    plan: {
+      name: plan.name,
+      goal: stripGoal({ kind: plan.goal, label: plan.name }),
+      daysPerWeek: template.daysPerWeek,
+      weeks: generated.weeks,
+      sessions,
+      notes: plan.notes,
+    },
+    exercises: await customExercisesFor(
+      generated.sessions.flatMap((session) => session.prescription.blocks),
+    ),
   };
 }
 

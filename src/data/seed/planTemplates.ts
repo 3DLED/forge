@@ -292,14 +292,14 @@ export const SEED_PLAN_TEMPLATES: SeedPlanTemplate[] = [
     deloadFactor: 0.65,
   },
   {
-    slug: 'spartan-ocr',
-    name: 'Spartan / OCR',
+    slug: 'ocr-race',
+    name: 'Obstacle Course Race',
     description:
       'Twelve weeks for obstacle racing. Hills and trail instead of track, grip work on every strength day, and burpees on tired legs — because that is when they actually happen.',
     goal: 'race',
     weeks: 12,
     daysPerWeek: 4,
-    tags: ['ocr', 'spartan', 'hybrid', 'grip'],
+    tags: ['ocr', 'hybrid', 'grip'],
     slots: [
       slot('kettlebell-full-body', 'strength', 1),
       slot('run-hills', 'cardio', 2),
@@ -311,18 +311,18 @@ export const SEED_PLAN_TEMPLATES: SeedPlanTemplate[] = [
     taperWeeks: 2,
   },
   {
-    slug: 'hyrox-prep',
-    name: 'Hyrox Prep',
+    slug: 'hybrid-race',
+    name: 'Hybrid Fitness Race',
     description:
-      'Twelve weeks of compromised running — the thing that actually decides a Hyrox. Strength, a race simulation, intervals, and one long run each week.',
+      'Twelve weeks of compromised running — the thing that actually decides a hybrid fitness race. Strength, a race simulation, intervals, and one long run each week.',
     goal: 'race',
     weeks: 12,
     daysPerWeek: 4,
-    tags: ['hyrox', 'hybrid', 'race'],
+    tags: ['hybridRace', 'hybrid', 'race'],
     slots: [
-      slot('hyrox-strength', 'strength', 1),
+      slot('hybrid-race-strength', 'strength', 1),
       slot('run-intervals', 'cardio', 2),
-      slot('hyrox-sim', 'cardio', 3),
+      slot('hybrid-race-sim', 'cardio', 3),
       slot('run-long', 'cardio', 4, longRun('long-run', 8, 16)),
     ],
     deloadEvery: 4,

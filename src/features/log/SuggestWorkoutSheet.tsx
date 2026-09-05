@@ -16,7 +16,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import Sheet from '../../ui/Sheet';
 import { useApp } from '../../ui/AppProvider';
 import { exerciseUsage } from '../../data/sessions';
-import { deleteSavedWorkout, isTimedWorkout, savedWorkouts } from '../../data/namedWorkouts';
+import { isTimedWorkout, savedWorkouts } from '../../data/namedWorkouts';
 import SavedWorkoutRow from './SavedWorkoutRow';
 import VariationSheet from './VariationSheet';
 import { formatClock } from '../../domain/units';
@@ -194,7 +194,6 @@ export default function SuggestWorkoutSheet({
                 (template.estimatedMinutes ? ` · about ${template.estimatedMinutes} min` : '')
               }
               onUse={() => onUseSaved(template)}
-              onDelete={() => deleteSavedWorkout(template.id)}
             />
           ))}
           <div className="section-title">Or build a new one</div>

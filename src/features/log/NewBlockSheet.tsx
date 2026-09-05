@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import Sheet from '../../ui/Sheet';
 import { formatClock } from '../../domain/units';
-import { deleteSavedWorkout, isTimedWorkout, savedWorkouts } from '../../data/namedWorkouts';
+import { isTimedWorkout, savedWorkouts } from '../../data/namedWorkouts';
 import SavedWorkoutRow from './SavedWorkoutRow';
 import { plural } from '../../ui/text';
 import type { LoggedBlock, LoggedBlockStyle, SessionTemplate } from '../../domain/types';
@@ -96,7 +96,6 @@ export default function NewBlockSheet({
               template={template}
               subtitle={`${plural(template.blocks[0]?.items.length ?? 0, 'movement')} · run it again`}
               onUse={() => onPickSaved(template)}
-              onDelete={() => deleteSavedWorkout(template.id)}
             />
           ))}
           <div className="section-title">Or build a new one</div>

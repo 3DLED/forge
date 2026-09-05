@@ -1,44 +1,24 @@
 /**
- * One saved workout in a list: use it, or get rid of it.
+ * One saved workout in a list you are picking from.
  *
- * Deleting asks twice rather than opening a confirmation sheet. These rows already live
- * inside a sheet, and a sheet on top of a sheet is both awkward to render and a lot of
- * ceremony for removing a workout you saved by accident. The second tap has to be deliberate:
- * the button changes what it says, and it disarms itself after a few seconds so a stray tap
- * cannot sit there waiting to be completed later.
+ * One button, deliberately. This list is answered in a gym, part-way through a session, and
+ * the only question it asks is which of these am I doing now. Sharing and deleting used to sit
+ * beside Use as an arrow and a cross — three targets inside a thumb's width, where the one you
+ * hit by accident was the delete. They live in More → Saved workouts now, which is where you
+ * are when you are managing a library rather than using it.
  */
 
-import { useEffect, useState } from 'react';
 import type { SessionTemplate } from '../../domain/types';
-
-/** Long enough to read the button and decide; short enough not to stay armed. */
-const DISARM_MS = 6000;
 
 export default function SavedWorkoutRow({
   template,
   subtitle,
   onUse,
-  onShare,
-  onDelete,
 }: {
   template: SessionTemplate;
   subtitle: string;
   onUse: () => void | Promise<void>;
-  /**
-   * Offered where you are browsing your own library, and left off where you are picking a
-   * workout to run — mid-session is not the moment to be handing files to people.
-   */
-  onShare?: () => void | Promise<void>;
-  onDelete: () => void | Promise<void>;
 }) {
-  const [armed, setArmed] = useState(false);
-
-  useEffect(() => {
-    if (!armed) return;
-    const timer = setTimeout(() => setArmed(false), DISARM_MS);
-    return () => clearTimeout(timer);
-  }, [armed]);
-
   return (
     <div className="suggest-row">
       <span className="grow">
@@ -47,31 +27,8 @@ export default function SavedWorkoutRow({
         <span className="tiny faint">{subtitle}</span>
       </span>
 
-      <button className="btn sm" onClick={() => void onUse()}>
+      <button className="btn sm primary" onClick={() => void onUse()}>
         Use
-      </button>
-
-      {onShare && (
-        <button
-          className="btn ghost sm"
-          aria-label={`Share ${template.name}`}
-          onClick={() => void onShare()}
-        >
-          ↗
-        </button>
-      )}
-
-      <button
-        className={`btn ghost sm danger${armed ? ' on' : ''}`}
-        onClick={() => {
-          if (!armed) {
-            setArmed(true);
-            return;
-          }
-          void onDelete();
-        }}
-      >
-        {armed ? 'Delete?' : '✕'}
       </button>
     </div>
   );

@@ -54,7 +54,7 @@ describe('acceptsExtraConditioning', () => {
   });
 
   it('refuses hybrid-race plans, however they are tagged', () => {
-    expect(acceptsExtraConditioning('general', ['hyrox'])).toBe(false);
+    expect(acceptsExtraConditioning('general', ['hybridRace'])).toBe(false);
     expect(acceptsExtraConditioning('strength', ['ocr'])).toBe(false);
   });
 
@@ -72,7 +72,7 @@ describe('extraConditioningFor', () => {
 
   it('adds nothing to a race plan even when the goal asks', () => {
     expect(extraConditioningFor('fatLoss', 'race')).toBe(0);
-    expect(extraConditioningFor('endurance', 'general', ['hyrox'])).toBe(0);
+    expect(extraConditioningFor('endurance', 'general', ['hybridRace'])).toBe(0);
   });
 
   it('adds nothing when the goal does not ask', () => {
