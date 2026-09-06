@@ -28,6 +28,7 @@ import type {
   Id,
   Instant,
   LoggedSession,
+  CustomEquipment,
   CustomPlan,
   Plan,
   PlannedSession,
@@ -62,6 +63,7 @@ export class TrainingDb extends Dexie {
   calendarExceptions!: Table<CalendarException, Id>;
   plans!: Table<Plan, Id>;
   customPlans!: Table<CustomPlan, Id>;
+  customEquipment!: Table<CustomEquipment, Id>;
   profiles!: Table<Profile, Id>;
   bodyMetrics!: Table<BodyMetric, Id>;
   injuries!: Table<Injury & { createdAt: Instant; updatedAt: Instant }, Id>;
@@ -124,6 +126,17 @@ export class TrainingDb extends Dexie {
     this.version(4).stores({
       customPlans: 'id, name, updatedAt',
     });
+
+    /*
+     * Version 5: equipment you added yourself.
+     *
+     * Additive, and indexed by tag because every read is "what is this thing called" from a
+     * tag an exercise is holding. The label has to live somewhere queryable: the seeded
+     * labels are a static table, and a rebounder somebody typed in has nowhere in it to go.
+     */
+    this.version(5).stores({
+      customEquipment: 'id, tag, name, updatedAt',
+    });
   }
 }
 
@@ -139,6 +152,7 @@ export const DATA_TABLES = [
   'calendarExceptions',
   'plans',
   'customPlans',
+  'customEquipment',
   'profiles',
   'bodyMetrics',
   'injuries',

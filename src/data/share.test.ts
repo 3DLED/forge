@@ -11,7 +11,8 @@
 import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { db } from '../db/db';
-import { exerciseRepo, planRepo, templateRepo } from './repos';
+import { addCustomEquipment, allCustomEquipment } from './customEquipment';
+import { customEquipmentRepo, exerciseRepo, planRepo, templateRepo } from './repos';
 import {
   ShareFileError,
   buildPlanFile,
@@ -103,6 +104,7 @@ async function seedPlanSessions(planId: string, days: { date: string; slugs: str
 
 beforeEach(async () => {
   await Promise.all([
+    db.customEquipment.clear(),
     db.exercises.clear(),
     db.templates.clear(),
     db.plans.clear(),
@@ -432,5 +434,88 @@ describe('what an import would do, before it does it', () => {
     const preview = await previewShareFile(await buildPlanFile(plan));
 
     expect(preview).toMatchObject({ kind: 'plan', sessionCount: 2, weeks: 2 });
+  });
+});
+
+/**
+ * Kit travelling with the movements that need it.
+ *
+ * The same argument as the movements themselves, one level down. A workout can use a movement
+ * you invented, and that movement can require a rebounder you added — carrying the movement
+ * without the equipment lands it on someone else's phone requiring `custom-01m1…`, which
+ * nothing can name and no profile will ever contain.
+ */
+describe('equipment somebody added, inside a shared file', () => {
+  const usingKit = async (name: string) => {
+    const kit = await addCustomEquipment(name);
+    await exerciseRepo.create({ ...exercise('custom-bounce', true), equipment: [kit.tag] } as never);
+    return kit;
+  };
+
+  it('carries the kit a custom movement requires', async () => {
+    const kit = await usingKit('Rebounder');
+    const file = await buildWorkoutFile(await seedTemplate('Bounce session', ['custom-bounce']));
+
+    expect(file.equipment?.map((item) => item.name)).toEqual(['Rebounder']);
+    expect(file.equipment?.[0].tag).toBe(kit.tag);
+  });
+
+  /* Everyone has a kettlebell tag. Shipping the whole vocabulary would be silly. */
+  it('leaves built-in kit out of the file', async () => {
+    await exerciseRepo.create({ ...exercise('custom-swing', true), equipment: ['kettlebell'] } as never);
+    const file = await buildWorkoutFile(await seedTemplate('Swings', ['custom-swing']));
+
+    expect(file.equipment).toEqual([]);
+  });
+
+  it('recreates it on a device that has never seen it', async () => {
+    await usingKit('Rebounder');
+    const file = await buildWorkoutFile(await seedTemplate('Bounce session', ['custom-bounce']));
+
+    await db.customEquipment.clear();
+    await db.exercises.where('slug').equals('custom-bounce').delete();
+    await db.templates.clear();
+
+    await importWorkout(file);
+
+    expect((await allCustomEquipment()).map((item) => item.name)).toEqual(['Rebounder']);
+  });
+
+  /* The movement has to land holding a tag that resolves, not one nothing can name. */
+  it('lands the movement pointing at kit that now exists', async () => {
+    const kit = await usingKit('Rebounder');
+    const file = await buildWorkoutFile(await seedTemplate('Bounce session', ['custom-bounce']));
+
+    await db.customEquipment.clear();
+    await db.exercises.where('slug').equals('custom-bounce').delete();
+    await db.templates.clear();
+
+    await importWorkout(file);
+
+    const landed = (await exerciseRepo.all()).find((e) => e.slug === 'custom-bounce');
+    expect(landed?.equipment).toEqual([kit.tag]);
+    expect((await allCustomEquipment())[0].tag).toBe(kit.tag);
+  });
+
+  it('leaves kit already here exactly as it is', async () => {
+    const kit = await usingKit('Rebounder');
+    const file = await buildWorkoutFile(await seedTemplate('Bounce session', ['custom-bounce']));
+
+    await customEquipmentRepo.update((await allCustomEquipment())[0].id, { name: 'My trampoline' });
+    await db.templates.clear();
+
+    await importWorkout(file);
+
+    const after = await allCustomEquipment();
+    expect(after).toHaveLength(1);
+    expect(after[0].name).toBe('My trampoline');
+    expect(after[0].tag).toBe(kit.tag);
+  });
+
+  it('accepts an older file with no equipment listed at all', () => {
+    const file = parseShareFile(
+      JSON.stringify({ app: 'forge', format: 1, kind: 'workout', workout: { name: 'x', blocks: [] } }),
+    );
+    expect(file.equipment).toEqual([]);
   });
 });

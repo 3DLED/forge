@@ -782,6 +782,15 @@ const LIBRARY: SeedExercise[] = [
     metrics: ['weightKg', 'distanceM', 'timeSec', 'rpe'],
   }),
   cardio('stair-climb', 'Stair Climb', ['stairs'], {}),
+  /*
+   * A rebounder is scored by time, not distance — you are not going anywhere. Left off the
+   * common list because most people do not own one, and a picker that opens on kit nobody has
+   * is a picker people stop trusting.
+   */
+  cardio('rebounder-bounce', 'Rebounding', ['rebounder'], {
+    metrics: ['timeSec', 'rpe'],
+    notes: 'Low-impact cardio on a mini trampoline. Scored by time — the health bounce is small and quick, not high.',
+  }),
   cardio('row-erg', 'Rowing Machine', ['rowErg'], {}),
   cardio('ski-erg', 'SkiErg', ['skiErg'], {}),
   cardio('bike-erg', 'Stationary Bike', ['bikeErg'], {}),

@@ -14,6 +14,7 @@
 import { useState } from 'react';
 import Sheet from '../../ui/Sheet';
 import { exerciseRepo } from '../../data/repos';
+import { useApp } from '../../ui/AppProvider';
 import { CATEGORY_LABELS, categoryOf } from '../../domain/categories';
 import { BAND_LABELS, bandOf } from '../../domain/difficulty';
 import { REGION_LABELS, regionOf } from '../../domain/regions';
@@ -26,7 +27,12 @@ import type {
   MovementPattern,
 } from '../../domain/types';
 
-/** The kit most custom movements actually use. The full tag list is not a useful question. */
+/**
+ * The kit most custom movements actually use. The full tag list is not a useful question.
+ *
+ * Anything you added yourself is offered underneath, because a movement you invented is
+ * exactly the one likely to need the rebounder nobody else has heard of.
+ */
 const EQUIPMENT: { tag: EquipmentTag; label: string }[] = [
   { tag: 'bodyweight', label: 'Bodyweight' },
   { tag: 'kettlebell', label: 'Kettlebell' },
@@ -83,6 +89,7 @@ export default function ExerciseEditorSheet({
   const [cues, setCues] = useState(existing?.coaching?.cues.join('\n') ?? '');
   const [fault, setFault] = useState(existing?.coaching?.fault ?? '');
   const [saving, setSaving] = useState(false);
+  const { customEquipment } = useApp();
 
   const toggleEquipment = (tag: EquipmentTag) =>
     setEquipment((current) =>
@@ -166,12 +173,33 @@ export default function ExerciseEditorSheet({
           <button
             key={tag}
             className={`chip${equipment.includes(tag) ? ' on' : ''}`}
+            aria-pressed={equipment.includes(tag)}
             onClick={() => toggleEquipment(tag)}
           >
             {label}
           </button>
         ))}
       </div>
+
+      {customEquipment.length > 0 && (
+        <>
+          <div className="tiny faint" style={{ margin: '0.5rem 0 0.35rem' }}>
+            Yours
+          </div>
+          <div className="row wrap" style={{ gap: '0.4rem' }}>
+            {customEquipment.map((item) => (
+              <button
+                key={item.id}
+                className={`chip${equipment.includes(item.tag) ? ' on' : ''}`}
+                aria-pressed={equipment.includes(item.tag)}
+                onClick={() => toggleEquipment(item.tag)}
+              >
+                {item.name}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
       <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
         Everything selected has to be in an equipment profile for this to be offered there.
       </p>

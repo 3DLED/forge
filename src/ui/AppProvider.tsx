@@ -14,7 +14,19 @@ import {
   exerciseRepo,
   profileRepo,
 } from '../data/repos';
-import type { EquipmentProfile, Exercise, Profile, UnitSystem } from '../domain/types';
+import type {
+  CustomEquipment,
+  EquipmentProfile,
+  EquipmentTag,
+  Exercise,
+  Profile,
+  UnitSystem,
+} from '../domain/types';
+import {
+  allCustomEquipment,
+  customEquipmentByTag,
+  equipmentLabel,
+} from '../data/customEquipment';
 import { availableSlugs } from '../domain/equipment';
 import { DEFAULT_THEME, isThemeId } from './themes';
 
@@ -22,6 +34,10 @@ interface AppState {
   profile: Profile;
   units: UnitSystem;
   exercises: Exercise[];
+  /** Kit added by the athlete, alongside the seeded vocabulary. */
+  customEquipment: CustomEquipment[];
+  /** What to call a piece of equipment, seeded or added. */
+  equipmentName: (tag: EquipmentTag) => string;
   exerciseBySlug: Map<string, Exercise>;
   equipmentProfiles: EquipmentProfile[];
   activeEquipment: EquipmentProfile | undefined;
@@ -56,6 +72,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
    * it. See `allIncludingDeleted`.
    */
   const everyExercise = useLiveQuery(() => exerciseRepo.allIncludingDeleted(), [], undefined);
+  /* Kit somebody added. Its names live in the database; the seeded ones are a static table. */
+  const customKit = useLiveQuery(() => allCustomEquipment(), [], undefined);
   const equipmentProfiles = useLiveQuery(() => equipmentProfileRepo.all(), [], undefined);
 
   // Paint the theme on <html> so it covers the whole document, including areas React does
@@ -85,6 +103,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
      * is itself worth knowing.
      */
     const unique = [...new Map(exercises.map((e) => [e.slug, e])).values()];
+    const customByTag = customEquipmentByTag(customKit ?? []);
 
     return {
       profile,
@@ -94,8 +113,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       equipmentProfiles,
       activeEquipment,
       available: availableSlugs(unique, activeEquipment?.items ?? []),
+      customEquipment: customKit ?? [],
+      equipmentName: (tag: EquipmentTag) => equipmentLabel(tag, customByTag),
     };
-  }, [profiles, exercises, everyExercise, equipmentProfiles]);
+  }, [profiles, exercises, everyExercise, equipmentProfiles, customKit]);
 
   if (error) {
     return (

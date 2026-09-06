@@ -6,12 +6,16 @@
  * survives a trip, a closed gym, or a new rack at home without being rebuilt.
  */
 
-import type { EquipmentProfile, EquipmentTag } from '../../domain/types';
+import type { EquipmentProfile, EquipmentTag, SeededEquipmentTag } from '../../domain/types';
 
 /** Present in every profile — you always have these, so nothing needs to declare them. */
 export const ALWAYS_AVAILABLE: EquipmentTag[] = ['bodyweight', 'floor', 'wall', 'stairs'];
 
-export const EQUIPMENT_LABELS: Record<EquipmentTag, string> = {
+/**
+ * What the built-in kit is called. Keyed on the seeded tags only — equipment somebody added
+ * has its name in the database, and `equipmentLabel` is what knows to look there.
+ */
+export const EQUIPMENT_LABELS: Record<SeededEquipmentTag, string> = {
   bodyweight: 'Bodyweight',
   floor: 'Floor space',
   wall: 'A wall',
@@ -45,6 +49,7 @@ export const EQUIPMENT_LABELS: Record<EquipmentTag, string> = {
   treadmill: 'Treadmill',
   sled: 'Sled',
   jumpRope: 'Jump rope',
+  rebounder: 'Rebounder',
   box: 'Plyo box or step',
   medicineBall: 'Medicine ball',
   slamBall: 'Slam ball',
@@ -65,14 +70,14 @@ export const EQUIPMENT_LABELS: Record<EquipmentTag, string> = {
 };
 
 /** How the equipment picker is grouped in settings. */
-export const EQUIPMENT_GROUPS: { label: string; tags: EquipmentTag[] }[] = [
+export const EQUIPMENT_GROUPS: { label: string; tags: SeededEquipmentTag[] }[] = [
   { label: 'Free weights', tags: ['kettlebell', 'dumbbell', 'barbell', 'plates', 'rack', 'bench', 'trapBar'] },
   { label: 'Hanging & bars', tags: ['pullupBar', 'dipBars', 'rings', 'suspensionTrainer', 'ropeClimb'] },
   {
     label: 'Machines',
     tags: ['cableMachine', 'latPulldown', 'chestPress', 'rowMachine', 'legPress', 'legCurl', 'legExtension', 'smithMachine', 'hyperextension', 'gluteHamRaise'],
   },
-  { label: 'Conditioning', tags: ['rowErg', 'skiErg', 'bikeErg', 'airBike', 'treadmill', 'sled', 'jumpRope', 'battleRopes'] },
+  { label: 'Conditioning', tags: ['rowErg', 'skiErg', 'bikeErg', 'airBike', 'treadmill', 'sled', 'jumpRope', 'rebounder', 'battleRopes'] },
   { label: 'Odd objects', tags: ['box', 'sandbag', 'medicineBall', 'slamBall', 'wallBall', 'weightVest', 'abWheel', 'gripTrainer'] },
   { label: 'Bands', tags: ['resistanceBand', 'miniBand'] },
   { label: 'Places to train', tags: ['road', 'trail', 'track', 'hill', 'pool', 'openWater'] },

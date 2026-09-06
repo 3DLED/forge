@@ -15,12 +15,19 @@ import Sheet from '../../ui/Sheet';
 import RackEditor from './RackEditor';
 import { useApp } from '../../ui/AppProvider';
 import { equipmentProfileRepo, profileRepo } from '../../data/repos';
-import { EQUIPMENT_GROUPS, EQUIPMENT_LABELS, ALWAYS_AVAILABLE } from '../../data/seed/equipment';
+import { EQUIPMENT_GROUPS, ALWAYS_AVAILABLE } from '../../data/seed/equipment';
+import {
+  addCustomEquipment,
+  deleteCustomEquipment,
+  movementsNeeding,
+  renameCustomEquipment,
+} from '../../data/customEquipment';
 import { availableSlugs } from '../../domain/equipment';
-import type { EquipmentProfile, EquipmentTag } from '../../domain/types';
+import type { CustomEquipment, EquipmentProfile, EquipmentTag } from '../../domain/types';
 
 export default function EquipmentView() {
-  const { equipmentProfiles, activeEquipment, exercises, profile, units } = useApp();
+  const { equipmentProfiles, activeEquipment, exercises, profile, units, customEquipment, equipmentName } =
+    useApp();
   const [editing, setEditing] = useState<string | null>(null);
   const [naming, setNaming] = useState(false);
   const [managing, setManaging] = useState<EquipmentProfile | null>(null);
@@ -39,6 +46,10 @@ export default function EquipmentView() {
    * garage, not a plan you are trying out.
    */
   const [draft, setDraft] = useState<EquipmentTag[] | null>(null);
+  const [addingKit, setAddingKit] = useState(false);
+  const [renamingKit, setRenamingKit] = useState<CustomEquipment | null>(null);
+  const [removingKit, setRemovingKit] = useState<CustomEquipment | null>(null);
+  const [affected, setAffected] = useState<string[]>([]);
 
   const target = equipmentProfiles.find((p) => p.id === editing) ?? activeEquipment;
   const shown = draft ?? target?.items ?? [];
@@ -156,6 +167,66 @@ export default function EquipmentView() {
         />
       )}
 
+      {addingKit && (
+        <AskSheet
+          title="Add a piece of kit"
+          message="Whatever you train with that the list does not name. It behaves like any other equipment: tick it into a profile, and movements can require it."
+          input={{ label: 'What is it', placeholder: 'Rebounder, macebell, sledgehammer…', required: true }}
+          confirmLabel="Add it"
+          onCancel={() => setAddingKit(false)}
+          onConfirm={async (name) => {
+            await addCustomEquipment(name);
+            setAddingKit(false);
+          }}
+        />
+      )}
+
+      {renamingKit && (
+        <Sheet title={renamingKit.name} onClose={() => setRenamingKit(null)}>
+          <button
+            className="btn block"
+            onClick={async () => {
+              const item = renamingKit;
+              setRenamingKit(null);
+              setAffected(await movementsNeeding(item.tag));
+              setRemovingKit(item);
+            }}
+          >
+            Delete
+          </button>
+          <div className="section-title">Rename</div>
+          <input
+            defaultValue={renamingKit.name}
+            aria-label="Equipment name"
+            onBlur={async (event) => {
+              const next = event.target.value.trim();
+              if (next && next !== renamingKit.name) await renameCustomEquipment(renamingKit.id, next);
+            }}
+          />
+          <p className="tiny faint">
+            Renaming it renames it everywhere — the same rebounder can sit in three profiles.
+          </p>
+        </Sheet>
+      )}
+
+      {removingKit && (
+        <AskSheet
+          title={`Delete “${removingKit.name}”?`}
+          message={
+            affected.length > 0
+              ? `${affected.length === 1 ? 'One movement needs' : `${affected.length} movements need`} this: ${affected.slice(0, 4).join(', ')}${affected.length > 4 ? ', and more' : ''}. They are not deleted — they simply stop being offered, exactly as a barbell movement does without a barbell.`
+              : 'Nothing needs it. It comes out of any profile holding it.'
+          }
+          confirmLabel="Delete"
+          danger
+          onCancel={() => setRemovingKit(null)}
+          onConfirm={async () => {
+            await deleteCustomEquipment(removingKit);
+            setRemovingKit(null);
+          }}
+        />
+      )}
+
       {managing && (
         <Sheet title={managing.name} onClose={() => setManaging(null)}>
           <button
@@ -237,12 +308,59 @@ export default function EquipmentView() {
                     disabled={!draft}
                     onClick={() => toggleTag(tag)}
                   >
-                    {EQUIPMENT_LABELS[tag]}
+                    {equipmentName(tag)}
                   </button>
                 ))}
               </div>
             </section>
           ))}
+
+          {/*
+            Anything the built-in list does not name. A macebell, a sledgehammer, a rebounder —
+            the seeded vocabulary stays finite on purpose, and this is where the rest goes.
+          */}
+          <section className="card">
+            <div className="row between" style={{ marginBottom: '0.5rem' }}>
+              <h3 className="grow">Yours</h3>
+              <button className="btn sm ghost" onClick={() => setAddingKit(true)}>
+                + Add
+              </button>
+            </div>
+
+            {customEquipment.length === 0 ? (
+              <p className="tiny faint" style={{ margin: 0 }}>
+                Kit the list does not cover. Add it here and movements can require it exactly as
+                they require a barbell.
+              </p>
+            ) : (
+              <>
+                <div className="row wrap" style={{ gap: '0.4rem' }}>
+                  {customEquipment.map((item) => (
+                    <button
+                      key={item.id}
+                      className={`chip${shown.includes(item.tag) ? ' on' : ''}`}
+                      aria-pressed={shown.includes(item.tag)}
+                      disabled={!draft}
+                      onClick={() => toggleTag(item.tag)}
+                    >
+                      {item.name}
+                    </button>
+                  ))}
+                </div>
+                <div className="row wrap" style={{ gap: '0.4rem', marginTop: '0.5rem' }}>
+                  {customEquipment.map((item) => (
+                    <button
+                      key={item.id}
+                      className="btn sm ghost"
+                      onClick={() => setRenamingKit(item)}
+                    >
+                      ✎ {item.name}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </section>
 
           {draft && (
             <div className="card tight">
@@ -290,7 +408,7 @@ export default function EquipmentView() {
                 </p>
                 {upgrades.map((row) => (
                   <div className="row between" key={row.tag} style={{ padding: '0.3rem 0' }}>
-                    <span>{EQUIPMENT_LABELS[row.tag]}</span>
+                    <span>{equipmentName(row.tag)}</span>
                     <span className="pill good">+{row.gain} movements</span>
                   </div>
                 ))}

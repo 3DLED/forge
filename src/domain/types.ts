@@ -58,8 +58,12 @@ export type MovementPattern =
 /**
  * What an exercise requires. An `EquipmentProfile` is a set of these; an exercise is
  * available when the profile is a superset of its requirements.
+ *
+ * Kit somebody added themselves carries a `custom-` tag instead of one of these, since no
+ * list is ever going to hold every macebell, sledgehammer and rebounder anyone trains with —
+ * see `CustomEquipmentTag`.
  */
-export type EquipmentTag =
+export type SeededEquipmentTag =
   // always available
   | 'bodyweight' | 'floor' | 'wall' | 'stairs'
   // free weights
@@ -70,11 +74,41 @@ export type EquipmentTag =
   | 'cableMachine' | 'latPulldown' | 'legPress' | 'legCurl' | 'legExtension'
   | 'chestPress' | 'rowMachine' | 'smithMachine' | 'hyperextension' | 'gluteHamRaise'
   // conditioning kit
-  | 'rowErg' | 'skiErg' | 'bikeErg' | 'airBike' | 'treadmill' | 'sled' | 'jumpRope'
+  | 'rowErg' | 'skiErg' | 'bikeErg' | 'airBike' | 'treadmill' | 'sled' | 'jumpRope' | 'rebounder'
   | 'box' | 'medicineBall' | 'slamBall' | 'wallBall' | 'sandbag' | 'battleRopes'
   | 'resistanceBand' | 'miniBand' | 'abWheel' | 'gripTrainer' | 'weightVest'
   // places
   | 'road' | 'trail' | 'track' | 'hill' | 'pool' | 'openWater';
+
+/**
+ * Kit somebody added themselves.
+ *
+ * A template literal rather than a bare `string`, which is the difference between admitting
+ * new equipment and abandoning the type: `'kettelbell'` is still a compile error, while
+ * `custom-01m1…` is accepted. The label lives in the database, because the tag is a
+ * ulid nobody should ever read.
+ */
+export type CustomEquipmentTag = `custom-${string}`;
+
+export type EquipmentTag = SeededEquipmentTag | CustomEquipmentTag;
+
+export function isCustomEquipment(tag: EquipmentTag): tag is CustomEquipmentTag {
+  return tag.startsWith('custom-');
+}
+
+/**
+ * A piece of kit the athlete added, and what to call it.
+ *
+ * Its own record rather than a field on the equipment profile, because the same rebounder can
+ * be in three profiles and renaming it should rename it everywhere. Movements reference it by
+ * tag exactly as they reference a barbell.
+ */
+export interface CustomEquipment extends Entity {
+  tag: CustomEquipmentTag;
+  name: string;
+  /** Which of the equipment groups it is filed under, for the picker. */
+  group?: string;
+}
 
 /** The values a set can hold. An exercise declares which ones it uses. */
 export type MetricKey =

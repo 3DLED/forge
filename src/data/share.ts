@@ -20,13 +20,21 @@
  */
 
 import { db } from '../db/db';
-import { exerciseRepo, planRepo, plannedSessionRepo, templateRepo } from './repos';
+import {
+  customEquipmentRepo,
+  exerciseRepo,
+  planRepo,
+  plannedSessionRepo,
+  templateRepo,
+} from './repos';
 import { ulid } from '../domain/ids';
 import { translateCustomPlan } from './customPlans';
 import { ONGOING_PLAN_WEEKS, generatePlan } from '../domain/planning';
 import { addDays, daysBetween, todayKey } from '../domain/dates';
+import { isCustomEquipment } from '../domain/types';
 import type {
   Block,
+  CustomEquipment,
   CustomPlan,
   DayKey,
   Exercise,
@@ -78,7 +86,18 @@ export interface ShareFile {
   plan?: SharedPlan;
   /** Custom movements referenced above. Seeded ones are left out; everyone has them. */
   exercises: SharedExercise[];
+  /**
+   * Kit those movements require that the built-in vocabulary does not name.
+   *
+   * The same argument as the movements themselves, one level down: a workout can use a
+   * movement you invented, and that movement can require a rebounder you added. Carrying the
+   * movement without the equipment lands it on someone else's phone requiring `custom-01m1…`,
+   * which nothing can name and no profile will ever contain.
+   */
+  equipment?: SharedEquipment[];
 }
+
+export type SharedEquipment = Omit<CustomEquipment, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>;
 
 // --- reading what a payload needs -------------------------------------------
 
@@ -99,6 +118,19 @@ async function customExercisesFor(blocks: Block[]): Promise<SharedExercise[]> {
 
   return all
     .filter((exercise) => exercise.isCustom && needed.has(exercise.slug))
+    .map(({ id: _id, createdAt: _c, updatedAt: _u, deletedAt: _d, ...rest }) => rest);
+}
+
+/** The custom kit a set of movements depends on, so a shared file arrives usable. */
+async function customEquipmentFor(exercises: SharedExercise[]): Promise<SharedEquipment[]> {
+  const needed = new Set(
+    exercises.flatMap((exercise) => exercise.equipment).filter(isCustomEquipment),
+  );
+  if (needed.size === 0) return [];
+
+  const all = await customEquipmentRepo.all();
+  return all
+    .filter((item) => needed.has(item.tag))
     .map(({ id: _id, createdAt: _c, updatedAt: _u, deletedAt: _d, ...rest }) => rest);
 }
 
@@ -138,6 +170,7 @@ export async function buildWorkoutFile(template: SessionTemplate): Promise<Share
       notes: template.notes,
     },
     exercises: await customExercisesFor(template.blocks),
+    equipment: await customEquipmentFor(await customExercisesFor(template.blocks)),
   };
 }
 
@@ -173,6 +206,7 @@ export async function buildPlanFile(plan: Plan): Promise<ShareFile> {
       notes: plan.notes,
     },
     exercises: await customExercisesFor(blocks),
+    equipment: await customEquipmentFor(await customExercisesFor(blocks)),
   };
 }
 
@@ -228,6 +262,11 @@ export async function buildCustomPlanFile(plan: CustomPlan): Promise<ShareFile> 
     },
     exercises: await customExercisesFor(
       generated.sessions.flatMap((session) => session.prescription.blocks),
+    ),
+    equipment: await customEquipmentFor(
+      await customExercisesFor(
+        generated.sessions.flatMap((session) => session.prescription.blocks),
+      ),
     ),
   };
 }
@@ -303,7 +342,11 @@ export function parseShareFile(json: string): ShareFile {
     throw new ShareFileError('That file holds neither a workout nor a plan.');
   }
 
-  return { ...file, exercises: Array.isArray(file.exercises) ? file.exercises : [] } as ShareFile;
+  return {
+    ...file,
+    exercises: Array.isArray(file.exercises) ? file.exercises : [],
+    equipment: Array.isArray(file.equipment) ? file.equipment : [],
+  } as ShareFile;
 }
 
 export interface SharePreview {
@@ -372,6 +415,23 @@ export async function previewShareFile(file: ShareFile): Promise<SharePreview> {
  * leaving the workout pointing at something no picker will offer. Importing a workout is a
  * decision to be able to do it.
  */
+/**
+ * Creates any kit the file brought that this device does not have.
+ *
+ * Before the movements, so a movement requiring it never exists in a library that cannot name
+ * what it needs. Matched on tag, which is a ulid, so two devices never collide.
+ */
+async function ensureEquipment(file: ShareFile): Promise<number> {
+  const carried = file.equipment ?? [];
+  if (carried.length === 0) return 0;
+
+  const known = new Set((await customEquipmentRepo.all()).map((item) => item.tag));
+  const missing = carried.filter((item) => !known.has(item.tag));
+
+  for (const item of missing) await customEquipmentRepo.create(item as never);
+  return missing.length;
+}
+
 async function ensureExercises(file: ShareFile): Promise<{ added: number; restored: number }> {
   const existing = new Map(
     (await exerciseRepo.allIncludingDeleted()).map((exercise) => [exercise.slug, exercise]),
@@ -417,6 +477,7 @@ export async function importWorkout(file: ShareFile): Promise<ImportedWorkout> {
     throw new ShareFileError('That file does not hold a workout.');
   }
 
+  await ensureEquipment(file);
   const { added, restored } = await ensureExercises(file);
   const taken = new Set((await templateRepo.all()).map((t) => t.name));
   const name = freeName(file.workout.name, taken);
@@ -461,6 +522,7 @@ export async function importPlan(
     throw new ShareFileError('That file does not hold a plan.');
   }
 
+  await ensureEquipment(file);
   const { added, restored } = await ensureExercises(file);
   const taken = new Set((await planRepo.all()).map((p) => p.name));
   const name = freeName(file.plan.name, taken);
