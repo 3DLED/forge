@@ -62,14 +62,12 @@ export default function RunScreen({
    * session the prescription could not have expressed.
    */
   const plan = useMemo<RunPlan | null>(() => {
-    if (plannedDistanceM != null && plannedDistanceM > 0 && shape.kind !== 'intervals') {
-      return buildRunPlan({
-        kind: 'steady',
-        distanceM: plannedDistanceM,
-        targetSecPerKm: plannedPaceSecPerKm ?? settings.targetSecPerKm,
-      });
+    const aim = plannedPaceSecPerKm ?? settings.targetSecPerKm;
+    const structured = shape.kind === 'intervals' || shape.kind === 'tempo';
+    if (plannedDistanceM != null && plannedDistanceM > 0 && !structured) {
+      return buildRunPlan({ kind: 'steady', distanceM: plannedDistanceM }, aim);
     }
-    return buildRunPlan(shape);
+    return buildRunPlan(shape, aim);
   }, [plannedDistanceM, plannedPaceSecPerKm, shape, settings.targetSecPerKm]);
 
   const run = useRunTracker({ settings, units, plan });

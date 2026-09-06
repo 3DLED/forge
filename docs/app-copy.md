@@ -559,12 +559,12 @@ Counts: 515 strings, 59 files, 9 sections.
 - **[MORE-104]** This browser cannot speak, so cues will appear on screen only. Everything below still decides what gets shown.
 - **[MORE-105]** Speak cues
 - **[MORE-106]** Silent keeps every cue on screen and says none of them — for a race, a group run, or a track session where someone is already shouting at you.
-- **[MORE-107]** Pace alerts
-- **[MORE-108]** Say something once I am off by
-- **[MORE-109]** Drifting is normal, so this waits — half a minute off pace before it says anything, and longer before it says the same thing twice.
-- **[MORE-110]** Each kind of run keeps its own setup, so a track session does not turn Sunday's long run into four by eight hundred.
-- **[MORE-111]** Each rep
-- **[MORE-112]** Jog between
+- **[MORE-107]** Each kind of run keeps its own setup, so a track session does not turn Sunday's long run into four by eight hundred.
+- **[MORE-108]** Each rep
+- **[MORE-109]** Jog between
+- **[MORE-110]** Pace alerts
+- **[MORE-111]** Say something once I am off by
+- **[MORE-112]** Measured against the target above, or on a tempo or interval session against the pace of the piece you are on. Drifting is normal, so this waits — half a minute off pace before it says anything, and longer before it says the same thing twice.
 - **[MORE-113]** Minutes and seconds, like 8:30
 
 ### Settings

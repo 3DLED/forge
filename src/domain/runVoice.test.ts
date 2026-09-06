@@ -6,7 +6,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { sayChange, sayDrift, saySplit, sayStart, speakable, splitPlace } from './runVoice';
-import { buildRunPlan, advanceRun, startRun, type RunPlan } from './runPlan';
+import { buildRunPlan, advanceRun, describeSegment, startRun, type RunPlan } from './runPlan';
 import type { PaceReading, SplitCue } from './pace';
 
 const cue = (over: Partial<SplitCue> = {}): SplitCue => ({
@@ -270,6 +270,22 @@ describe('building a plan from a handful of numbers', () => {
   });
 
   it('refuses a steady run with neither a distance nor a time', () => {
-    expect(buildRunPlan({ kind: 'steady', targetSecPerKm: 300 })).toBeNull();
+    expect(buildRunPlan({ kind: 'steady' }, 300)).toBeNull();
+  });
+
+  /*
+   * A steady run has one pace, and it is the target pace the alerts and splits already use.
+   * Storing a second one on the shape gave the screen two fields for the same number, only
+   * one of which did anything.
+   */
+  it('runs a steady piece at the target it is handed', () => {
+    const plan = buildRunPlan({ kind: 'steady', distanceM: 8000 }, 330)!;
+    expect(plan.segments[0].targetSecPerKm).toBe(330);
+    expect(describeSegment(plan.segments[0], 'metric')).toBe('Steady 8 kilometres at 5:30 /km');
+  });
+
+  it('leaves a steady piece unpaced when there is no target to hand', () => {
+    const plan = buildRunPlan({ kind: 'steady', distanceM: 8000 })!;
+    expect(plan.segments[0].targetSecPerKm).toBeUndefined();
   });
 });

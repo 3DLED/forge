@@ -217,31 +217,31 @@
  },
  "LOG-029": {
   "file": "src/features/log/RunScreen.tsx",
-  "line": 87,
+  "line": 85,
   "kind": "aria-label",
   "text": "Run alerts"
  },
  "LOG-030": {
   "file": "src/features/log/RunScreen.tsx",
-  "line": 126,
+  "line": 124,
   "kind": "on screen",
   "text": "Waiting for a decent fix. Under trees or between tall buildings this can take a minute."
  },
  "LOG-031": {
   "file": "src/features/log/RunScreen.tsx",
-  "line": 161,
+  "line": 159,
   "kind": "on screen",
   "text": "Cues will appear here as they are said."
  },
  "LOG-032": {
   "file": "src/features/log/RunScreen.tsx",
-  "line": 173,
+  "line": 171,
   "kind": "on screen",
   "text": "Start run"
  },
  "LOG-033": {
   "file": "src/features/log/RunScreen.tsx",
-  "line": 207,
+  "line": 205,
   "kind": "on screen",
   "text": "Save to workout"
  },
@@ -1903,127 +1903,127 @@
  },
  "MORE-093": {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 31,
+  "line": 32,
   "kind": "label",
   "text": "200 m"
  },
  "MORE-094": {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 32,
+  "line": 33,
   "kind": "label",
   "text": "400 m"
  },
  "MORE-095": {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 33,
+  "line": 34,
   "kind": "label",
   "text": "800 m"
  },
  "MORE-096": {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 34,
+  "line": 35,
   "kind": "label",
   "text": "1 km"
  },
  "MORE-097": {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 35,
+  "line": 36,
   "kind": "label",
   "text": "1600 m"
  },
  "MORE-098": {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 39,
+  "line": 40,
   "kind": "label",
   "text": "¼ mi"
  },
  "MORE-099": {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 40,
+  "line": 41,
   "kind": "label",
   "text": "½ mi"
  },
  "MORE-100": {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 41,
+  "line": 42,
   "kind": "label",
   "text": "1 mi"
  },
  "MORE-101": {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 53,
+  "line": 54,
   "kind": "label",
   "text": "Just run"
  },
  "MORE-102": {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 61,
+  "line": 62,
   "kind": "label",
   "text": "Easy or long"
  },
  "MORE-103": {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 123,
+  "line": 124,
   "kind": "title",
   "text": "Run alerts"
  },
  "MORE-104": {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 134,
+  "line": 135,
   "kind": "on screen",
   "text": "This browser cannot speak, so cues will appear on screen only. Everything below still decides what gets shown."
  },
  "MORE-105": {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 146,
+  "line": 147,
   "kind": "on screen",
   "text": "Speak cues"
  },
  "MORE-106": {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 156,
+  "line": 157,
   "kind": "on screen",
   "text": "Silent keeps every cue on screen and says none of them — for a race, a group run, or a track session where someone is already shouting at you."
  },
  "MORE-107": {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 198,
-  "kind": "on screen",
-  "text": "Pace alerts"
- },
- "MORE-108": {
-  "file": "src/features/more/RunSettingsView.tsx",
-  "line": 223,
-  "kind": "on screen",
-  "text": "Say something once I am off by"
- },
- "MORE-109": {
-  "file": "src/features/more/RunSettingsView.tsx",
-  "line": 241,
-  "kind": "on screen",
-  "text": "Drifting is normal, so this waits — half a minute off pace before it says anything, and longer before it says the same thing twice."
- },
- "MORE-110": {
-  "file": "src/features/more/RunSettingsView.tsx",
-  "line": 266,
+  "line": 217,
   "kind": "on screen",
   "text": "Each kind of run keeps its own setup, so a track session does not turn Sunday's long run into four by eight hundred."
  },
- "MORE-111": {
+ "MORE-108": {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 357,
+  "line": 302,
   "kind": "on screen",
   "text": "Each rep"
  },
- "MORE-112": {
+ "MORE-109": {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 379,
+  "line": 324,
   "kind": "on screen",
   "text": "Jog between"
  },
+ "MORE-110": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 382,
+  "kind": "on screen",
+  "text": "Pace alerts"
+ },
+ "MORE-111": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 400,
+  "kind": "on screen",
+  "text": "Say something once I am off by"
+ },
+ "MORE-112": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 418,
+  "kind": "on screen",
+  "text": "Measured against the target above, or on a tempo or interval session against the pace of the piece you are on. Drifting is normal, so this waits — half a minute off pace before it says anything, and longer before it says the same thing twice."
+ },
  "MORE-113": {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 493,
+  "line": 494,
   "kind": "on screen",
   "text": "Minutes and seconds, like 8:30"
  },

@@ -282,7 +282,16 @@ export function describeNext(segment: RunSegment | null, units: UnitSystem): str
 export type RunShape =
   /** No structure. Splits and drift alerts still work; nothing is prescribed. */
   | { kind: 'open' }
-  | { kind: 'steady'; distanceM?: number; durationSec?: number; targetSecPerKm?: number }
+  /**
+   * A distance, and nothing else.
+   *
+   * No pace of its own on purpose. A one-segment run has exactly one pace, and that is the
+   * target pace the alerts and the splits are already measured against — a second field for
+   * it would be the same number asked for twice, with only one of the two doing anything.
+   * Tempo and interval work is different: their pieces disagree with each other, so there is
+   * no single number and each piece states its own.
+   */
+  | { kind: 'steady'; distanceM?: number; durationSec?: number }
   | {
       kind: 'tempo';
       warmupSec: number;
@@ -313,7 +322,16 @@ function intervalName(reps: number, workM: number): string {
  * behave the same at every boundary but read differently on screen, and a run screen showing
  * "Segment 1 of 1" for an ordinary easy run is noise.
  */
-export function buildRunPlan(shape: RunShape): RunPlan | null {
+export function buildRunPlan(
+  shape: RunShape,
+  /**
+   * The pace a shape that has none of its own should be run at.
+   *
+   * Only a steady run takes it. Passing it in rather than storing it on the shape is what
+   * keeps there being one target pace in the app instead of two that can disagree.
+   */
+  targetSecPerKm?: number,
+): RunPlan | null {
   if (shape.kind === 'open') return null;
 
   if (shape.kind === 'steady') {
@@ -325,7 +343,7 @@ export function buildRunPlan(shape: RunShape): RunPlan | null {
           kind: 'steady',
           distanceM: shape.distanceM,
           durationSec: shape.distanceM == null ? shape.durationSec : undefined,
-          targetSecPerKm: shape.targetSecPerKm,
+          targetSecPerKm,
         },
       ],
     };

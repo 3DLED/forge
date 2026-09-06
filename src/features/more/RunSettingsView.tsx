@@ -14,6 +14,7 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import PageHeader from '../../ui/PageHeader';
+import { plural } from '../../ui/text';
 import { useApp } from '../../ui/AppProvider';
 import { profileRepo } from '../../data/repos';
 import { speechAvailable } from '../../ui/speak';
@@ -87,7 +88,7 @@ function blankShape(kind: RunShape['kind'], units: UnitSystem): RunShape {
     case 'open':
       return { kind: 'open' };
     case 'steady':
-      return { kind: 'steady', distanceM: mile ? M_PER_MILE * 5 : 8000, targetSecPerKm: 330 };
+      return { kind: 'steady', distanceM: mile ? M_PER_MILE * 5 : 8000 };
     case 'tempo':
       return { kind: 'tempo', warmupSec: 600, distanceM: mile ? M_PER_MILE * 3 : 5000, targetSecPerKm: 270, cooldownSec: 600 };
     case 'intervals':
@@ -133,7 +134,7 @@ export default function RunSettingsView() {
   const setShape = (next: RunShape) =>
     void profileRepo.update(profile.id, { run: withShape(settings, kind, next) });
 
-  const plan = buildRunPlan(shape);
+  const plan = buildRunPlan(shape, settings.targetSecPerKm);
 
   /*
    * Split intervals are offered in the units you use first, but not exclusively: people run
@@ -223,56 +224,6 @@ export default function RunSettingsView() {
         </>
       )}
 
-      <div className="section-title">Pace alerts</div>
-      <div className="row" style={{ gap: '0.5rem' }}>
-        <button
-          className={`btn grow${settings.paceAlerts ? ' primary' : ''}`}
-          onClick={() => patch({ paceAlerts: true })}
-        >
-          On
-        </button>
-        <button
-          className={`btn grow${settings.paceAlerts ? '' : ' primary'}`}
-          onClick={() => patch({ paceAlerts: false })}
-        >
-          Off
-        </button>
-      </div>
-
-      {settings.paceAlerts && (
-        <>
-          <PaceField
-            label={`Target pace (${paceLabel(units)})`}
-            value={settings.targetSecPerKm}
-            units={units}
-            onChange={(targetSecPerKm) => patch({ targetSecPerKm })}
-          />
-
-          <div className="tiny faint" style={{ marginTop: '0.6rem' }}>
-            Say something once I am off by
-          </div>
-          <div className="chip-row">
-            {TOLERANCES.map((seconds) => {
-              const secPerKm = units === 'imperial' ? seconds / (M_PER_MILE / 1000) : seconds;
-              const chosen = Math.abs(displayPace(settings.toleranceSecPerKm, units) - seconds) < 1;
-              return (
-                <button
-                  key={seconds}
-                  className={`chip${chosen ? ' on' : ''}`}
-                  onClick={() => patch({ toleranceSecPerKm: secPerKm })}
-                >
-                  {seconds}s
-                </button>
-              );
-            })}
-          </div>
-          <p className="tiny faint">
-            Drifting is normal, so this waits — half a minute off pace before it says anything, and
-            longer before it says the same thing twice.
-          </p>
-        </>
-      )}
-
       <div className="section-title">
         {scoped ? `Structure for ${forExercise!.name.toLowerCase()}` : 'Run structure'}
       </div>
@@ -311,6 +262,7 @@ export default function RunSettingsView() {
       </div>
       <p className="tiny faint">{SHAPES[shape.kind].hint}</p>
 
+
       {shape.kind === 'steady' && (
         <>
           <DistanceField
@@ -319,13 +271,6 @@ export default function RunSettingsView() {
             value={shape.distanceM}
             units={units}
             onChange={(distanceM) => setShape({ ...shape, distanceM })}
-          />
-          <PaceField
-            key="steady-pace"
-            label={`Pace (${paceLabel(units)})`}
-            value={shape.targetSecPerKm}
-            units={units}
-            onChange={(targetSecPerKm) => setShape({ ...shape, targetSecPerKm })}
           />
         </>
       )}
@@ -435,6 +380,25 @@ export default function RunSettingsView() {
       )}
 
       {/*
+        One pace, for the shapes that have one.
+
+        Lives here rather than inside Pace alerts because two things read it — the splits
+        compare each one against it whether or not alerts are switched on — and because on a
+        one-segment run it is simply the pace of the run, which is the thing being set up on
+        this half of the screen. Hidden for tempo and interval work, where the pieces disagree
+        with each other and each states its own.
+      */}
+      {(shape.kind === 'open' || shape.kind === 'steady') && (
+        <PaceField
+          key="target-pace"
+          label={`Target pace (${paceLabel(units)})`}
+          value={settings.targetSecPerKm}
+          units={units}
+          onChange={(targetSecPerKm) => patch({ targetSecPerKm })}
+        />
+      )}
+
+      {/*
         The session read back as sentences, in the same words it will be spoken in. A list of
         fields can be right in every box and still describe a session nobody meant to run.
       */}
@@ -442,7 +406,7 @@ export default function RunSettingsView() {
         <div className="card tight" style={{ marginTop: '0.8rem' }}>
           <div className="row between">
             <strong>{plan.name}</strong>
-            <span className="tiny faint">{plan.segments.length} pieces</span>
+            <span className="tiny faint">{plural(plan.segments.length, 'piece')}</span>
           </div>
           <ol className="run-plan-list">
             {plan.segments.map((segment, index) => (
@@ -453,6 +417,51 @@ export default function RunSettingsView() {
           </ol>
         </div>
       )}
+
+      <div className="section-title">Pace alerts</div>
+      <div className="row" style={{ gap: '0.5rem' }}>
+        <button
+          className={`btn grow${settings.paceAlerts ? ' primary' : ''}`}
+          onClick={() => patch({ paceAlerts: true })}
+        >
+          On
+        </button>
+        <button
+          className={`btn grow${settings.paceAlerts ? '' : ' primary'}`}
+          onClick={() => patch({ paceAlerts: false })}
+        >
+          Off
+        </button>
+      </div>
+
+      {settings.paceAlerts && (
+        <>
+          <div className="tiny faint" style={{ marginTop: '0.6rem' }}>
+            Say something once I am off by
+          </div>
+          <div className="chip-row">
+            {TOLERANCES.map((seconds) => {
+              const secPerKm = units === 'imperial' ? seconds / (M_PER_MILE / 1000) : seconds;
+              const chosen = Math.abs(displayPace(settings.toleranceSecPerKm, units) - seconds) < 1;
+              return (
+                <button
+                  key={seconds}
+                  className={`chip${chosen ? ' on' : ''}`}
+                  onClick={() => patch({ toleranceSecPerKm: secPerKm })}
+                >
+                  {seconds}s
+                </button>
+              );
+            })}
+          </div>
+          <p className="tiny faint">
+            Measured against the target above, or on a tempo or interval session against the pace
+            of the piece you are on. Drifting is normal, so this waits — half a minute off pace
+            before it says anything, and longer before it says the same thing twice.
+          </p>
+        </>
+      )}
+
     </>
   );
 }
