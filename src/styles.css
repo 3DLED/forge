@@ -1242,6 +1242,23 @@ section[id^='movement-'] {
   border: 0;
 }
 
+/*
+ * Kit somebody added, told apart by its corners.
+ *
+ * A shape rather than a heading or a colour: it files with the built-in kit it belongs beside
+ * — a rebounder is conditioning — while still being identifiable at a glance, and it costs no
+ * legend to read. Colour alone would carry the same information and lose it for anyone who
+ * cannot see the difference.
+ */
+.chip.custom { border-radius: 3px; }
+
+/* Marked for removal. Distinct from `on`, which means "in this profile". */
+.chip.marked {
+  border-color: var(--danger);
+  color: var(--danger);
+  background: var(--surface-2);
+}
+
 .chip-row {
   display: flex;
   gap: 0.4rem;

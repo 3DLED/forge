@@ -25,6 +25,9 @@ import {
 import { availableSlugs } from '../../domain/equipment';
 import type { CustomEquipment, EquipmentProfile, EquipmentTag } from '../../domain/types';
 
+/** Where kit goes when nobody said, or said something the list no longer has. */
+const CATCH_ALL_GROUP = 'Odd objects';
+
 export default function EquipmentView() {
   const { equipmentProfiles, activeEquipment, exercises, profile, units, customEquipment, equipmentName } =
     useApp();
@@ -48,8 +51,51 @@ export default function EquipmentView() {
   const [draft, setDraft] = useState<EquipmentTag[] | null>(null);
   const [addingKit, setAddingKit] = useState(false);
   const [renamingKit, setRenamingKit] = useState<CustomEquipment | null>(null);
-  const [removingKit, setRemovingKit] = useState<CustomEquipment | null>(null);
+  /**
+   * Managing your own kit, rather than choosing what is in a profile.
+   *
+   * A separate mode because the chips mean two different things: normally tapping one puts it
+   * in the profile, and here it marks it for removal. Running both at once would make every
+   * tap ambiguous, so entering one leaves the other.
+   */
+  const [culling, setCulling] = useState(false);
+  const [marked, setMarked] = useState<Set<string>>(new Set());
+  const [confirmCull, setConfirmCull] = useState(false);
   const [affected, setAffected] = useState<string[]>([]);
+
+  const markedItems = customEquipment.filter((item) => marked.has(item.id));
+
+  /**
+   * The custom kit filed under a group.
+   *
+   * Anything whose group no longer exists — or which predates being asked — falls into the
+   * catch-all rather than vanishing from the screen, which is the one outcome that would
+   * make it unreachable.
+   */
+  const groupNames = new Set(EQUIPMENT_GROUPS.map((group) => group.label));
+  const customIn = (label: string) =>
+    customEquipment.filter((item) =>
+      item.group && groupNames.has(item.group) ? item.group === label : label === CATCH_ALL_GROUP,
+    );
+
+  const startCulling = () => {
+    setDraft(null);
+    setMarked(new Set());
+    setCulling(true);
+  };
+
+  const stopCulling = () => {
+    setCulling(false);
+    setMarked(new Set());
+  };
+
+  const toggleMark = (id: string) =>
+    setMarked((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
 
   const target = equipmentProfiles.find((p) => p.id === editing) ?? activeEquipment;
   const shown = draft ?? target?.items ?? [];
@@ -168,50 +214,33 @@ export default function EquipmentView() {
       )}
 
       {addingKit && (
-        <AskSheet
-          title="Add a piece of kit"
-          message="Whatever you train with that the list does not name. It behaves like any other equipment: tick it into a profile, and movements can require it."
-          input={{ label: 'What is it', placeholder: 'Rebounder, macebell, sledgehammer…', required: true }}
-          confirmLabel="Add it"
-          onCancel={() => setAddingKit(false)}
-          onConfirm={async (name) => {
-            await addCustomEquipment(name);
-            setAddingKit(false);
-          }}
+        <AddKitSheet
+          onClose={() => setAddingKit(false)}
+          onAdded={() => setAddingKit(false)}
         />
       )}
 
       {renamingKit && (
-        <Sheet title={renamingKit.name} onClose={() => setRenamingKit(null)}>
-          <button
-            className="btn block"
-            onClick={async () => {
-              const item = renamingKit;
-              setRenamingKit(null);
-              setAffected(await movementsNeeding(item.tag));
-              setRemovingKit(item);
-            }}
-          >
-            Delete
-          </button>
-          <div className="section-title">Rename</div>
-          <input
-            defaultValue={renamingKit.name}
-            aria-label="Equipment name"
-            onBlur={async (event) => {
-              const next = event.target.value.trim();
-              if (next && next !== renamingKit.name) await renameCustomEquipment(renamingKit.id, next);
-            }}
-          />
-          <p className="tiny faint">
-            Renaming it renames it everywhere — the same rebounder can sit in three profiles.
-          </p>
-        </Sheet>
+        <AskSheet
+          title={`Rename “${renamingKit.name}”`}
+          message="Renaming it renames it everywhere — the same rebounder can sit in three profiles."
+          input={{ label: 'Name', defaultValue: renamingKit.name, required: true }}
+          confirmLabel="Save"
+          onCancel={() => setRenamingKit(null)}
+          onConfirm={async (name) => {
+            await renameCustomEquipment(renamingKit.id, name);
+            setRenamingKit(null);
+          }}
+        />
       )}
 
-      {removingKit && (
+      {confirmCull && (
         <AskSheet
-          title={`Delete “${removingKit.name}”?`}
+          title={
+            markedItems.length === 1
+              ? `Delete “${markedItems[0].name}”?`
+              : `Delete ${markedItems.length} pieces of kit?`
+          }
           message={
             affected.length > 0
               ? `${affected.length === 1 ? 'One movement needs' : `${affected.length} movements need`} this: ${affected.slice(0, 4).join(', ')}${affected.length > 4 ? ', and more' : ''}. They are not deleted — they simply stop being offered, exactly as a barbell movement does without a barbell.`
@@ -219,10 +248,11 @@ export default function EquipmentView() {
           }
           confirmLabel="Delete"
           danger
-          onCancel={() => setRemovingKit(null)}
+          onCancel={() => setConfirmCull(false)}
           onConfirm={async () => {
-            await deleteCustomEquipment(removingKit);
-            setRemovingKit(null);
+            for (const item of markedItems) await deleteCustomEquipment(item);
+            setConfirmCull(false);
+            stopCulling();
           }}
         />
       )}
@@ -289,12 +319,60 @@ export default function EquipmentView() {
         <>
           <div className="row between" style={{ alignItems: 'baseline' }}>
             <div className="section-title grow">What's in “{target.name}”</div>
-            {!draft && (
+          </div>
+
+          {/*
+            Three things you can do to a kit list, and only one of them at a time. Editing
+            picks what is in this profile; adding and culling are about the vocabulary itself.
+          */}
+          <div className="row wrap" style={{ gap: '0.4rem', marginBottom: '0.5rem' }}>
+            {!draft && !culling && (
               <button className="btn sm ghost" onClick={() => setDraft([...target.items])}>
                 ✎ Edit kit
               </button>
             )}
+            {!culling && (
+              <button className="btn sm ghost" onClick={() => setAddingKit(true)}>
+                + Add
+              </button>
+            )}
+            {customEquipment.length > 0 && !draft && (
+              <button
+                className={`btn sm ${culling ? 'danger' : 'ghost'}`}
+                onClick={async () => {
+                  if (!culling) return startCulling();
+                  if (markedItems.length === 0) return stopCulling();
+                  // Gathered before asking, so the question can name what depends on it.
+                  const needed = await Promise.all(markedItems.map((item) => movementsNeeding(item.tag)));
+                  setAffected([...new Set(needed.flat())]);
+                  setConfirmCull(true);
+                }}
+              >
+                {culling
+                  ? markedItems.length > 0
+                    ? `🗑 Delete ${markedItems.length}`
+                    : 'Done'
+                  : '🗑 Delete'}
+              </button>
+            )}
+            {culling && markedItems.length === 1 && (
+              <button className="btn sm ghost" onClick={() => setRenamingKit(markedItems[0])}>
+                ✎ Rename
+              </button>
+            )}
+            {culling && (
+              <button className="btn sm ghost" onClick={stopCulling}>
+                Cancel
+              </button>
+            )}
           </div>
+
+          {culling && (
+            <p className="tiny faint" style={{ marginTop: '-0.25rem', marginBottom: '0.5rem' }}>
+              Tap the kit you added — the square ones — to mark it, then Delete. Built-in kit
+              cannot be removed.
+            </p>
+          )}
 
           {EQUIPMENT_GROUPS.map((group) => (
             <section className="card" key={group.label}>
@@ -311,56 +389,35 @@ export default function EquipmentView() {
                     {equipmentName(tag)}
                   </button>
                 ))}
+
+                {/*
+                  Kit you added sits with the built-in kit it belongs beside, rather than in a
+                  pile of its own — a rebounder is conditioning, and looking for it under
+                  "yours" means knowing you were the one who added it. Square corners are what
+                  say it is yours; a separate heading was buying the same information twice.
+                */}
+                {customIn(group.label).map((item) => (
+                  <button
+                    key={item.id}
+                    className={`chip custom${
+                      culling
+                        ? marked.has(item.id)
+                          ? ' marked'
+                          : ''
+                        : shown.includes(item.tag)
+                          ? ' on'
+                          : ''
+                    }`}
+                    aria-pressed={culling ? marked.has(item.id) : shown.includes(item.tag)}
+                    disabled={!draft && !culling}
+                    onClick={() => (culling ? toggleMark(item.id) : toggleTag(item.tag))}
+                  >
+                    {item.name}
+                  </button>
+                ))}
               </div>
             </section>
           ))}
-
-          {/*
-            Anything the built-in list does not name. A macebell, a sledgehammer, a rebounder —
-            the seeded vocabulary stays finite on purpose, and this is where the rest goes.
-          */}
-          <section className="card">
-            <div className="row between" style={{ marginBottom: '0.5rem' }}>
-              <h3 className="grow">Yours</h3>
-              <button className="btn sm ghost" onClick={() => setAddingKit(true)}>
-                + Add
-              </button>
-            </div>
-
-            {customEquipment.length === 0 ? (
-              <p className="tiny faint" style={{ margin: 0 }}>
-                Kit the list does not cover. Add it here and movements can require it exactly as
-                they require a barbell.
-              </p>
-            ) : (
-              <>
-                <div className="row wrap" style={{ gap: '0.4rem' }}>
-                  {customEquipment.map((item) => (
-                    <button
-                      key={item.id}
-                      className={`chip${shown.includes(item.tag) ? ' on' : ''}`}
-                      aria-pressed={shown.includes(item.tag)}
-                      disabled={!draft}
-                      onClick={() => toggleTag(item.tag)}
-                    >
-                      {item.name}
-                    </button>
-                  ))}
-                </div>
-                <div className="row wrap" style={{ gap: '0.4rem', marginTop: '0.5rem' }}>
-                  {customEquipment.map((item) => (
-                    <button
-                      key={item.id}
-                      className="btn sm ghost"
-                      onClick={() => setRenamingKit(item)}
-                    >
-                      ✎ {item.name}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </section>
 
           {draft && (
             <div className="card tight">
@@ -418,5 +475,70 @@ export default function EquipmentView() {
         </>
       )}
     </>
+  );
+}
+
+/**
+ * Adding a piece of kit the built-in list does not name.
+ *
+ * Asks which shelf it belongs on, because that is where it will appear from then on — filed
+ * with the kit it sits beside rather than in a pile of everything anyone ever added. The
+ * default is the catch-all, so the question can be ignored by anyone who does not care.
+ */
+function AddKitSheet({ onClose, onAdded }: { onClose: () => void; onAdded: () => void }) {
+  const [name, setName] = useState('');
+  const [group, setGroup] = useState<string>(CATCH_ALL_GROUP);
+  const [saving, setSaving] = useState(false);
+
+  return (
+    <Sheet
+      title="Add a piece of kit"
+      onClose={onClose}
+      footer={
+        <button
+          className="btn primary block"
+          disabled={saving || !name.trim()}
+          onClick={async () => {
+            setSaving(true);
+            await addCustomEquipment(name, group);
+            onAdded();
+          }}
+        >
+          {saving ? 'Adding…' : 'Add it'}
+        </button>
+      }
+    >
+      <p className="small muted">
+        Whatever you train with that the list does not name. It behaves like any other
+        equipment: tick it into a profile, and movements can require it.
+      </p>
+
+      <div className="section-title">What is it</div>
+      <input
+        value={name}
+        autoFocus
+        aria-label="Equipment name"
+        placeholder="Rebounder, macebell, sledgehammer…"
+        onChange={(event) => setName(event.target.value)}
+      />
+
+      <div className="section-title">Where it belongs</div>
+      <div className="row wrap" style={{ gap: '0.4rem' }}>
+        {EQUIPMENT_GROUPS.map((option) => (
+          <button
+            key={option.label}
+            className={`chip${group === option.label ? ' on' : ''}`}
+            aria-pressed={group === option.label}
+            onClick={() => setGroup(option.label)}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+      <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
+        Which shelf it shows up on. It will have square corners either way, which is how kit
+        you added is told apart from the built-in list.
+      </p>
+    </Sheet>
   );
 }
