@@ -17,9 +17,10 @@ import { savedWorkouts } from '../../data/namedWorkouts';
 import { testTiming } from '../../domain/fitnessTests';
 import { activeInjuries } from '../../domain/injuries';
 import { todayKey } from '../../domain/dates';
+import { describeRunSettings, runSettingsFor } from '../../domain/runSettings';
 
 export default function MoreView() {
-  const { activeEquipment, exercises, profile } = useApp();
+  const { activeEquipment, exercises, profile, units } = useApp();
   const fileInput = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<string | null>(null);
   const today = todayKey();
@@ -64,6 +65,15 @@ export default function MoreView() {
           <span className="tiny faint">
             {activeEquipment?.name ?? 'Not set'} · {activeEquipment?.items.length ?? 0} items
           </span>
+        </span>
+        <span className="faint">›</span>
+      </Link>
+
+      <Link to="/more/run" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">
+          <strong>Run alerts</strong>
+          <br />
+          <span className="tiny faint">{describeRunSettings(runSettingsFor(units, profile.run))}</span>
         </span>
         <span className="faint">›</span>
       </Link>

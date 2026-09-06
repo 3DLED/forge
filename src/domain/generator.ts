@@ -92,6 +92,31 @@ export function isHold(exercise: Exercise): boolean {
   return exercise.metrics.includes('timeSec') && !exercise.metrics.includes('reps');
 }
 
+/**
+ * Kit you use while staying exactly where you are.
+ *
+ * The distinction matters to precisely one feature — GPS tracking — and it is not the same as
+ * "indoors": a treadmill in a garden would still report no movement. What these share is that
+ * the ground does not go past, so a satellite has nothing to measure.
+ */
+const STATIONARY_TAGS = new Set<EquipmentTag>([
+  'treadmill', 'rowErg', 'skiErg', 'bikeErg', 'airBike', 'pool', 'stairs', 'rebounder',
+]);
+
+/**
+ * Whether a live run screen would have anything to show.
+ *
+ * Distance-scored cardio that actually covers ground. Rebounding is cardio and is scored by
+ * time; a rowing machine is cardio and reports distance but never moves. Both would open a
+ * screen whose every number stayed at zero, which reads as the feature being broken rather
+ * than as it being the wrong feature.
+ */
+export function isTrackableRun(exercise: Exercise): boolean {
+  if (exercise.modality !== 'cardio') return false;
+  if (!exercise.metrics.includes('distanceM')) return false;
+  return !exercise.equipment.some((tag) => STATIONARY_TAGS.has(tag));
+}
+
 export interface SuggestedItem {
   exercise: Exercise;
   pattern: MovementPattern;

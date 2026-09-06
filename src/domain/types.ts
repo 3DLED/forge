@@ -14,6 +14,8 @@
  * Storage is canonical SI — kilograms, meters, seconds. Display converts (see units.ts).
  */
 
+import type { RunSettings } from './runSettings';
+
 /** ULID: lexicographically sortable, generated offline, safe for a future sync. */
 export type Id = string;
 
@@ -623,6 +625,14 @@ export interface Profile extends Entity {
    * wants the single figure at the end, which is the one training load is built from.
    */
   perSetEffort?: boolean;
+  /**
+   * How you like to be talked to on a run — splits, pace alerts, and today's shape.
+   *
+   * On the profile for the same reason the goal is: it is a standing preference, and being
+   * asked to set it up again in a car park before every outing is how a feature stops being
+   * used. See `runSettings.ts`.
+   */
+  run?: RunSettings;
 }
 
 /** Bodyweight, resting HR, and anything else tracked over time rather than per set. */

@@ -18,7 +18,7 @@ anything I think is carrying weight.
 included because they are words people read, but they will look thin next to the prose. Skim
 past them unless one is wrong.
 
-Counts: 470 strings, 56 files, 9 sections.
+Counts: 514 strings, 59 files, 9 sections.
 
 ---
 
@@ -56,167 +56,179 @@ Counts: 470 strings, 56 files, 9 sections.
 <sub>`src/features/log/ExerciseGroup.tsx`</sub>
 
 - **[LOG-006]** Time this hold
-- **[LOG-007]** + Set
-- **[LOG-008]** − Set
+- **[LOG-007]** ▶ Track this run
+- **[LOG-008]** Run alerts
+- **[LOG-009]** + Set
+- **[LOG-010]** − Set
 
 ### LogRunSheet
 
 <sub>`src/features/log/LogRunSheet.tsx`</sub>
 
-- **[LOG-009]** Log a run
-- **[LOG-010]** 1 is a walk, 10 is everything you had. This is what your training load is built from, so it is worth a moment's thought.
-- **[LOG-011]** Felt flat, humid, new shoes…
+- **[LOG-011]** Log a run
+- **[LOG-012]** 1 is a walk, 10 is everything you had. This is what your training load is built from, so it is worth a moment's thought.
+- **[LOG-013]** Felt flat, humid, new shoes…
 
 ### Movement write-ups
 
 <sub>`src/features/log/ExerciseInfoSheet.tsx`</sub>
 
-- **[LOG-012]** Swap for another version
-- **[LOG-013]** Set up
-- **[LOG-014]** How to do it
-- **[LOG-015]** Watch for
-- **[LOG-016]** No write-up for this one yet — it is likely a movement you added yourself.
-- **[LOG-017]** Trained one side at a time — log both sides, or double the sets.
+- **[LOG-014]** Swap for another version
+- **[LOG-015]** Set up
+- **[LOG-016]** How to do it
+- **[LOG-017]** Watch for
+- **[LOG-018]** No write-up for this one yet — it is likely a movement you added yourself.
+- **[LOG-019]** Trained one side at a time — log both sides, or double the sets.
 
 ### Picking a saved workout mid-session
 
 <sub>`src/features/log/SavedWorkoutsSheet.tsx`</sub>
 
-- **[LOG-018]** void | Promise
-- **[LOG-019]** Your saved workouts
-- **[LOG-020]** Nothing saved yet.
-- **[LOG-021]** Name a workout you have built and it comes back here, ready to run again — and, if it is timed, with its own best to beat.
-- **[LOG-022]** Straight sets
-- **[LOG-023]** Share, import or tidy these up in More → Saved workouts.
-- **[LOG-024]** Run it again
+- **[LOG-020]** void | Promise
+- **[LOG-021]** Your saved workouts
+- **[LOG-022]** Nothing saved yet.
+- **[LOG-023]** Name a workout you have built and it comes back here, ready to run again — and, if it is timed, with its own best to beat.
+- **[LOG-024]** Straight sets
+- **[LOG-025]** Share, import or tidy these up in More → Saved workouts.
+- **[LOG-026]** Run it again
 
 ### PinnedTimer
 
 <sub>`src/features/log/PinnedTimer.tsx`</sub>
 
-- **[LOG-025]** Open the full timer
-- **[LOG-026]** Record a completed round
+- **[LOG-027]** Open the full timer
+- **[LOG-028]** Record a completed round
+
+### RunScreen
+
+<sub>`src/features/log/RunScreen.tsx`</sub>
+
+- **[LOG-029]** Run alerts
+- **[LOG-030]** Waiting for a decent fix. Under trees or between tall buildings this can take a minute.
+- **[LOG-031]** Cues will appear here as they are said.
+- **[LOG-032]** Start run
+- **[LOG-033]** Save to workout
 
 ### Running a benchmark test
 
 <sub>`src/features/log/TestRunner.tsx`</sub>
 
-- **[LOG-027]** Recently tested
-- **[LOG-028]** What can you do for three?
-- **[LOG-029]** A rough guess is fine. Everything is worked out from it, and a wrong one costs an extra attempt rather than the result — what gets recorded is the heaviest set you actually finish.
-- **[LOG-030]** Lay out the test
-- **[LOG-031]** Use it
-- **[LOG-032]** Use a different weight
-- **[LOG-033]** How many did you get?
-- **[LOG-034]** Reps completed
-- **[LOG-035]** Record it
-- **[LOG-036]** ▶ Start the hold
-- **[LOG-037]** Made it — three good reps
-- **[LOG-038]** Failed it — stop the test
-- **[LOG-039]** No attempt was completed, so there is nothing to record. Nothing is saved.
+- **[LOG-034]** Recently tested
+- **[LOG-035]** What can you do for three?
+- **[LOG-036]** A rough guess is fine. Everything is worked out from it, and a wrong one costs an extra attempt rather than the result — what gets recorded is the heaviest set you actually finish.
+- **[LOG-037]** Lay out the test
+- **[LOG-038]** Use it
+- **[LOG-039]** Use a different weight
+- **[LOG-040]** How many did you get?
+- **[LOG-041]** Reps completed
+- **[LOG-042]** Record it
+- **[LOG-043]** ▶ Start the hold
+- **[LOG-044]** Made it — three good reps
+- **[LOG-045]** Failed it — stop the test
+- **[LOG-046]** No attempt was completed, so there is nothing to record. Nothing is saved.
 
 ### SavedWorkoutRow
 
 <sub>`src/features/log/SavedWorkoutRow.tsx`</sub>
 
-- **[LOG-040]** void | Promise
+- **[LOG-047]** void | Promise
 
 ### SessionEquipmentSheet
 
 <sub>`src/features/log/SessionEquipmentSheet.tsx`</sub>
 
-- **[LOG-041]** void | Promise
-- **[LOG-042]** Equipment for this workout
-- **[LOG-043]** Use my default
-- **[LOG-044]** Use for this workout
-- **[LOG-045]** Start from a profile
-- **[LOG-046]** Nothing but bodyweight
+- **[LOG-048]** void | Promise
+- **[LOG-049]** Equipment for this workout
+- **[LOG-050]** Use my default
+- **[LOG-051]** Use for this workout
+- **[LOG-052]** Start from a profile
+- **[LOG-053]** Nothing but bodyweight
 
 ### Suggest a workout
 
 <sub>`src/features/log/SuggestWorkoutSheet.tsx`</sub>
 
-- **[LOG-047]** void | Promise
-- **[LOG-048]** Suggest a workout
-- **[LOG-049]** ⏱ Add as a timed workout
-- **[LOG-050]** Your saved sessions
-- **[LOG-051]** Or build a new one
-- **[LOG-052]** Full body
-- **[LOG-053]** Nothing available for that combination.
-- **[LOG-054]** Try another region, or add equipment for this session.
-- **[LOG-055]** Swap for an easier or harder version
-- **[LOG-056]** Drop this movement
-- **[LOG-057]** 🎲 Suggest something else
+- **[LOG-054]** void | Promise
+- **[LOG-055]** Suggest a workout
+- **[LOG-056]** ⏱ Add as a timed workout
+- **[LOG-057]** Your saved sessions
+- **[LOG-058]** Or build a new one
+- **[LOG-059]** Full body
+- **[LOG-060]** Nothing available for that combination.
+- **[LOG-061]** Try another region, or add equipment for this session.
+- **[LOG-062]** Swap for an easier or harder version
+- **[LOG-063]** Drop this movement
+- **[LOG-064]** 🎲 Suggest something else
 
 ### The logging screen
 
 <sub>`src/features/log/SessionLogger.tsx`</sub>
 
-- **[LOG-058]** 💪 Great
-- **[LOG-059]** 🙂 Good
-- **[LOG-060]** 😐 OK
-- **[LOG-061]** 😮‍💨 Rough
-- **[LOG-062]** 🥴 Bad
-- **[LOG-063]** That session is gone.
-- **[LOG-064]** Back to today
-- **[LOG-065]** Session name
-- **[LOG-066]** Finished workout — reviewing. Tap Edit to change anything.
-- **[LOG-067]** Editing a finished workout. Changes save as you make them.
-- **[LOG-068]** ⏱ Add block
-- **[LOG-069]** Add a movement, or start an AMRAP or EMOM block.
-- **[LOG-070]** Each round
-- **[LOG-071]** + Add movement to this block
-- **[LOG-072]** ⏱ Edit timed workout
-- **[LOG-073]** Ungroup block
-- **[LOG-074]** + Add exercise
-- **[LOG-075]** ✨ Suggest a workout
-- **[LOG-076]** 💾 Save as a workout
-- **[LOG-077]** 📂 Browse saved workouts
-- **[LOG-078]** ⏱ Make this a timed workout
-- **[LOG-079]** Discard session
-- **[LOG-080]** Save this workout
-- **[LOG-081]** Upper A
-- **[LOG-082]** Edit timed workout
-- **[LOG-083]** Discard this session?
-- **[LOG-084]** Worth doing before you save
-- **[LOG-085]** Cindy, Tuesday burner…
-- **[LOG-086]** Name this workout
-- **[LOG-087]** Name it
-- **[LOG-088]** Optional — saving without them is fine.
-- **[LOG-089]** How hard was the whole session? This is what makes running and lifting comparable — effort × minutes is the one load number that spans both.
-- **[LOG-090]** 1 = barely moved · 5 = solid work · 8 = hard · 10 = everything you had
-- **[LOG-091]** Duration in minutes
-- **[LOG-092]** How did it feel?
-- **[LOG-093]** Anything worth remembering next time…
+- **[LOG-065]** 💪 Great
+- **[LOG-066]** 🙂 Good
+- **[LOG-067]** 😐 OK
+- **[LOG-068]** 😮‍💨 Rough
+- **[LOG-069]** 🥴 Bad
+- **[LOG-070]** That session is gone.
+- **[LOG-071]** Back to today
+- **[LOG-072]** Session name
+- **[LOG-073]** Finished workout — reviewing. Tap Edit to change anything.
+- **[LOG-074]** Editing a finished workout. Changes save as you make them.
+- **[LOG-075]** ⏱ Add block
+- **[LOG-076]** Add a movement, or start an AMRAP or EMOM block.
+- **[LOG-077]** Each round
+- **[LOG-078]** + Add movement to this block
+- **[LOG-079]** ⏱ Edit timed workout
+- **[LOG-080]** Ungroup block
+- **[LOG-081]** + Add exercise
+- **[LOG-082]** ✨ Suggest a workout
+- **[LOG-083]** 💾 Save as a workout
+- **[LOG-084]** 📂 Browse saved workouts
+- **[LOG-085]** ⏱ Make this a timed workout
+- **[LOG-086]** Discard session
+- **[LOG-087]** Save this workout
+- **[LOG-088]** Upper A
+- **[LOG-089]** Edit timed workout
+- **[LOG-090]** Discard this session?
+- **[LOG-091]** Worth doing before you save
+- **[LOG-092]** Cindy, Tuesday burner…
+- **[LOG-093]** Name this workout
+- **[LOG-094]** Name it
+- **[LOG-095]** Optional — saving without them is fine.
+- **[LOG-096]** How hard was the whole session? This is what makes running and lifting comparable — effort × minutes is the one load number that spans both.
+- **[LOG-097]** 1 = barely moved · 5 = solid work · 8 = hard · 10 = everything you had
+- **[LOG-098]** Duration in minutes
+- **[LOG-099]** How did it feel?
+- **[LOG-100]** Anything worth remembering next time…
 
 ### Timed workouts (AMRAP, EMOM, for time)
 
 <sub>`src/features/log/NewBlockSheet.tsx`</sub>
 
-- **[LOG-094]** As many rounds as possible before the cap. Tap a big button for each round.
-- **[LOG-095]** Every minute on the minute — a cue at each interval, for a set number of rounds.
-- **[LOG-096]** For time
-- **[LOG-097]** Fixed work, clock running. The score is how long it took.
-- **[LOG-098]** void | Promise
-- **[LOG-099]** Your saved timed workouts
-- **[LOG-100]** Or build a new one
+- **[LOG-101]** As many rounds as possible before the cap. Tap a big button for each round.
+- **[LOG-102]** Every minute on the minute — a cue at each interval, for a set number of rounds.
+- **[LOG-103]** For time
+- **[LOG-104]** Fixed work, clock running. The score is how long it took.
+- **[LOG-105]** void | Promise
+- **[LOG-106]** Your saved timed workouts
+- **[LOG-107]** Or build a new one
 
 ### VariationSheet
 
 <sub>`src/features/log/VariationSheet.tsx`</sub>
 
-- **[LOG-101]** void | Promise
+- **[LOG-108]** void | Promise
 
 ### WorkoutTimer
 
 <sub>`src/features/log/WorkoutTimer.tsx`</sub>
 
-- **[LOG-102]** void | Promise
-- **[LOG-103]** The clock keeps running in the strip at the top — closing this does not stop it.
-- **[LOG-104]** Each round
-- **[LOG-105]** Record a completed round
-- **[LOG-106]** Undo round
-- **[LOG-107]** This browser has no audio support — the timer still runs, silently.
+- **[LOG-109]** void | Promise
+- **[LOG-110]** The clock keeps running in the strip at the top — closing this does not stop it.
+- **[LOG-111]** Each round
+- **[LOG-112]** Record a completed round
+- **[LOG-113]** Undo round
+- **[LOG-114]** This browser has no audio support — the timer still runs, silently.
 
 ---
 
@@ -470,155 +482,191 @@ Counts: 470 strings, 56 files, 9 sections.
 - **[MORE-052]** New equipment profile
 - **[MORE-053]** Hotel gym
 - **[MORE-054]** This is your only profile. Make another before deleting this one — the app has to know what you can train with.
-- **[MORE-055]** ✎ Edit kit
-- **[MORE-056]** Save kit
-- **[MORE-057]** Biggest gaps
-- **[MORE-058]** What one more piece of kit would unlock, on top of this profile.
+- **[MORE-055]** ✎ Tick what you have
+- **[MORE-056]** + Add
+- **[MORE-057]** ✎ Rename
+- **[MORE-058]** Tap the kit you added — the square-cornered ones — to mark it. One at a time to rename, any number to delete. Built-in kit cannot be changed.
+- **[MORE-059]** Save kit
+- **[MORE-060]** Biggest gaps
+- **[MORE-061]** What one more piece of kit would unlock, on top of this profile.
+- **[MORE-062]** Add a piece of kit
+- **[MORE-063]** Whatever you train with that the list does not name. It behaves like any other equipment: tick it into a profile, and movements can require it.
+- **[MORE-064]** What is it
+- **[MORE-065]** Equipment name
+- **[MORE-066]** Rebounder, macebell, sledgehammer…
+- **[MORE-067]** Where it belongs
+- **[MORE-068]** Which shelf it shows up on. It will have square corners either way, which is how kit you added is told apart from the built-in list.
 
 ### Importing a file
 
 <sub>`src/features/more/ImportSheet.tsx`</sub>
 
-- **[MORE-059]** That file could not be read. It may have been altered or truncated.
-- **[MORE-060]** That import did not work.
-- **[MORE-061]** Choose a file
-- **[MORE-062]** What is in it
-- **[MORE-063]** They will be added so this works. Anything you already have is left alone.
-- **[MORE-064]** Start it on
-- **[MORE-065]** Plan start date
-- **[MORE-066]** Sessions are spaced the way the plan author laid them out, counted from this day. It comes in switched off — starting it is a separate choice.
+- **[MORE-069]** That file could not be read. It may have been altered or truncated.
+- **[MORE-070]** That import did not work.
+- **[MORE-071]** Choose a file
+- **[MORE-072]** What is in it
+- **[MORE-073]** They will be added so this works. Anything you already have is left alone.
+- **[MORE-074]** Start it on
+- **[MORE-075]** Plan start date
+- **[MORE-076]** Sessions are spaced the way the plan author laid them out, counted from this day. It comes in switched off — starting it is a separate choice.
 
 ### LibraryRow
 
 <sub>`src/features/more/LibraryRow.tsx`</sub>
 
-- **[MORE-067]** void | Promise
-- **[MORE-068]** ↗ Export / Share
-- **[MORE-069]** ✎ Edit
+- **[MORE-077]** void | Promise
+- **[MORE-078]** ↗ Export / Share
+- **[MORE-079]** ✎ Edit
 
 ### Logging an injury
 
 <sub>`src/features/more/InjurySheet.tsx`</sub>
 
-- **[MORE-070]** Log an injury
-- **[MORE-071]** What hurts
-- **[MORE-072]** Left shoulder
-- **[MORE-073]** What hurts, in your words
-- **[MORE-074]** How bad
-- **[MORE-075]** Rest until
-- **[MORE-076]** How it happened
-- **[MORE-077]** Optional — third set of overhead press
-- **[MORE-078]** Skipped, not deleted — mark the injury healed early and you can take them back.
+- **[MORE-080]** Log an injury
+- **[MORE-081]** What hurts
+- **[MORE-082]** Left shoulder
+- **[MORE-083]** What hurts, in your words
+- **[MORE-084]** How bad
+- **[MORE-085]** Rest until
+- **[MORE-086]** How it happened
+- **[MORE-087]** Optional — third set of overhead press
+- **[MORE-088]** Skipped, not deleted — mark the injury healed early and you can take them back.
 
 ### ReshuffleSheet
 
 <sub>`src/features/more/ReshuffleSheet.tsx`</sub>
 
-- **[MORE-079]** Fit the plan to your week
-- **[MORE-080]** Leave the plan alone
-- **[MORE-081]** Your availability no longer matches where these sessions sit. Completed and skipped sessions are never touched, and nothing before today moves.
-- **[MORE-082]** Dropped sessions are removed from the plan, not from your history. Your adherence is measured against what remains.
+- **[MORE-089]** Fit the plan to your week
+- **[MORE-090]** Leave the plan alone
+- **[MORE-091]** Your availability no longer matches where these sessions sit. Completed and skipped sessions are never touched, and nothing before today moves.
+- **[MORE-092]** Dropped sessions are removed from the plan, not from your history. Your adherence is measured against what remains.
+
+### RunSettingsView
+
+<sub>`src/features/more/RunSettingsView.tsx`</sub>
+
+- **[MORE-093]** 200 m
+- **[MORE-094]** 400 m
+- **[MORE-095]** 800 m
+- **[MORE-096]** 1 km
+- **[MORE-097]** 1600 m
+- **[MORE-098]** ¼ mi
+- **[MORE-099]** ½ mi
+- **[MORE-100]** 1 mi
+- **[MORE-101]** Just run
+- **[MORE-102]** Run alerts
+- **[MORE-103]** This browser cannot speak, so cues will appear on screen only. Everything below still decides what gets shown.
+- **[MORE-104]** Speak cues
+- **[MORE-105]** Silent keeps every cue on screen and says none of them — for a race, a group run, or a track session where someone is already shouting at you.
+- **[MORE-106]** Pace alerts
+- **[MORE-107]** Say something once I am off by
+- **[MORE-108]** Drifting is normal, so this waits — half a minute off pace before it says anything, and longer before it says the same thing twice.
+- **[MORE-109]** Today's run
+- **[MORE-110]** Each rep
+- **[MORE-111]** Jog between
+- **[MORE-112]** Minutes and seconds, like 8:30
 
 ### Settings
 
 <sub>`src/features/more/SettingsView.tsx`</sub>
 
-- **[MORE-083]** Training for
-- **[MORE-084]** Orders the plan library, sets what ‘Suggest a workout’ opens on, and shapes the sets and reps in plans you start from here. Plans already on your calendar keep what they prescribed.
-- **[MORE-085]** Training max
-- **[MORE-086]** Suggested loads are worked out from this share of your tested max, rather than from the max itself. Ninety per cent is the usual convention: a number computed from your best day is not makeable on an average one, and a programme you miss reps on is one you stop running. At 100% the suggestions come straight off your max.
-- **[MORE-087]** lb / miles
-- **[MORE-088]** kg / km
-- **[MORE-089]** Stored data does not change — this only affects how numbers are shown, so switching back and forth never rounds your history away.
-- **[MORE-090]** Week starts on
-- **[MORE-091]** Effort per set
-- **[MORE-092]** Once per session
-- **[MORE-093]** Every set
-- **[MORE-094]** Per-set effort is how autoregulated strength work picks its loads — a 9 on a triple you wanted at 8 means the next set comes down. It is worth the extra box on every row only if you act on it between sets. Training load uses the session figure either way.
-- **[MORE-095]** Weekly availability
-- **[MORE-096]** See what would move
-- **[MORE-097]** Which kinds of training each day can hold. Planning will respect this — a day with nothing selected is a rest day.
+- **[MORE-113]** Training for
+- **[MORE-114]** Orders the plan library, sets what ‘Suggest a workout’ opens on, and shapes the sets and reps in plans you start from here. Plans already on your calendar keep what they prescribed.
+- **[MORE-115]** Training max
+- **[MORE-116]** Suggested loads are worked out from this share of your tested max, rather than from the max itself. Ninety per cent is the usual convention: a number computed from your best day is not makeable on an average one, and a programme you miss reps on is one you stop running. At 100% the suggestions come straight off your max.
+- **[MORE-117]** lb / miles
+- **[MORE-118]** kg / km
+- **[MORE-119]** Stored data does not change — this only affects how numbers are shown, so switching back and forth never rounds your history away.
+- **[MORE-120]** Week starts on
+- **[MORE-121]** Effort per set
+- **[MORE-122]** Once per session
+- **[MORE-123]** Every set
+- **[MORE-124]** Per-set effort is how autoregulated strength work picks its loads — a 9 on a triple you wanted at 8 means the next set comes down. It is worth the extra box on every row only if you act on it between sets. Training load uses the session figure either way.
+- **[MORE-125]** Weekly availability
+- **[MORE-126]** See what would move
+- **[MORE-127]** Which kinds of training each day can hold. Planning will respect this — a day with nothing selected is a rest day.
 
 ### Tests
 
 <sub>`src/features/more/TestsView.tsx`</sub>
 
-- **[MORE-098]** Nothing measured yet.
-- **[MORE-099]** A test gives the app a real number to program from instead of a guess — and gives you something to beat.
-- **[MORE-100]** Just tested
-- **[MORE-101]** Test it again
-- **[MORE-102]** Remove this result
-- **[MORE-103]** Test a movement
-- **[MORE-104]** Enter a max I already know
-- **[MORE-105]** Remove this result?
+- **[MORE-128]** Nothing measured yet.
+- **[MORE-129]** A test gives the app a real number to program from instead of a guess — and gives you something to beat.
+- **[MORE-130]** Just tested
+- **[MORE-131]** Test it again
+- **[MORE-132]** Remove this result
+- **[MORE-133]** Test a movement
+- **[MORE-134]** Enter a max I already know
+- **[MORE-135]** Remove this result?
 
 ### The More menu
 
 <sub>`src/features/more/MoreView.tsx`</sub>
 
-- **[MORE-106]** Could not read that file.
-- **[MORE-107]** Saved workouts
-- **[MORE-108]** Your data
-- **[MORE-109]** Everything lives in this browser on this device. Nothing is uploaded, and no account exists — which also means a cleared browser takes your history with it. Export regularly and keep the file somewhere that syncs.
-- **[MORE-110]** Export backup
-- **[MORE-111]** Restore from backup
-- **[MORE-112]** Start over
-- **[MORE-113]** Erases every session, plan, and setting on this device and reseeds the movement library from scratch. Export a backup first if there is anything you want.
-- **[MORE-114]** Erase all data
-- **[MORE-115]** Forge · offline training tracker
-- **[MORE-116]** Restore backup
-- **[MORE-117]** . Merging keeps what is already on this device and lets the newer copy of each record win — the right choice when you have trained since the export. Replacing wipes first, for moving to a new phone.
-- **[MORE-118]** Merge (recommended)
-- **[MORE-119]** Replace everything
-- **[MORE-120]** Type ERASE to confirm
+- **[MORE-136]** Could not read that file.
+- **[MORE-137]** Run alerts
+- **[MORE-138]** Saved workouts
+- **[MORE-139]** Your data
+- **[MORE-140]** Everything lives in this browser on this device. Nothing is uploaded, and no account exists — which also means a cleared browser takes your history with it. Export regularly and keep the file somewhere that syncs.
+- **[MORE-141]** Export backup
+- **[MORE-142]** Restore from backup
+- **[MORE-143]** Start over
+- **[MORE-144]** Erases every session, plan, and setting on this device and reseeds the movement library from scratch. Export a backup first if there is anything you want.
+- **[MORE-145]** Erase all data
+- **[MORE-146]** Forge · offline training tracker
+- **[MORE-147]** Restore backup
+- **[MORE-148]** . Merging keeps what is already on this device and lets the newer copy of each record win — the right choice when you have trained since the export. Replacing wipes first, for moving to a new phone.
+- **[MORE-149]** Merge (recommended)
+- **[MORE-150]** Replace everything
+- **[MORE-151]** Type ERASE to confirm
 
 ### The injury log
 
 <sub>`src/features/more/InjuryView.tsx`</sub>
 
-- **[MORE-121]** Nothing logged.
-- **[MORE-122]** Log something that hurts and the sessions that load it step aside — the rest of your training carries on.
-- **[MORE-123]** Mark it healed
-- **[MORE-124]** Remove from the log
-- **[MORE-125]** Log an injury
-- **[MORE-126]** Healed already?
-- **[MORE-127]** Remove this from the log?
+- **[MORE-152]** Nothing logged.
+- **[MORE-153]** Log something that hurts and the sessions that load it step aside — the rest of your training carries on.
+- **[MORE-154]** Mark it healed
+- **[MORE-155]** Remove from the log
+- **[MORE-156]** Log an injury
+- **[MORE-157]** Healed already?
+- **[MORE-158]** Remove this from the log?
 
 ### The movement library
 
 <sub>`src/features/more/ExerciseLibraryView.tsx`</sub>
 
-- **[MORE-128]** Search movements
-- **[MORE-129]** + Add a movement
-- **[MORE-130]** Built in
+- **[MORE-159]** Search movements
+- **[MORE-160]** + Add a movement
+- **[MORE-161]** Built in
 
 ### Which weights you own
 
 <sub>`src/features/more/RackEditor.tsx`</sub>
 
-- **[MORE-131]** + Another size
-- **[MORE-132]** Weights you own
-- **[MORE-133]** Suggested loads, progressions and test ladders all snap to these. Leave a section empty and that movement falls back to round numbers.
-- **[MORE-134]** The bar
-- **[MORE-135]** Plates, in pairs
+- **[MORE-162]** + Another size
+- **[MORE-163]** Weights you own
+- **[MORE-164]** Suggested loads, progressions and test ladders all snap to these. Leave a section empty and that movement falls back to round numbers.
+- **[MORE-165]** The bar
+- **[MORE-166]** Plates, in pairs
 
 ### Your plans
 
 <sub>`src/features/more/PlansView.tsx`</sub>
 
-- **[MORE-136]** No plans of your own yet.
-- **[MORE-137]** Lay out a week — which days you train and what you do on them — and it repeats for as long as you set it to.
-- **[MORE-138]** + Build a plan
-- **[MORE-139]** 📥 Import a plan
+- **[MORE-167]** No plans of your own yet.
+- **[MORE-168]** Lay out a week — which days you train and what you do on them — and it repeats for as long as you set it to.
+- **[MORE-169]** + Build a plan
+- **[MORE-170]** 📥 Import a plan
 
 ### Your saved workouts
 
 <sub>`src/features/more/SavedWorkoutsView.tsx`</sub>
 
-- **[MORE-140]** Saved workouts
-- **[MORE-141]** Nothing saved yet.
-- **[MORE-142]** Name a workout you have built and it comes back here, ready to run again — and, if it is timed, with its own best to beat.
-- **[MORE-143]** 📥 Import a workout
+- **[MORE-171]** Saved workouts
+- **[MORE-172]** Nothing saved yet.
+- **[MORE-173]** Name a workout you have built and it comes back here, ready to run again — and, if it is timed, with its own best to beat.
+- **[MORE-174]** 📥 Import a workout
 
 ---
 
@@ -705,19 +753,20 @@ Counts: 470 strings, 56 files, 9 sections.
 - **[LIB-047]** The single most important session in any distance plan.
 - **[LIB-048]** Comfortably hard, roughly one-hour race effort.
 - **[LIB-049]** Where OCR fitness actually gets built — uneven ground and real vert.
+- **[LIB-050]** Low-impact cardio on a mini trampoline. Scored by time — the health bounce is small and quick, not high.
 
 ### equipment
 
 <sub>`src/data/seed/equipment.ts`</sub>
 
-- **[LIB-050]** Free weights
-- **[LIB-051]** Hanging & bars
-- **[LIB-052]** Odd objects
-- **[LIB-053]** Places to train
-- **[LIB-054]** Bodyweight only
-- **[LIB-055]** Road & bodyweight
-- **[LIB-056]** Home — kettlebells
-- **[LIB-057]** Full gym
+- **[LIB-051]** Free weights
+- **[LIB-052]** Hanging & bars
+- **[LIB-053]** Odd objects
+- **[LIB-054]** Places to train
+- **[LIB-055]** Bodyweight only
+- **[LIB-056]** Road & bodyweight
+- **[LIB-057]** Home — kettlebells
+- **[LIB-058]** Full gym
 
 ---
 
@@ -792,17 +841,27 @@ Counts: 470 strings, 56 files, 9 sections.
 - **[WORDS-043]** Cannot use it
 - **[WORDS-044]** Training this area is off the table for now.
 
+### pace
+
+<sub>`src/domain/pace.ts`</sub>
+
+- **[WORDS-045]** Every quarter mile
+- **[WORDS-046]** Every half mile
+- **[WORDS-047]** Every mile
+- **[WORDS-048]** Every half kilometre
+- **[WORDS-049]** Every kilometre
+
 ### plans
 
 <sub>`src/data/plans.ts`</sub>
 
-- **[WORDS-045]** Benchmark tests
-- **[WORDS-046]** Run this from Tests so the protocol is the same both times.
+- **[WORDS-050]** Benchmark tests
+- **[WORDS-051]** Run this from Tests so the protocol is the same both times.
 
 ### scheduling
 
 <sub>`src/domain/scheduling.ts`</sub>
 
-- **[WORDS-047]** That day has already passed this week
-- **[WORDS-048]** No available days this week
+- **[WORDS-052]** That day has already passed this week
+- **[WORDS-053]** No available days this week
 

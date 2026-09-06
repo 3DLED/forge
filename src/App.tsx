@@ -6,6 +6,7 @@ import HistoryView from './features/history/HistoryView';
 import ProgressView from './features/progress/ProgressView';
 import MoreView from './features/more/MoreView';
 import EquipmentView from './features/more/EquipmentView';
+import RunSettingsView from './features/more/RunSettingsView';
 import SettingsView from './features/more/SettingsView';
 import AppearanceView from './features/more/AppearanceView';
 import BodyView from './features/more/BodyView';
@@ -42,6 +43,7 @@ export default function App() {
           <Route path="/more/plans" element={<PlansView />} />
           <Route path="/more/workouts" element={<SavedWorkoutsView />} />
           <Route path="/more/equipment" element={<EquipmentView />} />
+          <Route path="/more/run" element={<RunSettingsView />} />
           <Route path="/more/settings" element={<SettingsView />} />
           <Route path="/more/appearance" element={<AppearanceView />} />
           <Route path="*" element={<Navigate to="/today" replace />} />

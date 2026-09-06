@@ -79,611 +79,653 @@
  },
  "LOG-006": {
   "file": "src/features/log/ExerciseGroup.tsx",
-  "line": 185,
+  "line": 193,
   "kind": "title",
   "text": "Time this hold"
  },
  "LOG-007": {
   "file": "src/features/log/ExerciseGroup.tsx",
-  "line": 238,
+  "line": 247,
   "kind": "on screen",
-  "text": "+ Set"
+  "text": "▶ Track this run"
  },
  "LOG-008": {
   "file": "src/features/log/ExerciseGroup.tsx",
-  "line": 242,
+  "line": 251,
+  "kind": "aria-label",
+  "text": "Run alerts"
+ },
+ "LOG-009": {
+  "file": "src/features/log/ExerciseGroup.tsx",
+  "line": 260,
+  "kind": "on screen",
+  "text": "+ Set"
+ },
+ "LOG-010": {
+  "file": "src/features/log/ExerciseGroup.tsx",
+  "line": 264,
   "kind": "on screen",
   "text": "− Set"
  },
- "LOG-009": {
+ "LOG-011": {
   "file": "src/features/log/LogRunSheet.tsx",
   "line": 88,
   "kind": "title",
   "text": "Log a run"
  },
- "LOG-010": {
+ "LOG-012": {
   "file": "src/features/log/LogRunSheet.tsx",
   "line": 176,
   "kind": "on screen",
   "text": "1 is a walk, 10 is everything you had. This is what your training load is built from, so it is worth a moment's thought."
  },
- "LOG-011": {
+ "LOG-013": {
   "file": "src/features/log/LogRunSheet.tsx",
   "line": 184,
   "kind": "placeholder",
   "text": "Felt flat, humid, new shoes…"
  },
- "LOG-012": {
+ "LOG-014": {
   "file": "src/features/log/ExerciseInfoSheet.tsx",
   "line": 29,
   "kind": "on screen",
   "text": "Swap for another version"
  },
- "LOG-013": {
+ "LOG-015": {
   "file": "src/features/log/ExerciseInfoSheet.tsx",
   "line": 42,
   "kind": "on screen",
   "text": "Set up"
  },
- "LOG-014": {
+ "LOG-016": {
   "file": "src/features/log/ExerciseInfoSheet.tsx",
   "line": 45,
   "kind": "on screen",
   "text": "How to do it"
  },
- "LOG-015": {
+ "LOG-017": {
   "file": "src/features/log/ExerciseInfoSheet.tsx",
   "line": 52,
   "kind": "on screen",
   "text": "Watch for"
  },
- "LOG-016": {
+ "LOG-018": {
   "file": "src/features/log/ExerciseInfoSheet.tsx",
   "line": 56,
   "kind": "on screen",
   "text": "No write-up for this one yet — it is likely a movement you added yourself."
  },
- "LOG-017": {
+ "LOG-019": {
   "file": "src/features/log/ExerciseInfoSheet.tsx",
   "line": 84,
   "kind": "on screen",
   "text": "Trained one side at a time — log both sides, or double the sets."
  },
- "LOG-018": {
+ "LOG-020": {
   "file": "src/features/log/SavedWorkoutsSheet.tsx",
   "line": 17,
   "kind": "on screen",
   "text": "void | Promise"
  },
- "LOG-019": {
+ "LOG-021": {
   "file": "src/features/log/SavedWorkoutsSheet.tsx",
   "line": 27,
   "kind": "title",
   "text": "Your saved workouts"
  },
- "LOG-020": {
+ "LOG-022": {
   "file": "src/features/log/SavedWorkoutsSheet.tsx",
   "line": 31,
   "kind": "on screen",
   "text": "Nothing saved yet."
  },
- "LOG-021": {
+ "LOG-023": {
   "file": "src/features/log/SavedWorkoutsSheet.tsx",
   "line": 32,
   "kind": "on screen",
   "text": "Name a workout you have built and it comes back here, ready to run again — and, if it is timed, with its own best to beat."
  },
- "LOG-022": {
+ "LOG-024": {
   "file": "src/features/log/SavedWorkoutsSheet.tsx",
   "line": 48,
   "kind": "on screen",
   "text": "Straight sets"
  },
- "LOG-023": {
+ "LOG-025": {
   "file": "src/features/log/SavedWorkoutsSheet.tsx",
   "line": 61,
   "kind": "on screen",
   "text": "Share, import or tidy these up in More → Saved workouts."
  },
- "LOG-024": {
+ "LOG-026": {
   "file": "src/features/log/SavedWorkoutsSheet.tsx",
   "line": 98,
   "kind": "on screen",
   "text": "Run it again"
  },
- "LOG-025": {
+ "LOG-027": {
   "file": "src/features/log/PinnedTimer.tsx",
   "line": 98,
   "kind": "aria-label",
   "text": "Open the full timer"
  },
- "LOG-026": {
+ "LOG-028": {
   "file": "src/features/log/PinnedTimer.tsx",
   "line": 117,
   "kind": "aria-label",
   "text": "Record a completed round"
  },
- "LOG-027": {
+ "LOG-029": {
+  "file": "src/features/log/RunScreen.tsx",
+  "line": 70,
+  "kind": "aria-label",
+  "text": "Run alerts"
+ },
+ "LOG-030": {
+  "file": "src/features/log/RunScreen.tsx",
+  "line": 120,
+  "kind": "on screen",
+  "text": "Waiting for a decent fix. Under trees or between tall buildings this can take a minute."
+ },
+ "LOG-031": {
+  "file": "src/features/log/RunScreen.tsx",
+  "line": 127,
+  "kind": "on screen",
+  "text": "Cues will appear here as they are said."
+ },
+ "LOG-032": {
+  "file": "src/features/log/RunScreen.tsx",
+  "line": 138,
+  "kind": "on screen",
+  "text": "Start run"
+ },
+ "LOG-033": {
+  "file": "src/features/log/RunScreen.tsx",
+  "line": 172,
+  "kind": "on screen",
+  "text": "Save to workout"
+ },
+ "LOG-034": {
   "file": "src/features/log/TestRunner.tsx",
   "line": 126,
   "kind": "on screen",
   "text": "Recently tested"
  },
- "LOG-028": {
+ "LOG-035": {
   "file": "src/features/log/TestRunner.tsx",
   "line": 153,
   "kind": "on screen",
   "text": "What can you do for three?"
  },
- "LOG-029": {
+ "LOG-036": {
   "file": "src/features/log/TestRunner.tsx",
   "line": 168,
   "kind": "on screen",
   "text": "A rough guess is fine. Everything is worked out from it, and a wrong one costs an extra attempt rather than the result — what gets recorded is the heaviest set you actually finish."
  },
- "LOG-030": {
+ "LOG-037": {
   "file": "src/features/log/TestRunner.tsx",
   "line": 178,
   "kind": "on screen",
   "text": "Lay out the test"
  },
- "LOG-031": {
+ "LOG-038": {
   "file": "src/features/log/TestRunner.tsx",
   "line": 235,
   "kind": "on screen",
   "text": "Use it"
  },
- "LOG-032": {
+ "LOG-039": {
   "file": "src/features/log/TestRunner.tsx",
   "line": 250,
   "kind": "on screen",
   "text": "Use a different weight"
  },
- "LOG-033": {
+ "LOG-040": {
   "file": "src/features/log/TestRunner.tsx",
   "line": 261,
   "kind": "on screen",
   "text": "How many did you get?"
  },
- "LOG-034": {
+ "LOG-041": {
   "file": "src/features/log/TestRunner.tsx",
   "line": 267,
   "kind": "aria-label",
   "text": "Reps completed"
  },
- "LOG-035": {
+ "LOG-042": {
   "file": "src/features/log/TestRunner.tsx",
   "line": 278,
   "kind": "on screen",
   "text": "Record it"
  },
- "LOG-036": {
+ "LOG-043": {
   "file": "src/features/log/TestRunner.tsx",
   "line": 293,
   "kind": "on screen",
   "text": "▶ Start the hold"
  },
- "LOG-037": {
+ "LOG-044": {
   "file": "src/features/log/TestRunner.tsx",
   "line": 304,
   "kind": "on screen",
   "text": "Made it — three good reps"
  },
- "LOG-038": {
+ "LOG-045": {
   "file": "src/features/log/TestRunner.tsx",
   "line": 307,
   "kind": "on screen",
   "text": "Failed it — stop the test"
  },
- "LOG-039": {
+ "LOG-046": {
   "file": "src/features/log/TestRunner.tsx",
   "line": 341,
   "kind": "on screen",
   "text": "No attempt was completed, so there is nothing to record. Nothing is saved."
  },
- "LOG-040": {
+ "LOG-047": {
   "file": "src/features/log/SavedWorkoutRow.tsx",
   "line": 12,
   "kind": "on screen",
   "text": "void | Promise"
  },
- "LOG-041": {
+ "LOG-048": {
   "file": "src/features/log/SessionEquipmentSheet.tsx",
   "line": 20,
   "kind": "on screen",
   "text": "void | Promise"
  },
- "LOG-042": {
+ "LOG-049": {
   "file": "src/features/log/SessionEquipmentSheet.tsx",
   "line": 36,
   "kind": "title",
   "text": "Equipment for this workout"
  },
- "LOG-043": {
+ "LOG-050": {
   "file": "src/features/log/SessionEquipmentSheet.tsx",
   "line": 41,
   "kind": "on screen",
   "text": "Use my default"
  },
- "LOG-044": {
+ "LOG-051": {
   "file": "src/features/log/SessionEquipmentSheet.tsx",
   "line": 45,
   "kind": "on screen",
   "text": "Use for this workout"
  },
- "LOG-045": {
+ "LOG-052": {
   "file": "src/features/log/SessionEquipmentSheet.tsx",
   "line": 56,
   "kind": "on screen",
   "text": "Start from a profile"
  },
- "LOG-046": {
+ "LOG-053": {
   "file": "src/features/log/SessionEquipmentSheet.tsx",
   "line": 67,
   "kind": "on screen",
   "text": "Nothing but bodyweight"
  },
- "LOG-047": {
+ "LOG-054": {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
   "line": 45,
   "kind": "on screen",
   "text": "void | Promise"
  },
- "LOG-048": {
+ "LOG-055": {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
   "line": 128,
   "kind": "title",
   "text": "Suggest a workout"
  },
- "LOG-049": {
+ "LOG-056": {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
   "line": 148,
   "kind": "on screen",
   "text": "⏱ Add as a timed workout"
  },
- "LOG-050": {
+ "LOG-057": {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
   "line": 158,
   "kind": "on screen",
   "text": "Your saved sessions"
  },
- "LOG-051": {
+ "LOG-058": {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
   "line": 170,
   "kind": "on screen",
   "text": "Or build a new one"
  },
- "LOG-052": {
+ "LOG-059": {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
   "line": 189,
   "kind": "on screen",
   "text": "Full body"
  },
- "LOG-053": {
+ "LOG-060": {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
   "line": 241,
   "kind": "on screen",
   "text": "Nothing available for that combination."
  },
- "LOG-054": {
+ "LOG-061": {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
   "line": 242,
   "kind": "on screen",
   "text": "Try another region, or add equipment for this session."
  },
- "LOG-055": {
+ "LOG-062": {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
   "line": 257,
   "kind": "title",
   "text": "Swap for an easier or harder version"
  },
- "LOG-056": {
+ "LOG-063": {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
   "line": 264,
   "kind": "title",
   "text": "Drop this movement"
  },
- "LOG-057": {
+ "LOG-064": {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
   "line": 283,
   "kind": "on screen",
   "text": "🎲 Suggest something else"
  },
- "LOG-058": {
-  "file": "src/features/log/SessionLogger.tsx",
-  "line": 86,
-  "kind": "label",
-  "text": "💪 Great"
- },
- "LOG-059": {
+ "LOG-065": {
   "file": "src/features/log/SessionLogger.tsx",
   "line": 87,
   "kind": "label",
-  "text": "🙂 Good"
- },
- "LOG-060": {
-  "file": "src/features/log/SessionLogger.tsx",
-  "line": 88,
-  "kind": "label",
-  "text": "😐 OK"
- },
- "LOG-061": {
-  "file": "src/features/log/SessionLogger.tsx",
-  "line": 89,
-  "kind": "label",
-  "text": "😮‍💨 Rough"
- },
- "LOG-062": {
-  "file": "src/features/log/SessionLogger.tsx",
-  "line": 90,
-  "kind": "label",
-  "text": "🥴 Bad"
- },
- "LOG-063": {
-  "file": "src/features/log/SessionLogger.tsx",
-  "line": 460,
-  "kind": "on screen",
-  "text": "That session is gone."
- },
- "LOG-064": {
-  "file": "src/features/log/SessionLogger.tsx",
-  "line": 461,
-  "kind": "on screen",
-  "text": "Back to today"
- },
- "LOG-065": {
-  "file": "src/features/log/SessionLogger.tsx",
-  "line": 685,
-  "kind": "aria-label",
-  "text": "Session name"
+  "text": "💪 Great"
  },
  "LOG-066": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 725,
-  "kind": "on screen",
-  "text": "Finished workout — reviewing. Tap Edit to change anything."
+  "line": 88,
+  "kind": "label",
+  "text": "🙂 Good"
  },
  "LOG-067": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 748,
-  "kind": "on screen",
-  "text": "Editing a finished workout. Changes save as you make them."
+  "line": 89,
+  "kind": "label",
+  "text": "😐 OK"
  },
  "LOG-068": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 752,
-  "kind": "on screen",
-  "text": "⏱ Add block"
+  "line": 90,
+  "kind": "label",
+  "text": "😮‍💨 Rough"
  },
  "LOG-069": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 772,
-  "kind": "on screen",
-  "text": "Add a movement, or start an AMRAP or EMOM block."
+  "line": 91,
+  "kind": "label",
+  "text": "🥴 Bad"
  },
  "LOG-070": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 862,
+  "line": 463,
   "kind": "on screen",
-  "text": "Each round"
+  "text": "That session is gone."
  },
  "LOG-071": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 890,
+  "line": 464,
   "kind": "on screen",
-  "text": "+ Add movement to this block"
+  "text": "Back to today"
  },
  "LOG-072": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 910,
-  "kind": "on screen",
-  "text": "⏱ Edit timed workout"
+  "line": 711,
+  "kind": "aria-label",
+  "text": "Session name"
  },
  "LOG-073": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 949,
+  "line": 751,
   "kind": "on screen",
-  "text": "Ungroup block"
+  "text": "Finished workout — reviewing. Tap Edit to change anything."
  },
  "LOG-074": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 963,
+  "line": 774,
   "kind": "on screen",
-  "text": "+ Add exercise"
+  "text": "Editing a finished workout. Changes save as you make them."
  },
  "LOG-075": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 971,
+  "line": 778,
   "kind": "on screen",
-  "text": "✨ Suggest a workout"
+  "text": "⏱ Add block"
  },
  "LOG-076": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 983,
+  "line": 798,
   "kind": "on screen",
-  "text": "💾 Save as a workout"
+  "text": "Add a movement, or start an AMRAP or EMOM block."
  },
  "LOG-077": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 994,
+  "line": 900,
   "kind": "on screen",
-  "text": "📂 Browse saved workouts"
+  "text": "Each round"
  },
  "LOG-078": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1005,
+  "line": 928,
   "kind": "on screen",
-  "text": "⏱ Make this a timed workout"
+  "text": "+ Add movement to this block"
  },
  "LOG-079": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1023,
+  "line": 948,
   "kind": "on screen",
-  "text": "Discard session"
+  "text": "⏱ Edit timed workout"
  },
  "LOG-080": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1110,
-  "kind": "title",
-  "text": "Save this workout"
+  "line": 987,
+  "kind": "on screen",
+  "text": "Ungroup block"
  },
  "LOG-081": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1115,
-  "kind": "placeholder",
-  "text": "Upper A"
+  "line": 1001,
+  "kind": "on screen",
+  "text": "+ Add exercise"
  },
  "LOG-082": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1223,
-  "kind": "title",
-  "text": "Edit timed workout"
+  "line": 1009,
+  "kind": "on screen",
+  "text": "✨ Suggest a workout"
  },
  "LOG-083": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1275,
-  "kind": "title",
-  "text": "Discard this session?"
+  "line": 1021,
+  "kind": "on screen",
+  "text": "💾 Save as a workout"
  },
  "LOG-084": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1382,
+  "line": 1032,
   "kind": "on screen",
-  "text": "Worth doing before you save"
+  "text": "📂 Browse saved workouts"
  },
  "LOG-085": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1410,
-  "kind": "placeholder",
-  "text": "Cindy, Tuesday burner…"
+  "line": 1043,
+  "kind": "on screen",
+  "text": "⏱ Make this a timed workout"
  },
  "LOG-086": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1411,
-  "kind": "aria-label",
-  "text": "Name this workout"
+  "line": 1061,
+  "kind": "on screen",
+  "text": "Discard session"
  },
  "LOG-087": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1420,
-  "kind": "on screen",
-  "text": "Name it"
+  "line": 1148,
+  "kind": "title",
+  "text": "Save this workout"
  },
  "LOG-088": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1427,
-  "kind": "on screen",
-  "text": "Optional — saving without them is fine."
+  "line": 1153,
+  "kind": "placeholder",
+  "text": "Upper A"
  },
  "LOG-089": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1433,
-  "kind": "on screen",
-  "text": "How hard was the whole session? This is what makes running and lifting comparable — effort × minutes is the one load number that spans both."
+  "line": 1261,
+  "kind": "title",
+  "text": "Edit timed workout"
  },
  "LOG-090": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1451,
-  "kind": "on screen",
-  "text": "1 = barely moved · 5 = solid work · 8 = hard · 10 = everything you had"
+  "line": 1329,
+  "kind": "title",
+  "text": "Discard this session?"
  },
  "LOG-091": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1463,
-  "kind": "aria-label",
-  "text": "Duration in minutes"
+  "line": 1436,
+  "kind": "on screen",
+  "text": "Worth doing before you save"
  },
  "LOG-092": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1469,
-  "kind": "on screen",
-  "text": "How did it feel?"
+  "line": 1464,
+  "kind": "placeholder",
+  "text": "Cindy, Tuesday burner…"
  },
  "LOG-093": {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1486,
+  "line": 1465,
+  "kind": "aria-label",
+  "text": "Name this workout"
+ },
+ "LOG-094": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1474,
+  "kind": "on screen",
+  "text": "Name it"
+ },
+ "LOG-095": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1481,
+  "kind": "on screen",
+  "text": "Optional — saving without them is fine."
+ },
+ "LOG-096": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1487,
+  "kind": "on screen",
+  "text": "How hard was the whole session? This is what makes running and lifting comparable — effort × minutes is the one load number that spans both."
+ },
+ "LOG-097": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1505,
+  "kind": "on screen",
+  "text": "1 = barely moved · 5 = solid work · 8 = hard · 10 = everything you had"
+ },
+ "LOG-098": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1517,
+  "kind": "aria-label",
+  "text": "Duration in minutes"
+ },
+ "LOG-099": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1523,
+  "kind": "on screen",
+  "text": "How did it feel?"
+ },
+ "LOG-100": {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1540,
   "kind": "placeholder",
   "text": "Anything worth remembering next time…"
  },
- "LOG-094": {
+ "LOG-101": {
   "file": "src/features/log/NewBlockSheet.tsx",
   "line": 16,
   "kind": "blurb",
   "text": "As many rounds as possible before the cap. Tap a big button for each round."
  },
- "LOG-095": {
+ "LOG-102": {
   "file": "src/features/log/NewBlockSheet.tsx",
   "line": 21,
   "kind": "blurb",
   "text": "Every minute on the minute — a cue at each interval, for a set number of rounds."
  },
- "LOG-096": {
+ "LOG-103": {
   "file": "src/features/log/NewBlockSheet.tsx",
   "line": 25,
   "kind": "label",
   "text": "For time"
  },
- "LOG-097": {
+ "LOG-104": {
   "file": "src/features/log/NewBlockSheet.tsx",
   "line": 26,
   "kind": "blurb",
   "text": "Fixed work, clock running. The score is how long it took."
  },
- "LOG-098": {
+ "LOG-105": {
   "file": "src/features/log/NewBlockSheet.tsx",
   "line": 42,
   "kind": "on screen",
   "text": "void | Promise"
  },
- "LOG-099": {
+ "LOG-106": {
   "file": "src/features/log/NewBlockSheet.tsx",
   "line": 86,
   "kind": "on screen",
   "text": "Your saved timed workouts"
  },
- "LOG-100": {
+ "LOG-107": {
   "file": "src/features/log/NewBlockSheet.tsx",
   "line": 95,
   "kind": "on screen",
   "text": "Or build a new one"
  },
- "LOG-101": {
+ "LOG-108": {
   "file": "src/features/log/VariationSheet.tsx",
   "line": 25,
   "kind": "on screen",
   "text": "void | Promise"
  },
- "LOG-102": {
+ "LOG-109": {
   "file": "src/features/log/WorkoutTimer.tsx",
   "line": 22,
   "kind": "on screen",
   "text": "void | Promise"
  },
- "LOG-103": {
+ "LOG-110": {
   "file": "src/features/log/WorkoutTimer.tsx",
   "line": 79,
   "kind": "on screen",
   "text": "The clock keeps running in the strip at the top — closing this does not stop it."
  },
- "LOG-104": {
+ "LOG-111": {
   "file": "src/features/log/WorkoutTimer.tsx",
   "line": 86,
   "kind": "on screen",
   "text": "Each round"
  },
- "LOG-105": {
+ "LOG-112": {
   "file": "src/features/log/WorkoutTimer.tsx",
   "line": 101,
   "kind": "aria-label",
   "text": "Record a completed round"
  },
- "LOG-106": {
+ "LOG-113": {
   "file": "src/features/log/WorkoutTimer.tsx",
   "line": 112,
   "kind": "on screen",
   "text": "Undo round"
  },
- "LOG-107": {
+ "LOG-114": {
   "file": "src/features/log/WorkoutTimer.tsx",
   "line": 139,
   "kind": "on screen",
@@ -1309,199 +1351,199 @@
  },
  "MORE-001": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 24,
+  "line": 25,
   "kind": "label",
   "text": "Pull-up bar"
  },
  "MORE-002": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 28,
+  "line": 29,
   "kind": "label",
   "text": "Jump rope"
  },
  "MORE-003": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 36,
+  "line": 37,
   "kind": "label",
   "text": "Push (forward)"
  },
  "MORE-004": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 37,
+  "line": 38,
   "kind": "label",
   "text": "Push (overhead)"
  },
  "MORE-005": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 38,
+  "line": 39,
   "kind": "label",
   "text": "Pull (row)"
  },
  "MORE-006": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 39,
+  "line": 40,
   "kind": "label",
   "text": "Pull (chin)"
  },
  "MORE-007": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 42,
+  "line": 43,
   "kind": "label",
   "text": "Full body"
  },
  "MORE-008": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 43,
+  "line": 44,
   "kind": "label",
   "text": "Run / walk"
  },
  "MORE-009": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 47,
+  "line": 48,
   "kind": "blurb",
   "text": "A loaded lift."
  },
  "MORE-010": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 47,
+  "line": 48,
   "kind": "label",
   "text": "Weight & reps"
  },
  "MORE-011": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 48,
+  "line": 49,
   "kind": "blurb",
   "text": "Bodyweight, counted."
  },
  "MORE-012": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 49,
+  "line": 50,
   "kind": "blurb",
   "text": "A plank, a hang, a wall sit."
  },
  "MORE-013": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 49,
+  "line": 50,
   "kind": "label",
   "text": "Time held"
  },
  "MORE-014": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 50,
+  "line": 51,
   "kind": "blurb",
   "text": "A run, a row, a carry."
  },
  "MORE-015": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 50,
+  "line": 51,
   "kind": "label",
   "text": "Distance & time"
  },
  "MORE-016": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 147,
+  "line": 149,
   "kind": "placeholder",
   "text": "Bulgarian bag spin"
  },
  "MORE-017": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 148,
+  "line": 150,
   "kind": "aria-label",
   "text": "Movement name"
  },
  "MORE-018": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 152,
+  "line": 154,
   "kind": "on screen",
   "text": "What it needs"
  },
  "MORE-019": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 164,
+  "line": 187,
   "kind": "on screen",
   "text": "Everything selected has to be in an equipment profile for this to be offered there."
  },
  "MORE-020": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 168,
+  "line": 191,
   "kind": "on screen",
   "text": "How it moves"
  },
  "MORE-021": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 181,
+  "line": 204,
   "kind": "on screen",
   "text": "What it records"
  },
  "MORE-022": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 198,
+  "line": 221,
   "kind": "on screen",
   "text": "How hard"
  },
  "MORE-023": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 216,
+  "line": 239,
   "kind": "on screen",
   "text": "Files as"
  },
  "MORE-024": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 220,
+  "line": 243,
   "kind": "on screen",
   "text": "Worked out from the kit and the pattern, so filtering, suggestions and the injury log all understand it without being told separately."
  },
  "MORE-025": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 226,
+  "line": 249,
   "kind": "on screen",
   "text": "What it trains"
  },
  "MORE-026": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 229,
+  "line": 252,
   "kind": "placeholder",
   "text": "shoulders, core"
  },
  "MORE-027": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 230,
+  "line": 253,
   "kind": "aria-label",
   "text": "Muscles trained"
  },
  "MORE-028": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 234,
+  "line": 257,
   "kind": "on screen",
   "text": "Set up"
  },
  "MORE-029": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 238,
+  "line": 261,
   "kind": "placeholder",
   "text": "Where you and the kit start. Optional."
  },
  "MORE-030": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 243,
+  "line": 266,
   "kind": "on screen",
   "text": "How to do it"
  },
  "MORE-031": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 247,
+  "line": 270,
   "kind": "placeholder",
   "text": "One cue per line, in the order they happen."
  },
  "MORE-032": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 252,
+  "line": 275,
   "kind": "on screen",
   "text": "Watch for"
  },
  "MORE-033": {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 256,
+  "line": 279,
   "kind": "placeholder",
   "text": "The one thing that usually goes wrong. Optional."
  },
@@ -1609,557 +1651,743 @@
  },
  "MORE-051": {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 118,
+  "line": 163,
   "kind": "on screen",
   "text": "+ New profile"
  },
  "MORE-052": {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 124,
+  "line": 169,
   "kind": "title",
   "text": "New equipment profile"
  },
  "MORE-053": {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 126,
+  "line": 171,
   "kind": "placeholder",
   "text": "Hotel gym"
  },
  "MORE-054": {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 164,
+  "line": 253,
   "kind": "on screen",
   "text": "This is your only profile. Make another before deleting this one — the app has to know what you can train with."
  },
  "MORE-055": {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 204,
+  "line": 297,
   "kind": "on screen",
-  "text": "✎ Edit kit"
+  "text": "✎ Tick what you have"
  },
  "MORE-056": {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 250,
+  "line": 302,
   "kind": "on screen",
-  "text": "Save kit"
+  "text": "+ Add"
  },
  "MORE-057": {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 265,
+  "line": 326,
   "kind": "on screen",
-  "text": "Biggest gaps"
+  "text": "✎ Rename"
  },
  "MORE-058": {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 267,
+  "line": 338,
+  "kind": "on screen",
+  "text": "Tap the kit you added — the square-cornered ones — to mark it. One at a time to rename, any number to delete. Built-in kit cannot be changed."
+ },
+ "MORE-059": {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 405,
+  "kind": "on screen",
+  "text": "Save kit"
+ },
+ "MORE-060": {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 420,
+  "kind": "on screen",
+  "text": "Biggest gaps"
+ },
+ "MORE-061": {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 422,
   "kind": "on screen",
   "text": "What one more piece of kit would unlock, on top of this profile."
  },
- "MORE-059": {
+ "MORE-062": {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 448,
+  "kind": "title",
+  "text": "Add a piece of kit"
+ },
+ "MORE-063": {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 464,
+  "kind": "on screen",
+  "text": "Whatever you train with that the list does not name. It behaves like any other equipment: tick it into a profile, and movements can require it."
+ },
+ "MORE-064": {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 469,
+  "kind": "on screen",
+  "text": "What is it"
+ },
+ "MORE-065": {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 473,
+  "kind": "aria-label",
+  "text": "Equipment name"
+ },
+ "MORE-066": {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 474,
+  "kind": "placeholder",
+  "text": "Rebounder, macebell, sledgehammer…"
+ },
+ "MORE-067": {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 478,
+  "kind": "on screen",
+  "text": "Where it belongs"
+ },
+ "MORE-068": {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 491,
+  "kind": "on screen",
+  "text": "Which shelf it shows up on. It will have square corners either way, which is how kit you added is told apart from the built-in list."
+ },
+ "MORE-069": {
   "file": "src/features/more/ImportSheet.tsx",
   "line": 53,
   "kind": "message",
   "text": "That file could not be read. It may have been altered or truncated."
  },
- "MORE-060": {
+ "MORE-070": {
   "file": "src/features/more/ImportSheet.tsx",
   "line": 93,
   "kind": "message",
   "text": "That import did not work."
  },
- "MORE-061": {
+ "MORE-071": {
   "file": "src/features/more/ImportSheet.tsx",
   "line": 120,
   "kind": "aria-label",
   "text": "Choose a file"
  },
- "MORE-062": {
+ "MORE-072": {
   "file": "src/features/more/ImportSheet.tsx",
   "line": 144,
   "kind": "on screen",
   "text": "What is in it"
  },
- "MORE-063": {
+ "MORE-073": {
   "file": "src/features/more/ImportSheet.tsx",
   "line": 168,
   "kind": "on screen",
   "text": "They will be added so this works. Anything you already have is left alone."
  },
- "MORE-064": {
+ "MORE-074": {
   "file": "src/features/more/ImportSheet.tsx",
   "line": 200,
   "kind": "on screen",
   "text": "Start it on"
  },
- "MORE-065": {
+ "MORE-075": {
   "file": "src/features/more/ImportSheet.tsx",
   "line": 204,
   "kind": "aria-label",
   "text": "Plan start date"
  },
- "MORE-066": {
+ "MORE-076": {
   "file": "src/features/more/ImportSheet.tsx",
   "line": 207,
   "kind": "on screen",
   "text": "Sessions are spaced the way the plan author laid them out, counted from this day. It comes in switched off — starting it is a separate choice."
  },
- "MORE-067": {
+ "MORE-077": {
   "file": "src/features/more/LibraryRow.tsx",
   "line": 20,
   "kind": "on screen",
   "text": "void | Promise"
  },
- "MORE-068": {
+ "MORE-078": {
   "file": "src/features/more/LibraryRow.tsx",
   "line": 47,
   "kind": "on screen",
   "text": "↗ Export / Share"
  },
- "MORE-069": {
+ "MORE-079": {
   "file": "src/features/more/LibraryRow.tsx",
   "line": 51,
   "kind": "on screen",
   "text": "✎ Edit"
  },
- "MORE-070": {
+ "MORE-080": {
   "file": "src/features/more/InjurySheet.tsx",
   "line": 70,
   "kind": "title",
   "text": "Log an injury"
  },
- "MORE-071": {
+ "MORE-081": {
   "file": "src/features/more/InjurySheet.tsx",
   "line": 86,
   "kind": "on screen",
   "text": "What hurts"
  },
- "MORE-072": {
+ "MORE-082": {
   "file": "src/features/more/InjurySheet.tsx",
   "line": 102,
   "kind": "placeholder",
   "text": "Left shoulder"
  },
- "MORE-073": {
+ "MORE-083": {
   "file": "src/features/more/InjurySheet.tsx",
   "line": 103,
   "kind": "aria-label",
   "text": "What hurts, in your words"
  },
- "MORE-074": {
+ "MORE-084": {
   "file": "src/features/more/InjurySheet.tsx",
   "line": 107,
   "kind": "on screen",
   "text": "How bad"
  },
- "MORE-075": {
+ "MORE-085": {
   "file": "src/features/more/InjurySheet.tsx",
   "line": 123,
   "kind": "on screen",
   "text": "Rest until"
  },
- "MORE-076": {
+ "MORE-086": {
   "file": "src/features/more/InjurySheet.tsx",
   "line": 137,
   "kind": "on screen",
   "text": "How it happened"
  },
- "MORE-077": {
+ "MORE-087": {
   "file": "src/features/more/InjurySheet.tsx",
   "line": 140,
   "kind": "placeholder",
   "text": "Optional — third set of overhead press"
  },
- "MORE-078": {
+ "MORE-088": {
   "file": "src/features/more/InjurySheet.tsx",
   "line": 164,
   "kind": "on screen",
   "text": "Skipped, not deleted — mark the injury healed early and you can take them back."
  },
- "MORE-079": {
+ "MORE-089": {
   "file": "src/features/more/ReshuffleSheet.tsx",
   "line": 28,
   "kind": "title",
   "text": "Fit the plan to your week"
  },
- "MORE-080": {
+ "MORE-090": {
   "file": "src/features/more/ReshuffleSheet.tsx",
   "line": 42,
   "kind": "on screen",
   "text": "Leave the plan alone"
  },
- "MORE-081": {
+ "MORE-091": {
   "file": "src/features/more/ReshuffleSheet.tsx",
   "line": 48,
   "kind": "on screen",
   "text": "Your availability no longer matches where these sessions sit. Completed and skipped sessions are never touched, and nothing before today moves."
  },
- "MORE-082": {
+ "MORE-092": {
   "file": "src/features/more/ReshuffleSheet.tsx",
   "line": 84,
   "kind": "on screen",
   "text": "Dropped sessions are removed from the plan, not from your history. Your adherence is measured against what remains."
  },
- "MORE-083": {
+ "MORE-093": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 30,
+  "kind": "label",
+  "text": "200 m"
+ },
+ "MORE-094": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 31,
+  "kind": "label",
+  "text": "400 m"
+ },
+ "MORE-095": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 32,
+  "kind": "label",
+  "text": "800 m"
+ },
+ "MORE-096": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 33,
+  "kind": "label",
+  "text": "1 km"
+ },
+ "MORE-097": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 34,
+  "kind": "label",
+  "text": "1600 m"
+ },
+ "MORE-098": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 38,
+  "kind": "label",
+  "text": "¼ mi"
+ },
+ "MORE-099": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 39,
+  "kind": "label",
+  "text": "½ mi"
+ },
+ "MORE-100": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 40,
+  "kind": "label",
+  "text": "1 mi"
+ },
+ "MORE-101": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 52,
+  "kind": "label",
+  "text": "Just run"
+ },
+ "MORE-102": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 104,
+  "kind": "title",
+  "text": "Run alerts"
+ },
+ "MORE-103": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 115,
+  "kind": "on screen",
+  "text": "This browser cannot speak, so cues will appear on screen only. Everything below still decides what gets shown."
+ },
+ "MORE-104": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 127,
+  "kind": "on screen",
+  "text": "Speak cues"
+ },
+ "MORE-105": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 137,
+  "kind": "on screen",
+  "text": "Silent keeps every cue on screen and says none of them — for a race, a group run, or a track session where someone is already shouting at you."
+ },
+ "MORE-106": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 179,
+  "kind": "on screen",
+  "text": "Pace alerts"
+ },
+ "MORE-107": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 204,
+  "kind": "on screen",
+  "text": "Say something once I am off by"
+ },
+ "MORE-108": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 222,
+  "kind": "on screen",
+  "text": "Drifting is normal, so this waits — half a minute off pace before it says anything, and longer before it says the same thing twice."
+ },
+ "MORE-109": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 229,
+  "kind": "on screen",
+  "text": "Today's run"
+ },
+ "MORE-110": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 314,
+  "kind": "on screen",
+  "text": "Each rep"
+ },
+ "MORE-111": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 336,
+  "kind": "on screen",
+  "text": "Jog between"
+ },
+ "MORE-112": {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 450,
+  "kind": "on screen",
+  "text": "Minutes and seconds, like 8:30"
+ },
+ "MORE-113": {
   "file": "src/features/more/SettingsView.tsx",
   "line": 74,
   "kind": "on screen",
   "text": "Training for"
  },
- "MORE-084": {
+ "MORE-114": {
   "file": "src/features/more/SettingsView.tsx",
   "line": 76,
   "kind": "on screen",
   "text": "Orders the plan library, sets what ‘Suggest a workout’ opens on, and shapes the sets and reps in plans you start from here. Plans already on your calendar keep what they prescribed."
  },
- "MORE-085": {
+ "MORE-115": {
   "file": "src/features/more/SettingsView.tsx",
   "line": 82,
   "kind": "on screen",
   "text": "Training max"
  },
- "MORE-086": {
+ "MORE-116": {
   "file": "src/features/more/SettingsView.tsx",
   "line": 94,
   "kind": "on screen",
   "text": "Suggested loads are worked out from this share of your tested max, rather than from the max itself. Ninety per cent is the usual convention: a number computed from your best day is not makeable on an average one, and a programme you miss reps on is one you stop running. At 100% the suggestions come straight off your max."
  },
- "MORE-087": {
+ "MORE-117": {
   "file": "src/features/more/SettingsView.tsx",
   "line": 106,
   "kind": "on screen",
   "text": "lb / miles"
  },
- "MORE-088": {
+ "MORE-118": {
   "file": "src/features/more/SettingsView.tsx",
   "line": 112,
   "kind": "on screen",
   "text": "kg / km"
  },
- "MORE-089": {
+ "MORE-119": {
   "file": "src/features/more/SettingsView.tsx",
   "line": 116,
   "kind": "on screen",
   "text": "Stored data does not change — this only affects how numbers are shown, so switching back and forth never rounds your history away."
  },
- "MORE-090": {
+ "MORE-120": {
   "file": "src/features/more/SettingsView.tsx",
   "line": 121,
   "kind": "on screen",
   "text": "Week starts on"
  },
- "MORE-091": {
+ "MORE-121": {
   "file": "src/features/more/SettingsView.tsx",
   "line": 134,
   "kind": "on screen",
   "text": "Effort per set"
  },
- "MORE-092": {
+ "MORE-122": {
   "file": "src/features/more/SettingsView.tsx",
   "line": 139,
   "kind": "on screen",
   "text": "Once per session"
  },
- "MORE-093": {
+ "MORE-123": {
   "file": "src/features/more/SettingsView.tsx",
   "line": 145,
   "kind": "on screen",
   "text": "Every set"
  },
- "MORE-094": {
+ "MORE-124": {
   "file": "src/features/more/SettingsView.tsx",
   "line": 149,
   "kind": "on screen",
   "text": "Per-set effort is how autoregulated strength work picks its loads — a 9 on a triple you wanted at 8 means the next set comes down. It is worth the extra box on every row only if you act on it between sets. Training load uses the session figure either way."
  },
- "MORE-095": {
+ "MORE-125": {
   "file": "src/features/more/SettingsView.tsx",
   "line": 155,
   "kind": "on screen",
   "text": "Weekly availability"
  },
- "MORE-096": {
+ "MORE-126": {
   "file": "src/features/more/SettingsView.tsx",
   "line": 169,
   "kind": "on screen",
   "text": "See what would move"
  },
- "MORE-097": {
+ "MORE-127": {
   "file": "src/features/more/SettingsView.tsx",
   "line": 182,
   "kind": "on screen",
   "text": "Which kinds of training each day can hold. Planning will respect this — a day with nothing selected is a rest day."
  },
- "MORE-098": {
+ "MORE-128": {
   "file": "src/features/more/TestsView.tsx",
   "line": 83,
   "kind": "on screen",
   "text": "Nothing measured yet."
  },
- "MORE-099": {
+ "MORE-129": {
   "file": "src/features/more/TestsView.tsx",
   "line": 84,
   "kind": "on screen",
   "text": "A test gives the app a real number to program from instead of a guess — and gives you something to beat."
  },
- "MORE-100": {
+ "MORE-130": {
   "file": "src/features/more/TestsView.tsx",
   "line": 96,
   "kind": "on screen",
   "text": "Just tested"
  },
- "MORE-101": {
+ "MORE-131": {
   "file": "src/features/more/TestsView.tsx",
   "line": 115,
   "kind": "on screen",
   "text": "Test it again"
  },
- "MORE-102": {
+ "MORE-132": {
   "file": "src/features/more/TestsView.tsx",
   "line": 123,
   "kind": "on screen",
   "text": "Remove this result"
  },
- "MORE-103": {
+ "MORE-133": {
   "file": "src/features/more/TestsView.tsx",
   "line": 136,
   "kind": "on screen",
   "text": "Test a movement"
  },
- "MORE-104": {
+ "MORE-134": {
   "file": "src/features/more/TestsView.tsx",
   "line": 148,
   "kind": "on screen",
   "text": "Enter a max I already know"
  },
- "MORE-105": {
+ "MORE-135": {
   "file": "src/features/more/TestsView.tsx",
   "line": 198,
   "kind": "title",
   "text": "Remove this result?"
  },
- "MORE-106": {
+ "MORE-136": {
   "file": "src/features/more/MoreView.tsx",
-  "line": 52,
+  "line": 53,
   "kind": "message",
   "text": "Could not read that file."
  },
- "MORE-107": {
+ "MORE-137": {
   "file": "src/features/more/MoreView.tsx",
-  "line": 121,
+  "line": 74,
+  "kind": "on screen",
+  "text": "Run alerts"
+ },
+ "MORE-138": {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 131,
   "kind": "on screen",
   "text": "Saved workouts"
  },
- "MORE-108": {
+ "MORE-139": {
   "file": "src/features/more/MoreView.tsx",
-  "line": 171,
+  "line": 181,
   "kind": "on screen",
   "text": "Your data"
  },
- "MORE-109": {
+ "MORE-140": {
   "file": "src/features/more/MoreView.tsx",
-  "line": 173,
+  "line": 183,
   "kind": "on screen",
   "text": "Everything lives in this browser on this device. Nothing is uploaded, and no account exists — which also means a cleared browser takes your history with it. Export regularly and keep the file somewhere that syncs."
  },
- "MORE-110": {
+ "MORE-141": {
   "file": "src/features/more/MoreView.tsx",
-  "line": 186,
+  "line": 196,
   "kind": "on screen",
   "text": "Export backup"
  },
- "MORE-111": {
+ "MORE-142": {
   "file": "src/features/more/MoreView.tsx",
-  "line": 205,
+  "line": 215,
   "kind": "on screen",
   "text": "Restore from backup"
  },
- "MORE-112": {
+ "MORE-143": {
   "file": "src/features/more/MoreView.tsx",
-  "line": 213,
+  "line": 223,
   "kind": "on screen",
   "text": "Start over"
  },
- "MORE-113": {
+ "MORE-144": {
   "file": "src/features/more/MoreView.tsx",
-  "line": 214,
+  "line": 224,
   "kind": "on screen",
   "text": "Erases every session, plan, and setting on this device and reseeds the movement library from scratch. Export a backup first if there is anything you want."
  },
- "MORE-114": {
+ "MORE-145": {
   "file": "src/features/more/MoreView.tsx",
-  "line": 221,
+  "line": 231,
   "kind": "on screen",
   "text": "Erase all data"
  },
- "MORE-115": {
+ "MORE-146": {
   "file": "src/features/more/MoreView.tsx",
-  "line": 226,
+  "line": 236,
   "kind": "on screen",
   "text": "Forge · offline training tracker"
  },
- "MORE-116": {
+ "MORE-147": {
   "file": "src/features/more/MoreView.tsx",
-  "line": 231,
+  "line": 241,
   "kind": "title",
   "text": "Restore backup"
  },
- "MORE-117": {
+ "MORE-148": {
   "file": "src/features/more/MoreView.tsx",
-  "line": 233,
+  "line": 243,
   "kind": "on screen",
   "text": ". Merging keeps what is already on this device and lets the newer copy of each record win — the right choice when you have trained since the export. Replacing wipes first, for moving to a new phone."
  },
- "MORE-118": {
-  "file": "src/features/more/MoreView.tsx",
-  "line": 245,
-  "kind": "on screen",
-  "text": "Merge (recommended)"
- },
- "MORE-119": {
+ "MORE-149": {
   "file": "src/features/more/MoreView.tsx",
   "line": 255,
   "kind": "on screen",
+  "text": "Merge (recommended)"
+ },
+ "MORE-150": {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 265,
+  "kind": "on screen",
   "text": "Replace everything"
  },
- "MORE-120": {
+ "MORE-151": {
   "file": "src/features/more/MoreView.tsx",
-  "line": 266,
+  "line": 276,
   "kind": "label",
   "text": "Type ERASE to confirm"
  },
- "MORE-121": {
+ "MORE-152": {
   "file": "src/features/more/InjuryView.tsx",
   "line": 47,
   "kind": "on screen",
   "text": "Nothing logged."
  },
- "MORE-122": {
+ "MORE-153": {
   "file": "src/features/more/InjuryView.tsx",
   "line": 48,
   "kind": "on screen",
   "text": "Log something that hurts and the sessions that load it step aside — the rest of your training carries on."
  },
- "MORE-123": {
+ "MORE-154": {
   "file": "src/features/more/InjuryView.tsx",
   "line": 74,
   "kind": "on screen",
   "text": "Mark it healed"
  },
- "MORE-124": {
+ "MORE-155": {
   "file": "src/features/more/InjuryView.tsx",
   "line": 98,
   "kind": "on screen",
   "text": "Remove from the log"
  },
- "MORE-125": {
+ "MORE-156": {
   "file": "src/features/more/InjuryView.tsx",
   "line": 108,
   "kind": "on screen",
   "text": "Log an injury"
  },
- "MORE-126": {
+ "MORE-157": {
   "file": "src/features/more/InjuryView.tsx",
   "line": 128,
   "kind": "title",
   "text": "Healed already?"
  },
- "MORE-127": {
+ "MORE-158": {
   "file": "src/features/more/InjuryView.tsx",
   "line": 150,
   "kind": "title",
   "text": "Remove this from the log?"
  },
- "MORE-128": {
+ "MORE-159": {
   "file": "src/features/more/ExerciseLibraryView.tsx",
   "line": 88,
   "kind": "placeholder",
   "text": "Search movements"
  },
- "MORE-129": {
+ "MORE-160": {
   "file": "src/features/more/ExerciseLibraryView.tsx",
   "line": 117,
   "kind": "on screen",
   "text": "+ Add a movement"
  },
- "MORE-130": {
+ "MORE-161": {
   "file": "src/features/more/ExerciseLibraryView.tsx",
   "line": 124,
   "kind": "on screen",
   "text": "Built in"
  },
- "MORE-131": {
+ "MORE-162": {
   "file": "src/features/more/RackEditor.tsx",
   "line": 166,
   "kind": "on screen",
   "text": "+ Another size"
  },
- "MORE-132": {
+ "MORE-163": {
   "file": "src/features/more/RackEditor.tsx",
   "line": 187,
   "kind": "on screen",
   "text": "Weights you own"
  },
- "MORE-133": {
+ "MORE-164": {
   "file": "src/features/more/RackEditor.tsx",
   "line": 188,
   "kind": "on screen",
   "text": "Suggested loads, progressions and test ladders all snap to these. Leave a section empty and that movement falls back to round numbers."
  },
- "MORE-134": {
+ "MORE-165": {
   "file": "src/features/more/RackEditor.tsx",
   "line": 204,
   "kind": "on screen",
   "text": "The bar"
  },
- "MORE-135": {
+ "MORE-166": {
   "file": "src/features/more/RackEditor.tsx",
   "line": 221,
   "kind": "on screen",
   "text": "Plates, in pairs"
  },
- "MORE-136": {
+ "MORE-167": {
   "file": "src/features/more/PlansView.tsx",
   "line": 74,
   "kind": "on screen",
   "text": "No plans of your own yet."
  },
- "MORE-137": {
+ "MORE-168": {
   "file": "src/features/more/PlansView.tsx",
   "line": 75,
   "kind": "on screen",
   "text": "Lay out a week — which days you train and what you do on them — and it repeats for as long as you set it to."
  },
- "MORE-138": {
+ "MORE-169": {
   "file": "src/features/more/PlansView.tsx",
   "line": 82,
   "kind": "on screen",
   "text": "+ Build a plan"
  },
- "MORE-139": {
+ "MORE-170": {
   "file": "src/features/more/PlansView.tsx",
   "line": 86,
   "kind": "on screen",
   "text": "📥 Import a plan"
  },
- "MORE-140": {
+ "MORE-171": {
   "file": "src/features/more/SavedWorkoutsView.tsx",
   "line": 48,
   "kind": "title",
   "text": "Saved workouts"
  },
- "MORE-141": {
+ "MORE-172": {
   "file": "src/features/more/SavedWorkoutsView.tsx",
   "line": 80,
   "kind": "on screen",
   "text": "Nothing saved yet."
  },
- "MORE-142": {
+ "MORE-173": {
   "file": "src/features/more/SavedWorkoutsView.tsx",
   "line": 81,
   "kind": "on screen",
   "text": "Name a workout you have built and it comes back here, ready to run again — and, if it is timed, with its own best to beat."
  },
- "MORE-143": {
+ "MORE-174": {
   "file": "src/features/more/SavedWorkoutsView.tsx",
   "line": 88,
   "kind": "on screen",
@@ -2167,13 +2395,13 @@
  },
  "SHARED-001": {
   "file": "src/ui/AppProvider.tsx",
-  "line": 83,
+  "line": 104,
   "kind": "on screen",
   "text": "Could not open your training data"
  },
  "SHARED-002": {
   "file": "src/ui/AppProvider.tsx",
-  "line": 85,
+  "line": 106,
   "kind": "on screen",
   "text": "Private browsing blocks local storage in some browsers. Try a normal window."
  },
@@ -2484,50 +2712,56 @@
   "text": "Where OCR fitness actually gets built — uneven ground and real vert."
  },
  "LIB-050": {
-  "file": "src/data/seed/equipment.ts",
-  "line": 63,
-  "kind": "label",
-  "text": "Free weights"
+  "file": "src/data/seed/exercises.ts",
+  "line": 764,
+  "kind": "notes",
+  "text": "Low-impact cardio on a mini trampoline. Scored by time — the health bounce is small and quick, not high."
  },
  "LIB-051": {
   "file": "src/data/seed/equipment.ts",
-  "line": 64,
+  "line": 65,
   "kind": "label",
-  "text": "Hanging & bars"
+  "text": "Free weights"
  },
  "LIB-052": {
   "file": "src/data/seed/equipment.ts",
-  "line": 70,
+  "line": 66,
   "kind": "label",
-  "text": "Odd objects"
+  "text": "Hanging & bars"
  },
  "LIB-053": {
   "file": "src/data/seed/equipment.ts",
   "line": 72,
   "kind": "label",
-  "text": "Places to train"
+  "text": "Odd objects"
  },
  "LIB-054": {
   "file": "src/data/seed/equipment.ts",
-  "line": 83,
-  "kind": "name",
-  "text": "Bodyweight only"
+  "line": 74,
+  "kind": "label",
+  "text": "Places to train"
  },
  "LIB-055": {
   "file": "src/data/seed/equipment.ts",
-  "line": 88,
+  "line": 85,
   "kind": "name",
-  "text": "Road & bodyweight"
+  "text": "Bodyweight only"
  },
  "LIB-056": {
   "file": "src/data/seed/equipment.ts",
-  "line": 93,
+  "line": 90,
   "kind": "name",
-  "text": "Home — kettlebells"
+  "text": "Road & bodyweight"
  },
  "LIB-057": {
   "file": "src/data/seed/equipment.ts",
-  "line": 99,
+  "line": 95,
+  "kind": "name",
+  "text": "Home — kettlebells"
+ },
+ "LIB-058": {
+  "file": "src/data/seed/equipment.ts",
+  "line": 101,
   "kind": "name",
   "text": "Full gym"
  },
@@ -2796,24 +3030,54 @@
   "text": "Training this area is off the table for now."
  },
  "WORDS-045": {
+  "file": "src/domain/pace.ts",
+  "line": 115,
+  "kind": "label",
+  "text": "Every quarter mile"
+ },
+ "WORDS-046": {
+  "file": "src/domain/pace.ts",
+  "line": 116,
+  "kind": "label",
+  "text": "Every half mile"
+ },
+ "WORDS-047": {
+  "file": "src/domain/pace.ts",
+  "line": 117,
+  "kind": "label",
+  "text": "Every mile"
+ },
+ "WORDS-048": {
+  "file": "src/domain/pace.ts",
+  "line": 118,
+  "kind": "label",
+  "text": "Every half kilometre"
+ },
+ "WORDS-049": {
+  "file": "src/domain/pace.ts",
+  "line": 119,
+  "kind": "label",
+  "text": "Every kilometre"
+ },
+ "WORDS-050": {
   "file": "src/data/plans.ts",
   "line": 148,
   "kind": "name",
   "text": "Benchmark tests"
  },
- "WORDS-046": {
+ "WORDS-051": {
   "file": "src/data/plans.ts",
   "line": 161,
   "kind": "notes",
   "text": "Run this from Tests so the protocol is the same both times."
  },
- "WORDS-047": {
+ "WORDS-052": {
   "file": "src/domain/scheduling.ts",
   "line": 120,
   "kind": "reason",
   "text": "That day has already passed this week"
  },
- "WORDS-048": {
+ "WORDS-053": {
   "file": "src/domain/scheduling.ts",
   "line": 137,
   "kind": "reason",

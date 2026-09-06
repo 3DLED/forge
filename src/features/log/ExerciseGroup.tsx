@@ -38,6 +38,8 @@ export default function ExerciseGroup({
   onSwapExercise,
   onShowInfo,
   onStartHold,
+  onTrackRun,
+  onRunSettings,
   warnings = [],
   suggestion,
   onUseSuggestion,
@@ -64,6 +66,15 @@ export default function ExerciseGroup({
   onShowInfo: (slug: string) => void;
   /** Start a count-up clock for a hold. Absent where holds cannot be timed. */
   onStartHold?: (setId: string) => void;
+  /**
+   * Open the live run screen for this movement. Absent for anything you do standing still.
+   *
+   * Passed in rather than decided here: whether a movement is a run is a question about the
+   * exercise library, and this component is deliberately ignorant of what it is rendering.
+   */
+  onTrackRun?: () => void;
+  /** Run alerts and today's structure. Beside the run button because it belongs to it. */
+  onRunSettings?: () => void;
   /** Current injuries this movement runs into. Flagged, never enforced. */
   warnings?: string[];
   /** A working load worked out from your max, offered for the sets that have none. */
@@ -97,7 +108,13 @@ export default function ExerciseGroup({
    * the number only exists once you stop. Inside a block the sets are a round's recipe rather
    * than something you tick off, so there is nothing there to time.
    */
-  const timeable = Boolean(onStartHold) && !nested && !readOnly && exercise && isHold(exercise);
+  /*
+   * A run qualifies as a hold — timed, no reps — and would otherwise put a second ▶ on the
+   * same card, two rows above the first, starting a different clock. The run screen is the
+   * timer for a run, and it records the distance as well, so it wins outright.
+   */
+  const timeable =
+    Boolean(onStartHold) && !onTrackRun && !nested && !readOnly && exercise && isHold(exercise);
 
   /*
    * Whether this movement's distances read in metres.
@@ -289,6 +306,27 @@ export default function ExerciseGroup({
           )}
         </div>
       ))}
+
+      {/*
+        Above the set controls, not beside them: this is the thing you came to this card to
+        press, and adding a set to a run is a rare correction by comparison.
+
+        The cog sits with it because run alerts are the settings *for this button* — what gets
+        said while it is running — and a runner looking for them looks where the run starts,
+        not in a menu two screens away.
+      */}
+      {onTrackRun && !nested && !readOnly && (
+        <div className="row" style={{ marginTop: '0.5rem', gap: '0.5rem' }}>
+          <button className="btn primary grow" onClick={onTrackRun}>
+            ▶ Track this run
+          </button>
+          {onRunSettings && (
+            <button className="btn sm" onClick={onRunSettings} aria-label="Run alerts">
+              ⚙
+            </button>
+          )}
+        </div>
+      )}
 
       {!nested && !readOnly && (
         <div className="row" style={{ marginTop: '0.5rem', gap: '0.5rem' }}>

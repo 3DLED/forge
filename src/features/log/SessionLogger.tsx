@@ -20,6 +20,7 @@ import ExercisePicker from './ExercisePicker';
 import ExerciseGroup from './ExerciseGroup';
 import RestTimer, { type UpNext } from './RestTimer';
 import HoldTimer from './HoldTimer';
+import RunScreen from './RunScreen';
 import WorkoutTimer from './WorkoutTimer';
 import PinnedTimer from './PinnedTimer';
 import { useBlockTimer } from './useBlockTimer';
@@ -35,7 +36,7 @@ import { allInjuries } from '../../data/injuries';
 import { allTestResults } from '../../data/fitnessTests';
 import { knownMax, suggestLoad } from '../../domain/loading';
 import { suggestProgression } from '../../domain/progression';
-import { GOAL_SCHEMES } from '../../domain/generator';
+import { GOAL_SCHEMES, isTrackableRun } from '../../domain/generator';
 import { goalSpec } from '../../domain/goals';
 import { scanRecords, type PrEvent } from '../../domain/training';
 import { loadsForExercise } from '../../domain/equipment';
@@ -172,6 +173,8 @@ export default function SessionLogger() {
    * it. Read at render, after both have flushed, it is the number on screen.
    */
   const [holding, setHolding] = useState<string | null>(null);
+  /** The set a live run is being tracked into, or null when no run screen is open. */
+  const [tracking, setTracking] = useState<string | null>(null);
   /**
    * Opt-in editing of a workout that is already finished.
    *
@@ -689,13 +692,15 @@ export default function SessionLogger() {
    * concerned, and having each one start its own rest and its own stopwatch is how the two
    * drift apart.
    */
-  const afterCompleting = (target: LoggedSet) => {
+  const afterCompleting = (target: LoggedSet, { rest = true }: { rest?: boolean } = {}) => {
       // This tap is the only user gesture in the rest flow, and browsers hand out an
       // AudioContext nowhere else. Unlocking here is what lets the timer make a sound when
       // it runs out — by then there is no gesture left to ask for one.
     unlockAudio();
-    setRestEndsAt(Date.now() + (target.restSec ?? DEFAULT_REST_SEC) * 1000);
-    setRestingAfter(target.exerciseSlug);
+    if (rest) {
+      setRestEndsAt(Date.now() + (target.restSec ?? DEFAULT_REST_SEC) * 1000);
+      setRestingAfter(target.exerciseSlug);
+    }
 
     /*
      * Finishing your first set is starting the workout.
@@ -743,6 +748,40 @@ export default function SessionLogger() {
       ),
     );
     afterCompleting(target);
+  };
+
+  /**
+   * A finished run, written onto the set it was started from.
+   *
+   * Same rule as a hold: what the satellites measured is what happened. A five kilometre
+   * prescription that came out at 4.94 km is a 4.94 km run, and rounding it up to the number
+   * that was asked for would put a distance in your history you did not cover.
+   */
+  const completeRun = (setId: string, result: { distanceM: number; timeSec: number }) => {
+    setTracking(null);
+    const target = sets.find((s) => s.id === setId);
+    if (!target) return;
+
+    mutate(
+      sets.map((set) =>
+        set.id === setId
+          ? {
+              ...set,
+              values: { ...set.values, distanceM: result.distanceM, timeSec: result.timeSec },
+              completed: true,
+            }
+          : set,
+      ),
+    );
+    /*
+     * No rest panel after a run.
+     *
+     * Rest between sets is a real instruction — ninety seconds before the next five. Rest
+     * after a run is not a thing anybody does, and putting a countdown on the screen the
+     * moment someone finishes a ten kilometre effort is the app asking them to stand in the
+     * street and watch it.
+     */
+    afterCompleting(target, { rest: false });
   };
 
   const endRest = () => {
@@ -1007,6 +1046,22 @@ export default function SessionLogger() {
               unlockAudio();
               setHolding(setId);
             }}
+            {...(() => {
+              const exercise = exerciseBySlug.get(section.group.slug);
+              if (!exercise || !isTrackableRun(exercise)) return {};
+              /*
+               * Tracked into the first set still outstanding, so a session with three
+               * separate efforts of the same movement fills them in order rather than
+               * overwriting the first one three times.
+               */
+              const target =
+                section.group.sets.find((set) => !set.completed) ?? section.group.sets[0];
+              if (!target) return {};
+              return {
+                onTrackRun: () => setTracking(target.id),
+                onRunSettings: () => navigate('/more/run'),
+              };
+            })()}
           />
         ) : (
           <section className="card block-card" key={section.key}>
@@ -1476,6 +1531,32 @@ export default function SessionLogger() {
           }}
         />
       )}
+
+      {/*
+        Over everything, including the pinned strip.
+
+        A run is not something you do while glancing at the workout behind it, and the session
+        clock underneath keeps running the whole time — the run screen has its own clock for
+        the run, and they are answering different questions.
+      */}
+      {tracking && (() => {
+        const target = sets.find((set) => set.id === tracking);
+        const exercise = target ? exerciseBySlug.get(target.exerciseSlug) : undefined;
+        if (!target) return null;
+        return (
+          <RunScreen
+            title={exercise?.name ?? target.exerciseSlug}
+            /*
+             * Only from a set still to be run. On an unfinished set a distance is what you
+             * were told to do; on a finished one it is what you did, and handing that back
+             * as a prescription would set today's target to yesterday's result.
+             */
+            plannedDistanceM={target.completed ? undefined : target.values.distanceM}
+            onSave={(result) => completeRun(target.id, result)}
+            onClose={() => setTracking(null)}
+          />
+        );
+      })()}
 
       {/* One panel at a time: a hold is running work, and rest has not started yet. */}
       {holding && (

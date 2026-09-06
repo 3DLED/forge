@@ -1286,3 +1286,127 @@ section[id^='movement-'] {
   border-color: var(--accent);
   color: var(--accent);
 }
+
+/* --- the live run screen -------------------------------------------------- */
+
+/*
+ * Covers everything, including the tab bar.
+ *
+ * A run is not something done alongside the rest of the app, and leaving the navigation
+ * reachable would put "History" one stray thumb away from a running clock. The way out is
+ * the ✕, deliberately, and the way out with the run kept is Finish.
+ */
+.run-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: calc(var(--safe-top) + 0.8rem) 1rem calc(var(--safe-bottom) + 0.8rem);
+  background: var(--bg);
+  overflow-y: auto;
+}
+
+.run-screen-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* What you were told to do, held above the numbers that say how it is going. */
+.run-segment {
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+}
+
+.run-segment-what {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+/*
+ * The one number read mid-stride.
+ *
+ * Enormous because it is read at arm's length by someone who cannot stop, and because it is
+ * the only figure on this screen that can still be acted on. `clamp` rather than a fixed
+ * size: on a small phone in landscape this would otherwise push the controls off the bottom.
+ */
+.run-pace-big {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  padding: 0.6rem 0;
+}
+
+.run-pace-value {
+  font-size: clamp(3.5rem, 22vw, 6rem);
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.run-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.run-stat {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.run-error { border-color: var(--danger); color: var(--danger); }
+
+/*
+ * Everything that was said, newest first.
+ *
+ * Spoken cues happen once, into one earbud, over traffic. Without this the answer to "what
+ * did it just say" is to run the rest of the session not knowing.
+ */
+.run-notes {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.run-note {
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  border-left: 3px solid var(--border);
+  font-size: 0.92rem;
+}
+
+.run-note.split { border-left-color: var(--accent); }
+.run-note.segment { border-left-color: var(--good); font-weight: 600; }
+.run-note.drift { border-left-color: var(--warn); }
+
+.run-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 0.4rem;
+}
+
+/* Bigger than an ordinary button. These get pressed with a thumb, at pace, out of breath. */
+.run-actions .btn { min-height: 52px; font-size: 1rem; }
+
+/* The session read back as sentences, on the settings screen. */
+.run-plan-list {
+  margin: 0.5rem 0 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}

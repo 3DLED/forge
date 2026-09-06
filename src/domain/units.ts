@@ -180,3 +180,21 @@ export function formatPaceFor(distanceM: number, timeSec: number, units: UnitSys
   const pace = paceSecPerKm(distanceM, timeSec);
   return pace === null ? null : formatPace(pace, units);
 }
+
+/**
+ * "8:30" in whatever units are on screen, back to seconds per kilometre.
+ *
+ * Everything downstream stores pace per kilometre regardless of what is displayed — one
+ * canonical unit, converted at the edges, the same way weights are all kilograms inside.
+ */
+export function parsePaceInput(input: string, units: UnitSystem): number | null {
+  const seconds = parseDuration(input);
+  if (seconds == null || seconds <= 0) return null;
+  return units === 'imperial' ? seconds / (M_PER_MILE / M_PER_KM) : seconds;
+}
+
+/** "8:30" — a pace as it belongs in an input box, without the unit trailing it. */
+export function paceInputValue(secPerKm: number, units: UnitSystem): string {
+  const per = Math.round(displayPace(secPerKm, units));
+  return `${Math.floor(per / 60)}:${String(per % 60).padStart(2, '0')}`;
+}
