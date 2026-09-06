@@ -16,6 +16,8 @@
  * change, too slow to be running at all. The measurement is the easy half.
  */
 
+import { M_PER_KM, M_PER_MILE } from './units';
+
 /** One reading from wherever the positions are coming from. See `locationSource`. */
 export interface Fix {
   /** Milliseconds since the epoch, as both the browser and the plugin report it. */
@@ -150,6 +152,105 @@ export function readPace(fixes: Fix[], now: number): PaceReading {
     distanceM,
     moving,
     discarded,
+  };
+}
+
+// --- splits: cueing on distance rather than on a clock -----------------------
+
+/**
+ * How often to speak, measured in ground rather than in seconds.
+ *
+ * Distance is how runners already think — "every quarter, every mile" — and it self-gates in a
+ * way a timer cannot: stop at a crossing and the distance stops accumulating, so the app stops
+ * talking without needing a rule that says so. A time-based cue has to be told about traffic
+ * lights; this one never notices them.
+ */
+export type SplitUnit = 'quarterMile' | 'halfMile' | 'mile' | 'halfKm' | 'km';
+
+export const SPLIT_INTERVALS: Record<
+  SplitUnit,
+  { metres: number; label: string; short: string; units: 'imperial' | 'metric' }
+> = {
+  quarterMile: { metres: M_PER_MILE / 4, label: 'Every quarter mile', short: '¼ mi', units: 'imperial' },
+  halfMile: { metres: M_PER_MILE / 2, label: 'Every half mile', short: '½ mi', units: 'imperial' },
+  mile: { metres: M_PER_MILE, label: 'Every mile', short: 'mi', units: 'imperial' },
+  halfKm: { metres: M_PER_KM / 2, label: 'Every half kilometre', short: '½ km', units: 'metric' },
+  km: { metres: M_PER_KM, label: 'Every kilometre', short: 'km', units: 'metric' },
+};
+
+export const SPLIT_ORDER: SplitUnit[] = ['quarterMile', 'halfMile', 'mile', 'halfKm', 'km'];
+
+export interface SplitState {
+  /** Total distance at the last announcement. */
+  atMetres: number;
+  /** When that announcement happened, for timing the next split. */
+  atTime: number;
+  /** How many have gone by — "mile three" rather than "a mile". */
+  count: number;
+}
+
+export function startSplits(now: number): SplitState {
+  return { atMetres: 0, atTime: now, count: 0 };
+}
+
+export interface SplitCue {
+  /** 1-based, so it can be spoken: the third quarter mile. */
+  index: number;
+  /** Pace over this interval alone, which is the number worth hearing. */
+  splitSecPerKm: number;
+  /** Seconds per kilometre off target — positive is slow. Null without a target. */
+  offSecPerKm: number | null;
+  kind: 'tooFast' | 'tooSlow' | 'onPace';
+}
+
+export interface SplitDecision {
+  cue: SplitCue | null;
+  state: SplitState;
+}
+
+/**
+ * Whether another interval has gone by, and how it went.
+ *
+ * The split's own pace rather than the smoothed current one: "your last quarter was 7:58" is a
+ * fact about ground you covered, where "you are running 7:58" is an estimate about this
+ * instant. The first is what a runner can act on, and it needs no smoothing because averaging
+ * over four hundred metres is the smoothing.
+ *
+ * Only one cue per call even when two boundaries have passed — which happens after a tunnel,
+ * or when the phone was asleep and the plugin hands over a backlog. Announcing both would be
+ * two sentences about ground already behind you.
+ */
+export function decideSplit(options: {
+  distanceM: number;
+  now: number;
+  interval: SplitUnit;
+  state: SplitState;
+  target?: PaceTarget;
+}): SplitDecision {
+  const { distanceM, now, interval, state, target } = options;
+  const step = SPLIT_INTERVALS[interval].metres;
+
+  const crossed = Math.floor(distanceM / step);
+  if (crossed <= state.count) return { cue: null, state };
+
+  const covered = distanceM - state.atMetres;
+  const seconds = (now - state.atTime) / 1000;
+  if (covered <= 0 || seconds <= 0) return { cue: null, state };
+
+  const splitSecPerKm = (seconds / covered) * 1000;
+  const off = target ? splitSecPerKm - target.targetSecPerKm : null;
+  const kind: SplitCue['kind'] =
+    off == null || Math.abs(off) <= (target?.toleranceSecPerKm ?? 0)
+      ? 'onPace'
+      : off > 0
+        ? 'tooSlow'
+        : 'tooFast';
+
+  return {
+    cue: { index: crossed, splitSecPerKm, offSecPerKm: off, kind },
+    // Measured from the boundary rather than from wherever the fix landed, so a long gap
+    // between fixes does not push every later split off by the same drift.
+    state: { atMetres: crossed * step, atTime: now, count: crossed },
   };
 }
 

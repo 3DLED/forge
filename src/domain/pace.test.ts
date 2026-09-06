@@ -9,6 +9,9 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  M_PER_MILE,
+} from './units';
+import {
   MIN_GAP_MS,
   REPEAT_MS,
   WARMUP_MS,
@@ -20,7 +23,11 @@ import {
   usable,
   type CueState,
   type Fix,
+  SPLIT_INTERVALS,
+  decideSplit,
+  startSplits,
   type PaceTarget,
+  type SplitState,
 } from './pace';
 
 const fix = (over: Partial<Fix> = {}): Fix => ({
@@ -346,5 +353,143 @@ describe('a run, start to finish', () => {
       null,
       'tooFast',
     ]);
+  });
+});
+
+/**
+ * Splits — cueing on ground covered rather than on a clock.
+ *
+ * The reason this beats a timer is that it self-gates: stopping at a crossing stops the
+ * distance accumulating, so it stops talking without needing a rule about crossings. What the
+ * tests below are mostly checking is that a boundary fires once, at the right moment, with the
+ * pace of the interval rather than of the instant.
+ */
+describe('splitting on distance', () => {
+  const QUARTER = SPLIT_INTERVALS.quarterMile.metres;
+
+  const at = (distanceM: number, now: number, state: SplitState, target?: PaceTarget) =>
+    decideSplit({ distanceM, now, interval: 'quarterMile', state, target });
+
+  it('says nothing before the first boundary', () => {
+    expect(at(QUARTER - 1, 60_000, startSplits(0)).cue).toBeNull();
+  });
+
+  it('speaks the moment one goes by', () => {
+    const { cue } = at(QUARTER + 1, 120_000, startSplits(0));
+    expect(cue?.index).toBe(1);
+  });
+
+  /* A quarter mile in two minutes is a five minute kilometre, near enough. */
+  it('reports the pace of that interval, not of this instant', () => {
+    const { cue } = at(QUARTER, 120_000, startSplits(0));
+
+    expect(cue!.splitSecPerKm).toBeGreaterThan(295);
+    expect(cue!.splitSecPerKm).toBeLessThan(303);
+  });
+
+  it('does not say the same one twice', () => {
+    const first = at(QUARTER + 5, 120_000, startSplits(0));
+    const again = at(QUARTER + 50, 130_000, first.state);
+
+    expect(first.cue).not.toBeNull();
+    expect(again.cue).toBeNull();
+  });
+
+  it('counts them up as they go by', () => {
+    let state = startSplits(0);
+    const indexes: number[] = [];
+
+    for (let i = 1; i <= 4; i += 1) {
+      const decision = at(QUARTER * i, 120_000 * i, state);
+      state = decision.state;
+      if (decision.cue) indexes.push(decision.cue.index);
+    }
+
+    expect(indexes).toEqual([1, 2, 3, 4]);
+  });
+
+  /**
+   * After a tunnel, or when the phone was asleep and the plugin hands over a backlog, two
+   * boundaries can arrive at once. Announcing both would be two sentences about ground that is
+   * already behind you.
+   */
+  it('speaks once even when two boundaries arrive together', () => {
+    const decision = at(QUARTER * 2 + 10, 240_000, startSplits(0));
+
+    expect(decision.cue?.index).toBe(2);
+    expect(decision.state.count).toBe(2);
+  });
+
+  /**
+   * The next split is measured from the boundary, not from wherever the fix happened to land.
+   * Otherwise every later split inherits the same overshoot and they all read slightly wrong.
+   */
+  it('measures the next one from the boundary it crossed', () => {
+    const { state } = at(QUARTER + 80, 120_000, startSplits(0));
+    expect(state.atMetres).toBe(QUARTER);
+  });
+
+  it('stops talking when you stop moving', () => {
+    const { state } = at(QUARTER, 120_000, startSplits(0));
+    expect(at(QUARTER, 400_000, state).cue).toBeNull();
+  });
+});
+
+describe('a split against a target', () => {
+  const MILE = SPLIT_INTERVALS.mile.metres;
+  const target: PaceTarget = { targetSecPerKm: 300, toleranceSecPerKm: 15 };
+
+  /** Runs a mile in the given number of seconds. */
+  const mileIn = (seconds: number) =>
+    decideSplit({
+      distanceM: MILE,
+      now: seconds * 1000,
+      interval: 'mile',
+      state: startSplits(0),
+      target,
+    }).cue!;
+
+  it('calls a mile on target on target', () => {
+    // 300 s/km over 1.609 km is 483 s.
+    expect(mileIn(483).kind).toBe('onPace');
+  });
+
+  it('calls a slow one slow, and says by how much', () => {
+    const cue = mileIn(540);
+    expect(cue.kind).toBe('tooSlow');
+    expect(cue.offSecPerKm).toBeGreaterThan(0);
+  });
+
+  it('calls a fast one fast', () => {
+    expect(mileIn(430).kind).toBe('tooFast');
+  });
+
+  it('says nothing about a target it was not given', () => {
+    const cue = decideSplit({
+      distanceM: MILE,
+      now: 600_000,
+      interval: 'mile',
+      state: startSplits(0),
+    }).cue!;
+
+    expect(cue.offSecPerKm).toBeNull();
+    expect(cue.kind).toBe('onPace');
+  });
+});
+
+describe('the intervals on offer', () => {
+  it('covers both ways of measuring a run', () => {
+    const imperial = Object.values(SPLIT_INTERVALS).filter((i) => i.units === 'imperial');
+    const metric = Object.values(SPLIT_INTERVALS).filter((i) => i.units === 'metric');
+
+    expect(imperial).toHaveLength(3);
+    expect(metric).toHaveLength(2);
+  });
+
+  it('gets the distances right', () => {
+    expect(SPLIT_INTERVALS.mile.metres).toBe(M_PER_MILE);
+    expect(SPLIT_INTERVALS.quarterMile.metres).toBeCloseTo(402.336, 2);
+    expect(SPLIT_INTERVALS.halfKm.metres).toBe(500);
+    expect(SPLIT_INTERVALS.km.metres).toBe(1000);
   });
 });
