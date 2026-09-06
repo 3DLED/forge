@@ -154,7 +154,7 @@ describe('saying what is coming', () => {
 
   it('leaves the pace out when the segment does not set one', () => {
     expect(describeSegment(seg({ kind: 'recovery', distanceM: 400 }), 'metric')).toBe(
-      'Recover 400 metres',
+      'Jog 400 metres',
     );
   });
 

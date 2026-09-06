@@ -181,7 +181,12 @@ function plural(value: number, noun: string): string {
 const KIND_VERB: Record<SegmentKind, string> = {
   warmup: 'Warm up',
   work: 'Run',
-  recovery: 'Recover',
+  /*
+   * "Jog", not "Recover". Recovery is what the segment is for; jogging is what you do, and an
+   * instruction shouted at someone mid-session should name the action. It also matches the
+   * word the settings screen uses to set it up.
+   */
+  recovery: 'Jog',
   steady: 'Steady',
   cooldown: 'Cool down',
 };
