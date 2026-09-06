@@ -322,13 +322,17 @@ export default function EquipmentView() {
           </div>
 
           {/*
-            Three things you can do to a kit list, and only one of them at a time. Editing
-            picks what is in this profile; adding and culling are about the vocabulary itself.
+            Two different jobs, and the names have to carry the difference.
+            
+            "Edit kit" changes what is in *this profile* — the frequent one. The other two are
+            about the vocabulary itself, which every profile draws from. That distinction was
+            not landing while the second was labelled "Delete": renaming lives in the same
+            mode as deleting, and nobody goes looking for a rename under a bin icon.
           */}
           <div className="row wrap" style={{ gap: '0.4rem', marginBottom: '0.5rem' }}>
             {!draft && !culling && (
               <button className="btn sm ghost" onClick={() => setDraft([...target.items])}>
-                ✎ Edit kit
+                ✎ Tick what you have
               </button>
             )}
             {!culling && (
@@ -352,7 +356,7 @@ export default function EquipmentView() {
                   ? markedItems.length > 0
                     ? `🗑 Delete ${markedItems.length}`
                     : 'Done'
-                  : '🗑 Delete'}
+                  : '⚙ Rename or delete'}
               </button>
             )}
             {culling && markedItems.length === 1 && (
@@ -369,8 +373,8 @@ export default function EquipmentView() {
 
           {culling && (
             <p className="tiny faint" style={{ marginTop: '-0.25rem', marginBottom: '0.5rem' }}>
-              Tap the kit you added — the square ones — to mark it, then Delete. Built-in kit
-              cannot be removed.
+              Tap the kit you added — the square-cornered ones — to mark it. One at a time to
+              rename, any number to delete. Built-in kit cannot be changed.
             </p>
           )}
 
