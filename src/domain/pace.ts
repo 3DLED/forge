@@ -277,8 +277,19 @@ export const WARMUP_MS = 30_000;
 /** The least time between two cues, however much has changed. */
 export const MIN_GAP_MS = 45_000;
 
-/** How long before the same complaint may be repeated. */
+/** How long before the same complaint may be repeated the first time. */
 export const REPEAT_MS = 90_000;
+
+/**
+ * How many times the same complaint is worth making.
+ *
+ * You have been told you are running fast. You are still running fast. At some point the
+ * honest conclusion is not that you failed to hear it — it is that you have decided, and
+ * being told again every ninety seconds for the rest of an hour is how a feature gets
+ * switched off. Four times over the first eleven minutes, then silence until something
+ * changes.
+ */
+export const MAX_REPEATS = 3;
 
 /**
  * How far back inside the band you must come before it says you are back on pace.
@@ -295,6 +306,13 @@ export interface CueState {
   lastAt: number;
   /** When the run started, for the warm-up. */
   startedAt: number;
+  /**
+   * How many times running it has said the same thing. Absent means none.
+   *
+   * Each one buys a longer wait before the next, because a complaint you have already heard
+   * and not acted on is worth less than the one before it.
+   */
+  repeats?: number;
 }
 
 export interface CueDecision {
@@ -330,9 +348,17 @@ export function decideCue(options: {
 
   if (outside) {
     const kind: CueKind = off > 0 ? 'tooSlow' : 'tooFast';
-    // The same complaint twice needs a longer wait than a new one.
-    if (kind === state.last && now - state.lastAt < REPEAT_MS) return keep('said that recently');
-    return { kind, state: { ...state, last: kind, lastAt: now } };
+
+    if (kind === state.last) {
+      const repeats = state.repeats ?? 0;
+      if (repeats >= MAX_REPEATS) return keep('said that enough times');
+      // Each repeat waits twice as long as the last: 90 s, then three minutes, then six.
+      if (now - state.lastAt < REPEAT_MS * 2 ** repeats) return keep('said that recently');
+      return { kind, state: { ...state, last: kind, lastAt: now, repeats: repeats + 1 } };
+    }
+
+    // A different complaint is news, and starts the backing-off over.
+    return { kind, state: { ...state, last: kind, lastAt: now, repeats: 0 } };
   }
 
   // Inside the band. Only worth saying if it had complained, and only once properly back.
@@ -340,7 +366,7 @@ export function decideCue(options: {
     if (Math.abs(off) > target.toleranceSecPerKm * RETURN_FRACTION) {
       return keep('back inside, but only just');
     }
-    return { kind: 'backOnPace', state: { ...state, last: 'backOnPace', lastAt: now } };
+    return { kind: 'backOnPace', state: { ...state, last: 'backOnPace', lastAt: now, repeats: 0 } };
   }
 
   return keep('on pace, nothing to report');

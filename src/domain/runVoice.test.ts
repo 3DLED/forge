@@ -201,9 +201,28 @@ describe('a segment change', () => {
 });
 
 describe('saying it out loud', () => {
+  /*
+   * A speech engine reads "11:00" as a time of day, so an eleven minute mile came out of the
+   * phone as "eleven o'clock per mile". Nothing this app says on a run is a clock time.
+   */
+  it('says durations as durations, not as times of day', () => {
+    expect(speakable('Steady 5 miles at 11:00 /mi')).toBe(
+      'Steady 5 miles at 11 minutes per mile',
+    );
+    expect(speakable('800 metres in 3:29')).toBe('800 metres in 3 minutes 29 seconds');
+    expect(speakable('0:45 to go')).toBe('45 seconds to go');
+    expect(speakable('1:04:15')).toBe('1 hour 4 minutes 15 seconds');
+    expect(speakable('1:01')).toBe('1 minute 1 second');
+  });
+
   it('expands what reads well but speaks badly', () => {
-    expect(speakable('Run 800 metres at 4:30 /km')).toBe('Run 800 metres at 4:30 per kilometre');
-    expect(speakable('Mile 3 · 8:14 /mi')).toBe('Mile 3. 8:14 per mile');
+    expect(speakable('Run 800 metres at 4:30 /km')).toBe(
+      'Run 800 metres at 4 minutes 30 seconds per kilometre',
+    );
+    expect(speakable('Mile 3 · 8:14 /mi')).toBe('Mile 3. 8 minutes 14 seconds per mile');
+    expect(speakable('Mile 3 · on pace')).toBe('Mile 3. On pace');
+    // A decimal point is not a sentence boundary, and has no space to say so.
+    expect(speakable('1.03 miles · next')).toBe('1.03 miles. Next');
     expect(speakable('4 × 800')).toBe('4 by 800');
   });
 

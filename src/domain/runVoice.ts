@@ -28,6 +28,9 @@ import type { UnitSystem } from './types';
  * Abbreviations that read cleanly are exactly the ones a speech engine mangles, and the fix
  * is not to drop them from the screen — it is to expand them on the way out.
  */
+/** "11:00", "6:58", "1:04:15" — every colon in these sentences separates a duration. */
+const CLOCK = /(\d+):([0-5]\d)(?::([0-5]\d))?/g;
+
 export function speakable(text: string): string {
   return text
     .replace(/\/km/g, 'per kilometre')
@@ -36,7 +39,41 @@ export function speakable(text: string): string {
     // The separator is a full stop in speech, not a word — " · " would leave a stray one
     // floating between two spaces, which some engines read aloud as "dot".
     .replace(/ · /g, '. ')
-    .replace(/·/g, '.');
+    .replace(/·/g, '.')
+    .replace(CLOCK, (_whole, a: string, b: string, c?: string) =>
+      c == null ? spokenDuration(0, Number(a), Number(b)) : spokenDuration(Number(a), Number(b), Number(c)),
+    )
+    /*
+     * The separator became a full stop, so what follows it is the start of a sentence.
+     *
+     * Engines lower the pitch and pause at a sentence boundary, which is exactly the reading
+     * these fragments want: "Mile two. On pace." The space in the pattern is what keeps a
+     * decimal point out of it — "1.03 miles" has no space after its stop.
+     */
+    .replace(/\. ([a-z])/g, (_whole, letter: string) => `. ${letter.toUpperCase()}`);
+}
+
+function count(value: number, noun: string): string {
+  return `${value} ${value === 1 ? noun : `${noun}s`}`;
+}
+
+/**
+ * A duration, in words.
+ *
+ * Speech engines read "11:00" as a time of day, so an eleven minute mile came out of the
+ * phone as "eleven o'clock per mile". There is no clock time anywhere in what this app says
+ * while you are running — every one of these is how long something took or should take — so
+ * they are all spelled out rather than left for the engine to guess at.
+ *
+ * Empty units are dropped, which is the difference between "eleven minutes" and "eleven
+ * minutes zero seconds", and between "forty-five seconds" and "zero minutes forty-five".
+ */
+function spokenDuration(hours: number, minutes: number, seconds: number): string {
+  const parts: string[] = [];
+  if (hours > 0) parts.push(count(hours, 'hour'));
+  if (minutes > 0) parts.push(count(minutes, 'minute'));
+  if (seconds > 0) parts.push(count(seconds, 'second'));
+  return parts.length > 0 ? parts.join(' ') : '0 seconds';
 }
 
 /** "1.5" rather than "1.50", and "1" rather than "1.0". */

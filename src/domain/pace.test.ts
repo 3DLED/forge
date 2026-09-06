@@ -13,6 +13,7 @@ import {
 } from './units';
 import {
   MIN_GAP_MS,
+  MAX_REPEATS,
   REPEAT_MS,
   WARMUP_MS,
   decideCue,
@@ -263,6 +264,49 @@ describe('speaking up', () => {
     });
 
     expect(again.kind).toBe('tooSlow');
+  });
+
+  /*
+   * You have been told. You are still running fast. At some point the honest reading is not
+   * that you missed it but that you have decided, and a phone that says the same sentence
+   * every ninety seconds for an hour is a phone with the feature switched off.
+   */
+  it('waits longer before each repeat of the same complaint', () => {
+    let at = 100_000;
+    let current = state({ last: 'tooSlow', lastAt: at, repeats: 1 });
+
+    // The second repeat wants twice the first wait, so the original gap is no longer enough.
+    expect(decideCue({ reading: reading(400), target, state: current, now: at + REPEAT_MS + 1 }).kind).toBeNull();
+
+    at += REPEAT_MS * 2 + 1;
+    const spoke = decideCue({ reading: reading(400), target, state: current, now: at });
+    expect(spoke.kind).toBe('tooSlow');
+    expect(spoke.state.repeats).toBe(2);
+
+    current = spoke.state;
+    at += REPEAT_MS * 8;
+    expect(decideCue({ reading: reading(400), target, state: current, now: at }).kind).toBe('tooSlow');
+  });
+
+  it('gives up on a complaint you have clearly decided to ignore', () => {
+    const exhausted = state({ last: 'tooSlow', lastAt: 100_000, repeats: MAX_REPEATS });
+    const hours = 100_000 + REPEAT_MS * 100;
+
+    expect(decideCue({ reading: reading(400), target, state: exhausted, now: hours }).kind).toBeNull();
+  });
+
+  /* Silence is about that one complaint, not about the run. Anything new still gets said. */
+  it('speaks up again when the complaint changes', () => {
+    const exhausted = state({ last: 'tooSlow', lastAt: 100_000, repeats: MAX_REPEATS });
+    const flipped = decideCue({
+      reading: reading(250),
+      target,
+      state: exhausted,
+      now: 100_000 + MIN_GAP_MS + 1,
+    });
+
+    expect(flipped.kind).toBe('tooFast');
+    expect(flipped.state.repeats).toBe(0);
   });
 
   it('switches complaint immediately when you overcorrect', () => {
