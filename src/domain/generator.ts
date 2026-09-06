@@ -27,6 +27,7 @@
 import type { EquipmentTag, Exercise, MetricValues, MovementPattern } from './types';
 import { BUILDABLE_REGIONS, PATTERNS_IN_REGION, regionOf, type BodyRegion } from './regions';
 import { CONTAINER_SLUGS } from './training';
+import type { RunKind } from './runPlan';
 
 export type TrainingGoal = 'strength' | 'muscle' | 'endurance';
 
@@ -115,6 +116,32 @@ export function isTrackableRun(exercise: Exercise): boolean {
   if (exercise.modality !== 'cardio') return false;
   if (!exercise.metrics.includes('distanceM')) return false;
   return !exercise.equipment.some((tag) => STATIONARY_TAGS.has(tag));
+}
+
+/**
+ * Runs that are a list of efforts rather than one effort.
+ *
+ * Kept as a slug list rather than derived from anything on the exercise, because nothing on
+ * the exercise says it: a hill repeat and a recovery run are both gait-pattern cardio scored
+ * by distance and time, and the only thing separating them is what the words mean.
+ */
+const INTERVAL_SLUGS = new Set(['interval-run', 'hill-repeats', 'hill-sprint', 'sprint']);
+
+/** Runs with one hard stretch in the middle and something either side of it. */
+const TEMPO_SLUGS = new Set(['tempo-run', 'race-pace-run', 'progression-run']);
+
+/**
+ * Which prescriptions make sense for this movement.
+ *
+ * Steady by default, including for anything anyone adds themselves. A movement nobody
+ * classified is far more likely to be another way of going for a run than a rep session, and
+ * the cost of being wrong is one extra tap rather than a screen full of fields that do not
+ * apply to a Sunday long run.
+ */
+export function runKindFor(exercise: Exercise): RunKind {
+  if (INTERVAL_SLUGS.has(exercise.slug)) return 'intervals';
+  if (TEMPO_SLUGS.has(exercise.slug)) return 'tempo';
+  return 'steady';
 }
 
 export interface SuggestedItem {

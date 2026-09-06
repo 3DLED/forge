@@ -197,8 +197,21 @@ const KIND_VERB: Record<SegmentKind, string> = {
  * Exported because the spoken cues report distances too, and two implementations of this
  * would disagree about an 800 within a week.
  */
-export function distanceWords(metres: number, units: UnitSystem): string {
+export function distanceWords(
+  metres: number,
+  units: UnitSystem,
+  /**
+   * Set for a distance that was measured rather than asked for.
+   *
+   * The track-rep rule below is about what somebody *chose*: an 800 is an 800. Nobody chose
+   * to cover 1591 metres in their cool-down, so a measured distance is always read in the
+   * unit on screen — and always in words, because this ends up at a speech engine, where
+   * "1.03 mi" comes out as the letters M and I.
+   */
+  measured = false,
+): string {
   if (units === 'imperial') {
+    if (measured) return plural(Number((metres / M_PER_MILE).toFixed(2)), 'mile');
     const miles = metres / M_PER_MILE;
     /*
      * Track reps are said in metres even in a country that measures everything else in miles.
@@ -215,6 +228,7 @@ export function distanceWords(metres: number, units: UnitSystem): string {
     return plural(Number(miles.toFixed(2)), 'mile');
   }
 
+  if (measured) return plural(Number((metres / M_PER_KM).toFixed(2)), 'kilometre');
   return metres < M_PER_KM
     ? `${Math.round(metres)} metres`
     : plural(Number((metres / M_PER_KM).toFixed(2)), 'kilometre');
@@ -353,3 +367,29 @@ export function plannedDistanceM(plan: RunPlan): number | null {
   }
   return total;
 }
+
+// --- what a given run can even be ---------------------------------------------
+
+/**
+ * What kind of run a movement is, which decides what can be prescribed for it.
+ *
+ * The distinction that matters is reps. An interval session is a list of efforts with
+ * recoveries between them; an easy run, a long run, a walk and a ruck are one effort that
+ * lasts as long as it lasts. Offering "how many reps" on a Sunday long run is offering a
+ * question with no answer, and the setup screen is worse for every run because one kind of
+ * run needed it.
+ */
+export type RunKind = 'steady' | 'tempo' | 'intervals';
+
+/**
+ * The shapes worth offering for each kind, in the order they should appear.
+ *
+ * Not a hard rule about what is possible — it is a list of what is worth putting on a screen
+ * you open outdoors. Somebody who genuinely wants to run reps inside an "Easy Run" can pick
+ * Interval Run, which is what it is for.
+ */
+export const SHAPES_FOR: Record<RunKind, RunShape['kind'][]> = {
+  steady: ['open', 'steady'],
+  tempo: ['open', 'tempo', 'steady'],
+  intervals: ['open', 'intervals', 'tempo'],
+};

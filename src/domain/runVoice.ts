@@ -17,7 +17,7 @@
  *    `speakable` first. Same sentence, two renderings, one place to change it.
  */
 
-import { M_PER_KM, M_PER_MILE, displayPace, formatClock, formatDistance, formatPace } from './units';
+import { M_PER_KM, M_PER_MILE, displayPace, formatClock, formatPace } from './units';
 import { SPLIT_INTERVALS, type CueKind, type PaceReading, type PaceTarget, type SplitCue, type SplitUnit } from './pace';
 import { describeSegment, distanceWords, type RunSegment, type SegmentChange } from './runPlan';
 import type { UnitSystem } from './types';
@@ -153,7 +153,7 @@ export function sayDrift(options: {
 function sayCovered(segment: RunSegment, covered: { distanceM: number; seconds: number }, units: UnitSystem): string {
   if (segment.durationSec != null) {
     // Whatever it took was always going to be exactly the time asked for, so no time here.
-    return formatDistance(covered.distanceM, units);
+    return distanceWords(covered.distanceM, units, true);
   }
   return `${distanceWords(covered.distanceM, units)} in ${formatClock(Math.round(covered.seconds))}`;
 }

@@ -499,37 +499,37 @@
  },
  {
   "file": "src/domain/generator.ts",
-  "line": 24,
+  "line": 25,
   "kind": "label",
   "text": "Build strength"
  },
  {
   "file": "src/domain/generator.ts",
-  "line": 25,
+  "line": 26,
   "kind": "blurb",
   "text": "Heavy, low reps, long rest. Or a harder variation when there is nothing to load."
  },
  {
   "file": "src/domain/generator.ts",
-  "line": 33,
+  "line": 34,
   "kind": "label",
   "text": "Build muscle"
  },
  {
   "file": "src/domain/generator.ts",
-  "line": 34,
+  "line": 35,
   "kind": "blurb",
   "text": "Moderate load, moderate reps, enough rest to repeat it. A rep or two left in the tank."
  },
  {
   "file": "src/domain/generator.ts",
-  "line": 42,
+  "line": 43,
   "kind": "label",
   "text": "Build endurance"
  },
  {
   "file": "src/domain/generator.ts",
-  "line": 43,
+  "line": 44,
   "kind": "blurb",
   "text": "Lighter, higher reps, short rest. The point is to keep going."
  },
@@ -853,31 +853,31 @@
  },
  {
   "file": "src/features/log/RunScreen.tsx",
-  "line": 70,
+  "line": 87,
   "kind": "aria-label",
   "text": "Run alerts"
  },
  {
   "file": "src/features/log/RunScreen.tsx",
-  "line": 120,
+  "line": 126,
   "kind": "on screen",
   "text": "Waiting for a decent fix. Under trees or between tall buildings this can take a minute."
  },
  {
   "file": "src/features/log/RunScreen.tsx",
-  "line": 127,
+  "line": 161,
   "kind": "on screen",
   "text": "Cues will appear here as they are said."
  },
  {
   "file": "src/features/log/RunScreen.tsx",
-  "line": 138,
+  "line": 173,
   "kind": "on screen",
   "text": "Start run"
  },
  {
   "file": "src/features/log/RunScreen.tsx",
-  "line": 172,
+  "line": 207,
   "kind": "on screen",
   "text": "Save to workout"
  },
@@ -1117,67 +1117,67 @@
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1329,
+  "line": 1332,
   "kind": "title",
   "text": "Discard this session?"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1436,
+  "line": 1439,
   "kind": "on screen",
   "text": "Worth doing before you save"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1464,
+  "line": 1467,
   "kind": "placeholder",
   "text": "Cindy, Tuesday burner…"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1465,
+  "line": 1468,
   "kind": "aria-label",
   "text": "Name this workout"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1474,
+  "line": 1477,
   "kind": "on screen",
   "text": "Name it"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1481,
+  "line": 1484,
   "kind": "on screen",
   "text": "Optional — saving without them is fine."
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1487,
+  "line": 1490,
   "kind": "on screen",
   "text": "How hard was the whole session? This is what makes running and lifting comparable — effort × minutes is the one load number that spans both."
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1505,
+  "line": 1508,
   "kind": "on screen",
   "text": "1 = barely moved · 5 = solid work · 8 = hard · 10 = everything you had"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1517,
+  "line": 1520,
   "kind": "aria-label",
   "text": "Duration in minutes"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1523,
+  "line": 1526,
   "kind": "on screen",
   "text": "How did it feel?"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1540,
+  "line": 1543,
   "kind": "placeholder",
   "text": "Anything worth remembering next time…"
  },
@@ -2131,121 +2131,127 @@
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 30,
+  "line": 31,
   "kind": "label",
   "text": "200 m"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 31,
+  "line": 32,
   "kind": "label",
   "text": "400 m"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 32,
+  "line": 33,
   "kind": "label",
   "text": "800 m"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 33,
+  "line": 34,
   "kind": "label",
   "text": "1 km"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 34,
+  "line": 35,
   "kind": "label",
   "text": "1600 m"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 38,
+  "line": 39,
   "kind": "label",
   "text": "¼ mi"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 39,
+  "line": 40,
   "kind": "label",
   "text": "½ mi"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 40,
+  "line": 41,
   "kind": "label",
   "text": "1 mi"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 52,
+  "line": 53,
   "kind": "label",
   "text": "Just run"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 104,
+  "line": 61,
+  "kind": "label",
+  "text": "Easy or long"
+ },
+ {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 123,
   "kind": "title",
   "text": "Run alerts"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 115,
+  "line": 134,
   "kind": "on screen",
   "text": "This browser cannot speak, so cues will appear on screen only. Everything below still decides what gets shown."
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 127,
+  "line": 146,
   "kind": "on screen",
   "text": "Speak cues"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 137,
+  "line": 156,
   "kind": "on screen",
   "text": "Silent keeps every cue on screen and says none of them — for a race, a group run, or a track session where someone is already shouting at you."
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 179,
+  "line": 198,
   "kind": "on screen",
   "text": "Pace alerts"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 204,
+  "line": 223,
   "kind": "on screen",
   "text": "Say something once I am off by"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 222,
+  "line": 241,
   "kind": "on screen",
   "text": "Drifting is normal, so this waits — half a minute off pace before it says anything, and longer before it says the same thing twice."
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 229,
+  "line": 266,
   "kind": "on screen",
-  "text": "Today's run"
+  "text": "Each kind of run keeps its own setup, so a track session does not turn Sunday's long run into four by eight hundred."
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 314,
+  "line": 357,
   "kind": "on screen",
   "text": "Each rep"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 336,
+  "line": 379,
   "kind": "on screen",
   "text": "Jog between"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 450,
+  "line": 493,
   "kind": "on screen",
   "text": "Minutes and seconds, like 8:30"
  },

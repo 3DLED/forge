@@ -1314,18 +1314,74 @@ section[id^='movement-'] {
   gap: 0.5rem;
 }
 
-/* What you were told to do, held above the numbers that say how it is going. */
-.run-segment {
-  padding: 0.6rem 0.8rem;
-  border-radius: var(--radius-sm);
-  background: var(--accent-soft);
-  border: 1px solid var(--accent);
+/*
+ * The whole session, with the piece you are on lit.
+ *
+ * Three states rather than one highlight: what is behind you carries what it actually cost,
+ * what you are on carries what is left of it, and what is ahead is dimmed but legible — the
+ * difference between pacing the fourth of eight and pacing the fourth of four is the reason
+ * the list exists at all.
+ */
+.run-pieces {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
-.run-segment-what {
-  font-weight: 700;
-  font-size: 1.05rem;
+.run-piece {
+  display: grid;
+  grid-template-columns: 1.6rem 1fr auto;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: var(--surface-2);
 }
+
+.run-piece-mark {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--faint);
+}
+
+.run-piece-what { font-size: 0.95rem; }
+.run-piece-note { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Lit, and a size larger — this is the one being read at a glance, mid-stride. */
+.run-piece.current {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.run-piece.current .run-piece-mark { color: var(--accent); }
+.run-piece.current .run-piece-what { font-weight: 700; font-size: 1.05rem; }
+.run-piece.current .run-piece-note { color: var(--accent); }
+
+.run-piece.done { background: transparent; }
+.run-piece.done .run-piece-mark { color: var(--good); }
+.run-piece.done .run-piece-what { color: var(--muted); }
+
+.run-piece.ahead { background: transparent; opacity: 0.6; }
+
+/* The last thing said, above the list. */
+.run-latest {
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  border-left: 3px solid var(--border);
+  font-size: 0.92rem;
+}
+
+.run-latest.split { border-left-color: var(--accent); }
+.run-latest.segment { border-left-color: var(--good); font-weight: 600; }
+.run-latest.drift { border-left-color: var(--warn); }
 
 /*
  * The one number read mid-stride.

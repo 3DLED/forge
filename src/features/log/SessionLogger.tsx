@@ -36,7 +36,7 @@ import { allInjuries } from '../../data/injuries';
 import { allTestResults } from '../../data/fitnessTests';
 import { knownMax, suggestLoad } from '../../domain/loading';
 import { suggestProgression } from '../../domain/progression';
-import { GOAL_SCHEMES, isTrackableRun } from '../../domain/generator';
+import { GOAL_SCHEMES, isTrackableRun, runKindFor } from '../../domain/generator';
 import { goalSpec } from '../../domain/goals';
 import { scanRecords, type PrEvent } from '../../domain/training';
 import { loadsForExercise } from '../../domain/equipment';
@@ -1059,7 +1059,7 @@ export default function SessionLogger() {
               if (!target) return {};
               return {
                 onTrackRun: () => setTracking(target.id),
-                onRunSettings: () => navigate('/more/run'),
+                onRunSettings: () => navigate(`/more/run?for=${exercise.slug}`),
               };
             })()}
           />
@@ -1543,9 +1543,12 @@ export default function SessionLogger() {
         const target = sets.find((set) => set.id === tracking);
         const exercise = target ? exerciseBySlug.get(target.exerciseSlug) : undefined;
         if (!target) return null;
+        if (!exercise) return null;
         return (
           <RunScreen
-            title={exercise?.name ?? target.exerciseSlug}
+            title={exercise.name}
+            slug={exercise.slug}
+            runKind={runKindFor(exercise)}
             /*
              * Only from a set still to be run. On an unfinished set a distance is what you
              * were told to do; on a finished one it is what you did, and handing that back

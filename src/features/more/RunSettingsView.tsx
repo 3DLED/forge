@@ -12,14 +12,15 @@
  */
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import PageHeader from '../../ui/PageHeader';
 import { useApp } from '../../ui/AppProvider';
 import { profileRepo } from '../../data/repos';
 import { speechAvailable } from '../../ui/speak';
 import { SPLIT_INTERVALS, SPLIT_ORDER, type SplitUnit } from '../../domain/pace';
-import { buildRunPlan, describeSegment, type RunShape } from '../../domain/runPlan';
-import { runSettingsFor, type RunSettings } from '../../domain/runSettings';
+import { buildRunPlan, describeSegment, SHAPES_FOR, type RunKind, type RunShape } from '../../domain/runPlan';
+import { runSettingsFor, shapeFor, withShape, type RunSettings } from '../../domain/runSettings';
+import { runKindFor } from '../../domain/generator';
 import {
   displayPace,
   distanceLabel,
@@ -59,11 +60,24 @@ const REPS = [3, 4, 5, 6, 8, 10, 12];
 /** Tolerances offered in the pace unit on screen, stored per kilometre like everything else. */
 const TOLERANCES = [10, 15, 20, 30];
 
-const SHAPES: { kind: RunShape['kind']; label: string; hint: string }[] = [
-  { kind: 'open', label: 'Just run', hint: 'No structure. Splits and alerts still work.' },
-  { kind: 'steady', label: 'Steady', hint: 'One distance at one pace.' },
-  { kind: 'tempo', label: 'Tempo', hint: 'Warm-up, a hard middle, cool-down.' },
-  { kind: 'intervals', label: 'Intervals', hint: 'Reps with a jog between them.' },
+const SHAPES: Record<RunShape['kind'], { label: string; hint: string }> = {
+  open: { label: 'Just run', hint: 'No structure. Splits and alerts still work.' },
+  steady: { label: 'Steady', hint: 'One distance at one pace.' },
+  tempo: { label: 'Tempo', hint: 'Warm-up, a hard middle, cool-down.' },
+  intervals: { label: 'Intervals', hint: 'Reps with a jog between them.' },
+};
+
+/**
+ * The three kinds of run, named as the runs themselves rather than as categories.
+ *
+ * Shown only when this screen was opened from More, where there is no run in hand to say
+ * which one is being set up. Coming from a run block the answer is already known, and asking
+ * again would be the app forgetting where you just came from.
+ */
+const KINDS: { kind: RunKind; label: string }[] = [
+  { kind: 'steady', label: 'Easy or long' },
+  { kind: 'tempo', label: 'Tempo' },
+  { kind: 'intervals', label: 'Intervals' },
 ];
 
 /** A sensible starting point for each shape, so switching never lands on an empty form. */
@@ -91,15 +105,33 @@ function blankShape(kind: RunShape['kind'], units: UnitSystem): RunShape {
 }
 
 export default function RunSettingsView() {
-  const { profile, units } = useApp();
+  const { profile, units, exerciseBySlug } = useApp();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   const settings = runSettingsFor(units, profile.run);
-  const shape = settings.shape ?? { kind: 'open' };
+
+  /*
+   * Which run this screen is about.
+   *
+   * The cog on a run block passes the movement, so an easy run opens on the easy-run setup and
+   * never offers a rep count — the question has no answer on a Sunday long run, and a screen
+   * full of fields that do not apply is how a setup screen stops being read. Opened from More
+   * there is no run in hand, so the kind becomes something you pick.
+   */
+  const forSlug = params.get('for');
+  const forExercise = forSlug ? exerciseBySlug.get(forSlug) : undefined;
+  const scoped = forExercise != null;
+  const [picked, setPicked] = useState<RunKind>('steady');
+  const kind = forExercise ? runKindFor(forExercise) : picked;
+
+  const shape = shapeFor(settings, kind);
+  const offered = SHAPES_FOR[kind];
 
   const patch = (change: Partial<RunSettings>) =>
     void profileRepo.update(profile.id, { run: { ...settings, ...change } });
 
-  const setShape = (next: RunShape) => patch({ shape: next });
+  const setShape = (next: RunShape) =>
+    void profileRepo.update(profile.id, { run: withShape(settings, kind, next) });
 
   const plan = buildRunPlan(shape);
 
@@ -241,19 +273,43 @@ export default function RunSettingsView() {
         </>
       )}
 
-      <div className="section-title">Today's run</div>
-      <div className="chip-row">
-        {SHAPES.map((option) => (
+      <div className="section-title">
+        {scoped ? `Structure for ${forExercise!.name.toLowerCase()}` : 'Run structure'}
+      </div>
+
+      {/* Only where the screen does not already know which run you are setting up. */}
+      {!scoped && (
+        <>
+          <div className="chip-row">
+            {KINDS.map((option) => (
+              <button
+                key={option.kind}
+                className={`chip${kind === option.kind ? ' on' : ''}`}
+                onClick={() => setPicked(option.kind)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          <p className="tiny faint">
+            Each kind of run keeps its own setup, so a track session does not turn Sunday's long
+            run into four by eight hundred.
+          </p>
+        </>
+      )}
+
+      <div className="chip-row" style={{ marginTop: scoped ? 0 : '0.6rem' }}>
+        {offered.map((option) => (
           <button
-            key={option.kind}
-            className={`chip${shape.kind === option.kind ? ' on' : ''}`}
-            onClick={() => setShape(blankShape(option.kind, units))}
+            key={option}
+            className={`chip${shape.kind === option ? ' on' : ''}`}
+            onClick={() => setShape(blankShape(option, units))}
           >
-            {option.label}
+            {SHAPES[option].label}
           </button>
         ))}
       </div>
-      <p className="tiny faint">{SHAPES.find((s) => s.kind === shape.kind)?.hint}</p>
+      <p className="tiny faint">{SHAPES[shape.kind].hint}</p>
 
       {shape.kind === 'steady' && (
         <>

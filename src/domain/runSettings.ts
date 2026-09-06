@@ -13,7 +13,7 @@
  */
 
 import { SPLIT_INTERVALS, type SplitUnit } from './pace';
-import type { RunShape } from './runPlan';
+import type { RunKind, RunShape } from './runPlan';
 import type { UnitSystem } from './types';
 
 export interface RunSettings {
@@ -40,8 +40,16 @@ export interface RunSettings {
   toleranceSecPerKm: number;
   /** Call each segment of a structured run as it starts. */
   segmentCues: boolean;
-  /** The shape last built here, reused until it is changed. */
-  shape?: RunShape;
+  /**
+   * The last structure set up for each kind of run, kept apart from each other.
+   *
+   * One shape for everything was wrong in both directions: setting up a track session left
+   * Sunday's long run prescribing four by eight hundred, and an easy run offering a rep count
+   * is a question with no answer. Keyed by kind rather than by movement so that "my usual
+   * interval session" survives switching between Interval Run and Hill Repeats, which is the
+   * same session on a different surface.
+   */
+  shapes?: Partial<Record<RunKind, RunShape>>;
 }
 
 /** Fifteen seconds a kilometre — about a nine second mile, which is a real drift, not noise. */
@@ -68,13 +76,31 @@ export function runSettingsFor(units: UnitSystem, stored?: RunSettings): RunSett
     targetSecPerKm: stored?.targetSecPerKm,
     toleranceSecPerKm: stored?.toleranceSecPerKm ?? DEFAULT_TOLERANCE_SEC_PER_KM,
     segmentCues: stored?.segmentCues ?? true,
-    shape: stored?.shape ?? { kind: 'open' },
+    shapes: stored?.shapes ?? {},
   };
 }
 
-/** Whether pace alerts can actually fire — the switch is on and there is something to aim at. */
-export function alertsArmed(settings: RunSettings): boolean {
-  return settings.paceAlerts && settings.targetSecPerKm != null && settings.targetSecPerKm > 0;
+/** What this kind of run is set up to be today. Unstructured until somebody says otherwise. */
+export function shapeFor(settings: RunSettings, kind: RunKind): RunShape {
+  return settings.shapes?.[kind] ?? { kind: 'open' };
+}
+
+/** Stores one kind's structure without disturbing the other two. */
+export function withShape(settings: RunSettings, kind: RunKind, shape: RunShape): RunSettings {
+  return { ...settings, shapes: { ...settings.shapes, [kind]: shape } };
+}
+
+/**
+ * Whether pace alerts can actually fire — the switch is on and there is something to aim at.
+ *
+ * `segmentHasTarget` covers the structured case: a rep prescribed at 4:30 supplies its own
+ * number, so the standing target need not be set for alerts to mean something. The switch
+ * still governs, because off has to mean off.
+ */
+export function alertsArmed(settings: RunSettings, segmentHasTarget = false): boolean {
+  if (!settings.paceAlerts) return false;
+  if (segmentHasTarget) return true;
+  return settings.targetSecPerKm != null && settings.targetSecPerKm > 0;
 }
 
 /** One line for the row that opens this screen: "Every mile · pace alerts on". */

@@ -18,7 +18,7 @@ anything I think is carrying weight.
 included because they are words people read, but they will look thin next to the prose. Skim
 past them unless one is wrong.
 
-Counts: 514 strings, 59 files, 9 sections.
+Counts: 515 strings, 59 files, 9 sections.
 
 ---
 
@@ -554,119 +554,120 @@ Counts: 514 strings, 59 files, 9 sections.
 - **[MORE-099]** ½ mi
 - **[MORE-100]** 1 mi
 - **[MORE-101]** Just run
-- **[MORE-102]** Run alerts
-- **[MORE-103]** This browser cannot speak, so cues will appear on screen only. Everything below still decides what gets shown.
-- **[MORE-104]** Speak cues
-- **[MORE-105]** Silent keeps every cue on screen and says none of them — for a race, a group run, or a track session where someone is already shouting at you.
-- **[MORE-106]** Pace alerts
-- **[MORE-107]** Say something once I am off by
-- **[MORE-108]** Drifting is normal, so this waits — half a minute off pace before it says anything, and longer before it says the same thing twice.
-- **[MORE-109]** Today's run
-- **[MORE-110]** Each rep
-- **[MORE-111]** Jog between
-- **[MORE-112]** Minutes and seconds, like 8:30
+- **[MORE-102]** Easy or long
+- **[MORE-103]** Run alerts
+- **[MORE-104]** This browser cannot speak, so cues will appear on screen only. Everything below still decides what gets shown.
+- **[MORE-105]** Speak cues
+- **[MORE-106]** Silent keeps every cue on screen and says none of them — for a race, a group run, or a track session where someone is already shouting at you.
+- **[MORE-107]** Pace alerts
+- **[MORE-108]** Say something once I am off by
+- **[MORE-109]** Drifting is normal, so this waits — half a minute off pace before it says anything, and longer before it says the same thing twice.
+- **[MORE-110]** Each kind of run keeps its own setup, so a track session does not turn Sunday's long run into four by eight hundred.
+- **[MORE-111]** Each rep
+- **[MORE-112]** Jog between
+- **[MORE-113]** Minutes and seconds, like 8:30
 
 ### Settings
 
 <sub>`src/features/more/SettingsView.tsx`</sub>
 
-- **[MORE-113]** Training for
-- **[MORE-114]** Orders the plan library, sets what ‘Suggest a workout’ opens on, and shapes the sets and reps in plans you start from here. Plans already on your calendar keep what they prescribed.
-- **[MORE-115]** Training max
-- **[MORE-116]** Suggested loads are worked out from this share of your tested max, rather than from the max itself. Ninety per cent is the usual convention: a number computed from your best day is not makeable on an average one, and a programme you miss reps on is one you stop running. At 100% the suggestions come straight off your max.
-- **[MORE-117]** lb / miles
-- **[MORE-118]** kg / km
-- **[MORE-119]** Stored data does not change — this only affects how numbers are shown, so switching back and forth never rounds your history away.
-- **[MORE-120]** Week starts on
-- **[MORE-121]** Effort per set
-- **[MORE-122]** Once per session
-- **[MORE-123]** Every set
-- **[MORE-124]** Per-set effort is how autoregulated strength work picks its loads — a 9 on a triple you wanted at 8 means the next set comes down. It is worth the extra box on every row only if you act on it between sets. Training load uses the session figure either way.
-- **[MORE-125]** Weekly availability
-- **[MORE-126]** See what would move
-- **[MORE-127]** Which kinds of training each day can hold. Planning will respect this — a day with nothing selected is a rest day.
+- **[MORE-114]** Training for
+- **[MORE-115]** Orders the plan library, sets what ‘Suggest a workout’ opens on, and shapes the sets and reps in plans you start from here. Plans already on your calendar keep what they prescribed.
+- **[MORE-116]** Training max
+- **[MORE-117]** Suggested loads are worked out from this share of your tested max, rather than from the max itself. Ninety per cent is the usual convention: a number computed from your best day is not makeable on an average one, and a programme you miss reps on is one you stop running. At 100% the suggestions come straight off your max.
+- **[MORE-118]** lb / miles
+- **[MORE-119]** kg / km
+- **[MORE-120]** Stored data does not change — this only affects how numbers are shown, so switching back and forth never rounds your history away.
+- **[MORE-121]** Week starts on
+- **[MORE-122]** Effort per set
+- **[MORE-123]** Once per session
+- **[MORE-124]** Every set
+- **[MORE-125]** Per-set effort is how autoregulated strength work picks its loads — a 9 on a triple you wanted at 8 means the next set comes down. It is worth the extra box on every row only if you act on it between sets. Training load uses the session figure either way.
+- **[MORE-126]** Weekly availability
+- **[MORE-127]** See what would move
+- **[MORE-128]** Which kinds of training each day can hold. Planning will respect this — a day with nothing selected is a rest day.
 
 ### Tests
 
 <sub>`src/features/more/TestsView.tsx`</sub>
 
-- **[MORE-128]** Nothing measured yet.
-- **[MORE-129]** A test gives the app a real number to program from instead of a guess — and gives you something to beat.
-- **[MORE-130]** Just tested
-- **[MORE-131]** Test it again
-- **[MORE-132]** Remove this result
-- **[MORE-133]** Test a movement
-- **[MORE-134]** Enter a max I already know
-- **[MORE-135]** Remove this result?
+- **[MORE-129]** Nothing measured yet.
+- **[MORE-130]** A test gives the app a real number to program from instead of a guess — and gives you something to beat.
+- **[MORE-131]** Just tested
+- **[MORE-132]** Test it again
+- **[MORE-133]** Remove this result
+- **[MORE-134]** Test a movement
+- **[MORE-135]** Enter a max I already know
+- **[MORE-136]** Remove this result?
 
 ### The More menu
 
 <sub>`src/features/more/MoreView.tsx`</sub>
 
-- **[MORE-136]** Could not read that file.
-- **[MORE-137]** Run alerts
-- **[MORE-138]** Saved workouts
-- **[MORE-139]** Your data
-- **[MORE-140]** Everything lives in this browser on this device. Nothing is uploaded, and no account exists — which also means a cleared browser takes your history with it. Export regularly and keep the file somewhere that syncs.
-- **[MORE-141]** Export backup
-- **[MORE-142]** Restore from backup
-- **[MORE-143]** Start over
-- **[MORE-144]** Erases every session, plan, and setting on this device and reseeds the movement library from scratch. Export a backup first if there is anything you want.
-- **[MORE-145]** Erase all data
-- **[MORE-146]** Forge · offline training tracker
-- **[MORE-147]** Restore backup
-- **[MORE-148]** . Merging keeps what is already on this device and lets the newer copy of each record win — the right choice when you have trained since the export. Replacing wipes first, for moving to a new phone.
-- **[MORE-149]** Merge (recommended)
-- **[MORE-150]** Replace everything
-- **[MORE-151]** Type ERASE to confirm
+- **[MORE-137]** Could not read that file.
+- **[MORE-138]** Run alerts
+- **[MORE-139]** Saved workouts
+- **[MORE-140]** Your data
+- **[MORE-141]** Everything lives in this browser on this device. Nothing is uploaded, and no account exists — which also means a cleared browser takes your history with it. Export regularly and keep the file somewhere that syncs.
+- **[MORE-142]** Export backup
+- **[MORE-143]** Restore from backup
+- **[MORE-144]** Start over
+- **[MORE-145]** Erases every session, plan, and setting on this device and reseeds the movement library from scratch. Export a backup first if there is anything you want.
+- **[MORE-146]** Erase all data
+- **[MORE-147]** Forge · offline training tracker
+- **[MORE-148]** Restore backup
+- **[MORE-149]** . Merging keeps what is already on this device and lets the newer copy of each record win — the right choice when you have trained since the export. Replacing wipes first, for moving to a new phone.
+- **[MORE-150]** Merge (recommended)
+- **[MORE-151]** Replace everything
+- **[MORE-152]** Type ERASE to confirm
 
 ### The injury log
 
 <sub>`src/features/more/InjuryView.tsx`</sub>
 
-- **[MORE-152]** Nothing logged.
-- **[MORE-153]** Log something that hurts and the sessions that load it step aside — the rest of your training carries on.
-- **[MORE-154]** Mark it healed
-- **[MORE-155]** Remove from the log
-- **[MORE-156]** Log an injury
-- **[MORE-157]** Healed already?
-- **[MORE-158]** Remove this from the log?
+- **[MORE-153]** Nothing logged.
+- **[MORE-154]** Log something that hurts and the sessions that load it step aside — the rest of your training carries on.
+- **[MORE-155]** Mark it healed
+- **[MORE-156]** Remove from the log
+- **[MORE-157]** Log an injury
+- **[MORE-158]** Healed already?
+- **[MORE-159]** Remove this from the log?
 
 ### The movement library
 
 <sub>`src/features/more/ExerciseLibraryView.tsx`</sub>
 
-- **[MORE-159]** Search movements
-- **[MORE-160]** + Add a movement
-- **[MORE-161]** Built in
+- **[MORE-160]** Search movements
+- **[MORE-161]** + Add a movement
+- **[MORE-162]** Built in
 
 ### Which weights you own
 
 <sub>`src/features/more/RackEditor.tsx`</sub>
 
-- **[MORE-162]** + Another size
-- **[MORE-163]** Weights you own
-- **[MORE-164]** Suggested loads, progressions and test ladders all snap to these. Leave a section empty and that movement falls back to round numbers.
-- **[MORE-165]** The bar
-- **[MORE-166]** Plates, in pairs
+- **[MORE-163]** + Another size
+- **[MORE-164]** Weights you own
+- **[MORE-165]** Suggested loads, progressions and test ladders all snap to these. Leave a section empty and that movement falls back to round numbers.
+- **[MORE-166]** The bar
+- **[MORE-167]** Plates, in pairs
 
 ### Your plans
 
 <sub>`src/features/more/PlansView.tsx`</sub>
 
-- **[MORE-167]** No plans of your own yet.
-- **[MORE-168]** Lay out a week — which days you train and what you do on them — and it repeats for as long as you set it to.
-- **[MORE-169]** + Build a plan
-- **[MORE-170]** 📥 Import a plan
+- **[MORE-168]** No plans of your own yet.
+- **[MORE-169]** Lay out a week — which days you train and what you do on them — and it repeats for as long as you set it to.
+- **[MORE-170]** + Build a plan
+- **[MORE-171]** 📥 Import a plan
 
 ### Your saved workouts
 
 <sub>`src/features/more/SavedWorkoutsView.tsx`</sub>
 
-- **[MORE-171]** Saved workouts
-- **[MORE-172]** Nothing saved yet.
-- **[MORE-173]** Name a workout you have built and it comes back here, ready to run again — and, if it is timed, with its own best to beat.
-- **[MORE-174]** 📥 Import a workout
+- **[MORE-172]** Saved workouts
+- **[MORE-173]** Nothing saved yet.
+- **[MORE-174]** Name a workout you have built and it comes back here, ready to run again — and, if it is timed, with its own best to beat.
+- **[MORE-175]** 📥 Import a workout
 
 ---
 

@@ -34,7 +34,15 @@ import {
   type PaceReading,
   type SplitState,
 } from '../../domain/pace';
-import { advanceRun, runProgress, startRun, type RunCursor, type RunPlan, type RunProgress } from '../../domain/runPlan';
+import {
+  advanceRun,
+  runProgress,
+  segmentAt,
+  startRun,
+  type RunCursor,
+  type RunPlan,
+  type RunProgress,
+} from '../../domain/runPlan';
 import { alertsArmed, type RunSettings } from '../../domain/runSettings';
 import { sayChange, sayDrift, saySplit, sayStart, speakable } from '../../domain/runVoice';
 import { speak, stopSpeaking, unlockSpeech } from '../../ui/speak';
@@ -56,6 +64,13 @@ export interface RunNote {
  */
 const BUFFER_MS = WINDOW_MS + 10_000;
 
+/** A piece already behind you, and what it actually cost. */
+export interface FinishedPiece {
+  index: number;
+  distanceM: number;
+  seconds: number;
+}
+
 export type RunStatus = 'idle' | 'running' | 'paused' | 'finished';
 
 export interface RunTracker {
@@ -68,6 +83,13 @@ export interface RunTracker {
   /** Average over the whole run, which is the number that ends up in the log. */
   averageSecPerKm: number | null;
   progress: RunProgress | null;
+  /**
+   * Pieces already run, by their index in the plan.
+   *
+   * Kept so the session can be read as a whole rather than as whatever is happening now —
+   * what you have done, what you are doing, and what is still to come, on one screen.
+   */
+  finished: FinishedPiece[];
   /** Newest first, so the screen can show the last few without reversing. */
   notes: RunNote[];
   error: string | null;
@@ -94,6 +116,7 @@ export function useRunTracker(options: {
   const [notes, setNotes] = useState<RunNote[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [cursor, setCursor] = useState<RunCursor>(() => startRun());
+  const [finishedPieces, setFinishedPieces] = useState<FinishedPiece[]>([]);
 
   /*
    * Everything the fix handler needs lives in refs rather than state.
@@ -155,10 +178,6 @@ export function useRunTracker(options: {
       setElapsedSec(seconds);
 
       const current = settingsRef.current;
-      const target =
-        current.targetSecPerKm != null
-          ? { targetSecPerKm: current.targetSecPerKm, toleranceSecPerKm: current.toleranceSecPerKm }
-          : undefined;
 
       /*
        * Segments first, splits second, drift last, and at most one of them per fix.
@@ -177,8 +196,26 @@ export function useRunTracker(options: {
           elapsedSec: seconds,
         });
         if (change.entering || change.finished) {
+          const done = cursorRef.current.index;
           cursorRef.current = change.cursor;
           setCursor(change.cursor);
+          if (change.covered) {
+            setFinishedPieces((pieces) => [
+              ...pieces,
+              { index: done, distanceM: change.covered!.distanceM, seconds: change.covered!.seconds },
+            ]);
+          }
+
+          /*
+           * A new piece is a new effort against a new number, so the drift rules start over.
+           *
+           * Without this, being slow at the end of a recovery jog carries into the rep that
+           * follows it and gets shouted at you ten seconds in, when you are still accelerating
+           * and the target has just changed anyway. Restarting also reinstates the warm-up
+           * grace, which is the same argument at the start of every rep as at the start of the
+           * run.
+           */
+          cueState.current = { last: null, lastAt: now, startedAt: now };
 
           const sentence = current.segmentCues ? sayChange(change, unitsRef.current) : null;
           if (sentence) {
@@ -187,6 +224,31 @@ export function useRunTracker(options: {
           }
         }
       }
+
+      /*
+       * What you are aiming at *right now*.
+       *
+       * The piece being run outranks the standing target, and getting this the wrong way round
+       * is loud: on a prescribed 11:16 recovery jog, an 8:00 easy-run target had the app
+       * shouting "pick it up, 196 seconds slow" at somebody doing exactly what they were told.
+       * The standing target is what to aim at when nothing else has said.
+       *
+       * The one place this is approximate is a split that straddles two pieces — half a rep
+       * and half a float compared against the rep's number. The segment calls already report
+       * each piece properly, so the split is the lesser of the two readings there.
+       */
+      const activeSegment = activePlan ? segmentAt(activePlan, cursorRef.current) : null;
+      /*
+       * With a session in hand, the session decides — including when it decides nothing.
+       *
+       * A warm-up and a cool-down carry no target on purpose, and falling back to the standing
+       * one there would nag somebody for jogging gently during the ten minutes whose entire
+       * job is jogging gently. The standing target is what to aim at on a run with no shape to
+       * it, which is most runs, and it keeps that job exactly there.
+       */
+      const aim = activePlan ? activeSegment?.targetSecPerKm : current.targetSecPerKm;
+      const target =
+        aim != null ? { targetSecPerKm: aim, toleranceSecPerKm: current.toleranceSecPerKm } : undefined;
 
       if (current.splits && splitState.current) {
         const decision = decideSplit({
@@ -207,7 +269,13 @@ export function useRunTracker(options: {
         }
       }
 
-      if (alertsArmed(current) && target && cueState.current) {
+      /*
+       * Alerts stay gated on the standing setting even when the piece supplies the number.
+       *
+       * Switching pace alerts off has to mean off. A structured run is exactly the case where
+       * a target exists whether or not anybody asked to be told about it.
+       */
+      if (alertsArmed(current, aim != null) && target && cueState.current) {
         const decision = decideCue({ reading: paceNow, target, state: cueState.current, now });
         cueState.current = decision.state;
         if (decision.kind) {
@@ -235,6 +303,7 @@ export function useRunTracker(options: {
     cursorRef.current = startRun();
 
     setCursor(startRun());
+    setFinishedPieces([]);
     setDistanceM(0);
     setElapsedSec(0);
     setReading(null);
@@ -323,6 +392,7 @@ export function useRunTracker(options: {
     reading,
     averageSecPerKm,
     progress: plan ? runProgress(plan, cursor, distanceM, elapsedSec) : null,
+    finished: finishedPieces,
     notes,
     error,
     start,

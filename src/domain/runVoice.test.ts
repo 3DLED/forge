@@ -146,7 +146,7 @@ describe('a segment change', () => {
     const first = advanceRun({ plan: tempo, cursor: startRun(), distanceM: 1000, elapsedSec: 300 });
     const said = sayChange(first, 'metric');
 
-    expect(said).toContain('1 km');
+    expect(said).toContain('1 kilometre');
     expect(said).toContain('Next, run 3 kilometres at 4:10 /km');
   });
 
@@ -162,7 +162,7 @@ describe('a segment change', () => {
    */
   it('reads a timed piece back as a measured distance, not as a rep', () => {
     const imperial = advanceRun({ plan: tempo, cursor: startRun(), distanceM: 1591, elapsedSec: 300 });
-    expect(sayChange(imperial, 'imperial')).toContain('0.99 mi');
+    expect(sayChange(imperial, 'imperial')).toContain('0.99 miles');
   });
 
   /* A rep, by contrast, finishes on its own number and is said in the words it was set in. */
