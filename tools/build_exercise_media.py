@@ -93,6 +93,9 @@ ALIASES = {
     "back-extension": "0489",
     # "broad jump to vertical" tacks a second, vertical jump onto the end.
     "broad-jump": "forward jump",
+    # "lever reverse hyperextension" is a loaded machine. Forge tags this one `bench`, and the
+    # catalogue has the unloaded flat-bench version.
+    "reverse-hyper": "reverse hyper on flat bench",
     # No alias for the carries. The catalogue's only two-handed carry is "farmers walk", and
     # Forge has no farmer's carry to hang it on -- it has a *suitcase* carry, which is
     # one-sided, and whose entire coaching point is resisting the lean that the second bell
@@ -138,6 +141,13 @@ NO_PICTURE = {
     # The only cossack squat in the catalogue is weighted -- which Forge's is not -- and it
     # never shows the standing position, so it demonstrates half the movement.
     "cossack-squat",
+    # "pike-to-cobra push-up" flows through cobra, which is a different exercise. The only
+    # other pikes in the catalogue are on a stability ball or hanging, and Forge's is on the
+    # floor, so there is nothing to swap to.
+    "pike-push-up",
+    # "wind sprints" is a hanging exercise -- straight-arm hang, legs cycling. Forge's Sprints
+    # is running on the ground. Not the same thing at any speed.
+    "sprint",
     # The catalogue has only a plain jump rope, and somebody skipping says nothing about the
     # two rope passes that make it a double-under. (It also has "double under jump rope",
     # which does match, so this is a note rather than an entry.)

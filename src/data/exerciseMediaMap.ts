@@ -77,11 +77,10 @@ export const EXERCISE_MEDIA: Record<string, string> = {
   'overhead-press': '0091', // barbell seated overhead press
   'pallof-press': '0979', // band horizontal pallof press
   'pendlay-row': '3017', // barbell pendlay row
-  'pike-push-up': '3662', // pike-to-cobra push-up
   'pull-up': '0651', // pull up (neutral grip)
   'push-up': '0662', // push-up
   'renegade-row': '0521', // kettlebell alternating renegade row
-  'reverse-hyper': '0593', // lever reverse hyperextension
+  'reverse-hyper': '1423', // reverse hyper on flat bench
   'ring-dip': '0677', // ring dips
   'romanian-deadlift': '0085', // barbell romanian deadlift
   'rope-climb': '0680', // rope climb
@@ -92,7 +91,6 @@ export const EXERCISE_MEDIA: Record<string, string> = {
   'sit-up': '0735', // sit-up v. 2
   'slam-ball': '1354', // medicine ball overhead slam
   'split-squat': '2368', // split squats
-  'sprint': '0858', // wind sprints
   'sumo-deadlift': '0117', // barbell sumo deadlift
   'thruster': '3305', // barbell thruster
   'trap-bar-deadlift': '0811', // trap bar deadlift
