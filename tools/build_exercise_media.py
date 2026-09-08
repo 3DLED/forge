@@ -80,11 +80,11 @@ ALIASES = {
     "kb-swing": "kettlebell swing",
     "kb-windmill": "kettlebell windmill",
     "barbell-row": "barbell bent over row",
-    "bicep-curl": "barbell curl",
+    "bicep-curl": "0294",  # dumbbell biceps curl -- Forge tags this one `dumbbell`
     "lateral-raise": "dumbbell lateral raise",
     "good-morning": "barbell good morning",
-    "glute-bridge": "barbell glute bridge",
-    "forward-lunge": "barbell lunge",
+    "glute-bridge": "3013",  # low glute bridge on floor -- Forge tags this one `floor`
+    "forward-lunge": "3470",  # forward lunge, bodyweight
     "arnold-press": "dumbbell arnold press",
     "ab-wheel": "wheel rollout",
     # Reviewed against the GIF. "lever back extension" is a loaded machine; Forge's movement
@@ -111,7 +111,7 @@ ALIASES = {
     # Resolved from the ambiguous list. The catalogue carries several near-variants of each of
     # these and picking one is a judgement, not a match, so they live here where the judgement
     # is visible rather than buried in a scoring function.
-    "calf-stretch": "standing calves calf stretch",
+    "calf-stretch": "1377",  # calf stretch with hands against wall
     "dip": "chest dip",
     "db-incline-press": "dumbbell incline bench press",
     "db-row": "dumbbell bent over row",
@@ -124,7 +124,7 @@ ALIASES = {
     "leg-press": "sled 45° leg press",
     "pallof-press": "band horizontal pallof press",
     "seated-cable-row": "cable low seated row",
-    "cable-fly": "cable low fly",
+    "cable-fly": "0227",  # cable standing fly
     "band-curl": "band alternating biceps curl",
 }
 
@@ -305,6 +305,9 @@ def main():
     unknown_slugs = sorted(slug for slug in ALIASES if slug not in forge)
 
     matched, unmatched, alias_misses, ambiguous = {}, [], [], []
+    #: An alias is a judgement, not a licence to ignore the equipment. Still applied --
+    #: sometimes the right picture uses different kit -- but never silently.
+    alias_conflicts = []
 
     for slug, (name, kit) in sorted(forge.items()):
         if slug in NO_PICTURE:
@@ -314,10 +317,12 @@ def main():
         alias = ALIASES.get(slug)
         if alias:
             hit = by_id.get(alias) if alias.isdigit() else by_name.get(normalise(alias))
-            if hit:
-                matched[slug] = (hit, "alias")
-            else:
+            if not hit:
                 alias_misses.append((slug, alias))
+            else:
+                matched[slug] = (hit, "alias")
+                if not equipment_agrees(hit, kit):
+                    alias_conflicts.append((slug, name, hit["name"], hit.get("equipment", "")))
             continue
 
         hit = by_name.get(normalise(name))
@@ -425,6 +430,11 @@ def main():
         print(f"ALIASES naming slugs that are not in the seed ({len(unknown_slugs)}):")
         for slug in unknown_slugs:
             print(f"  {slug}")
+    if alias_conflicts:
+        print()
+        print(f"ALIASES whose equipment contradicts the movement ({len(alias_conflicts)}):")
+        for slug, name, target, kit in alias_conflicts:
+            print(f"  {name} -> {target} [{kit}]")
     if alias_misses:
         print()
         print(f"ALIASES pointing at names not in the catalogue ({len(alias_misses)}):")

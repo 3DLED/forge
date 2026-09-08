@@ -24,11 +24,11 @@ export const EXERCISE_MEDIA: Record<string, string> = {
   'bear-crawl': '3360', // bear crawl
   'bench-dip': '0129', // bench dip (knees bent)
   'bench-press': '0025', // barbell bench press
-  'bicep-curl': '0031', // barbell curl
+  'bicep-curl': '0294', // dumbbell biceps curl
   'broad-jump': '1472', // forward jump
   'burpee': '1160', // burpee
-  'cable-fly': '0179', // cable low fly
-  'calf-stretch': '1398', // standing calves calf stretch
+  'cable-fly': '0227', // cable standing fly
+  'calf-stretch': '1377', // calf stretch with hands against wall
   'chest-press-machine': '1301', // machine inner chest press
   'chin-up': '1326', // chin-up
   'db-bench-press': '0289', // dumbbell bench press
@@ -43,11 +43,11 @@ export const EXERCISE_MEDIA: Record<string, string> = {
   'diamond-push-up': '0283', // diamond push-up
   'dip': '0251', // chest dip
   'double-unders': '3885', // double under jump rope
-  'forward-lunge': '0054', // barbell lunge
+  'forward-lunge': '3470', // forward lunge (male)
   'freestanding-handstand-push-up': '0471', // handstand push-up
   'front-squat': '0042', // barbell front squat
   'ghr': '3193', // glute-ham raise
-  'glute-bridge': '1409', // barbell glute bridge
+  'glute-bridge': '3013', // low glute bridge on floor
   'goblet-squat': '0534', // kettlebell goblet squat
   'good-morning': '0044', // barbell good morning
   'hamstring-stretch': '1511', // hamstring stretch
