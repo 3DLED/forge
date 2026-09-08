@@ -33,21 +33,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
 
       # Capacitor 8's Android project targets SDK 36 and Gradle 8.14, which wants a
       # current JDK. Temurin 21 is the version Capacitor documents.
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 21
 
-      - uses: android-actions/setup-android@v3
+      - uses: android-actions/setup-android@v4
 
       - run: npm ci
 
@@ -64,7 +64,7 @@ jobs:
       - run: ./gradlew assembleDebug --no-daemon
         working-directory: android
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: forge-debug-apk
           path: android/app/build/outputs/apk/debug/*.apk
