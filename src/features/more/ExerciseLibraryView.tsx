@@ -24,6 +24,9 @@ import {
 import { CONTAINER_SLUGS } from '../../domain/training';
 import type { Exercise } from '../../domain/types';
 
+/** As in the picker: about three screens of browsing, then the search box takes over. */
+const BROWSE_LIMIT = 60;
+
 export default function ExerciseLibraryView() {
   const { exercises } = useApp();
   const [query, setQuery] = useState('');
@@ -134,7 +137,21 @@ export default function ExerciseLibraryView() {
       {mine.map((exercise) => row(exercise, true))}
 
       {seeded.length > 0 && <div className="section-title">Built in</div>}
-      {seeded.map((exercise) => row(exercise, false))}
+      {/*
+        Capped while browsing. The library is fifteen hundred movements now, and rendering all
+        of them cost about half a second every time the search box was cleared — for a list
+        nobody reads past the first screen of. A search lifts the cap, because the whole point
+        of typing is that the answer is short.
+      */}
+      {seeded.slice(0, query.trim() ? seeded.length : BROWSE_LIMIT).map((exercise) =>
+        row(exercise, false),
+      )}
+      {!query.trim() && seeded.length > BROWSE_LIMIT && (
+        <p className="tiny faint" style={{ marginTop: '0.6rem' }}>
+          {plural(seeded.length - BROWSE_LIMIT, 'more movement')} in this category. Search to
+          find them.
+        </p>
+      )}
 
       {mine.length + seeded.length === 0 && (
         <div className="empty">

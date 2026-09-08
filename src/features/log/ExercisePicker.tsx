@@ -18,6 +18,7 @@ import { useApp } from '../../ui/AppProvider';
 import { resolveExercise } from '../../domain/equipment';
 import { CATEGORY_LABELS, CATEGORY_ORDER, categoryOf } from '../../domain/categories';
 import { exerciseUsage } from '../../data/sessions';
+import { plural } from '../../ui/text';
 import { CONTAINER_SLUGS } from '../../domain/training';
 import type { Exercise } from '../../domain/types';
 import type { ExerciseCategory } from '../../domain/categories';
@@ -35,6 +36,15 @@ const PATTERN_LABELS: Record<string, string> = {
   gait: 'Run',
   fullBody: 'Full body',
 };
+
+/**
+ * How much of the long tail an unfiltered picker shows.
+ *
+ * Sixty is about three screens — enough that scrolling feels like browsing rather than a wall,
+ * and few enough that opening the sheet is instant. Searching lifts the cap entirely, because
+ * a filtered list is short by construction.
+ */
+const BROWSE_LIMIT = 60;
 
 export default function ExercisePicker({
   onPick,
@@ -230,10 +240,21 @@ export default function ExercisePicker({
             </>
           )}
 
+          {/*
+            Capped, because "everything else" is now most of a fifteen-hundred movement
+            library and nobody has ever scrolled to the bottom of it. The staples above are
+            what an unfiltered picker is for; past those, the search box is the tool. Rendering
+            the lot cost about half a second of jank on opening — inside a sheet, mid-workout.
+          */}
           {rest.length > 0 && (
             <>
               <div className="section-title">Everything else</div>
-              {rest.map(renderRow)}
+              {rest.slice(0, BROWSE_LIMIT).map(renderRow)}
+              {rest.length > BROWSE_LIMIT && (
+                <p className="tiny faint" style={{ padding: '0.6rem 0.2rem' }}>
+                  {plural(rest.length - BROWSE_LIMIT, 'more movement')}. Search to find them.
+                </p>
+              )}
             </>
           )}
         </>

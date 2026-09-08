@@ -75,10 +75,19 @@ export type SeededEquipmentTag =
   // machines
   | 'cableMachine' | 'latPulldown' | 'legPress' | 'legCurl' | 'legExtension'
   | 'chestPress' | 'rowMachine' | 'smithMachine' | 'hyperextension' | 'gluteHamRaise'
+  /*
+   * The catch-all for a plate-loaded or selectorised station Forge does not name.
+   *
+   * Eighty-five of the imported movements are "lever" this or that, and giving each its own
+   * tag would be eighty-five rows in the equipment picker for kit that is only ever present
+   * as a set, in a commercial gym, all at once.
+   */
+  | 'leverageMachine' | 'elliptical'
   // conditioning kit
   | 'rowErg' | 'skiErg' | 'bikeErg' | 'airBike' | 'treadmill' | 'sled' | 'jumpRope' | 'rebounder'
   | 'box' | 'medicineBall' | 'slamBall' | 'wallBall' | 'sandbag' | 'battleRopes'
   | 'resistanceBand' | 'miniBand' | 'abWheel' | 'gripTrainer' | 'weightVest'
+  | 'stabilityBall' | 'bosuBall' | 'foamRoller' | 'tire' | 'sledgehammer'
   // places
   | 'road' | 'trail' | 'track' | 'hill' | 'pool' | 'openWater';
 
@@ -201,6 +210,15 @@ export interface Exercise extends Entity {
     cues: string[];
     fault: string;
   };
+  /**
+   * A sentence or two on what the movement is and what it trains.
+   *
+   * Distinct from `coaching`, which says how to do it, and from `notes`, which is an aside.
+   * This is the paragraph you read when deciding whether a movement you have never heard of
+   * is the one you want — so it exists for the imported library, where the name is often the
+   * only other thing you have to go on.
+   */
+  description?: string;
   notes?: string;
 }
 

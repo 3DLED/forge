@@ -68,6 +68,15 @@ export default function ExerciseInfoSheet({
         <span className="pips">{levelPips(level)}</span>
       </p>
 
+      {/*
+        What the movement is, above how to do it.
+        
+        Only the imported library carries one — the curated write-ups open with a setup cue
+        instead, which does the same job for a movement whose name already tells you what it
+        is. This is for the long tail, where the name often does not.
+      */}
+      {exercise.description && <p className="small">{exercise.description}</p>}
+
       {coaching ? (
         <>
           <div className="section-title">Set up</div>
@@ -80,8 +89,17 @@ export default function ExerciseInfoSheet({
             ))}
           </ol>
 
-          <div className="section-title">Watch for</div>
-          <p className="small">{coaching.fault}</p>
+          {/*
+            Omitted rather than left blank. The authored write-ups all name the way a movement
+            goes wrong; the imported ones have no such field, and inventing one would be
+            putting words in somebody's mouth about a lift they have never seen.
+          */}
+          {coaching.fault && (
+            <>
+              <div className="section-title">Watch for</div>
+              <p className="small">{coaching.fault}</p>
+            </>
+          )}
         </>
       ) : (
         <p className="small faint">

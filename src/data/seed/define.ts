@@ -59,7 +59,7 @@ export interface ExerciseSpec {
 /** The library entry before the repository stamps ids and timestamps onto it. */
 export type SeedExercise = Omit<Exercise, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>;
 
-function inferMetrics(
+export function inferMetrics(
   equipment: EquipmentTag[],
   pattern: MovementPattern,
   modality: Modality,

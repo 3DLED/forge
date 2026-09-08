@@ -8,16 +8,37 @@
 
 import { db } from '../db/db';
 import { getMeta, setMeta } from '../db/repo';
+import { ulid } from '../domain/ids';
 import type { AvailabilityRule, Profile, Weekday } from '../domain/types';
 import { equipmentProfileRepo, exerciseRepo, profileRepo } from './repos';
 import { SEED_EQUIPMENT_PROFILES } from './seed/equipment';
 import { SEED_EXERCISES } from './seed/exercises';
+import type { SeedExercise } from './seed/define';
 import { COACHED_SLUGS } from './seed/coaching';
 import { SEED_SESSION_TEMPLATES } from './seed/sessionTemplates';
 import { SEED_PLAN_TEMPLATES } from './seed/planTemplates';
 
 /** Bump when the seed library changes so new movements reach existing installs. */
-const SEED_VERSION = 1;
+const SEED_VERSION = 2;
+
+/**
+ * Everything the library ships with: the curated movements, then the imported catalogue.
+ *
+ * Loaded on demand rather than imported at the top, and the reason is the install size. The
+ * catalogue is 1.3 MB of names, muscles and write-ups that go into IndexedDB on first run and
+ * are never read from the bundle again — so holding it in the main chunk made every launch
+ * parse a megabyte to answer a question already answered. As its own chunk it is still
+ * precached, so a first run with no network still works, but the app shell is back to the
+ * size it was.
+ *
+ * Order matters only for the duplicate-slug tiebreak in `dedupeExercises`, which keeps the
+ * oldest row. Curated first means a curated movement wins a collision, which is right — it
+ * carries authored progressions and coaching that an imported one does not.
+ */
+async function allSeedExercises(): Promise<SeedExercise[]> {
+  const { IMPORTED_EXERCISES } = await import('./seed/imported');
+  return [...SEED_EXERCISES, ...IMPORTED_EXERCISES];
+}
 
 /**
  * Repairs duplicate slugs left by an interrupted or concurrent seed.
@@ -58,10 +79,17 @@ async function dedupeExercises(): Promise<number> {
  *
  * Only the curated flags are pushed. Names, equipment, and progressions are left alone: those
  * are things a user may reasonably have edited, and overwriting them would be data loss.
+ *
+ * Muscles and the description are pushed too, which looks like it breaks that rule and does
+ * not: the library screen splits custom entries from seeded ones and the editor only ever
+ * writes `isCustom: true`, so there is no path by which a seeded movement's muscles are
+ * anything but what the seed said. They are here because the curated library's muscles were
+ * never authored — `define.ts` derived them from the movement pattern, so every squat in the
+ * app claimed the same four muscles — and the catalogue states them per movement.
  */
-async function syncSeedFlags(): Promise<number> {
+async function syncSeedFlags(library: SeedExercise[]): Promise<number> {
   const existing = await db.exercises.toArray();
-  const seedBySlug = new Map(SEED_EXERCISES.map((s) => [s.slug, s]));
+  const seedBySlug = new Map(library.map((s) => [s.slug, s]));
 
   const stale = existing.filter((exercise) => {
     if (exercise.isCustom || exercise.deletedAt) return false;
@@ -73,7 +101,10 @@ async function syncSeedFlags(): Promise<number> {
       seed.common !== exercise.common ||
       seed.isAccessory !== Boolean(exercise.isAccessory) ||
       seed.level !== (exercise.level ?? 0) ||
-      seed.bodyweightFactor !== (exercise.bodyweightFactor ?? -1)
+      seed.bodyweightFactor !== (exercise.bodyweightFactor ?? -1) ||
+      seed.description !== exercise.description ||
+      seed.primaryMuscles.join() !== exercise.primaryMuscles.join() ||
+      seed.secondaryMuscles.join() !== exercise.secondaryMuscles.join()
     );
   });
 
@@ -88,6 +119,9 @@ async function syncSeedFlags(): Promise<number> {
         isAccessory: seed.isAccessory,
         level: seed.level,
         bodyweightFactor: seed.bodyweightFactor,
+        primaryMuscles: seed.primaryMuscles,
+        secondaryMuscles: seed.secondaryMuscles,
+        description: seed.description,
       };
     }),
   );
@@ -183,14 +217,35 @@ export async function dedupeProfiles(): Promise<number> {
   return doomed.length;
 }
 
-async function seedExercises(): Promise<number> {
+/**
+ * Adds any library movement this install has never seen, keyed by slug.
+ *
+ * In bulk, and that is not a micro-optimisation. `create()` opens its own transaction per
+ * record and every write counts the change outbox to decide whether to trim it, so seeding a
+ * thirteen-hundred movement library one row at a time is thirteen hundred transactions and
+ * thirteen hundred counts — on a phone, on first run, before the first screen appears.
+ * `bulkPut` does it in one.
+ *
+ * Ids and timestamps are minted here because `bulkPut` puts records rather than creating
+ * them. Deliberate: the same movement gets a different id on every install, which is exactly
+ * why backups reconcile the seeded tables on slug rather than on id.
+ */
+async function seedExercises(library: SeedExercise[]): Promise<number> {
   const existing = await db.exercises.toArray();
   const known = new Set(existing.map((e) => e.slug));
-  const missing = SEED_EXERCISES.filter((e) => !known.has(e.slug));
+  const missing = library.filter((e) => !known.has(e.slug));
+  if (missing.length === 0) return 0;
 
-  for (const seed of missing) {
-    await exerciseRepo.create(seed);
-  }
+  const timestamp = new Date().toISOString();
+  await exerciseRepo.bulkPut(
+    missing.map((seed) => ({
+      ...seed,
+      id: ulid(),
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      deletedAt: null,
+    })),
+  );
   return missing.length;
 }
 
@@ -247,8 +302,9 @@ export function bootstrap(): Promise<BootstrapResult> {
  * Session templates reference exercises by slug, and a typo there produces a workout that
  * silently prescribes nothing. Caught loudly in development, where it is free to fix.
  */
-function verifySeedIntegrity(): void {
-  const known = new Set(SEED_EXERCISES.map((e) => e.slug));
+async function verifySeedIntegrity(): Promise<void> {
+  const { IMPORTED_SLUGS } = await import('./seed/imported');
+  const known = new Set([...SEED_EXERCISES.map((e) => e.slug), ...IMPORTED_SLUGS]);
   const missing = new Set<string>();
 
   for (const template of SEED_SESSION_TEMPLATES) {
@@ -273,8 +329,10 @@ function verifySeedIntegrity(): void {
   // Coaching text is authored by hand, so a movement added later silently ships without a
   // write-up unless something says so. Containers are not movements and have nothing to write.
   const containers = new Set(['amrap', 'emom', 'for-time']);
+  // Imported movements carry their own write-up inline, so they have nothing to look up in
+  // the authored table and listing all thirteen hundred of them would bury the real gaps.
   const uncoached = SEED_EXERCISES.filter(
-    (e) => !containers.has(e.slug) && !COACHED_SLUGS.has(e.slug),
+    (e) => !containers.has(e.slug) && !IMPORTED_SLUGS.has(e.slug) && !COACHED_SLUGS.has(e.slug),
   ).map((e) => e.slug);
   if (uncoached.length > 0) {
     console.warn('Movements with no coaching write-up:', uncoached);
@@ -287,7 +345,7 @@ function verifySeedIntegrity(): void {
 }
 
 async function runBootstrap(): Promise<BootstrapResult> {
-  if (import.meta.env.DEV) verifySeedIntegrity();
+  if (import.meta.env.DEV) await verifySeedIntegrity();
   await db.open();
 
   const previousSeed = await getMeta<number>('seedVersion', 0);
@@ -297,8 +355,9 @@ async function runBootstrap(): Promise<BootstrapResult> {
   await dedupeEquipmentProfiles();
   await dedupeProfiles();
   await dedupeExercises();
-  const exercisesAdded = await seedExercises();
-  await syncSeedFlags();
+  const library = await allSeedExercises();
+  const exercisesAdded = await seedExercises(library);
+  await syncSeedFlags(library);
   const profile = await ensureProfile();
 
   if (previousSeed !== SEED_VERSION) await setMeta('seedVersion', SEED_VERSION);

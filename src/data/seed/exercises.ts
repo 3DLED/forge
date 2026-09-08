@@ -14,6 +14,7 @@
  */
 
 import { cardio, ex, mobility, type SeedExercise } from './define';
+import { ENRICHMENT } from './enrichment';
 
 const LIBRARY: SeedExercise[] = [
   // -------------------------------------------------------------------------
@@ -1042,12 +1043,29 @@ for (const [level, slugs] of Object.entries(LEVELS)) {
   for (const slug of slugs) LEVEL_BY_SLUG.set(slug, Number(level));
 }
 
-export const SEED_EXERCISES: SeedExercise[] = LIBRARY.map((exercise) => ({
-  ...exercise,
-  common: COMMON_SLUGS.has(exercise.slug),
-  isAccessory: ACCESSORY_SLUGS.has(exercise.slug),
-  level: LEVEL_BY_SLUG.get(exercise.slug) ?? 3,
-  bodyweightFactor: BODYWEIGHT_FACTORS[exercise.slug] ?? 0,
-}));
+/**
+ * The curated library, with the flags and the catalogue's muscles folded in.
+ *
+ * The muscles are the notable one. `define.ts` derives them from the movement pattern, which
+ * was always a placeholder — every squat here claimed quads, glutes, hamstrings and core,
+ * whether it was a goblet squat or a pistol. Where the licensed catalogue describes the same
+ * movement it states them per exercise, so its answer wins for those. Everything the
+ * catalogue cannot know — the pattern, the ladders, the coaching — stays as authored above.
+ */
+export const SEED_EXERCISES: SeedExercise[] = LIBRARY.map((exercise) => {
+  const enriched = ENRICHMENT[exercise.slug];
+  return {
+    ...exercise,
+    common: COMMON_SLUGS.has(exercise.slug),
+    isAccessory: ACCESSORY_SLUGS.has(exercise.slug),
+    level: LEVEL_BY_SLUG.get(exercise.slug) ?? 3,
+    bodyweightFactor: BODYWEIGHT_FACTORS[exercise.slug] ?? 0,
+    ...(enriched && {
+      primaryMuscles: enriched.primary,
+      secondaryMuscles: enriched.secondary,
+      description: enriched.description || undefined,
+    }),
+  };
+});
 
 export const SEED_EXERCISE_BY_SLUG = new Map(SEED_EXERCISES.map((e) => [e.slug, e]));
