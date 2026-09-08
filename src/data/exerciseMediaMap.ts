@@ -12,7 +12,7 @@ export const EXERCISE_MEDIA: Record<string, string> = {
   'archer-pull-up': '3293', // archer pull up
   'archer-push-up': '3294', // archer push up
   'arnold-press': '2137', // dumbbell arnold press
-  'back-extension': '0573', // lever back extension
+  'back-extension': '0489', // hyperextension
   'back-squat': '0043', // barbell full squat
   'band-assisted-pull-up': '0970', // band assisted pull-up
   'band-chest-press': '3124', // resistance band seated chest press
@@ -25,13 +25,12 @@ export const EXERCISE_MEDIA: Record<string, string> = {
   'bench-dip': '0129', // bench dip (knees bent)
   'bench-press': '0025', // barbell bench press
   'bicep-curl': '0031', // barbell curl
-  'broad-jump': '4242', // broad jump to vertical
+  'broad-jump': '1472', // forward jump
   'burpee': '1160', // burpee
   'cable-fly': '0179', // cable low fly
   'calf-stretch': '1398', // standing calves calf stretch
   'chest-press-machine': '1301', // machine inner chest press
   'chin-up': '1326', // chin-up
-  'cossack-squat': '3643', // weighted cossack squats (male)
   'db-bench-press': '0289', // dumbbell bench press
   'db-goblet-squat': '1760', // dumbbell goblet squat
   'db-incline-press': '0314', // dumbbell incline bench press

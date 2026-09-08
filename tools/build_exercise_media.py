@@ -60,9 +60,13 @@ CRLF = chr(13) + chr(10)
 #: bytes, which is not worth it for a reference picture.
 SIZE = "180"
 
-#: Forge slug -> the catalogue's name for the same movement.
+#: Forge slug -> the catalogue's name for the same movement, or its four-digit id.
 #:
-#: Only pairs somebody has looked at. Extend this from the review list the script writes.
+#: Only pairs somebody has looked at. Extend this from the contact sheet the script writes.
+#:
+#: An id is for when a name cannot pick one entry out: "hyperextension" and "hyperextension
+#: (on bench)" normalise to the same string, and which of the two you get would otherwise
+#: depend on their order in the file.
 ALIASES = {
     "bench-press": "barbell bench press",
     "db-bench-press": "dumbbell bench press",
@@ -83,6 +87,12 @@ ALIASES = {
     "forward-lunge": "barbell lunge",
     "arnold-press": "dumbbell arnold press",
     "ab-wheel": "wheel rollout",
+    # Reviewed against the GIF. "lever back extension" is a loaded machine; Forge's movement
+    # is tagged `hyperextension`, which is the unloaded roman chair -- id 0489, not the
+    # bench variant that shares its normalised name.
+    "back-extension": "0489",
+    # "broad jump to vertical" tacks a second, vertical jump onto the end.
+    "broad-jump": "forward jump",
     # No alias for the carries. The catalogue's only two-handed carry is "farmers walk", and
     # Forge has no farmer's carry to hang it on -- it has a *suitcase* carry, which is
     # one-sided, and whose entire coaching point is resisting the lean that the second bell
@@ -125,6 +135,9 @@ NO_PICTURE = {
     "box-jump",
     # "band squat row": rowing from the bottom of a deep squat. Different movement.
     "band-row",
+    # The only cossack squat in the catalogue is weighted -- which Forge's is not -- and it
+    # never shows the standing position, so it demonstrates half the movement.
+    "cossack-squat",
     # The catalogue has only a plain jump rope, and somebody skipping says nothing about the
     # two rope passes that make it a double-under. (It also has "double under jump rope",
     # which does match, so this is a note rather than an entry.)
@@ -272,9 +285,10 @@ def main():
     forge = forge_exercises()
     catalogue = load_catalogue(folder)
 
-    by_name = {}
+    by_name, by_id = {}, {}
     for record in catalogue:
         by_name.setdefault(normalise(record["name"]), record)
+        by_id[record["id"]] = record
 
     #: An alias whose slug is not in the seed never matches and never shows up as a gap
     #: either. Cheap to check, and it has already caught three.
@@ -289,7 +303,7 @@ def main():
 
         alias = ALIASES.get(slug)
         if alias:
-            hit = by_name.get(normalise(alias))
+            hit = by_id.get(alias) if alias.isdigit() else by_name.get(normalise(alias))
             if hit:
                 matched[slug] = (hit, "alias")
             else:
