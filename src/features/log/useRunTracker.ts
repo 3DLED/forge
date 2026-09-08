@@ -20,7 +20,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { browserLocation, type LocationSource, type LocationWatch } from '../../data/locationSource';
+import { locationSource, type LocationSource, type LocationWatch } from '../../data/locationSource';
 import {
   decideCue,
   decideSplit,
@@ -104,10 +104,10 @@ export function useRunTracker(options: {
   units: UnitSystem;
   /** Absent for an unstructured run — splits and drift alerts still work. */
   plan?: RunPlan | null;
-  /** Swapped for the background plugin once there is a native shell to run it in. */
+  /** Defaults to the right one for the platform; passed explicitly only by tests. */
   source?: LocationSource;
 }): RunTracker {
-  const { settings, units, plan, source = browserLocation } = options;
+  const { settings, units, plan, source = locationSource() } = options;
 
   const [status, setStatus] = useState<RunStatus>('idle');
   const [distanceM, setDistanceM] = useState(0);

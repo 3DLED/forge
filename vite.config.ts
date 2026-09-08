@@ -2,13 +2,29 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig({
+/**
+ * `--mode native` builds the bundle that goes inside the Capacitor shell.
+ *
+ * The only difference is the service worker, and it has to go. Android serves the webview
+ * from https://localhost, so the worker registers happily and then precaches two megabytes of
+ * assets that are already sitting on disk inside the APK — paying twice for the same files.
+ * Worse, it keeps serving them: after an app update the on-disk assets change and a cached
+ * worker carries on answering from the old ones, which is an app that silently never updates.
+ *
+ * Offline is not the reason it exists here either. A native build is already local; there is
+ * no network for it to survive the loss of.
+ */
+export default defineConfig(({ mode }) => {
+  const native = mode === 'native';
+
+  return {
   // Relative base so the built app works from a GitHub Pages subpath
   // (username.github.io/repo-name/) without hardcoding the repo name.
   base: './',
   plugins: [
     react(),
-    VitePWA({
+    !native &&
+      VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icons/*.png'],
       manifest: {
@@ -82,4 +98,5 @@ export default defineConfig({
       ignored: ['**/ExerciseDBstarter/**', '**/exercise-media/**'],
     },
   },
+  };
 });

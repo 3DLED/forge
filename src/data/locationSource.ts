@@ -103,3 +103,93 @@ function describe(error: GeolocationPositionError): string {
       return error.message || 'Location failed.';
   }
 }
+
+/**
+ * The native receiver, via `@capacitor-community/background-geolocation`.
+ *
+ * The whole reason `LocationSource` is shaped the way it is. The plugin's own API is
+ * `addWatcher(options, callback) -> id` and `removeWatcher({ id })`, which is what the
+ * interface above was drawn around — so this is a translation, not an adaptation, and nothing
+ * that consumes a location source had to learn a second shape.
+ *
+ * What it buys over the browser is the only thing the browser cannot do: fixes with the screen
+ * off and the app in the background. On Android that requires a foreground service, which
+ * requires a notification, which is why `backgroundMessage` is not optional in practice —
+ * omitting it is how you ask the plugin for foreground-only updates.
+ *
+ * Registered through `registerPlugin` rather than imported from the package, so a web build
+ * pulls in the type definitions and no code. The plugin has no browser implementation; on the
+ * web `browserLocation` is used instead and this is never constructed.
+ */
+
+import { Capacitor, registerPlugin } from '@capacitor/core';
+import type { BackgroundGeolocationPlugin } from '@capacitor-community/background-geolocation';
+
+const BackgroundGeolocation =
+  registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation');
+
+export const nativeLocation: LocationSource = {
+  available: () => Capacitor.isNativePlatform(),
+
+  async watch(options, onFix) {
+    const id = await BackgroundGeolocation.addWatcher(
+      {
+        /*
+         * Naming the notification is what asks for background updates at all. Without these
+         * two the plugin only promises fixes while the app is in front of you, which is the
+         * one thing the browser could already do.
+         */
+        backgroundTitle: options.backgroundTitle ?? 'Forge',
+        backgroundMessage: options.backgroundMessage ?? 'Tracking your run',
+        requestPermissions: true,
+        // Never hand back a fix from before the watcher started: a stale position looks like
+        // standing still, and the pace engine would believe it.
+        stale: false,
+        // Every fix. The pace engine does its own smoothing over a time window, and a
+        // distance filter would thin the very samples that smoothing is made of.
+        distanceFilter: options.distanceFilter ?? 0,
+      },
+      (position, error) => {
+        if (error) {
+          onFix(null, new Error(describeNative(error)));
+          return;
+        }
+        if (!position) return;
+
+        onFix(
+          {
+            // `time` is nullable in the plugin's own types, and a fix with no timestamp
+            // cannot be placed in the window — treating it as "now" is the honest reading.
+            at: position.time ?? Date.now(),
+            lat: position.latitude,
+            lon: position.longitude,
+            accuracy: position.accuracy,
+            speed: position.speed,
+          },
+          null,
+        );
+      },
+    );
+
+    return { stop: async () => BackgroundGeolocation.removeWatcher({ id }) };
+  },
+};
+
+/** The plugin's error codes, in words someone could act on. */
+function describeNative(error: { code?: string; message?: string }): string {
+  if (error.code === 'NOT_AUTHORIZED') {
+    return 'Location permission was refused. Allow it in Settings and start the run again.';
+  }
+  return error.message || 'Location failed.';
+}
+
+/**
+ * The right receiver for wherever this is running.
+ *
+ * A function rather than a constant because `isNativePlatform` is answered by the Capacitor
+ * runtime, which is not there at module-evaluation time in every environment — a test
+ * importing this file should not have to care.
+ */
+export function locationSource(): LocationSource {
+  return Capacitor.isNativePlatform() ? nativeLocation : browserLocation;
+}

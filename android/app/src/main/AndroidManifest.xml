@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBarLaunch"
+            android:launchMode="singleTask"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"></meta-data>
+        </provider>
+    </application>
+
+    <!-- Permissions -->
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--
+      Location, for pace alerts during a run.
+
+      COARSE is declared alongside FINE because Android 12 and later let the user grant only
+      the approximate one, and an app that declared only FINE would simply be refused rather
+      than degraded. The pace engine drops anything worse than thirty metres of accuracy on
+      its own, so a coarse grant produces no fixes rather than wrong ones.
+
+      BACKGROUND is what keeps them coming with the phone in a pocket and the screen off,
+      which is the entire reason for the native shell — a browser cannot do it at all. It is
+      requested separately by the system, on a second prompt, after the foreground grant.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+    <!--
+      A foreground service with a location type, which is the deal Android offers: you may
+      keep receiving fixes while backgrounded provided you show a notification saying so.
+      FOREGROUND_SERVICE_LOCATION is the separate permission Android 14 added for it.
+    -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+
+    <!-- Wake locks keep the fix stream alive while the device is idle mid-run. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!--
+      Declared optional so the app still installs on a device with no GPS. Everything except
+      pace alerts works without one, and the run screen already reports a receiver that
+      cannot produce a fix.
+    -->
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
+</manifest>
