@@ -35,7 +35,33 @@ export default defineConfig({
       workbox: {
         // The whole app is precached, so it opens with no network at all.
         globPatterns: ['**/*.{js,css,html,png,svg,woff2}'],
+        /*
+         * Except the movement animations, which are the one thing too big to hold.
+         *
+         * The app precaches because opening with no network is the premise; that works
+         * because the app is under a megabyte. The licensed exercise set is around 120 KB
+         * per animation, so a few hundred of them would put tens of megabytes into the
+         * install before the first screen appeared. They are cached as they are viewed
+         * instead — see the runtime rule below and `data/exerciseMedia`.
+         *
+         * Written as a glob rather than relying on the extension list above because the
+         * source set is GIF today and PNG is already precached: converting the media to a
+         * still image would otherwise silently pull the whole library into the install.
+         */
+        globIgnores: ['**/exercise-media/**'],
         cleanupOutdatedCaches: true,
+        runtimeCaching: [
+          {
+            urlPattern: /\/exercise-media\/.*\.(?:gif|webp|png)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'exercise-media',
+              // They never change: a new drawing would arrive under a new id.
+              expiration: { maxEntries: 400, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
       },
       devOptions: { enabled: false },
     }),

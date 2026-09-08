@@ -1466,3 +1466,22 @@ section[id^='movement-'] {
   flex-direction: column;
   gap: 0.2rem;
 }
+
+/* --- movement animations --------------------------------------------------- */
+
+/*
+ * The licensed set draws on white, which is a hole punched in a dark theme.
+ *
+ * So the picture gets its own light panel rather than being dropped onto the page: a rounded
+ * white card, centred, at the size it was drawn for. Scaling a 180px GIF up to fill the sheet
+ * would make a crisp line drawing look like a photocopy.
+ */
+.exercise-media {
+  display: block;
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 0.6rem;
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  object-fit: contain;
+}

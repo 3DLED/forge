@@ -17,3 +17,14 @@ dist-ssr/
 
 # Local simulation of GitHub Pages subpath hosting
 dist-test/
+
+# Licensed exercise animations — deliberately NOT in the repo.
+#
+# This repo is public. The ExerciseDB licence permits displaying the images inside the app
+# and forbids redistributing the files as a downloadable set; committing them here would put
+# the whole library one `git clone` away, with an index next to it. The map that references
+# them is checked in, the images themselves are fetched into place at build time.
+#
+# Rebuild locally with:
+#   python tools/build_exercise_media.py <path-to-purchased-set> --copy
+public/exercise-media/

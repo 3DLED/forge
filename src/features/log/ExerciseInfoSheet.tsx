@@ -11,6 +11,7 @@
  */
 
 import Sheet from '../../ui/Sheet';
+import { exerciseMediaUrl } from '../../data/exerciseMedia';
 import { coachingOf } from '../../domain/coaching';
 import { BAND_LABELS, bandOf, levelOf, levelPips } from '../../domain/difficulty';
 import { CATEGORY_LABELS, categoryOf } from '../../domain/categories';
@@ -29,6 +30,7 @@ export default function ExerciseInfoSheet({
 }) {
   const coaching = coachingOf(exercise);
   const level = levelOf(exercise);
+  const media = exerciseMediaUrl(exercise.slug);
 
   return (
     <Sheet
@@ -42,6 +44,25 @@ export default function ExerciseInfoSheet({
         )
       }
     >
+      {/*
+        Above the words, because it answers the question faster than they do.
+        
+        Absent for most movements and that has to look deliberate rather than broken, so
+        nothing is reserved for it — no grey box, no spinner, no "image unavailable". The
+        sheet simply starts at the text, exactly as it did before there were pictures.
+      */}
+      {media && (
+        <img
+          className="exercise-media"
+          src={media}
+          alt={`${exercise.name} demonstrated`}
+          loading="lazy"
+          decoding="async"
+          width={180}
+          height={180}
+        />
+      )}
+
       <p className="small muted">
         {CATEGORY_LABELS[categoryOf(exercise)]} · {BAND_LABELS[bandOf(level)]}{' '}
         <span className="pips">{levelPips(level)}</span>
