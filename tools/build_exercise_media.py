@@ -56,18 +56,19 @@ ALIASES = {
     "barbell-row": "barbell bent over row",
     "bicep-curl": "barbell curl",
     "lateral-raise": "dumbbell lateral raise",
-    "shrug": "barbell shrug",
     "good-morning": "barbell good morning",
     "glute-bridge": "barbell glute bridge",
     "forward-lunge": "barbell lunge",
     "arnold-press": "dumbbell arnold press",
-    "ab-wheel-rollout": "wheel rollout",
-    "farmers-carry": "farmers walk",
+    "ab-wheel": "wheel rollout",
+    "suitcase-carry": "farmers walk",
     "hanging-leg-raise": "hanging leg raise",
     "battle-ropes": "battling ropes",
     "slam-ball": "medicine ball overhead slam",
     "double-unders": "jump rope",
     "freestanding-handstand-push-up": "handstand push-up",
+    # Same movement, different vocabulary: the catalogue says "lever" for machines.
+    "machine-row": "lever seated row",
 }
 
 
@@ -113,6 +114,11 @@ def main():
         print(f"No exercise JSON files found in {folder}")
         return 1
 
+    #: An alias whose slug is not in the seed is silently dead: it never matches, and it
+    #: never shows up as a gap either, because the gap report reads this same table. Cheap to
+    #: check, and it has already caught three.
+    unknown_slugs = sorted(slug for slug in ALIASES if slug not in forge)
+
     matched, unmatched, aliased_but_absent = {}, [], []
 
     for slug, name in sorted(forge.items()):
@@ -156,6 +162,11 @@ def main():
 
     print(f"wrote {OUT}")
     print(f"matched {len(matched)} of {len(forge)} Forge movements")
+    if unknown_slugs:
+        print()
+        print(f"ALIASES naming slugs that are not in the seed ({len(unknown_slugs)}):")
+        for slug in unknown_slugs:
+            print(f"  {slug}")
     if aliased_but_absent:
         print(f"\nALIASES pointing at names not in the set ({len(aliased_but_absent)}):")
         for slug, target in aliased_but_absent:
