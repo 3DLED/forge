@@ -19,14 +19,12 @@ export const EXERCISE_MEDIA: Record<string, string> = {
   'band-curl': '0968', // band alternating biceps curl
   'band-lateral-raise': '0977', // band front lateral raise
   'band-overhead-press': '1012', // band twisting overhead press
-  'band-row': '1003', // band squat row
   'barbell-row': '0027', // barbell bent over row
   'battle-ropes': '0128', // battling ropes
   'bear-crawl': '3360', // bear crawl
   'bench-dip': '0129', // bench dip (knees bent)
   'bench-press': '0025', // barbell bench press
   'bicep-curl': '0031', // barbell curl
-  'box-jump': '3887', // jump box over (male)
   'broad-jump': '4242', // broad jump to vertical
   'burpee': '1160', // burpee
   'cable-fly': '0179', // cable low fly

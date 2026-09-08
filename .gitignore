@@ -35,5 +35,6 @@ public/exercise-media/
 # library including the raw JSON, which is squarely what the licence means by "the raw files
 # as a downloadable exercise database". One `git add -A` in a public repo would publish it.
 ExerciseDBstarter/
+exercise-media-review.html
 exercisedb-*/
 **/exerciseList.json
