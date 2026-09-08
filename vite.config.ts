@@ -66,5 +66,20 @@ export default defineConfig({
       devOptions: { enabled: false },
     }),
   ],
-  server: { port: 5173, strictPort: true },
+  server: {
+    port: 5173,
+    strictPort: true,
+    watch: {
+      /*
+       * Never watch the purchased ExerciseDB set.
+       *
+       * It is half a gigabyte of GIFs sitting inside the project folder, and the dev server
+       * died on it: the watcher opened the combined JSON while OneDrive had it locked and
+       * took the whole process down with an EBUSY. Nothing in there is source — the importer
+       * reads it on demand and copies what it needs into `public/exercise-media` — so there
+       * is nothing to gain by watching it and a crash to lose.
+       */
+      ignored: ['**/ExerciseDBstarter/**', '**/exercise-media/**'],
+    },
+  },
 });

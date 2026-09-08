@@ -28,3 +28,12 @@ dist-test/
 # Rebuild locally with:
 #   python tools/build_exercise_media.py <path-to-purchased-set> --copy
 public/exercise-media/
+
+# The purchased ExerciseDB set, wherever it gets unpacked.
+#
+# Same reason as public/exercise-media above, and more urgent: this is the whole 530 MB
+# library including the raw JSON, which is squarely what the licence means by "the raw files
+# as a downloadable exercise database". One `git add -A` in a public repo would publish it.
+ExerciseDBstarter/
+exercisedb-*/
+**/exerciseList.json

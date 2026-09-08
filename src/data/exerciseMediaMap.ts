@@ -7,5 +7,101 @@
  */
 
 export const EXERCISE_MEDIA: Record<string, string> = {
+  'ab-wheel': '0857', // wheel rollout
+  'air-bike': '0003', // air bike
+  'archer-pull-up': '3293', // archer pull up
+  'archer-push-up': '3294', // archer push up
+  'arnold-press': '2137', // dumbbell arnold press
+  'back-extension': '0573', // lever back extension
+  'back-squat': '0043', // barbell full squat
+  'band-assisted-pull-up': '0970', // band assisted pull-up
+  'band-chest-press': '3124', // resistance band seated chest press
+  'band-curl': '0968', // band alternating biceps curl
+  'band-lateral-raise': '0977', // band front lateral raise
+  'band-overhead-press': '1012', // band twisting overhead press
+  'band-row': '1003', // band squat row
+  'barbell-row': '0027', // barbell bent over row
+  'battle-ropes': '0128', // battling ropes
+  'bear-crawl': '3360', // bear crawl
+  'bench-dip': '0129', // bench dip (knees bent)
   'bench-press': '0025', // barbell bench press
+  'bicep-curl': '0031', // barbell curl
+  'box-jump': '3887', // jump box over (male)
+  'broad-jump': '4242', // broad jump to vertical
+  'burpee': '1160', // burpee
+  'cable-fly': '0179', // cable low fly
+  'calf-stretch': '1398', // standing calves calf stretch
+  'chest-press-machine': '1301', // machine inner chest press
+  'chin-up': '1326', // chin-up
+  'cossack-squat': '3643', // weighted cossack squats (male)
+  'db-bench-press': '0289', // dumbbell bench press
+  'db-goblet-squat': '1760', // dumbbell goblet squat
+  'db-incline-press': '0314', // dumbbell incline bench press
+  'db-romanian-deadlift': '1459', // dumbbell romanian deadlift
+  'db-row': '0293', // dumbbell bent over row
+  'db-shoulder-press': '0405', // dumbbell seated shoulder press
+  'dead-bug': '0276', // dead bug
+  'deadlift': '0032', // barbell deadlift
+  'decline-push-up': '0279', // decline push-up
+  'diamond-push-up': '0283', // diamond push-up
+  'dip': '0251', // chest dip
+  'double-unders': '3885', // double under jump rope
+  'forward-lunge': '0054', // barbell lunge
+  'freestanding-handstand-push-up': '0471', // handstand push-up
+  'front-squat': '0042', // barbell front squat
+  'ghr': '3193', // glute-ham raise
+  'glute-bridge': '1409', // barbell glute bridge
+  'goblet-squat': '0534', // kettlebell goblet squat
+  'good-morning': '0044', // barbell good morning
+  'hamstring-stretch': '1511', // hamstring stretch
+  'hanging-leg-raise': '0472', // hanging leg raise
+  'incline-bench-press': '0047', // barbell incline bench press
+  'incline-push-up': '0493', // incline push-up
+  'inverted-row': '0499', // inverted row
+  'jump-rope': '2612', // jump rope
+  'jump-squat': '0514', // jump squat
+  'kb-clean': '0535', // kettlebell hang clean
+  'kb-high-pull': '0548', // kettlebell sumo high pull
+  'kb-row': '0541', // kettlebell one arm row
+  'kb-single-arm-floor-press': '1298', // kettlebell one arm floor press
+  'kb-snatch': '0542', // kettlebell one arm snatch
+  'kb-swing': '0549', // kettlebell swing
+  'kb-thruster': '0550', // kettlebell thruster
+  'kb-windmill': '0554', // kettlebell windmill
+  'l-sit': '3419', // l-sit on floor
+  'lateral-raise': '0334', // dumbbell lateral raise
+  'leg-curl': '0586', // lever lying leg curl
+  'leg-extension': '0585', // lever leg extension
+  'leg-press': '0739', // sled 45° leg press
+  'machine-row': '1350', // lever seated row
+  'mountain-climber': '0630', // mountain climber
+  'muscle-up': '0631', // muscle up
+  'overhead-carry': '4244', // kettlebell overhead carry
+  'overhead-press': '0091', // barbell seated overhead press
+  'pallof-press': '0979', // band horizontal pallof press
+  'pendlay-row': '3017', // barbell pendlay row
+  'pike-push-up': '3662', // pike-to-cobra push-up
+  'pull-up': '0651', // pull up (neutral grip)
+  'push-up': '0662', // push-up
+  'renegade-row': '0521', // kettlebell alternating renegade row
+  'reverse-hyper': '0593', // lever reverse hyperextension
+  'ring-dip': '0677', // ring dips
+  'romanian-deadlift': '0085', // barbell romanian deadlift
+  'rope-climb': '0680', // rope climb
+  'russian-twist': '0687', // russian twist
+  'scapular-pull': '0688', // scapular pull-up
+  'seated-cable-row': '0180', // cable low seated row
+  'sissy-squat': '1489', // sissy squat
+  'sit-up': '0735', // sit-up v. 2
+  'slam-ball': '1354', // medicine ball overhead slam
+  'split-squat': '2368', // split squats
+  'sprint': '0858', // wind sprints
+  'sumo-deadlift': '0117', // barbell sumo deadlift
+  'thruster': '3305', // barbell thruster
+  'trap-bar-deadlift': '0811', // trap bar deadlift
+  'turkish-get-up': '0551', // kettlebell turkish get up (squat style)
+  'walking-lunge': '1460', // walking lunge
+  'weighted-pull-up': '0841', // weighted pull-up
+  'weighted-russian-twist': '0846', // weighted russian twist
+  'weighted-sit-up': '3670', // weighted decline sit-up
 };
