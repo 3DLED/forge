@@ -1,0 +1,18 @@
+# Line endings, pinned where getting them wrong breaks something.
+#
+# Most of this repo is authored on Windows and checked out on Windows, and git's own
+# normalisation handles that. These are the exceptions: files that are read by a Unix shell or
+# a JVM on a CI runner, where a stray carriage return is not a cosmetic difference.
+
+# The Gradle wrapper is a shell script. With CRLF, /bin/sh fails on the shebang line with a
+# message that names a program nobody typed. It is also the entry point for any macOS or Linux
+# build, so this is the one file whose endings must not follow the platform.
+android/gradlew text eol=lf
+gradlew text eol=lf
+
+# Binary, and not to be touched at all.
+*.jar binary
+*.keystore binary
+*.png binary
+*.gif binary
+*.ico binary
