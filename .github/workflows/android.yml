@@ -1,0 +1,72 @@
+# Builds the Android app, so that "does it compile" is answered by a machine rather than by
+# waiting until someone has the right laptop in front of them.
+#
+# There is no JDK or Android SDK on the machine this project is developed on, and the iOS half
+# needs macOS, so the Capacitor wrap and the background-geolocation plugin went in unverified.
+# The plugin declares `@capacitor/core >=3.0.0`, which is a permissive range rather than
+# evidence that it builds against Capacitor 8 — this is what turns that into a fact.
+#
+# Free on a public repository, which this is. It produces a debug APK you can sideload to a
+# real handset, which is also the only way to test pace alerts with the screen off.
+
+name: Build Android
+
+on:
+  push:
+    branches: [main]
+    # Only when something that could break the native build actually changed. A copy edit in
+    # docs should not spend six minutes of CI and a notification.
+    paths:
+      - 'android/**'
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'capacitor.config.ts'
+      - 'vite.config.ts'
+      - '.github/workflows/android.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      # Capacitor 8's Android project targets SDK 36 and Gradle 8.14, which wants a
+      # current JDK. Temurin 21 is the version Capacitor documents.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: android-actions/setup-android@v3
+
+      - run: npm ci
+
+      # The native bundle, which differs from the web one by having no service worker —
+      # see the note in vite.config.ts.
+      - run: npm run build:native
+
+      # Copies the bundle into android/ and re-reads the plugin list. Without it the APK
+      # would contain whatever web assets happened to be committed, which is none.
+      - run: npx cap sync android
+
+      # Assemble rather than `test`: there are no instrumented tests, and the question this
+      # job exists to answer is whether the plugin's Java compiles against Capacitor 8.
+      - run: ./gradlew assembleDebug --no-daemon
+        working-directory: android
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: forge-debug-apk
+          path: android/app/build/outputs/apk/debug/*.apk
+          # Long enough to still be there after a weekend, short enough not to accumulate.
+          retention-days: 14
