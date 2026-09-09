@@ -1,0 +1,70 @@
+# Compiles the iOS app, so that "does it build" is answered before anyone borrows a MacBook.
+#
+# The Android job already proved its worth once: it turned the background-geolocation
+# plugin's permissive `@capacitor/core >=3.0.0` into a fact. iOS is the platform this app is
+# actually aimed at, and until now it was the one nothing checked — a Swift error would have
+# been discovered by a person with a borrowed laptop and an hour to spend.
+#
+# Unsigned. Signing needs a certificate that only exists once somebody has run Xcode with the
+# developer account attached, and it is not what this job is for: the question is whether the
+# code compiles and the plugins link, not whether it can be shipped.
+#
+# macOS runners are billed at ten times the Linux rate on private repositories and are free on
+# public ones, which this is.
+
+name: Build iOS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ios/**'
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'capacitor.config.ts'
+      - 'vite.config.ts'
+      - '.github/workflows/ios.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      # The native bundle, which differs from the web one by having no service worker —
+      # see the note in vite.config.ts.
+      - run: npm run build:native
+
+      # Copies the bundle into ios/ and re-reads the plugin list. Capacitor 8 resolves
+      # plugins through Swift Package Manager, so there is no CocoaPods step here.
+      - run: npx cap sync ios
+
+      - name: Build
+        working-directory: ios/App
+        # `generic/platform=iOS` builds for a device without asking for one, which keeps the
+        # arm64 slice honest — a simulator build would compile for the runner's own
+        # architecture and prove less.
+        #
+        # Deliberately not piped through a log formatter. The default shell here does not set
+        # pipefail, so a pipe would hand back the formatter's exit code and let a failed build
+        # report success, which is the one thing this job must never do.
+        run: |
+          xcodebuild build \
+            -project App.xcodeproj \
+            -scheme App \
+            -configuration Debug \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
