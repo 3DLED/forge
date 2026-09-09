@@ -88,5 +88,15 @@
 		<string>location</string>
 		<string>audio</string>
 	</array>
+	<!--
+	  Export compliance, answered once here instead of on every upload.
+	
+	  Forge makes no network calls at all: no accounts, no sync, no analytics, and the
+	  exercise pictures are files on disk. There is no encryption to declare, so this is
+	  false in the plain sense rather than the "exempt" sense, and App Store Connect
+	  stops asking.
+	-->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>
