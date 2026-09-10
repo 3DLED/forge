@@ -57,9 +57,14 @@ def curated():
             strings += [piece.strip() for piece in value.split("|") if piece.strip()]
         out[slug] = strings
 
+    # One record per `ex(...)` call, because a note sits several lines below its slug and a
+    # pattern that cannot cross a newline silently found none of them.
     source = io.open(os.path.join(SEED, "exercises.ts"), encoding="utf-8").read()
-    for slug, note in re.findall(r"'([a-z0-9-]+)'.*?notes: " + Q + r"([^" + Q + r"]*)" + Q, source):
-        out.setdefault(slug, []).append(note)
+    for record in re.split(r"(?<![A-Za-z])(?:ex|cardio|mobility)\(", source)[1:]:
+        slug = quoted(record)[0]
+        note = re.search(r"notes: " + Q + r"([^" + Q + r"]*)" + Q, record)
+        if note:
+            out.setdefault(slug, []).append(note.group(1))
 
     path = os.path.join(SEED, "enrichment.ts")
     if os.path.exists(path):
