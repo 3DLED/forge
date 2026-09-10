@@ -62,7 +62,7 @@ export default function VariationSheet({
   return (
     <Sheet title={`Swap ${exercise.name}`} onClose={onClose}>
       <p className="small muted">
-        {BAND_LABELS[bandOf(currentLevel)]} · level {currentLevel} of 5. Everything here trains
+        {t(BAND_LABELS[bandOf(currentLevel)])} · level {currentLevel} of 5. Everything here trains
         the same pattern — pick a rung down if today is not the day, or up if this has stopped
         being hard.
       </p>
@@ -73,7 +73,7 @@ export default function VariationSheet({
 
         return (
           <div key={band}>
-            <div className="section-title">{BAND_LABELS[band]}</div>
+            <div className="section-title">{t(BAND_LABELS[band])}</div>
             {inBand.map((variation) => (
               <button
                 key={variation.exercise.id}

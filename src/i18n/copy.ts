@@ -24,6 +24,7 @@
  */
 
 import { ES } from './es';
+import { EQUIPMENT_ES, MUSCLES_ES, PATTERNS_ES } from './training.es';
 import type { Language } from '../domain/types';
 
 /** Anything after a bar is context for the translator, never shown. */
@@ -74,6 +75,7 @@ const PLURALS: Partial<Record<Language, Record<string, [string, string]>>> = {
     item: ['artículo', 'artículos'],
     result: ['resultado', 'resultados'],
     note: ['nota', 'notas'],
+    'more movement': ['movimiento más', 'movimientos más'],
     round: ['ronda', 'rondas'],
     minute: ['minuto', 'minutos'],
     second: ['segundo', 'segundos'],
@@ -83,4 +85,27 @@ const PLURALS: Partial<Record<Language, Record<string, [string, string]>>> = {
 /** Every English key that has a translation, for the coverage tool. */
 export function translated(lang: Language): Set<string> {
   return new Set(Object.keys(CATALOGUES[lang] ?? {}));
+}
+
+/**
+ * A muscle name, in the language being read.
+ *
+ * Falls back to the English, which is the ordinary case: the catalogue names muscles in two
+ * registers and the odd anatomical one has no common Spanish equivalent worth inventing.
+ */
+export function muscle(name: string, lang: Language | undefined): string {
+  if (lang !== 'es') return name;
+  return MUSCLES_ES[name.toLowerCase()] ?? name;
+}
+
+/** A movement pattern, as a filter label or a heading. */
+export function pattern(key: string, lang: Language | undefined): string {
+  if (lang !== 'es') return key;
+  return PATTERNS_ES[key] ?? key;
+}
+
+/** A piece of built-in kit, keyed on the English label rather than the tag. */
+export function equipment(label: string, lang: Language | undefined): string {
+  if (lang !== 'es') return label;
+  return EQUIPMENT_ES[label] ?? label;
 }

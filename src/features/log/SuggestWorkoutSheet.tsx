@@ -211,7 +211,7 @@ export default function SuggestWorkoutSheet({
             className={`chip${regions.includes(region) ? ' on' : ''}`}
             onClick={() => toggleRegion(region)}
           >
-            {REGION_LABELS[region]}
+            {t(REGION_LABELS[region])}
           </button>
         ))}
         <button

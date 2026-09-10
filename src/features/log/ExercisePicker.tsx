@@ -177,7 +177,7 @@ export default function ExercisePicker({
             className={`chip${category === value ? ' on' : ''}`}
             onClick={() => setCategory(value)}
           >
-            {CATEGORY_LABELS[value]}
+            {t(CATEGORY_LABELS[value])}
           </button>
         ))}
       </div>
@@ -227,7 +227,7 @@ export default function ExercisePicker({
                 if (inGroup.length === 0) return null;
                 return (
                   <div key={group}>
-                    <div className="section-title">Common · {CATEGORY_LABELS[group]}</div>
+                    <div className="section-title">Common · {t(CATEGORY_LABELS[group])}</div>
                     {inGroup.map(renderRow)}
                   </div>
                 );

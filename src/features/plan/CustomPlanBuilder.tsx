@@ -334,7 +334,7 @@ function DayPicker({
                       });
                     }}
                   >
-                    {REGION_LABELS[region]}
+                    {t(REGION_LABELS[region])}
                   </button>
                 );
               })}

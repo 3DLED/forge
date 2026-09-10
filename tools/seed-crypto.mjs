@@ -23,7 +23,7 @@
  * which is ignored for the same reason the plaintext is.
  */
 
-import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'node:crypto';
+import { createCipheriv, createDecipheriv, createHmac, scryptSync } from 'node:crypto';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -34,26 +34,49 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const FILES = [
   'src/data/seed/catalogue.ts',
   'src/data/seed/enrichment.ts',
+  // Derived from the two above, so it carries the same obligation.
+  'src/data/seed/names.es.ts',
 ];
 
 const SALT_BYTES = 16;
 const IV_BYTES = 12;
 const TAG_BYTES = 16;
 
-function key(salt) {
-  const secret = process.env.FORGE_SEED_KEY ?? readKeyFile();
-  if (!secret) {
+function secret() {
+  const value = process.env.FORGE_SEED_KEY ?? readKeyFile();
+  if (!value) {
     throw new Error(
       'No key. Set FORGE_SEED_KEY, or put one in .forge-seed-key at the repository root.',
     );
   }
+  return value.trim();
+}
+
+function key(salt) {
   // scrypt rather than a bare hash, so a short key is still expensive to attack.
-  return scryptSync(secret.trim(), salt, 32);
+  return scryptSync(secret(), salt, 32);
 }
 
 function readKeyFile() {
   const path = join(ROOT, '.forge-seed-key');
   return existsSync(path) ? readFileSync(path, 'utf8') : null;
+}
+
+/**
+ * Salt and nonce derived from the content rather than drawn at random.
+ *
+ * A random nonce meant relocking an unchanged file produced 1.8 MB of entirely different
+ * ciphertext, so every regeneration of the catalogue added another copy to git history for
+ * no change at all. Deriving them from the plaintext makes the output a pure function of
+ * (key, content): unchanged data relocks byte for byte, and the diff is empty.
+ *
+ * Safe precisely because it is deterministic on the content. The rule GCM cares about is that
+ * one key must never reuse a nonce across *different* plaintexts, and different plaintexts
+ * hash to different nonces here. Identical output for identical input is the point.
+ */
+function nonce(secret, content) {
+  const digest = (tag) => createHmac('sha256', secret).update(tag).update(content).digest();
+  return { salt: digest('forge-salt').subarray(0, SALT_BYTES), iv: digest('forge-iv').subarray(0, IV_BYTES) };
 }
 
 function lock() {
@@ -62,10 +85,10 @@ function lock() {
     if (!existsSync(source)) {
       throw new Error(`${file} is missing. Run tools/import_exercisedb.py against the set first.`);
     }
-    const salt = randomBytes(SALT_BYTES);
-    const iv = randomBytes(IV_BYTES);
+    const content = readFileSync(source);
+    const { salt, iv } = nonce(secret(), content);
     const cipher = createCipheriv('aes-256-gcm', key(salt), iv);
-    const body = Buffer.concat([cipher.update(readFileSync(source)), cipher.final()]);
+    const body = Buffer.concat([cipher.update(content), cipher.final()]);
     const blob = Buffer.concat([salt, iv, cipher.getAuthTag(), body]);
     // Base64 rather than raw bytes, so git treats it as text and no binary attribute is
     // needed to make a checkout behave the same on every platform.

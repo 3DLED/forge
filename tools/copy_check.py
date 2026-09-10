@@ -36,6 +36,11 @@ COUNT = re.compile(r"(?<![A-Za-z0-9_])t\.count\([^,]+,\s*(['\"])((?:(?!\1).)*)\1
 #: screen, so the keys are collected from where they are declared instead.
 INDIRECT = re.compile(r"(?m)\blabel:\s*(['\"])([A-Z][^'\"]{2,})\1")
 
+#: The same thing one level up: a whole constant of labels, keyed by an internal id.
+#: `CATEGORY_LABELS.weights` is "Weights", and the display site asks for it by lookup.
+LABEL_MAP = re.compile(r"(?s)_LABELS[^=]*=\s*[^{]*\{(.*?)\n\}")
+LABEL_VALUE = re.compile(r":\s*(['\"])([A-Z][^'\"]{1,60})\1")
+
 #: A quoted string sitting in a JSX attribute that is shown to somebody.
 UNWRAPPED_ATTR = re.compile(r"\b(?:placeholder|aria-label|title)=(['\"])([^'\"]{3,})\1")
 #: Bare text between JSX tags, which is the bulk of what is left to do. The lookbehind keeps
@@ -87,6 +92,9 @@ def main() -> int:
         if "/domain/" in rel:
             for match in INDIRECT.finditer(source):
                 asked.setdefault(match.group(2), rel)
+            for block in LABEL_MAP.finditer(source):
+                for value in LABEL_VALUE.finditer(block.group(1)):
+                    asked.setdefault(value.group(2), rel)
         for pattern in (UNWRAPPED_ATTR, UNWRAPPED_TEXT):
             for match in pattern.finditer(source):
                 text = (match.group(2) if pattern is UNWRAPPED_ATTR else match.group(1)).strip()

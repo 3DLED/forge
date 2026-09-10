@@ -52,4 +52,8 @@ exercisedb-*/
 #   node tools/seed-crypto.mjs unlock
 src/data/seed/catalogue.ts
 src/data/seed/enrichment.ts
+src/data/seed/names.es.ts
 .forge-seed-key
+
+# Python bytecode from the tools.
+tools/__pycache__/

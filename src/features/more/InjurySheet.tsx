@@ -49,7 +49,7 @@ export default function InjurySheet({
   const fields = useMemo<Omit<Injury, 'id'>>(
     () => ({
       region,
-      label: label.trim() || REGION_LABELS[region],
+      label: label.trim() || t(REGION_LABELS[region]),
       severity,
       startDate: today,
       restUntil,
@@ -99,7 +99,7 @@ export default function InjurySheet({
             className={`chip${region === option ? ' on' : ''}`}
             onClick={() => setRegion(option)}
           >
-            {REGION_LABELS[option]}
+            {t(REGION_LABELS[option])}
           </button>
         ))}
       </div>
@@ -158,12 +158,12 @@ export default function InjurySheet({
                 {plural(preview.affected, 'planned session')} will be skipped
               </strong>
               <div className="tiny faint" style={{ marginTop: '0.2rem' }}>
-                Everything that loads {REGION_LABELS[region].toLowerCase()} between now and then. {preview.unaffected > 0 && ` The other ${plural(preview.unaffected, 'session')} in that window carry on.`}
+                Everything that loads {t(REGION_LABELS[region]).toLowerCase()} between now and then. {preview.unaffected > 0 && ` The other ${plural(preview.unaffected, 'session')} in that window carry on.`}
               </div>
             </>
           ) : (
             <span className="small muted">
-              Nothing planned in that window loads {REGION_LABELS[region].toLowerCase()}, so your calendar is unchanged.
+              Nothing planned in that window loads {t(REGION_LABELS[region]).toLowerCase()}, so your calendar is unchanged.
             </span>
           )}
           <div className="tiny faint" style={{ marginTop: '0.35rem' }}>

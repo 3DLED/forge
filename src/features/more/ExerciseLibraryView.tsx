@@ -12,7 +12,6 @@ import PageHeader from '../../ui/PageHeader';
 import AskSheet from '../../ui/AskSheet';
 import ExerciseEditorSheet from './ExerciseEditorSheet';
 import ExerciseInfoSheet from '../log/ExerciseInfoSheet';
-import { plural } from '../../ui/text';
 import { useApp } from '../../ui/AppProvider';
 import { exerciseRepo } from '../../data/repos';
 import {
@@ -77,7 +76,7 @@ export default function ExerciseLibraryView() {
           {exercise.name}
           <span className="info-dot" aria-hidden="true">ⓘ</span>
         </button>
-        <span className="tiny faint">{CATEGORY_LABELS[categoryOf(exercise)]}</span>
+        <span className="tiny faint">{t(CATEGORY_LABELS[categoryOf(exercise)])}</span>
       </div>
       {editable && (
         <div className="row" style={{ gap: '0.5rem', marginTop: '0.4rem' }}>
@@ -96,7 +95,7 @@ export default function ExerciseLibraryView() {
     <>
       <PageHeader
         title={t('Movements')}
-        subtitle={`${plural(mine.length + seeded.length, 'movement')}`}
+        subtitle={t.count(mine.length + seeded.length, 'movement')}
         action={<Link to="/more" className="btn ghost sm">{t('Back')}</Link>}
       />
 
@@ -122,7 +121,7 @@ export default function ExerciseLibraryView() {
             aria-pressed={category === value}
             onClick={() => setCategory(value)}
           >
-            {CATEGORY_LABELS[value]} <span className="faint">{countByCategory.get(value)}</span>
+            {t(CATEGORY_LABELS[value])} <span className="faint">{countByCategory.get(value)}</span>
           </button>
         ))}
       </div>
@@ -132,7 +131,7 @@ export default function ExerciseLibraryView() {
         style={{ marginTop: '0.5rem' }}
         onClick={() => setAdding(true)}
       >
-        + Add a movement
+        + {t('Add a movement')}
       </button>
 
       {mine.length > 0 && <div className="section-title">{t('Yours')}</div>}
@@ -150,7 +149,7 @@ export default function ExerciseLibraryView() {
       )}
       {!query.trim() && seeded.length > BROWSE_LIMIT && (
         <p className="tiny faint" style={{ marginTop: '0.6rem' }}>
-          {plural(seeded.length - BROWSE_LIMIT, 'more movement')} in this category. Search to
+          {t.count(seeded.length - BROWSE_LIMIT, 'more movement')} in this category. Search to
           find them.
         </p>
       )}
@@ -160,7 +159,7 @@ export default function ExerciseLibraryView() {
           <span className="glyph">🔍</span>
           <p>
             {query.trim() ? `Nothing matches “${query.trim()}”` : 'Nothing here'}
-            {category !== 'all' && ` in ${CATEGORY_LABELS[category]}`}.
+            {category !== 'all' && ` in ${t(CATEGORY_LABELS[category])}`}.
           </p>
           <p className="small faint">
             {category === 'all'

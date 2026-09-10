@@ -18,6 +18,8 @@ import { CATEGORY_LABELS, categoryOf } from '../../domain/categories';
 import { plural } from '../../ui/text';
 import type { Exercise } from '../../domain/types';
 import { useT } from '../../i18n/useT';
+import { useApp } from '../../ui/AppProvider';
+import { muscle } from '../../i18n/copy';
 
 export default function ExerciseInfoSheet({
   exercise,
@@ -30,6 +32,7 @@ export default function ExerciseInfoSheet({
   onClose: () => void;
 }) {
   const t = useT();
+  const { lang } = useApp();
   const coaching = coachingOf(exercise);
   const level = levelOf(exercise);
   const media = exerciseMediaUrl(exercise.slug);
@@ -66,7 +69,7 @@ export default function ExerciseInfoSheet({
       )}
 
       <p className="small muted">
-        {CATEGORY_LABELS[categoryOf(exercise)]} · {BAND_LABELS[bandOf(level)]}{' '}
+        {t(CATEGORY_LABELS[categoryOf(exercise)])} · {t(BAND_LABELS[bandOf(level)])}{' '}
         <span className="pips">{levelPips(level)}</span>
       </p>
 
@@ -118,9 +121,12 @@ export default function ExerciseInfoSheet({
 
       <div className="section-title">{t('Trains')}</div>
       <p className="small">
-        {exercise.primaryMuscles.join(', ')}
+        {exercise.primaryMuscles.map((m) => muscle(m, lang)).join(', ')}
         {exercise.secondaryMuscles.length > 0 && (
-          <span className="faint"> · also {exercise.secondaryMuscles.join(', ')}</span>
+          <span className="faint">
+            {' · '}
+            {t('also')} {exercise.secondaryMuscles.map((m) => muscle(m, lang)).join(', ')}
+          </span>
         )}
       </p>
 

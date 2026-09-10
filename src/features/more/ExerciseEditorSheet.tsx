@@ -249,14 +249,14 @@ export default function ExerciseEditorSheet({
         ))}
       </div>
       <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
-        {BAND_LABELS[bandOf(level as 1 | 2 | 3 | 4 | 5)]} — across the whole library, not within
+        {t(BAND_LABELS[bandOf(level as 1 | 2 | 3 | 4 | 5)])} — across the whole library, not within
         its pattern.
       </p>
 
       <div className="card tight" style={{ marginTop: '0.75rem' }}>
         <div className="small">
-          {t('Files as')} <strong>{CATEGORY_LABELS[categoryOf(preview)]}</strong> ·{' '}
-          <strong>{REGION_LABELS[regionOf(preview)]}</strong>
+          {t('Files as')} <strong>{t(CATEGORY_LABELS[categoryOf(preview)])}</strong> ·{' '}
+          <strong>{t(REGION_LABELS[regionOf(preview)])}</strong>
         </div>
         <div className="tiny faint" style={{ marginTop: '0.2rem' }}>
           {t('Worked out from the kit and the pattern, so filtering, suggestions and the injury log all understand it without being told separately.')}

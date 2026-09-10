@@ -206,6 +206,7 @@ export const ES: Record<string, string> = {
   'Set up': 'Preparación',
   Needs: 'Necesita',
   Trains: 'Trabaja',
+  also: 'también',
   'Watch for': 'Cuidado con',
 
   // --- suggesting a workout --------------------------------------------------
@@ -270,6 +271,20 @@ export const ES: Record<string, string> = {
   Appearance: 'Apariencia',
   Equipment: 'Equipo',
   Movements: 'Movimientos',
+  // The library's own categories, whose English labels are keys in domain/categories.
+  Weights: 'Pesas',
+  Calisthenics: 'Calistenia',
+  Cardio: 'Cardio',
+  Skill: 'Técnica',
+  Mobility: 'Movilidad',
+  // Difficulty bands and body regions, same arrangement: English key, Spanish shown.
+  Beginner: 'Principiante',
+  Intermediate: 'Intermedio',
+  Advanced: 'Avanzado',
+  'Upper body': 'Tren superior',
+  'Lower body': 'Tren inferior',
+  Core: 'Core',
+  Conditioning: 'Acondicionamiento',
   Injuries: 'Lesiones',
   'Saved workouts': 'Entrenamientos guardados',
   'Your data': 'Tus datos',
@@ -341,6 +356,7 @@ export const ES: Record<string, string> = {
     'Todo lo seleccionado debe estar en un perfil de equipo para que esto se ofrezca ahí.',
   'Built in': 'Incluidos',
   'Search movements': 'Buscar movimientos',
+  'Add a movement': 'Añadir un movimiento',
 
   // --- injuries --------------------------------------------------------------
   'Log an injury': 'Registrar una lesión',

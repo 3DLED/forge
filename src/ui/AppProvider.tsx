@@ -87,6 +87,38 @@ export function AppProvider({ children }: { children: ReactNode }) {
     document.documentElement.dataset.theme = isThemeId(activeTheme) ? activeTheme : DEFAULT_THEME;
   }, [activeTheme]);
 
+  /*
+   * Movement names in Spanish, loaded only when they are wanted.
+   *
+   * Translated here rather than at each of the several dozen places a movement name is
+   * rendered: the library is built once, in one memo, and every list, picker and log reads
+   * from it. What goes to the database is untouched -- sessions reference slugs, so the
+   * stored history stays in one language whatever the app is set to.
+   *
+   * Lazily imported for the same reason the catalogue is: an English install should not carry
+   * it. Until it arrives the names are English, which is exactly the fallback for the half of
+   * the catalogue the translator cannot name yet.
+   */
+  const language = profiles?.[0]?.language;
+  const [movementNames, setMovementNames] = useState<Record<string, string> | null>(null);
+  useEffect(() => {
+    if (language !== 'es') {
+      setMovementNames(null);
+      return;
+    }
+    let live = true;
+    void import('../data/seed/names.es')
+      .then((module) => {
+        if (live) setMovementNames(module.NAMES_ES);
+      })
+      .catch(() => {
+        // Names stay English. Nothing else depends on this resolving.
+      });
+    return () => {
+      live = false;
+    };
+  }, [language]);
+
   const value = useMemo<AppState | null>(() => {
     const profile = profiles?.[0];
     if (!profile || !exercises || !equipmentProfiles) return null;
@@ -106,7 +138,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
      * would show the duplicate. If it happens again it will now happen somewhere else, which
      * is itself worth knowing.
      */
-    const unique = [...new Map(exercises.map((e) => [e.slug, e])).values()];
+    const named = movementNames
+      ? exercises.map((e) => {
+          const translated = movementNames[e.slug];
+          return translated ? { ...e, name: translated } : e;
+        })
+      : exercises;
+    const unique = [...new Map(named.map((e) => [e.slug, e])).values()];
     const customByTag = customEquipmentByTag(customKit ?? []);
 
     // Dates format through a module-level locale rather than an argument -- see the note
@@ -125,7 +163,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       customEquipment: customKit ?? [],
       equipmentName: (tag: EquipmentTag) => equipmentLabel(tag, customByTag),
     };
-  }, [profiles, exercises, everyExercise, equipmentProfiles, customKit]);
+  }, [profiles, exercises, everyExercise, equipmentProfiles, customKit, movementNames]);
 
   /*
    * Deliberately untranslated.

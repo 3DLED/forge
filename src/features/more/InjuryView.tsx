@@ -67,7 +67,7 @@ export default function InjuryView() {
             <span className="pill warn">{t(SEVERITIES[injury.severity].label)}</span>
           </div>
           <div className="small muted">
-            {REGION_LABELS[injury.region]} · resting{' '}
+            {t(REGION_LABELS[injury.region])} · resting{' '}
             {plural(Math.max(0, daysBetween(today, injury.restUntil) + 1), 'more day')}
           </div>
           <div className="tiny faint" style={{ marginTop: '0.2rem' }}>
@@ -88,7 +88,7 @@ export default function InjuryView() {
         <div className="card tight" key={injury.id}>
           <div className="row between">
             <span className="grow truncate">{injury.label}</span>
-            <span className="small mono muted">{REGION_LABELS[injury.region]}</span>
+            <span className="small mono muted">{t(REGION_LABELS[injury.region])}</span>
           </div>
           <div className="tiny faint" style={{ marginTop: '0.2rem' }}>
             {formatDayLabel(injury.startDate).toLowerCase()}
