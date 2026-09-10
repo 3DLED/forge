@@ -38,3 +38,18 @@ ExerciseDBstarter/
 exercise-media-review.html
 exercisedb-*/
 **/exerciseList.json
+
+# The generated ExerciseDB seed data, and the key that unlocks it.
+#
+# Same licence, one step further along than the images above. These two files are derived
+# from the purchased set rather than copied from it, but between them they carry 1,302 names,
+# every description and every instruction -- which is what clause 4 means by a substantially
+# similar compilation, and clause 12 forbids publishing one. A public repo does exactly that,
+# and a raw GitHub URL is the bulk-download endpoint clause 13 names.
+#
+# The repo stays public because that is what makes the macOS and Linux runners free. So the
+# ciphertext beside these is committed instead, and CI unlocks it before it builds:
+#   node tools/seed-crypto.mjs unlock
+src/data/seed/catalogue.ts
+src/data/seed/enrichment.ts
+.forge-seed-key

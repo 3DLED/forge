@@ -13,7 +13,9 @@
     "build:native": "tsc --noEmit && vite build --mode native",
     "sync": "npm run build:native && cap sync",
     "android": "npm run sync && cap open android",
-    "ios": "npm run sync && cap open ios"
+    "ios": "npm run sync && cap open ios",
+    "seed:lock": "node tools/seed-crypto.mjs lock",
+    "seed:unlock": "node tools/seed-crypto.mjs unlock"
   },
   "dependencies": {
     "@capacitor-community/background-geolocation": "1.2.26",

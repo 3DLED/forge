@@ -35,6 +35,13 @@ jobs:
 
       - run: npm ci
 
+      # The licensed seed data is committed encrypted, because the repo is public and the
+      # ExerciseDB licence forbids publishing the raw materials. Without this the build
+      # cannot resolve src/data/seed/catalogue.ts and fails at the typecheck.
+      - run: npm run seed:unlock
+        env:
+          FORGE_SEED_KEY: ${{ secrets.FORGE_SEED_KEY }}
+
       # Typechecks as part of the build script, so a type error fails the deploy
       # rather than shipping.
       - run: npm run build
