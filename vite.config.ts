@@ -64,9 +64,41 @@ export default defineConfig(({ mode }) => {
          * source set is GIF today and PNG is already precached: converting the media to a
          * still image would otherwise silently pull the whole library into the install.
          */
-        globIgnores: ['**/exercise-media/**'],
+        /*
+         * And the Spanish translations, for the same reason one step removed.
+         *
+         * They are dynamically imported, which keeps them out of the main bundle but not out
+         * of the precache manifest: Workbox precaches every emitted asset, so an install
+         * reading English was downloading half a megabyte of Spanish prose it would never
+         * open, and that number grows with every movement translated.
+         *
+         * Matched on the emitted chunk names, which carry a content hash, so the glob has to
+         * be a prefix rather than the exact filename.
+         */
+        globIgnores: [
+          '**/exercise-media/**',
+          '**/assets/prose.es-*.js',
+          '**/assets/names.es-*.js',
+        ],
         cleanupOutdatedCaches: true,
         runtimeCaching: [
+          {
+            /*
+             * Fetched the first time the app is set to Spanish, then kept.
+             *
+             * Without this rule the chunks would be excluded from the install and never
+             * cached at all, which would trade a download every English user did not want
+             * for a Spanish app that stops working on a train.
+             */
+            urlPattern: /\/assets\/(?:prose|names)\.es-[^/]*\.js$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'translations',
+              // A rebuild changes the hash, so an old one is only ever dead weight.
+              expiration: { maxEntries: 8, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
           {
             urlPattern: /\/exercise-media\/.*\.(?:gif|webp|png)$/,
             handler: 'CacheFirst',
