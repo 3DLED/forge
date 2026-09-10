@@ -9,6 +9,7 @@
 
 import { useState, type ReactNode } from 'react';
 import Sheet from './Sheet';
+import { useT } from '../i18n/useT';
 
 export interface AskInput {
   label?: string;
@@ -38,6 +39,7 @@ export default function AskSheet({
   onConfirm: (value: string) => void | Promise<void>;
   onCancel: () => void;
 }) {
+  const t = useT();
   const [value, setValue] = useState(input?.defaultValue ?? '');
   const [busy, setBusy] = useState(false);
 
@@ -59,7 +61,7 @@ export default function AskSheet({
       footer={
         <div className="row" style={{ gap: '0.5rem' }}>
           <button className="btn grow" onClick={onCancel} disabled={busy}>
-            Cancel
+            {t('Cancel')}
           </button>
           <button
             className={`btn grow ${danger ? 'danger' : 'primary'}`}

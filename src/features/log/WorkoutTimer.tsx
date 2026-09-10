@@ -18,6 +18,7 @@ import { audioAvailable, beepInterval, unlockAudio } from '../../ui/beep';
 import { formatClock } from '../../domain/units';
 import { plural } from '../../ui/text';
 import type { BlockTimer, TimerResult } from './useBlockTimer';
+import { useT } from '../../i18n/useT';
 
 export type { TimerResult } from './useBlockTimer';
 
@@ -33,6 +34,7 @@ export default function WorkoutTimer({
   onClose: () => void;
   onSave: (result: TimerResult) => void | Promise<void>;
 }) {
+  const t = useT();
   const { block, running, finished, started, splits } = timer;
 
   return (
@@ -48,7 +50,7 @@ export default function WorkoutTimer({
         <div className="stack">
           {running ? (
             <button className="btn block timer-action" onClick={timer.pause}>
-              Pause
+              {t('Pause')}
             </button>
           ) : (
             <button className="btn primary block timer-action" onClick={timer.start}>
@@ -61,13 +63,13 @@ export default function WorkoutTimer({
               className="btn primary block timer-action"
               onClick={() => void onSave(timer.result)}
             >
-              Save
+              {t('Save')}
             </button>
           )}
 
           {started && (
             <button className="btn block" onClick={timer.reset}>
-              Reset
+              {t('Reset')}
             </button>
           )}
         </div>
@@ -78,8 +80,7 @@ export default function WorkoutTimer({
         <div className="timer-sub">
           {block.style === 'emom' && (
             <>
-              Round {timer.emomRound} of {timer.targetRounds} ·{' '}
-              {formatClock(timer.elapsedSec)} elapsed
+              Round {timer.emomRound} of {timer.targetRounds} ·{' '} {formatClock(timer.elapsedSec)} elapsed
             </>
           )}
           {block.style === 'amrap' && (
@@ -93,13 +94,13 @@ export default function WorkoutTimer({
       </div>
 
       <p className="tiny faint" style={{ textAlign: 'center' }}>
-        The clock keeps running in the strip at the top — closing this does not stop it.
+        {t('The clock keeps running in the strip at the top — closing this does not stop it.')}
       </p>
 
       {/* What one round is. The reason for building the block instead of using any timer. */}
       {movements.length > 0 && (
         <div className="round-recipe">
-          <div className="round-recipe-title">Each round</div>
+          <div className="round-recipe-title">{t('Each round')}</div>
           {movements.map((line, index) => (
             <div className="round-recipe-line" key={index}>
               {line}
@@ -114,7 +115,7 @@ export default function WorkoutTimer({
             className="round-button"
             onClick={timer.logRound}
             disabled={!running}
-            aria-label="Record a completed round"
+            aria-label={t('Record a completed round')}
           >
             <span className="round-count mono">{splits.length}</span>
             <span className="round-label">
@@ -126,14 +127,14 @@ export default function WorkoutTimer({
             <div className="row between small" style={{ marginTop: '0.5rem' }}>
               <span className="muted">Last round {formatClock(timer.lastSplitSec ?? 0)}</span>
               <button className="btn ghost sm" onClick={timer.undoRound}>
-                Undo round
+                {t('Undo round')}
               </button>
             </div>
           )}
         </>
       )}
 
-      <div className="section-title">Sound</div>
+      <div className="section-title">{t('Sound')}</div>
       <button
         className={`chip${timer.cueOn ? ' on' : ''}`}
         onClick={() => {
@@ -153,7 +154,7 @@ export default function WorkoutTimer({
       </button>
       {!audioAvailable() && (
         <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
-          This browser has no audio support — the timer still runs, silently.
+          {t('This browser has no audio support — the timer still runs, silently.')}
         </p>
       )}
     </Sheet>

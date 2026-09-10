@@ -12,22 +12,23 @@ import PageHeader from '../../ui/PageHeader';
 import { useApp } from '../../ui/AppProvider';
 import { profileRepo } from '../../data/repos';
 import { DEFAULT_THEME, THEMES, isThemeId, type ThemeId } from '../../ui/themes';
+import { useT } from '../../i18n/useT';
 
 export default function AppearanceView() {
+  const t = useT();
   const { profile } = useApp();
   const current: ThemeId = isThemeId(profile.theme) ? profile.theme : DEFAULT_THEME;
 
   return (
     <>
       <PageHeader
-        title="Appearance"
+        title={t('Appearance')}
         subtitle="Applies instantly — try each on a real screen"
-        action={<Link to="/more" className="btn ghost sm">Back</Link>}
+        action={<Link to="/more" className="btn ghost sm">{t('Back')}</Link>}
       />
 
       <p className="small muted">
-        These are four different directions, not four palettes. Each one changes the shape of
-        things, the type, and how tightly the screen is packed.
+        {t('These are four different directions, not four palettes. Each one changes the shape of things, the type, and how tightly the screen is packed.')}
       </p>
 
       {THEMES.map((theme) => {
@@ -54,14 +55,14 @@ export default function AppearanceView() {
                 className="swatch-accent"
                 style={{ background: 'var(--accent)', color: 'var(--accent-ink)' }}
               >
-                Aa
+                {t('Aa')}
               </span>
             </span>
 
             <span className="theme-meta">
               <span className="row between">
                 <strong>{theme.name}</strong>
-                {selected && <span className="pill accent">Active</span>}
+                {selected && <span className="pill accent">{t('Active')}</span>}
               </span>
               <span className="tiny faint" style={{ display: 'block', marginTop: '0.1rem' }}>
                 {theme.tagline}
@@ -78,8 +79,7 @@ export default function AppearanceView() {
       })}
 
       <p className="tiny faint">
-        Nothing here touches your data — it is a display setting stored with your profile, so
-        it travels in your backup.
+        {t('Nothing here touches your data — it is a display setting stored with your profile, so it travels in your backup.')}
       </p>
     </>
   );

@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { lockScroll } from './scrollLock';
+import { useT } from '../i18n/useT';
 
 /**
  * Bottom sheet. Everything modal in this app is a sheet rather than a centred dialog —
@@ -25,6 +26,7 @@ export default function Sheet({
   footer?: ReactNode;
   confirmClose?: boolean;
 }) {
+  const t = useT();
   const [armed, setArmed] = useState(false);
 
   useEffect(() => {
@@ -93,7 +95,7 @@ export default function Sheet({
           <h2>{title}</h2>
           {!confirmClose && (
             <button className="btn ghost sm" onClick={onClose}>
-              Close
+              {t('Close')}
             </button>
           )}
         </div>

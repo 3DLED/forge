@@ -26,6 +26,7 @@ import { testKindFor } from '../../domain/fitnessTests';
 import { formatWeight, inputWeightToKg, weightLabel } from '../../domain/units';
 import { todayKey } from '../../domain/dates';
 import type { Exercise, UnitSystem } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export default function KnownMaxSheet({
   exercise,
@@ -39,6 +40,7 @@ export default function KnownMaxSheet({
   /** What was saved, already worded — the sheet knows which currency it was in. */
   onSaved: (summary: string) => void;
 }) {
+  const t = useT();
   const kind = testKindFor(exercise);
   const loaded = kind === 'threeRepMax' || kind === 'maxLoad';
 
@@ -120,7 +122,7 @@ export default function KnownMaxSheet({
 
       {loaded && (
         <>
-          <div className="section-title">The lift</div>
+          <div className="section-title">{t('The lift')}</div>
           <div className="row">
             <input
               type="number"
@@ -136,62 +138,61 @@ export default function KnownMaxSheet({
               type="number"
               inputMode="numeric"
               value={reps}
-              aria-label="Reps"
+              aria-label={t('Reps')}
               onChange={(event) => setReps(event.target.value)}
               style={{ maxWidth: '5rem' }}
             />
             <span className="muted small">reps</span>
           </div>
           <p className="tiny faint">
-            A single, a triple, whatever you know it as. One rep means you are giving a true max.
+            {t('A single, a triple, whatever you know it as. One rep means you are giving a true max.')}
           </p>
         </>
       )}
 
       {kind === 'reps' && (
         <>
-          <div className="section-title">Your best set</div>
+          <div className="section-title">{t('Your best set')}</div>
           <div className="row">
             <input
               type="number"
               inputMode="numeric"
               value={reps}
               placeholder="30"
-              aria-label="Reps"
+              aria-label={t('Reps')}
               onChange={(event) => setReps(event.target.value)}
               style={{ maxWidth: '6rem' }}
             />
             <span className="muted small">reps, unbroken</span>
           </div>
           <p className="tiny faint">
-            The most you can do in one set with good form, stopping when the form goes — not a
-            total across a session.
+            {t('The most you can do in one set with good form, stopping when the form goes — not a total across a session.')}
           </p>
         </>
       )}
 
       {kind === 'hold' && (
         <>
-          <div className="section-title">Your best hold</div>
+          <div className="section-title">{t('Your best hold')}</div>
           <div className="row">
             <input
               type="number"
               inputMode="numeric"
               value={seconds}
               placeholder="60"
-              aria-label="Seconds"
+              aria-label={t('Seconds')}
               onChange={(event) => setSeconds(event.target.value)}
               style={{ maxWidth: '6rem' }}
             />
             <span className="muted small">seconds</span>
           </div>
           <p className="tiny faint">
-            The longest you can hold the position before it breaks down.
+            {t('The longest you can hold the position before it breaks down.')}
           </p>
         </>
       )}
 
-      <div className="section-title">When</div>
+      <div className="section-title">{t('When')}</div>
       <input
         type="date"
         value={date}
@@ -200,21 +201,19 @@ export default function KnownMaxSheet({
         onChange={(event) => setDate(event.target.value)}
       />
       <p className="tiny faint">
-        Dating it honestly matters — an old result is still used, and the app says when it is
-        getting stale rather than quietly trusting it forever.
+        {t('Dating it honestly matters — an old result is still used, and the app says when it is getting stale rather than quietly trusting it forever.')}
       </p>
 
       {loaded && loadKg > 0 && repCount > MAX_CHART_REPS && (
         <p className="tiny" style={{ color: 'var(--warn)' }}>
-          Above {MAX_CHART_REPS} reps the conversion to a one-rep max stops meaning anything, so
-          this will not be stored as a max. Enter a heavier set for fewer reps.
+          Above {MAX_CHART_REPS} reps the conversion to a one-rep max stops meaning anything, so this will not be stored as a max. Enter a heavier set for fewer reps.
         </p>
       )}
 
       {loaded && usable && (
         <div className="card tight">
           <div className="row between">
-            <span className="grow">Works out at</span>
+            <span className="grow">{t('Works out at')}</span>
             <span className="mono">
               <strong>{formatWeight(oneRepMax!, units)}</strong> for one
             </span>

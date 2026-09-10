@@ -29,6 +29,7 @@ import { formatDayLabel, weekdayName } from '../../domain/dates';
 import type { Plan } from '../../domain/types';
 import { activateImportedPlan } from '../../data/share';
 import { rankByGoal } from '../../domain/goals';
+import { useT } from '../../i18n/useT';
 
 const GROUPS: { label: string; blurb: string; match: (t: SeedPlanTemplate) => boolean }[] = [
   {
@@ -54,6 +55,7 @@ const GROUPS: { label: string; blurb: string; match: (t: SeedPlanTemplate) => bo
 ];
 
 export default function PlanLibrary({ onClose }: { onClose: () => void }) {
+  const t = useT();
   const { activeEquipment, profile } = useApp();
   const [selected, setSelected] = useState<SeedPlanTemplate | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -112,14 +114,14 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
 
   return (
     <>
-      <Sheet title="Plans" onClose={onClose}>
+      <Sheet title={t('Plans')} onClose={onClose}>
       {/* However many you are following. Ending one leaves the others alone. */}
       {(running ?? []).map((item) => (
         <div className="card tight" key={item.id}>
           <div className="row between">
             <div className="grow">
               <strong>{item.name}</strong>
-              <div className="tiny faint">Currently active</div>
+              <div className="tiny faint">{t('Currently active')}</div>
             </div>
             <button
               className="btn sm ghost danger"
@@ -130,7 +132,7 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
                 );
               }}
             >
-              End plan
+              {t('End plan')}
             </button>
           </div>
         </div>
@@ -149,19 +151,18 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
       */}
       {waiting.length > 0 && (
         <>
-          <div className="section-title">Yours, not running</div>
+          <div className="section-title">{t('Yours, not running')}</div>
           {waiting.map((item) => (
             <div className="card tight" key={item.id}>
               <div className="row between">
                 <div className="grow">
                   <strong>{item.name}</strong>
                   <div className="tiny faint">
-                    Starts {formatDayLabel(item.startDate)}
-                    {item.endDate && ` · ends ${formatDayLabel(item.endDate)}`}
+                    Starts {formatDayLabel(item.startDate)} {item.endDate && ` · ends ${formatDayLabel(item.endDate)}`}
                   </div>
                 </div>
                 <button className="btn sm primary" onClick={() => setStarting(item)}>
-                  Start
+                  {t('Start')}
                 </button>
               </div>
             </div>
@@ -173,7 +174,7 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
         Plans you built. Above the catalogue, because a plan you wrote is the one you meant
         to come here for; the built-in ones are what you browse when you have not.
       */}
-      <div className="section-title">Built by you</div>
+      <div className="section-title">{t('Built by you')}</div>
       {(mine ?? []).map((item) => (
         <div className="card tight" key={item.id}>
           <div className="row between">
@@ -185,7 +186,7 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
               </div>
             </div>
             <button className="btn sm primary" onClick={() => setApplying(item)}>
-              Use
+              {t('Use')}
             </button>
           </div>
 
@@ -198,10 +199,10 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
 
           <div className="row" style={{ gap: '0.5rem', marginTop: '0.5rem' }}>
             <button className="btn sm grow" onClick={() => setBuilding(item)}>
-              Edit
+              {t('Edit')}
             </button>
             <button className="btn sm ghost danger" onClick={() => setRemoving(item)}>
-              Delete
+              {t('Delete')}
             </button>
           </div>
         </div>
@@ -212,8 +213,7 @@ export default function PlanLibrary({ onClose }: { onClose: () => void }) {
       </button>
 
       <p className="small muted" style={{ marginTop: '1rem' }}>
-        Every plan is a starting point — once it is on your calendar you can move, skip, or
-        rewrite any session in it.
+        {t('Every plan is a starting point — once it is on your calendar you can move, skip, or rewrite any session in it.')}
       </p>
 
       {grouped.map((group) => {

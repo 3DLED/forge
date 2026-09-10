@@ -24,6 +24,7 @@ import {
 } from '../../data/share';
 import { todayKey } from '../../domain/dates';
 import type { DayKey } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export default function ImportSheet({
   expecting,
@@ -35,6 +36,7 @@ export default function ImportSheet({
   onClose: () => void;
   onImported: (message: string) => void;
 }) {
+  const t = useT();
   const input = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<ShareFile | null>(null);
   const [preview, setPreview] = useState<SharePreview | null>(null);
@@ -127,7 +129,7 @@ export default function ImportSheet({
         ref={input}
         type="file"
         accept="application/json,.json"
-        aria-label="Choose a file"
+        aria-label={t('Choose a file')}
         style={{ display: 'none' }}
         onChange={(event) => {
           const chosen = event.target.files?.[0];
@@ -151,7 +153,7 @@ export default function ImportSheet({
 
       {preview && (
         <>
-          <div className="section-title">What is in it</div>
+          <div className="section-title">{t('What is in it')}</div>
           <div className="card tight">
             <strong>{preview.name}</strong>
             <div className="tiny faint" style={{ marginTop: '0.2rem' }}>
@@ -176,7 +178,7 @@ export default function ImportSheet({
                 {preview.newExercises.map((e) => e.name).join(' · ')}
               </div>
               <div className="tiny faint" style={{ marginTop: '0.25rem' }}>
-                They will be added so this works. Anything you already have is left alone.
+                {t('They will be added so this works. Anything you already have is left alone.')}
               </div>
             </div>
           )}
@@ -207,16 +209,15 @@ export default function ImportSheet({
 
           {preview.kind === 'plan' && (
             <>
-              <div className="section-title">Start it on</div>
+              <div className="section-title">{t('Start it on')}</div>
               <input
                 type="date"
                 value={startDate}
-                aria-label="Plan start date"
+                aria-label={t('Plan start date')}
                 onChange={(event) => setStartDate(event.target.value as DayKey)}
               />
               <p className="tiny faint">
-                Sessions are spaced the way the plan author laid them out, counted from this
-                day. It comes in switched off — starting it is a separate choice.
+                {t('Sessions are spaced the way the plan author laid them out, counted from this day. It comes in switched off — starting it is a separate choice.')}
               </p>
             </>
           )}

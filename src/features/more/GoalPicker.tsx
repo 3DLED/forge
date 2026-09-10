@@ -14,6 +14,7 @@ import { profileRepo } from '../../data/repos';
 import { PRIMARY_GOALS, PRIMARY_GOAL_ORDER, goalSpec } from '../../domain/goals';
 import type { PrimaryGoal } from '../../domain/goals';
 import type { Profile } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export default function GoalPicker({
   profile,
@@ -23,6 +24,7 @@ export default function GoalPicker({
   /** Fired after the answer is stored, for callers that want to move on. */
   onPicked?: (goal: PrimaryGoal) => void;
 }) {
+  const t = useT();
   const current = profile.primaryGoal;
 
   const pick = async (goal: PrimaryGoal) => {
@@ -44,7 +46,7 @@ export default function GoalPicker({
             className={`chip${current === goal ? ' on' : ''}`}
             onClick={() => void pick(goal)}
           >
-            {PRIMARY_GOALS[goal].label}
+            {t(PRIMARY_GOALS[goal].label)}
           </button>
         ))}
       </div>

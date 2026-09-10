@@ -16,6 +16,7 @@ import type { Injury, InjurySeverity } from '../../domain/injuries';
 import { BUILDABLE_REGIONS, REGION_LABELS } from '../../domain/regions';
 import type { BodyRegion } from '../../domain/regions';
 import { daysBetween, formatDayLabel, todayKey } from '../../domain/dates';
+import { useT } from '../../i18n/useT';
 
 /** Conditioning and cardio can be hurt too, so the picker offers more than the builder does. */
 const REGIONS: BodyRegion[] = [...BUILDABLE_REGIONS, 'conditioning', 'cardio'];
@@ -27,6 +28,7 @@ export default function InjurySheet({
   onClose: () => void;
   onLogged: (result: { skipped: number }) => void;
 }) {
+  const t = useT();
   const { exerciseBySlug } = useApp();
   const today = todayKey();
 
@@ -73,7 +75,7 @@ export default function InjurySheet({
 
   return (
     <Sheet
-      title="Log an injury"
+      title={t('Log an injury')}
       onClose={onClose}
       footer={
         <button
@@ -89,7 +91,7 @@ export default function InjurySheet({
         </button>
       }
     >
-      <div className="section-title">What hurts</div>
+      <div className="section-title">{t('What hurts')}</div>
       <div className="row wrap" style={{ gap: '0.4rem' }}>
         {REGIONS.map((option) => (
           <button
@@ -105,12 +107,12 @@ export default function InjurySheet({
       <input
         style={{ marginTop: '0.5rem' }}
         value={label}
-        placeholder="Left shoulder"
-        aria-label="What hurts, in your words"
+        placeholder={t('Left shoulder')}
+        aria-label={t('What hurts, in your words')}
         onChange={(event) => setLabel(event.target.value)}
       />
 
-      <div className="section-title">How bad</div>
+      <div className="section-title">{t('How bad')}</div>
       <div className="row wrap" style={{ gap: '0.4rem' }}>
         {SEVERITY_ORDER.map((option) => (
           <button
@@ -118,7 +120,7 @@ export default function InjurySheet({
             className={`chip${severity === option ? ' on' : ''}`}
             onClick={() => pickSeverity(option)}
           >
-            {SEVERITIES[option].label}
+            {t(SEVERITIES[option].label)}
           </button>
         ))}
       </div>
@@ -126,12 +128,12 @@ export default function InjurySheet({
         {SEVERITIES[severity].blurb}
       </p>
 
-      <div className="section-title">Rest until</div>
+      <div className="section-title">{t('Rest until')}</div>
       <input
         type="date"
         value={restUntil}
         min={today}
-        aria-label="Rest until"
+        aria-label={t('Rest until')}
         onChange={(event) => setRestUntil(event.target.value)}
       />
       <p className="tiny faint">
@@ -140,11 +142,11 @@ export default function InjurySheet({
         at properly.
       </p>
 
-      <div className="section-title">How it happened</div>
+      <div className="section-title">{t('How it happened')}</div>
       <input
         value={cause}
-        placeholder="Optional — third set of overhead press"
-        aria-label="How it happened"
+        placeholder={t('Optional — third set of overhead press')}
+        aria-label={t('How it happened')}
         onChange={(event) => setCause(event.target.value)}
       />
 
@@ -156,19 +158,16 @@ export default function InjurySheet({
                 {plural(preview.affected, 'planned session')} will be skipped
               </strong>
               <div className="tiny faint" style={{ marginTop: '0.2rem' }}>
-                Everything that loads {REGION_LABELS[region].toLowerCase()} between now and then.
-                {preview.unaffected > 0 &&
-                  ` The other ${plural(preview.unaffected, 'session')} in that window carry on.`}
+                Everything that loads {REGION_LABELS[region].toLowerCase()} between now and then. {preview.unaffected > 0 && ` The other ${plural(preview.unaffected, 'session')} in that window carry on.`}
               </div>
             </>
           ) : (
             <span className="small muted">
-              Nothing planned in that window loads {REGION_LABELS[region].toLowerCase()}, so your
-              calendar is unchanged.
+              Nothing planned in that window loads {REGION_LABELS[region].toLowerCase()}, so your calendar is unchanged.
             </span>
           )}
           <div className="tiny faint" style={{ marginTop: '0.35rem' }}>
-            Skipped, not deleted — mark the injury healed early and you can take them back.
+            {t('Skipped, not deleted — mark the injury healed early and you can take them back.')}
           </div>
         </div>
       )}

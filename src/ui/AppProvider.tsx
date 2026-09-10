@@ -29,6 +29,7 @@ import {
   equipmentLabel,
 } from '../data/customEquipment';
 import { availableSlugs } from '../domain/equipment';
+import { setDateLocale } from '../domain/dates';
 import { DEFAULT_THEME, isThemeId } from './themes';
 
 interface AppState {
@@ -108,6 +109,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const unique = [...new Map(exercises.map((e) => [e.slug, e])).values()];
     const customByTag = customEquipmentByTag(customKit ?? []);
 
+    // Dates format through a module-level locale rather than an argument -- see the note
+    // in domain/dates. Set here, so the first render is already in the right language.
+    setDateLocale(profile.language);
+
     return {
       profile,
       units: profile.units,
@@ -122,6 +127,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
   }, [profiles, exercises, everyExercise, equipmentProfiles, customKit]);
 
+  /*
+   * Deliberately untranslated.
+   *
+   * The chosen language lives on the profile, and the profile lives in the database this
+   * branch exists because it could not open. There is nothing to read the setting from, so
+   * English is not a gap here — it is the only answer available.
+   */
   if (error) {
     return (
       <div className="empty">

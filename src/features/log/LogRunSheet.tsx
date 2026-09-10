@@ -28,6 +28,7 @@ import {
   parseDuration,
 } from '../../domain/units';
 import type { DayKey } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 /**
  * Offered as chips, in the order a runner reaches for them. Slugs that are missing from the
@@ -63,6 +64,7 @@ export default function LogRunSheet({
   onSaved: (sessionId: string) => void;
   onClose: () => void;
 }) {
+  const t = useT();
   const { units, exerciseBySlug } = useApp();
 
   const types = useMemo(
@@ -104,7 +106,7 @@ export default function LogRunSheet({
 
   return (
     <Sheet
-      title="Log a run"
+      title={t('Log a run')}
       onClose={onClose}
       footer={
         <button className="btn primary block" disabled={!canSave || saving} onClick={() => void save()}>
@@ -130,13 +132,13 @@ export default function LogRunSheet({
           className={`chip${day === todayKey() ? ' on' : ''}`}
           onClick={() => setDay(todayKey())}
         >
-          Today
+          {t('Today')}
         </button>
         <button
           className={`chip${day === yesterday ? ' on' : ''}`}
           onClick={() => setDay(yesterday)}
         >
-          Yesterday
+          {t('Yesterday')}
         </button>
         {day !== todayKey() && day !== yesterday && (
           <button className="chip on">{formatDayLabel(day)}</button>
@@ -157,7 +159,7 @@ export default function LogRunSheet({
         </label>
 
         <label className="run-field">
-          <span className="tiny faint">Time</span>
+          <span className="tiny faint">{t('Time')}</span>
           <input
             type="text"
             inputMode="numeric"
@@ -183,7 +185,7 @@ export default function LogRunSheet({
         </span>
       </div>
 
-      <div className="section-title">Effort</div>
+      <div className="section-title">{t('Effort')}</div>
       <div className="chip-row">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
           <button
@@ -200,10 +202,10 @@ export default function LogRunSheet({
         so it is worth a moment's thought.
       </p>
 
-      <div className="section-title">Notes</div>
+      <div className="section-title">{t('Notes')}</div>
       <input
         type="text"
-        placeholder="Felt flat, humid, new shoes…"
+        placeholder={t('Felt flat, humid, new shoes…')}
         value={notes}
         onChange={(event) => setNotes(event.target.value)}
       />

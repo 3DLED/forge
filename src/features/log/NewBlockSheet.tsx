@@ -14,6 +14,7 @@ import { isTimedWorkout, savedWorkouts } from '../../data/namedWorkouts';
 import SavedWorkoutRow from './SavedWorkoutRow';
 import { plural } from '../../ui/text';
 import type { LoggedBlock, LoggedBlockStyle, SessionTemplate } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 const STYLES: { value: LoggedBlockStyle; label: string; blurb: string }[] = [
   {
@@ -52,6 +53,7 @@ export default function NewBlockSheet({
   initial?: Pick<LoggedBlock, 'style' | 'capSec' | 'intervalSec' | 'targetRounds'>;
   onClose: () => void;
 }) {
+  const t = useT();
   // Timed only. A saved straight session has no clock and no rounds; offered here it would
   // come back wearing an AMRAP's timer.
   const saved = useLiveQuery(
@@ -89,7 +91,7 @@ export default function NewBlockSheet({
       {/* Repeating a workout you have already named is the common case, so it comes first. */}
       {onPickSaved && (saved?.length ?? 0) > 0 && (
         <>
-          <div className="section-title">Your saved timed workouts</div>
+          <div className="section-title">{t('Your saved timed workouts')}</div>
           {saved!.map((template) => (
             <SavedWorkoutRow
               key={template.id}
@@ -98,7 +100,7 @@ export default function NewBlockSheet({
               onUse={() => onPickSaved(template)}
             />
           ))}
-          <div className="section-title">Or build a new one</div>
+          <div className="section-title">{t('Or build a new one')}</div>
         </>
       )}
 
@@ -136,7 +138,7 @@ export default function NewBlockSheet({
 
       {style === 'emom' && (
         <>
-          <div className="section-title">Interval</div>
+          <div className="section-title">{t('Interval')}</div>
           <div className="chip-row">
             {[30, 45, 60, 90, 120].map((seconds) => (
               <button
@@ -149,7 +151,7 @@ export default function NewBlockSheet({
             ))}
           </div>
 
-          <div className="section-title">Rounds</div>
+          <div className="section-title">{t('Rounds')}</div>
           <div className="chip-row">
             {[5, 8, 10, 12, 15, 20, 30].map((count) => (
               <button

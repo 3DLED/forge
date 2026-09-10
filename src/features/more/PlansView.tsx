@@ -27,8 +27,10 @@ import {
 import { buildCustomPlanFile, downloadShareFile } from '../../data/share';
 import { weekdayName } from '../../domain/dates';
 import type { CustomPlan } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export default function PlansView() {
+  const t = useT();
   const plans = useLiveQuery(() => allCustomPlans(), []);
   const [building, setBuilding] = useState<CustomPlan | 'new' | null>(null);
   const [importing, setImporting] = useState(false);
@@ -44,9 +46,9 @@ export default function PlansView() {
   return (
     <>
       <PageHeader
-        title="Plans"
+        title={t('Plans')}
         subtitle={mine.length > 0 ? plural(mine.length, 'plan') : 'Build one, or open one someone sent'}
-        action={<Link to="/more" className="btn ghost sm">Back</Link>}
+        action={<Link to="/more" className="btn ghost sm">{t('Back')}</Link>}
       />
 
       {notice && (
@@ -55,7 +57,7 @@ export default function PlansView() {
             {notice}
           </p>
           <button className="btn sm ghost" style={{ marginTop: '0.4rem' }} onClick={() => setNotice(null)}>
-            Dismiss
+            {t('Dismiss')}
           </button>
         </div>
       )}
@@ -80,10 +82,9 @@ export default function PlansView() {
       {mine.length === 0 && (
         <div className="empty">
           <span className="glyph">🗓️</span>
-          <p>No plans of your own yet.</p>
+          <p>{t('No plans of your own yet.')}</p>
           <p className="small faint">
-            Lay out a week — which days you train and what you do on them — and it repeats for
-            as long as you set it to.
+            {t('Lay out a week — which days you train and what you do on them — and it repeats for as long as you set it to.')}
           </p>
         </div>
       )}

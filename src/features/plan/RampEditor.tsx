@@ -22,6 +22,7 @@ import {
   inputDistanceToMeters,
 } from '../../domain/units';
 import type { SlotProgression, UnitSystem } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 /** Five to ten per cent is the conventional range for adding distance; twelve is pushing it. */
 const RATES = [0.05, 0.08, 0.1, 0.12];
@@ -39,6 +40,7 @@ export default function RampEditor({
   weeks: number;
   onChange: (ramp: SlotProgression | undefined) => void;
 }) {
+  const t = useT();
   const target = movements.find((m) => m.exerciseSlug === ramp?.exerciseSlug) ?? movements[0];
   if (!target) return null;
 
@@ -82,9 +84,9 @@ export default function RampEditor({
   return (
     <div className="card tight" style={{ marginTop: '0.6rem' }}>
       <div className="row between">
-        <strong className="small grow">Grows each week</strong>
+        <strong className="small grow">{t('Grows each week')}</strong>
         <button className="btn sm ghost" onClick={() => onChange(undefined)}>
-          Turn off
+          {t('Turn off')}
         </button>
       </div>
 
@@ -111,13 +113,13 @@ export default function RampEditor({
       )}
 
       <div className="section-title" style={{ marginTop: '0.5rem' }}>
-        Start at
+        {t('Start at')}
       </div>
       <div className="row" style={{ gap: '0.4rem' }}>
         <input
           type="number"
           inputMode="decimal"
-          aria-label="Starting value"
+          aria-label={t('Starting value')}
           value={toShown(ramp.startValue)}
           style={{ maxWidth: '7rem' }}
           onChange={(event) => edit({ startValue: toStored(Number(event.target.value)) })}
@@ -125,7 +127,7 @@ export default function RampEditor({
         <span className="muted small">{isDistance ? distanceLabel(units) : 'min'}</span>
       </div>
 
-      <div className="section-title">By how much</div>
+      <div className="section-title">{t('By how much')}</div>
       <div className="row wrap" style={{ gap: '0.4rem' }}>
         {RATES.map((rate) => (
           <button
@@ -139,17 +141,16 @@ export default function RampEditor({
         ))}
       </div>
       <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
-        Ten per cent a week is the conventional ceiling for adding distance. Past it the
-        injuries tend to arrive before the fitness does.
+        {t('Ten per cent a week is the conventional ceiling for adding distance. Past it the injuries tend to arrive before the fitness does.')}
       </p>
 
-      <div className="section-title">Stop at</div>
+      <div className="section-title">{t('Stop at')}</div>
       <div className="row" style={{ gap: '0.4rem' }}>
         <input
           type="number"
           inputMode="decimal"
-          aria-label="Maximum value"
-          placeholder="no limit"
+          aria-label={t('Maximum value')}
+          placeholder={t('no limit')}
           value={ramp.maxValue == null ? '' : toShown(ramp.maxValue)}
           style={{ maxWidth: '7rem' }}
           onChange={(event) => {
@@ -160,12 +161,12 @@ export default function RampEditor({
         <span className="muted small">{isDistance ? distanceLabel(units) : 'min'}</span>
       </div>
       <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
-        Where the build-up levels off. Without one it keeps climbing for the whole plan.
+        {t('Where the build-up levels off. Without one it keeps climbing for the whole plan.')}
       </p>
 
       <div className="card tight" style={{ marginTop: '0.6rem' }}>
         <div className="row between">
-          <span className="small grow">Week 1</span>
+          <span className="small grow">{t('Week 1')}</span>
           <span className="mono">{show(rampValueAt(ramp, 1))}</span>
         </div>
         <div className="row between" style={{ marginTop: '0.2rem' }}>

@@ -103,7 +103,7 @@ export default function RunScreen({
       <header className="run-screen-head">
         <div className="grow">
           <strong className="truncate">{plan?.name ?? title}</strong>
-          <div className="tiny faint">{describeRunSettings(settings)}</div>
+          <div className="tiny faint">{describeRunSettings(settings, lang)}</div>
         </div>
         {/*
           Only before the gun. Restructuring a session you are three reps into would either

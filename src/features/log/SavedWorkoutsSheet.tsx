@@ -19,6 +19,7 @@ import { isTimedWorkout, savedWorkouts, workoutHistory } from '../../data/namedW
 import { formatClock } from '../../domain/units';
 import { formatDayLabel } from '../../domain/dates';
 import type { SessionTemplate } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export default function SavedWorkoutsSheet({
   onUse,
@@ -28,6 +29,7 @@ export default function SavedWorkoutsSheet({
   onUse: (template: SessionTemplate) => void | Promise<void>;
   onClose: () => void;
 }) {
+  const t = useT();
   const saved = useLiveQuery(() => savedWorkouts(), []);
 
   const all = saved ?? [];
@@ -35,19 +37,18 @@ export default function SavedWorkoutsSheet({
   const straight = all.filter((template) => !isTimedWorkout(template));
 
   return (
-    <Sheet title="Your saved workouts" onClose={onClose}>
+    <Sheet title={t('Your saved workouts')} onClose={onClose}>
       {all.length === 0 && (
         <div className="empty">
           <span className="glyph">💾</span>
-          <p>Nothing saved yet.</p>
+          <p>{t('Nothing saved yet.')}</p>
           <p className="small faint">
-            Name a workout you have built and it comes back here, ready to run again — and, if
-            it is timed, with its own best to beat.
+            {t('Name a workout you have built and it comes back here, ready to run again — and, if it is timed, with its own best to beat.')}
           </p>
         </div>
       )}
 
-      {timed.length > 0 && <div className="section-title">Timed</div>}
+      {timed.length > 0 && <div className="section-title">{t('Timed')}</div>}
       {timed.map((template) => (
         <TimedRow
           key={template.id}
@@ -56,7 +57,7 @@ export default function SavedWorkoutsSheet({
         />
       ))}
 
-      {straight.length > 0 && <div className="section-title">Straight sets</div>}
+      {straight.length > 0 && <div className="section-title">{t('Straight sets')}</div>}
       {straight.map((template) => (
         <SavedWorkoutRow
           key={template.id}
@@ -89,6 +90,7 @@ function TimedRow({
   template: SessionTemplate;
   onUse: () => void;
 }) {
+  const t = useT();
   const history = useLiveQuery(() => workoutHistory(template.id, 3), [template.id]);
   const best = (history ?? []).reduce<number>((most, run) => Math.max(most, run.rounds ?? 0), 0);
   const last = history?.[0];
@@ -112,7 +114,7 @@ function TimedRow({
       </div>
 
       <button className="btn sm primary block" style={{ marginTop: '0.5rem' }} onClick={onUse}>
-        Run it again
+        {t('Run it again')}
       </button>
     </div>
   );

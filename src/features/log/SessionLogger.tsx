@@ -76,6 +76,7 @@ import { estimateDurationMin } from '../../domain/training';
 import { formatClock, weightLabel } from '../../domain/units';
 import { availableSlugs } from '../../domain/equipment';
 import type { SuggestedItem } from '../../domain/generator';
+import { useT } from '../../i18n/useT';
 import type {
   EquipmentTag,
   Exercise,
@@ -141,6 +142,7 @@ function describePr(event: PrEvent, units: UnitSystem): string {
 }
 
 export default function SessionLogger() {
+  const t = useT();
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
   const [search] = useSearchParams();
@@ -582,13 +584,13 @@ export default function SessionLogger() {
 
 
   if (!sessionId) return null;
-  if (session === undefined) return <p className="muted">Loading…</p>;
+  if (session === undefined) return <p className="muted">{t('Loading…')}</p>;
   if (session === null || !sets) {
     return (
       <div className="empty">
         <span className="glyph">🤷</span>
-        <p>That session is gone.</p>
-        <button className="btn" onClick={() => navigate('/today')}>Back to today</button>
+        <p>{t('That session is gone.')}</p>
+        <button className="btn" onClick={() => navigate('/today')}>{t('Back to today')}</button>
       </div>
     );
   }
@@ -906,7 +908,7 @@ export default function SessionLogger() {
             <input
               className="session-title"
               value={session.name}
-              aria-label="Session name"
+              aria-label={t('Session name')}
               onChange={(event) => void loggedSessionRepo.update(session.id, { name: event.target.value })}
             />
           )}
@@ -950,7 +952,7 @@ export default function SessionLogger() {
       {readOnly ? (
         <div className="card tight">
           <span className="review-note">
-            Finished workout — reviewing. Tap Edit to change anything.
+            {t('Finished workout — reviewing. Tap Edit to change anything.')}
           </span>
           {(session.durationMin || session.sessionRpe || session.feel) && (
             <div className="tiny faint" style={{ marginTop: '0.35rem' }}>
@@ -973,7 +975,7 @@ export default function SessionLogger() {
         <div className="card tight">
           {finished && (
             <div className="review-note" style={{ marginBottom: '0.5rem' }}>
-              Editing a finished workout. Changes save as you make them.
+              {t('Editing a finished workout. Changes save as you make them.')}
             </div>
           )}
           <button className="btn sm block" onClick={() => setCreatingBlock('new')}>
@@ -996,7 +998,7 @@ export default function SessionLogger() {
           <span className="glyph">🏋️</span>
           <p>Nothing logged{readOnly ? ' in this one' : ' yet'}.</p>
           {!readOnly && (
-            <p className="small faint">Add a movement, or start an AMRAP or EMOM block.</p>
+            <p className="small faint">{t('Add a movement, or start an AMRAP or EMOM block.')}</p>
           )}
         </div>
       )}
@@ -1094,15 +1096,12 @@ export default function SessionLogger() {
               const last = past[0];
               return (
                 <div className="tiny faint" style={{ marginBottom: '0.4rem' }}>
-                  Last time ({formatDayLabel(last.date).toLowerCase()}):{' '}
-                  {last.rounds != null ? plural(last.rounds, 'round') : ''}
-                  {last.rounds != null && last.timeSec ? ' in ' : ''}
-                  {last.timeSec ? formatClock(last.timeSec) : ''}
+                  Last time ({formatDayLabel(last.date).toLowerCase()}):{' '} {last.rounds != null ? plural(last.rounds, 'round') : ''} {last.rounds != null && last.timeSec ? ' in ' : ''} {last.timeSec ? formatClock(last.timeSec) : ''}
                 </div>
               );
             })()}
 
-            {section.groups.length > 0 && <div className="round-recipe-title">Each round</div>}
+            {section.groups.length > 0 && <div className="round-recipe-title">{t('Each round')}</div>}
 
             {section.groups.map((group) => (
               <ExerciseGroup
@@ -1204,7 +1203,7 @@ export default function SessionLogger() {
                   );
                 }}
               >
-                Ungroup block
+                {t('Ungroup block')}
               </button>
             )}
           </section>
@@ -1288,7 +1287,7 @@ export default function SessionLogger() {
       {!readOnly && (
         <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
           <button className="btn ghost sm danger" onClick={() => setDiscarding(true)}>
-            Discard session
+            {t('Discard session')}
           </button>
         </div>
       )}
@@ -1388,7 +1387,7 @@ export default function SessionLogger() {
 
       {namingSession && (
         <AskSheet
-          title="Save this workout"
+          title={t('Save this workout')}
           message="Saved sessions come back from ‘Suggest a workout’, and can be dropped onto a day in your plan."
           input={{
             label: 'Name',
@@ -1501,7 +1500,7 @@ export default function SessionLogger() {
         if (!target) return null;
         return (
           <NewBlockSheet
-            title="Edit timed workout"
+            title={t('Edit timed workout')}
             confirmLabel="Save changes"
             message="Movements and anything already recorded stay as they are — only the shape of the clock changes."
             initial={target}
@@ -1582,7 +1581,7 @@ export default function SessionLogger() {
 
       {discarding && (
         <AskSheet
-          title="Discard this session?"
+          title={t('Discard this session?')}
           message="Everything logged here is removed. If it came from a plan, that session goes back to unstarted."
           confirmLabel="Discard"
           danger
@@ -1653,6 +1652,7 @@ function FinishSheet({
   onGoToMovement: (slug: string) => void;
   onNameBlock: (blockId: Id, label: string) => Promise<void>;
 }) {
+  const t = useT();
   const [rpe, setRpe] = useState<number | undefined>(existing.sessionRpe);
   const [feel, setFeel] = useState<Feel | undefined>(existing.feel);
   const [notes, setNotes] = useState(existing.notes ?? '');
@@ -1696,7 +1696,7 @@ function FinishSheet({
     >
       {asking && (
         <div className="card tight" style={{ borderColor: 'var(--warn)' }}>
-          <strong className="small">Worth doing before you save</strong>
+          <strong className="small">{t('Worth doing before you save')}</strong>
 
           {missingLoads.map((row) => (
             <div className="row between" key={row.slug} style={{ marginTop: '0.4rem' }}>
@@ -1708,7 +1708,7 @@ function FinishSheet({
                 </span>
               </span>
               <button className="btn sm" onClick={() => onGoToMovement(row.slug)}>
-                Add
+                {t('Add')}
               </button>
             </div>
           ))}
@@ -1716,16 +1716,14 @@ function FinishSheet({
           {unnamedTimed.map((block) => (
             <div key={block.id} style={{ marginTop: '0.5rem' }}>
               <span className="tiny faint">
-                This {blockShape(block)} has no name. Name it and its score becomes something to
-                beat next time — unnamed, there is nothing for the next one to be compared
-                against, because a round count only means anything against the same workout.
+                This {blockShape(block)} has no name. Name it and its score becomes something to beat next time — unnamed, there is nothing for the next one to be compared against, because a round count only means anything against the same workout.
               </span>
               {/* Naming it takes it off this list, so there is no confirmed state to show. */}
               <div className="row" style={{ gap: '0.4rem', marginTop: '0.35rem' }}>
                 <input
                   value={names[block.id] ?? ''}
-                  placeholder="Cindy, Tuesday burner…"
-                  aria-label="Name this workout"
+                  placeholder={t('Cindy, Tuesday burner…')}
+                  aria-label={t('Name this workout')}
                   onChange={(event) =>
                     setNames((current) => ({ ...current, [block.id]: event.target.value }))
                   }
@@ -1735,24 +1733,23 @@ function FinishSheet({
                   disabled={!(names[block.id] ?? '').trim()}
                   onClick={() => void onNameBlock(block.id, (names[block.id] ?? '').trim())}
                 >
-                  Name it
+                  {t('Name it')}
                 </button>
               </div>
             </div>
           ))}
 
           <div className="tiny faint" style={{ marginTop: '0.5rem' }}>
-            Optional — saving without them is fine.
+            {t('Optional — saving without them is fine.')}
           </div>
         </div>
       )}
 
       <p className="small muted">
-        How hard was the whole session? This is what makes running and lifting comparable —
-        effort × minutes is the one load number that spans both.
+        {t('How hard was the whole session? This is what makes running and lifting comparable — effort × minutes is the one load number that spans both.')}
       </p>
 
-      <div className="section-title">Effort</div>
+      <div className="section-title">{t('Effort')}</div>
       <div className="chip-row">
         {Array.from({ length: 10 }, (_, i) => i + 1).map((value) => (
           <button
@@ -1769,7 +1766,7 @@ function FinishSheet({
         1 = barely moved · 5 = solid work · 8 = hard · 10 = everything you had
       </div>
 
-      <div className="section-title">Duration</div>
+      <div className="section-title">{t('Duration')}</div>
       <div className="row">
         <input
           type="number"
@@ -1777,13 +1774,13 @@ function FinishSheet({
           value={minutes}
           onChange={(event) => setMinutes(event.target.value)}
           style={{ maxWidth: '7rem' }}
-          aria-label="Duration in minutes"
+          aria-label={t('Duration in minutes')}
         />
         <span className="muted small">minutes</span>
         {load != null && <span className="pill accent">load {load}</span>}
       </div>
 
-      <div className="section-title">How did it feel?</div>
+      <div className="section-title">{t('How did it feel?')}</div>
       <div className="chip-row">
         {FEELS.map((option) => (
           <button
@@ -1796,11 +1793,11 @@ function FinishSheet({
         ))}
       </div>
 
-      <div className="section-title">Notes</div>
+      <div className="section-title">{t('Notes')}</div>
       <textarea
         rows={3}
         value={notes}
-        placeholder="Anything worth remembering next time…"
+        placeholder={t('Anything worth remembering next time…')}
         onChange={(event) => setNotes(event.target.value)}
       />
     </Sheet>

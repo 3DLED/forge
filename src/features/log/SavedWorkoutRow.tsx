@@ -9,6 +9,7 @@
  */
 
 import type { SessionTemplate } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export default function SavedWorkoutRow({
   template,
@@ -19,6 +20,7 @@ export default function SavedWorkoutRow({
   subtitle: string;
   onUse: () => void | Promise<void>;
 }) {
+  const t = useT();
   return (
     <div className="suggest-row">
       <span className="grow">
@@ -28,7 +30,7 @@ export default function SavedWorkoutRow({
       </span>
 
       <button className="btn sm primary" onClick={() => void onUse()}>
-        Use
+        {t('Use')}
       </button>
     </div>
   );

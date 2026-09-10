@@ -17,6 +17,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { beepFinish, buzz } from '../../ui/beep';
 import { formatClock } from '../../domain/units';
+import { useT } from '../../i18n/useT';
 
 export default function HoldTimer({
   targetSec,
@@ -29,6 +30,7 @@ export default function HoldTimer({
   onDone: (elapsedSec: number) => void;
   onCancel: () => void;
 }) {
+  const t = useT();
   const [startedAt] = useState(() => Date.now());
   const [now, setNow] = useState(() => Date.now());
 
@@ -65,13 +67,13 @@ export default function HoldTimer({
       </span>
       <div className="rest-actions">
         <button className="btn block on-accent timer-action" onClick={onCancel}>
-          Cancel
+          {t('Cancel')}
         </button>
         <button
           className="btn block on-accent timer-action"
           onClick={() => onDone(Math.round(elapsedSec))}
         >
-          Done
+          {t('Done')}
         </button>
       </div>
     </div>

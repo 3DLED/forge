@@ -25,6 +25,7 @@ import {
   variationsOf,
 } from '../../domain/difficulty';
 import type { Exercise } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export default function VariationSheet({
   exercise,
@@ -38,6 +39,7 @@ export default function VariationSheet({
   onPick: (next: Exercise) => void | Promise<void>;
   onClose: () => void;
 }) {
+  const t = useT();
   const { exercises } = useApp();
   const [showAll, setShowAll] = useState(false);
 
@@ -93,9 +95,9 @@ export default function VariationSheet({
                   </span>
                 </span>
                 {variation.current ? (
-                  <span className="pill">Current</span>
+                  <span className="pill">{t('Current')}</span>
                 ) : (
-                  <span className={`pill${variation.available ? ' accent' : ''}`}>Swap</span>
+                  <span className={`pill${variation.available ? ' accent' : ''}`}>{t('Swap')}</span>
                 )}
               </button>
             ))}

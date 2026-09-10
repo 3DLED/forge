@@ -26,14 +26,22 @@ ROOT = os.path.join(HERE, "..")
 SRC = os.path.join(ROOT, "src")
 CATALOGUE = os.path.join(SRC, "i18n", "es.ts")
 
-#: `t('...')` and `t("...")`, including the `t.count(n, 'noun')` form.
-CALL = re.compile(r"(?<![A-Za-z0-9_.])t\(\s*(['\"])((?:(?!\1).)*)\1\s*\)")
+#: `t('...')`, `translate('...', lang)`, and the local `say('...')` helpers that wrap it.
+CALL = re.compile(r"(?<![A-Za-z0-9_.])(?:t|say|translate)\(\s*(['\"])((?:(?!\1).)*)\1\s*[,)]")
 COUNT = re.compile(r"(?<![A-Za-z0-9_])t\.count\([^,]+,\s*(['\"])((?:(?!\1).)*)\1\s*\)")
+
+#: Copy that reaches the translator through a constant rather than a literal call:
+#: `t(SPLIT_INTERVALS[unit].label)` asks for a string this file never sees spelled out.
+#: Those labels live in the domain because they name a thing rather than decorate a
+#: screen, so the keys are collected from where they are declared instead.
+INDIRECT = re.compile(r"(?m)\blabel:\s*(['\"])([A-Z][^'\"]{2,})\1")
 
 #: A quoted string sitting in a JSX attribute that is shown to somebody.
 UNWRAPPED_ATTR = re.compile(r"\b(?:placeholder|aria-label|title)=(['\"])([^'\"]{3,})\1")
-#: Bare text between JSX tags, which is the bulk of what is left to do.
-UNWRAPPED_TEXT = re.compile(r">\s*([A-Z][A-Za-z',.!? -]{3,})\s*<")
+#: Bare text between JSX tags, which is the bulk of what is left to do. The lookbehind keeps
+#: `) => Promise<void>` out of the count: a type annotation is not copy, and one sitting in the
+#: backlog forever would train everybody to ignore the number.
+UNWRAPPED_TEXT = re.compile(r"(?<![=-])>\s*([A-Z][A-Za-z',.!? -]{3,})\s*<")
 
 
 def strip_comments(source: str) -> str:
@@ -76,10 +84,17 @@ def main() -> int:
             asked.setdefault(match.group(2), rel)
         for match in COUNT.finditer(source):
             nouns.add(match.group(2))
+        if "/domain/" in rel:
+            for match in INDIRECT.finditer(source):
+                asked.setdefault(match.group(2), rel)
         for pattern in (UNWRAPPED_ATTR, UNWRAPPED_TEXT):
             for match in pattern.finditer(source):
-                text = match.group(2) if pattern is UNWRAPPED_ATTR else match.group(1)
-                unwrapped.append((rel, text.strip()))
+                text = (match.group(2) if pattern is UNWRAPPED_ATTR else match.group(1)).strip()
+                # Placeholders showing the shape of an answer -- "6.2", "48:30" -- are examples
+                # of a number, and a number reads the same in both languages.
+                if not re.search(r"[A-Za-z]{2}", text):
+                    continue
+                unwrapped.append((rel, text))
 
     known = catalogue_keys()
     # A key carrying context is stored with it; compare on the whole thing.

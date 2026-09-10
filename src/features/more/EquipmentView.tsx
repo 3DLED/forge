@@ -24,11 +24,13 @@ import {
 } from '../../data/customEquipment';
 import { availableSlugs } from '../../domain/equipment';
 import type { CustomEquipment, EquipmentProfile, EquipmentTag } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 /** Where kit goes when nobody said, or said something the list no longer has. */
 const CATCH_ALL_GROUP = 'Odd objects';
 
 export default function EquipmentView() {
+  const t = useT();
   const { equipmentProfiles, activeEquipment, exercises, profile, units, customEquipment, equipmentName } =
     useApp();
   const [editing, setEditing] = useState<string | null>(null);
@@ -152,12 +154,12 @@ export default function EquipmentView() {
   return (
     <>
       <PageHeader
-        title="Equipment"
+        title={t('Equipment')}
         subtitle="What you can train with today"
-        action={<Link to="/more" className="btn ghost sm">Back</Link>}
+        action={<Link to="/more" className="btn ghost sm">{t('Back')}</Link>}
       />
 
-      <div className="section-title">Profiles</div>
+      <div className="section-title">{t('Profiles')}</div>
       {equipmentProfiles.map((item) => {
         const active = item.id === activeEquipment?.id;
         return (
@@ -177,7 +179,7 @@ export default function EquipmentView() {
                   {unlockCounts.get(item.id) ?? 0} movements available
                 </span>
               </span>
-              {active && <span className="pill accent">Active</span>}
+              {active && <span className="pill accent">{t('Active')}</span>}
             </button>
             <button
               className="btn ghost sm"
@@ -196,7 +198,7 @@ export default function EquipmentView() {
 
       {naming && (
         <AskSheet
-          title="New equipment profile"
+          title={t('New equipment profile')}
           message="Start from nothing but bodyweight, then tick what you have."
           input={{ label: 'Name', defaultValue: 'New profile', placeholder: 'Hotel gym', required: true }}
           confirmLabel="Create"
@@ -266,7 +268,7 @@ export default function EquipmentView() {
               setManaging(null);
             }}
           >
-            Rename
+            {t('Rename')}
           </button>
           <button
             className="btn block ghost danger"
@@ -277,12 +279,11 @@ export default function EquipmentView() {
               setManaging(null);
             }}
           >
-            Delete
+            {t('Delete')}
           </button>
           {equipmentProfiles.length < 2 && (
             <p className="tiny faint" style={{ marginTop: '0.5rem' }}>
-              This is your only profile. Make another before deleting this one — the app has to
-              know what you can train with.
+              {t('This is your only profile. Make another before deleting this one — the app has to know what you can train with.')}
             </p>
           )}
         </Sheet>
@@ -366,21 +367,20 @@ export default function EquipmentView() {
             )}
             {culling && (
               <button className="btn sm ghost" onClick={stopCulling}>
-                Cancel
+                {t('Cancel')}
               </button>
             )}
           </div>
 
           {culling && (
             <p className="tiny faint" style={{ marginTop: '-0.25rem', marginBottom: '0.5rem' }}>
-              Tap the kit you added — the square-cornered ones — to mark it. One at a time to
-              rename, any number to delete. Built-in kit cannot be changed.
+              {t('Tap the kit you added — the square-cornered ones — to mark it. One at a time to rename, any number to delete. Built-in kit cannot be changed.')}
             </p>
           )}
 
           {EQUIPMENT_GROUPS.map((group) => (
             <section className="card" key={group.label}>
-              <h3 style={{ marginBottom: '0.5rem' }}>{group.label}</h3>
+              <h3 style={{ marginBottom: '0.5rem' }}>{t(group.label)}</h3>
               <div className="row wrap" style={{ gap: '0.4rem' }}>
                 {group.tags.map((tag) => (
                   <button
@@ -445,10 +445,10 @@ export default function EquipmentView() {
                     setDraft(null);
                   }}
                 >
-                  Save kit
+                  {t('Save kit')}
                 </button>
                 <button className="btn grow" onClick={() => setDraft(null)}>
-                  Cancel
+                  {t('Cancel')}
                 </button>
               </div>
             </div>
@@ -462,10 +462,10 @@ export default function EquipmentView() {
 
           {upgrades.length > 0 && (
             <>
-              <div className="section-title">Biggest gaps</div>
+              <div className="section-title">{t('Biggest gaps')}</div>
               <div className="card">
                 <p className="small muted">
-                  What one more piece of kit would unlock, on top of this profile.
+                  {t('What one more piece of kit would unlock, on top of this profile.')}
                 </p>
                 {upgrades.map((row) => (
                   <div className="row between" key={row.tag} style={{ padding: '0.3rem 0' }}>
@@ -490,13 +490,14 @@ export default function EquipmentView() {
  * default is the catch-all, so the question can be ignored by anyone who does not care.
  */
 function AddKitSheet({ onClose, onAdded }: { onClose: () => void; onAdded: () => void }) {
+  const t = useT();
   const [name, setName] = useState('');
   const [group, setGroup] = useState<string>(CATCH_ALL_GROUP);
   const [saving, setSaving] = useState(false);
 
   return (
     <Sheet
-      title="Add a piece of kit"
+      title={t('Add a piece of kit')}
       onClose={onClose}
       footer={
         <button
@@ -513,20 +514,19 @@ function AddKitSheet({ onClose, onAdded }: { onClose: () => void; onAdded: () =>
       }
     >
       <p className="small muted">
-        Whatever you train with that the list does not name. It behaves like any other
-        equipment: tick it into a profile, and movements can require it.
+        {t('Whatever you train with that the list does not name. It behaves like any other equipment: tick it into a profile, and movements can require it.')}
       </p>
 
-      <div className="section-title">What is it</div>
+      <div className="section-title">{t('What is it')}</div>
       <input
         value={name}
         autoFocus
-        aria-label="Equipment name"
-        placeholder="Rebounder, macebell, sledgehammer…"
+        aria-label={t('Equipment name')}
+        placeholder={t('Rebounder, macebell, sledgehammer…')}
         onChange={(event) => setName(event.target.value)}
       />
 
-      <div className="section-title">Where it belongs</div>
+      <div className="section-title">{t('Where it belongs')}</div>
       <div className="row wrap" style={{ gap: '0.4rem' }}>
         {EQUIPMENT_GROUPS.map((option) => (
           <button
@@ -540,8 +540,7 @@ function AddKitSheet({ onClose, onAdded }: { onClose: () => void; onAdded: () =>
         ))}
       </div>
       <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
-        Which shelf it shows up on. It will have square corners either way, which is how kit
-        you added is told apart from the built-in list.
+        {t('Which shelf it shows up on. It will have square corners either way, which is how kit you added is told apart from the built-in list.')}
       </p>
     </Sheet>
   );

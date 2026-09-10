@@ -17,6 +17,7 @@ import { BAND_LABELS, bandOf, levelOf, levelPips } from '../../domain/difficulty
 import { CATEGORY_LABELS, categoryOf } from '../../domain/categories';
 import { plural } from '../../ui/text';
 import type { Exercise } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export default function ExerciseInfoSheet({
   exercise,
@@ -28,6 +29,7 @@ export default function ExerciseInfoSheet({
   onSwap?: () => void;
   onClose: () => void;
 }) {
+  const t = useT();
   const coaching = coachingOf(exercise);
   const level = levelOf(exercise);
   const media = exerciseMediaUrl(exercise.slug);
@@ -39,7 +41,7 @@ export default function ExerciseInfoSheet({
       footer={
         onSwap && (
           <button className="btn block" onClick={onSwap}>
-            Swap for another version
+            {t('Swap for another version')}
           </button>
         )
       }
@@ -79,10 +81,10 @@ export default function ExerciseInfoSheet({
 
       {coaching ? (
         <>
-          <div className="section-title">Set up</div>
+          <div className="section-title">{t('Set up')}</div>
           <p className="small">{coaching.setup}</p>
 
-          <div className="section-title">How to do it</div>
+          <div className="section-title">{t('How to do it')}</div>
           <ol className="cue-list">
             {coaching.cues.map((cue) => (
               <li key={cue}>{cue}</li>
@@ -96,25 +98,25 @@ export default function ExerciseInfoSheet({
           */}
           {coaching.fault && (
             <>
-              <div className="section-title">Watch for</div>
+              <div className="section-title">{t('Watch for')}</div>
               <p className="small">{coaching.fault}</p>
             </>
           )}
         </>
       ) : (
         <p className="small faint">
-          No write-up for this one yet — it is likely a movement you added yourself.
+          {t('No write-up for this one yet — it is likely a movement you added yourself.')}
         </p>
       )}
 
       {exercise.notes && (
         <>
-          <div className="section-title">Note</div>
+          <div className="section-title">{t('Note')}</div>
           <p className="small faint">{exercise.notes}</p>
         </>
       )}
 
-      <div className="section-title">Trains</div>
+      <div className="section-title">{t('Trains')}</div>
       <p className="small">
         {exercise.primaryMuscles.join(', ')}
         {exercise.secondaryMuscles.length > 0 && (
@@ -124,14 +126,14 @@ export default function ExerciseInfoSheet({
 
       {exercise.equipment.length > 0 && (
         <>
-          <div className="section-title">Needs</div>
+          <div className="section-title">{t('Needs')}</div>
           <p className="small">{exercise.equipment.join(', ')}</p>
         </>
       )}
 
       {exercise.unilateral && (
         <p className="tiny faint" style={{ marginTop: '0.5rem' }}>
-          Trained one side at a time — log both sides, or double the sets.
+          {t('Trained one side at a time — log both sides, or double the sets.')}
         </p>
       )}
 

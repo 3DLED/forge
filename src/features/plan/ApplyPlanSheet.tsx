@@ -28,6 +28,7 @@ import {
 import { addDays, formatDayLabel, startOfWeek, todayKey } from '../../domain/dates';
 import { testDayMovements } from '../../domain/fitnessTests';
 import { formatDistance } from '../../domain/units';
+import { useT } from '../../i18n/useT';
 
 export default function ApplyPlanSheet({
   template,
@@ -56,6 +57,7 @@ export default function ApplyPlanSheet({
   onClose: () => void;
   onApplied: () => void;
 }) {
+  const t = useT();
   const { profile, units, exerciseBySlug, available, activeEquipment } = useApp();
   const exceptions = useLiveQuery(() => calendarExceptions(), []);
 
@@ -214,14 +216,14 @@ export default function ApplyPlanSheet({
       <GoalPicker profile={profile} />
       {!profile.primaryGoal && (
         <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
-          Optional. Without it the plan is generated exactly as written.
+          {t('Optional. Without it the plan is generated exactly as written.')}
         </p>
       )}
 
       {/* Only worth asking when there is in fact something in the way. */}
       {clashing > 0 && (
         <>
-          <div className="section-title">Already planned</div>
+          <div className="section-title">{t('Already planned')}</div>
           <p className="tiny faint" style={{ marginTop: '-0.35rem' }}>
             {plural(clashing, 'session')} in these weeks, from another plan or added by hand.
           </p>
@@ -243,7 +245,7 @@ export default function ApplyPlanSheet({
 
       {testMovements.length > 0 && (
         <>
-          <div className="section-title">Testing days</div>
+          <div className="section-title">{t('Testing days')}</div>
           <button
             className={`chip${includeTests ? ' on' : ''}`}
             onClick={() => setIncludeTests((on) => !on)}
@@ -262,24 +264,22 @@ export default function ApplyPlanSheet({
 
       {trainingDays < template.daysPerWeek && (
         <div className="card tight" style={{ borderColor: 'var(--warn)' }}>
-          <span className="pill warn">Heads up</span>
+          <span className="pill warn">{t('Heads up')}</span>
           <p className="small" style={{ margin: '0.5rem 0 0' }}>
-            This plan wants {template.daysPerWeek} days a week, but your availability allows{' '}
-            {trainingDays}. Sessions that will not fit are listed below — widen your
-            availability in Settings, or expect to double up.
+            This plan wants {template.daysPerWeek} days a week, but your availability allows{' '} {trainingDays}. Sessions that will not fit are listed below — widen your availability in Settings, or expect to double up.
           </p>
         </div>
       )}
 
       {isRace && (
         <>
-          <div className="section-title">Race day</div>
+          <div className="section-title">{t('Race day')}</div>
           <input
             type="date"
             value={raceDate}
             min={todayKey()}
             onChange={(event) => setRaceDate(event.target.value)}
-            aria-label="Race date"
+            aria-label={t('Race date')}
           />
           <p className="tiny faint">
             {raceDate
@@ -291,12 +291,12 @@ export default function ApplyPlanSheet({
 
       {!(isRace && raceDate) && (
         <>
-          <div className="section-title">Start</div>
+          <div className="section-title">{t('Start')}</div>
           <input
             type="date"
             value={manualStart}
             onChange={(event) => setManualStart(event.target.value)}
-            aria-label="Start date"
+            aria-label={t('Start date')}
           />
           <p className="tiny faint">
             Nothing is scheduled before {formatDayLabel(startDate)}.
@@ -306,7 +306,7 @@ export default function ApplyPlanSheet({
 
       {template.weeks === null && (
         <>
-          <div className="section-title">How many weeks to lay down</div>
+          <div className="section-title">{t('How many weeks to lay down')}</div>
           <div className="chip-row">
             {[4, 8, 12, 16, 26].map((option) => (
               <button
@@ -319,12 +319,12 @@ export default function ApplyPlanSheet({
             ))}
           </div>
           <p className="tiny faint">
-            This plan has no end. Lay down a stretch now and extend it whenever you like.
+            {t('This plan has no end. Lay down a stretch now and extend it whenever you like.')}
           </p>
         </>
       )}
 
-      <div className="section-title">What you'll get</div>
+      <div className="section-title">{t("What you'll get")}</div>
       <div className="card tight">
         {weekRows.slice(0, 8).map(([weekIndex, row]) => (
           <div className="week-row" key={weekIndex}>
@@ -345,10 +345,10 @@ export default function ApplyPlanSheet({
 
       {generated.substitutions.length > 0 && (
         <>
-          <div className="section-title">Swapped for your equipment</div>
+          <div className="section-title">{t('Swapped for your equipment')}</div>
           <div className="card tight">
             <p className="tiny faint" style={{ marginTop: 0 }}>
-              Using <strong>{activeEquipment?.name}</strong>. These movements were replaced with
+              {t('Using')} <strong>{activeEquipment?.name}</strong>. These movements were replaced with
               the closest thing you can actually do.
             </p>
             {generated.substitutions.slice(0, 8).map((swap) => (
@@ -366,7 +366,7 @@ export default function ApplyPlanSheet({
 
       {generated.unavailable.length > 0 && (
         <div className="card tight" style={{ borderColor: 'var(--warn)' }}>
-          <span className="pill warn">No substitute</span>
+          <span className="pill warn">{t('No substitute')}</span>
           <p className="small" style={{ margin: '0.5rem 0 0' }}>
             {generated.unavailable
               .map((slug) => exerciseBySlug.get(slug)?.name ?? slug)
@@ -379,7 +379,7 @@ export default function ApplyPlanSheet({
 
       {generated.conflicts.length > 0 && (
         <>
-          <div className="section-title">Couldn't be scheduled</div>
+          <div className="section-title">{t("Couldn't be scheduled")}</div>
           <div className="card tight" style={{ borderColor: 'var(--warn)' }}>
             {generated.conflicts.slice(0, 6).map((conflict, index) => (
               <div className="small" key={index} style={{ padding: '0.15rem 0' }}>

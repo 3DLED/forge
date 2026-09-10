@@ -19,8 +19,10 @@ import { deleteSavedWorkout, isTimedWorkout, savedWorkouts } from '../../data/na
 import { buildWorkoutFile, downloadShareFile } from '../../data/share';
 import { blockShape } from '../log/blockLabels';
 import type { SessionTemplate } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export default function SavedWorkoutsView() {
+  const t = useT();
   const { exerciseBySlug } = useApp();
   const saved = useLiveQuery(() => savedWorkouts(), []);
   const [importing, setImporting] = useState(false);
@@ -52,9 +54,9 @@ export default function SavedWorkoutsView() {
   return (
     <>
       <PageHeader
-        title="Saved workouts"
+        title={t('Saved workouts')}
         subtitle={mine.length > 0 ? plural(mine.length, 'workout') : 'Name one and it comes back here'}
-        action={<Link to="/more" className="btn ghost sm">Back</Link>}
+        action={<Link to="/more" className="btn ghost sm">{t('Back')}</Link>}
       />
 
       {notice && (
@@ -63,7 +65,7 @@ export default function SavedWorkoutsView() {
             {notice}
           </p>
           <button className="btn sm ghost" style={{ marginTop: '0.4rem' }} onClick={() => setNotice(null)}>
-            Dismiss
+            {t('Dismiss')}
           </button>
         </div>
       )}
@@ -84,10 +86,9 @@ export default function SavedWorkoutsView() {
       {mine.length === 0 && (
         <div className="empty">
           <span className="glyph">💾</span>
-          <p>Nothing saved yet.</p>
+          <p>{t('Nothing saved yet.')}</p>
           <p className="small faint">
-            Name a workout you have built and it comes back here, ready to run again — and, if
-            it is timed, with its own best to beat.
+            {t('Name a workout you have built and it comes back here, ready to run again — and, if it is timed, with its own best to beat.')}
           </p>
         </div>
       )}

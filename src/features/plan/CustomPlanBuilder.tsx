@@ -29,6 +29,7 @@ import { SEED_SESSION_TEMPLATES } from '../../data/seed/sessionTemplates';
 import { weekdayName } from '../../domain/dates';
 import { BUILDABLE_REGIONS, REGION_LABELS } from '../../domain/regions';
 import { useApp } from '../../ui/AppProvider';
+import { useT } from '../../i18n/useT';
 import type {
   CustomPlan,
   CustomPlanDay,
@@ -56,6 +57,7 @@ export default function CustomPlanBuilder({
   onClose: () => void;
   onSaved: (plan: CustomPlan) => void;
 }) {
+  const t = useT();
   const { profile } = useApp();
   const saved = useLiveQuery(() => savedWorkouts(), []);
 
@@ -103,15 +105,15 @@ export default function CustomPlanBuilder({
           </button>
         }
       >
-        <div className="section-title">Name</div>
+        <div className="section-title">{t('Name')}</div>
         <input
           value={name}
-          aria-label="Plan name"
-          placeholder="Winter base"
+          aria-label={t('Plan name')}
+          placeholder={t('Winter base')}
           onChange={(event) => setName(event.target.value)}
         />
 
-        <div className="section-title">What it is for</div>
+        <div className="section-title">{t('What it is for')}</div>
         <div className="row wrap" style={{ gap: '0.4rem' }}>
           {GOALS.map((option) => (
             <button
@@ -125,7 +127,7 @@ export default function CustomPlanBuilder({
           ))}
         </div>
 
-        <div className="section-title">How long</div>
+        <div className="section-title">{t('How long')}</div>
         <div className="row wrap" style={{ gap: '0.4rem' }}>
           {WEEK_OPTIONS.map((option) => (
             <button
@@ -139,9 +141,9 @@ export default function CustomPlanBuilder({
           ))}
         </div>
 
-        <div className="section-title">Your week</div>
+        <div className="section-title">{t('Your week')}</div>
         <p className="tiny faint" style={{ marginTop: '-0.35rem' }}>
-          This repeats. The weights climb from what you actually lift, not from the plan.
+          {t('This repeats. The weights climb from what you actually lift, not from the plan.')}
         </p>
 
         {ordered.map((day) => (
@@ -222,6 +224,7 @@ function DayPicker({
    */
   onUpdate: (patch: Partial<CustomPlanDay>) => void;
 }) {
+  const t = useT();
   const [query, setQuery] = useState('');
   const [confirmClear, setConfirmClear] = useState(false);
 
@@ -253,7 +256,7 @@ function DayPicker({
           </button>
           {current.kind !== 'open' && (
             <button className="btn ghost" onClick={() => setConfirmClear(true)}>
-              Clear
+              {t('Clear')}
             </button>
           )}
         </div>
@@ -275,8 +278,8 @@ function DayPicker({
         <input
           type="search"
           value={query}
-          placeholder="Search sessions"
-          aria-label="Search sessions"
+          placeholder={t('Search sessions')}
+          aria-label={t('Search sessions')}
           style={{ marginTop: '0.6rem' }}
           onChange={(event) => setQuery(event.target.value)}
         />
@@ -285,7 +288,7 @@ function DayPicker({
           A day described rather than specified. Choosing the movements eight weeks out means
           choosing them without knowing what you own that week or how the last one went.
         */}
-        <div className="section-title">Decide on the day</div>
+        <div className="section-title">{t('Decide on the day')}</div>
         <button
           className={`pick${current.kind === 'suggest' ? ' selected' : ''}`}
           onClick={() =>
@@ -302,14 +305,14 @@ function DayPicker({
             <strong>✨ Suggest a session</strong>
             <br />
             <span className="tiny faint">
-              Filled in when the day arrives, from your kit and what you have been training.
+              {t('Filled in when the day arrives, from your kit and what you have been training.')}
             </span>
           </span>
         </button>
 
         {current.kind === 'suggest' && current.suggest && (
           <div className="card tight">
-            <div className="section-title" style={{ marginTop: 0 }}>Train</div>
+            <div className="section-title" style={{ marginTop: 0 }}>{t('Train')}</div>
             <div className="row wrap" style={{ gap: '0.4rem' }}>
               {BUILDABLE_REGIONS.map((region) => {
                 const on = current.suggest!.regions.includes(region);
@@ -337,7 +340,7 @@ function DayPicker({
               })}
             </div>
 
-            <div className="section-title">For about</div>
+            <div className="section-title">{t('For about')}</div>
             <div className="row wrap" style={{ gap: '0.4rem' }}>
               {[20, 30, 45, 60].map((minutes) => (
                 <button
@@ -353,7 +356,7 @@ function DayPicker({
           </div>
         )}
 
-        {mine.length > 0 && <div className="section-title">Your saved workouts</div>}
+        {mine.length > 0 && <div className="section-title">{t('Your saved workouts')}</div>}
         {mine.map((workout) => (
           <button
             key={workout.id}
@@ -378,12 +381,12 @@ function DayPicker({
             <span className="grow">
               <strong>{workout.name}</strong>
               <br />
-              <span className="tiny faint">Yours · copied into the plan</span>
+              <span className="tiny faint">{t('Yours · copied into the plan')}</span>
             </span>
           </button>
         ))}
 
-        {matches.length > 0 && <div className="section-title">Built in</div>}
+        {matches.length > 0 && <div className="section-title">{t('Built in')}</div>}
         {matches.map((template) => (
           <button
             key={template.slug}

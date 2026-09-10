@@ -23,11 +23,13 @@ import {
 } from '../../domain/categories';
 import { CONTAINER_SLUGS } from '../../domain/training';
 import type { Exercise } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 /** As in the picker: about three screens of browsing, then the search box takes over. */
 const BROWSE_LIMIT = 60;
 
 export default function ExerciseLibraryView() {
+  const t = useT();
   const { exercises } = useApp();
   const [query, setQuery] = useState('');
   const [editing, setEditing] = useState<Exercise | null>(null);
@@ -80,10 +82,10 @@ export default function ExerciseLibraryView() {
       {editable && (
         <div className="row" style={{ gap: '0.5rem', marginTop: '0.4rem' }}>
           <button className="btn sm grow" onClick={() => setEditing(exercise)}>
-            Edit
+            {t('Edit')}
           </button>
           <button className="btn sm ghost danger" onClick={() => setDeleting(exercise)}>
-            Delete
+            {t('Delete')}
           </button>
         </div>
       )}
@@ -93,15 +95,15 @@ export default function ExerciseLibraryView() {
   return (
     <>
       <PageHeader
-        title="Movements"
+        title={t('Movements')}
         subtitle={`${plural(mine.length + seeded.length, 'movement')}`}
-        action={<Link to="/more" className="btn ghost sm">Back</Link>}
+        action={<Link to="/more" className="btn ghost sm">{t('Back')}</Link>}
       />
 
       <input
         value={query}
-        placeholder="Search movements"
-        aria-label="Search movements"
+        placeholder={t('Search movements')}
+        aria-label={t('Search movements')}
         onChange={(event) => setQuery(event.target.value)}
       />
 
@@ -111,7 +113,7 @@ export default function ExerciseLibraryView() {
           aria-pressed={category === 'all'}
           onClick={() => setCategory('all')}
         >
-          All
+          {t('All')}
         </button>
         {CATEGORY_ORDER.filter((value) => (countByCategory.get(value) ?? 0) > 0).map((value) => (
           <button
@@ -133,10 +135,10 @@ export default function ExerciseLibraryView() {
         + Add a movement
       </button>
 
-      {mine.length > 0 && <div className="section-title">Yours</div>}
+      {mine.length > 0 && <div className="section-title">{t('Yours')}</div>}
       {mine.map((exercise) => row(exercise, true))}
 
-      {seeded.length > 0 && <div className="section-title">Built in</div>}
+      {seeded.length > 0 && <div className="section-title">{t('Built in')}</div>}
       {/*
         Capped while browsing. The library is fifteen hundred movements now, and rendering all
         of them cost about half a second every time the search box was cleared — for a list

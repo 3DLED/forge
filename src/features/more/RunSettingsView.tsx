@@ -33,6 +33,7 @@ import {
   parsePaceInput,
 } from '../../domain/units';
 import type { UnitSystem } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 /** Whole minutes, because nobody warms up for seven. */
 const MINUTES = [0, 5, 10, 15, 20];
@@ -106,6 +107,7 @@ function blankShape(kind: RunShape['kind'], units: UnitSystem): RunShape {
 }
 
 export default function RunSettingsView() {
+  const t = useT();
   const { profile, units, lang, exerciseBySlug } = useApp();
   const navigate = useNavigate();
   const [params] = useSearchParams();
@@ -149,11 +151,11 @@ export default function RunSettingsView() {
   return (
     <>
       <PageHeader
-        title="Run alerts"
+        title={t('Run alerts')}
         subtitle="What gets said while you are out, and what you are running"
         action={
           <button className="btn ghost sm" onClick={() => navigate(-1)}>
-            Back
+            {t('Back')}
           </button>
         }
       />
@@ -161,45 +163,43 @@ export default function RunSettingsView() {
       {!speechAvailable() && (
         <div className="card tight">
           <p className="small">
-            This browser cannot speak, so cues will appear on screen only. Everything below still
-            decides what gets shown.
+            {t('This browser cannot speak, so cues will appear on screen only. Everything below still decides what gets shown.')}
           </p>
         </div>
       )}
 
-      <div className="section-title">Voice</div>
+      <div className="section-title">{t('Voice')}</div>
       <div className="row" style={{ gap: '0.5rem' }}>
         <button
           className={`btn grow${settings.voice ? ' primary' : ''}`}
           onClick={() => patch({ voice: true })}
         >
-          Speak cues
+          {t('Speak cues')}
         </button>
         <button
           className={`btn grow${settings.voice ? '' : ' primary'}`}
           onClick={() => patch({ voice: false })}
         >
-          Silent
+          {t('Silent')}
         </button>
       </div>
       <p className="tiny faint">
-        Silent keeps every cue on screen and says none of them — for a race, a group run, or a
-        track session where someone is already shouting at you.
+        {t('Silent keeps every cue on screen and says none of them — for a race, a group run, or a track session where someone is already shouting at you.')}
       </p>
 
-      <div className="section-title">Splits</div>
+      <div className="section-title">{t('Splits')}</div>
       <div className="row" style={{ gap: '0.5rem' }}>
         <button
           className={`btn grow${settings.splits ? ' primary' : ''}`}
           onClick={() => patch({ splits: true })}
         >
-          On
+          {t('On')}
         </button>
         <button
           className={`btn grow${settings.splits ? '' : ' primary'}`}
           onClick={() => patch({ splits: false })}
         >
-          Off
+          {t('Off')}
         </button>
       </div>
 
@@ -217,9 +217,8 @@ export default function RunSettingsView() {
             ))}
           </div>
           <p className="tiny faint">
-            {SPLIT_INTERVALS[settings.splitUnit].label}, with the pace for that piece alone and how
-            it compares to your target. Distance rather than a timer, so standing at a crossing
-            does not count.
+            {t(SPLIT_INTERVALS[settings.splitUnit].label)}
+            {t(', with the pace for that piece alone and how it compares to your target. Distance rather than a timer, so standing at a crossing does not count.')}
           </p>
         </>
       )}
@@ -238,13 +237,12 @@ export default function RunSettingsView() {
                 className={`chip${kind === option.kind ? ' on' : ''}`}
                 onClick={() => setPicked(option.kind)}
               >
-                {option.label}
+                {t(option.label)}
               </button>
             ))}
           </div>
           <p className="tiny faint">
-            Each kind of run keeps its own setup, so a track session does not turn Sunday's long
-            run into four by eight hundred.
+            {t("Each kind of run keeps its own setup, so a track session does not turn Sunday's long run into four by eight hundred.")}
           </p>
         </>
       )}
@@ -256,7 +254,7 @@ export default function RunSettingsView() {
             className={`chip${shape.kind === option ? ' on' : ''}`}
             onClick={() => setShape(blankShape(option, units))}
           >
-            {SHAPES[option].label}
+            {t(SHAPES[option].label)}
           </button>
         ))}
       </div>
@@ -313,7 +311,7 @@ export default function RunSettingsView() {
           />
 
           <div className="tiny faint" style={{ marginTop: '0.6rem' }}>
-            Reps
+            {t('Reps')}
           </div>
           <div className="chip-row">
             {REPS.map((reps) => (
@@ -328,7 +326,7 @@ export default function RunSettingsView() {
           </div>
 
           <div className="tiny faint" style={{ marginTop: '0.6rem' }}>
-            Each rep
+            {t('Each rep')}
           </div>
           <div className="chip-row">
             {WORK_DISTANCES[units].map((option) => (
@@ -337,7 +335,7 @@ export default function RunSettingsView() {
                 className={`chip${Math.abs(shape.workM - option.m) < 1 ? ' on' : ''}`}
                 onClick={() => setShape({ ...shape, workM: option.m })}
               >
-                {option.label}
+                {t(option.label)}
               </button>
             ))}
           </div>
@@ -350,7 +348,7 @@ export default function RunSettingsView() {
           />
 
           <div className="tiny faint" style={{ marginTop: '0.6rem' }}>
-            Jog between
+            {t('Jog between')}
           </div>
           <div className="chip-row">
             {FLOAT_DISTANCES.map((metres) => (
@@ -418,26 +416,26 @@ export default function RunSettingsView() {
         </div>
       )}
 
-      <div className="section-title">Pace alerts</div>
+      <div className="section-title">{t('Pace alerts')}</div>
       <div className="row" style={{ gap: '0.5rem' }}>
         <button
           className={`btn grow${settings.paceAlerts ? ' primary' : ''}`}
           onClick={() => patch({ paceAlerts: true })}
         >
-          On
+          {t('On')}
         </button>
         <button
           className={`btn grow${settings.paceAlerts ? '' : ' primary'}`}
           onClick={() => patch({ paceAlerts: false })}
         >
-          Off
+          {t('Off')}
         </button>
       </div>
 
       {settings.paceAlerts && (
         <>
           <div className="tiny faint" style={{ marginTop: '0.6rem' }}>
-            Say something once I am off by
+            {t('Say something once I am off by')}
           </div>
           <div className="chip-row">
             {TOLERANCES.map((seconds) => {
@@ -455,9 +453,7 @@ export default function RunSettingsView() {
             })}
           </div>
           <p className="tiny faint">
-            Measured against the target above, or on a tempo or interval session against the pace
-            of the piece you are on. Drifting is normal, so this waits — half a minute off pace
-            before it says anything, and longer before it says the same thing twice.
+            {t('Measured against the target above, or on a tempo or interval session against the pace of the piece you are on. Drifting is normal, so this waits — half a minute off pace before it says anything, and longer before it says the same thing twice.')}
           </p>
         </>
       )}
@@ -520,6 +516,7 @@ function PaceField({
   units: UnitSystem;
   onChange: (secPerKm: number | undefined) => void;
 }) {
+  const t = useT();
   const [text, setText] = useState(value == null ? '' : paceInputValue(value, units));
   const parsed = parsePaceInput(text, units);
 
@@ -541,7 +538,7 @@ function PaceField({
         }}
       />
       {text.trim() !== '' && parsed == null && (
-        <span className="tiny faint">Minutes and seconds, like 8:30</span>
+        <span className="tiny faint">{t('Minutes and seconds, like 8:30')}</span>
       )}
     </label>
   );

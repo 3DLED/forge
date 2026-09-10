@@ -5,10 +5,12 @@ import SessionCard from '../../ui/SessionCard';
 import { recentSessions, sessionsBetween } from '../../data/sessions';
 import { formatDayLabel, monthName } from '../../domain/dates';
 import { prEventsBySession, scanRecords } from '../../domain/training';
+import { useT } from '../../i18n/useT';
 
 const PAGE = 30;
 
 export default function HistoryView() {
+  const t = useT();
   const [limit, setLimit] = useState(PAGE);
   const sessions = useLiveQuery(() => recentSessions(limit), [limit]);
 
@@ -39,20 +41,20 @@ export default function HistoryView() {
     return [...groups.entries()];
   }, [sessions]);
 
-  if (!sessions) return <p className="muted">Loading…</p>;
+  if (!sessions) return <p className="muted">{t('Loading…')}</p>;
 
   return (
     <>
       <PageHeader
-        title="History"
+        title={t('History')}
         subtitle={sessions.length > 0 ? `${sessions.length} session${sessions.length === 1 ? '' : 's'}` : undefined}
       />
 
       {sessions.length === 0 && (
         <div className="empty">
           <span className="glyph">📋</span>
-          <p>No sessions yet.</p>
-          <p className="small faint">Everything you log shows up here, newest first.</p>
+          <p>{t('No sessions yet.')}</p>
+          <p className="small faint">{t('Everything you log shows up here, newest first.')}</p>
         </div>
       )}
 
@@ -73,7 +75,7 @@ export default function HistoryView() {
 
       {sessions.length >= limit && (
         <button className="btn block" onClick={() => setLimit((n) => n + PAGE)}>
-          Load more
+          {t('Load more')}
         </button>
       )}
 

@@ -27,6 +27,7 @@ import { materialisePrescription } from '../../domain/planning';
 import { resolveDayAvailability } from '../../domain/scheduling';
 import { daysBetween, formatDayLabel, todayKey } from '../../domain/dates';
 import type { DayKey, PlannedSession } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 const MODALITY_LABEL: Record<string, string> = {
   strength: 'Strength',
@@ -36,6 +37,7 @@ const MODALITY_LABEL: Record<string, string> = {
 };
 
 export default function DaySheet({ date, onClose }: { date: DayKey; onClose: () => void }) {
+  const t = useT();
   const navigate = useNavigate();
   const { profile, exerciseBySlug, available } = useApp();
   const [adding, setAdding] = useState(false);
@@ -103,10 +105,10 @@ export default function DaySheet({ date, onClose }: { date: DayKey; onClose: () 
     );
 
     return (
-      <Sheet title="Add a session" onClose={() => setAdding(false)}>
+      <Sheet title={t('Add a session')} onClose={() => setAdding(false)}>
         <input
           type="search"
-          placeholder="Search workouts…"
+          placeholder={t('Search workouts…')}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           autoFocus
@@ -117,7 +119,7 @@ export default function DaySheet({ date, onClose }: { date: DayKey; onClose: () 
           (t) => !needle || t.name.toLowerCase().includes(needle),
         ).length > 0 && (
           <>
-            <div className="section-title">Your saved workouts</div>
+            <div className="section-title">{t('Your saved workouts')}</div>
             {(saved ?? [])
               .filter((t) => !needle || t.name.toLowerCase().includes(needle))
               .map((template) => (
@@ -133,10 +135,10 @@ export default function DaySheet({ date, onClose }: { date: DayKey; onClose: () 
                       {template.blocks[0]?.items.length ?? 0} movements · your workout
                     </span>
                   </span>
-                  <span className="pill accent">Add</span>
+                  <span className="pill accent">{t('Add')}</span>
                 </button>
               ))}
-            <div className="section-title">From the library</div>
+            <div className="section-title">{t('From the library')}</div>
           </>
         )}
 
@@ -151,11 +153,11 @@ export default function DaySheet({ date, onClose }: { date: DayKey; onClose: () 
                 {template.blocks.length === 1 ? '' : 's'}
               </span>
             </span>
-            <span className="pill accent">Add</span>
+            <span className="pill accent">{t('Add')}</span>
           </button>
         ))}
         <button className="btn ghost block" onClick={() => setAdding(false)}>
-          Cancel
+          {t('Cancel')}
         </button>
       </Sheet>
     );
@@ -167,7 +169,7 @@ export default function DaySheet({ date, onClose }: { date: DayKey; onClose: () 
         {blackout ? (
           <span className="pill warn">Blocked{blackout.reason ? ` · ${blackout.reason}` : ''}</span>
         ) : availability.allowedModalities.length === 0 ? (
-          <span className="pill">Rest day</span>
+          <span className="pill">{t('Rest day')}</span>
         ) : (
           availability.allowedModalities.map((modality) => (
             <span className="pill" key={modality}>
@@ -178,15 +180,15 @@ export default function DaySheet({ date, onClose }: { date: DayKey; onClose: () 
       </div>
 
       {(planned ?? []).length === 0 && (logged ?? []).length === 0 && (
-        <p className="small muted">Nothing scheduled or logged on this day.</p>
+        <p className="small muted">{t('Nothing scheduled or logged on this day.')}</p>
       )}
 
       {(planned ?? []).map((session) => (
         <div className="card tight" key={session.id}>
           <div className="row between" style={{ marginBottom: '0.4rem' }}>
             <strong className="grow truncate">{session.prescription.name}</strong>
-            {session.status === 'completed' && <span className="pill good">Done</span>}
-            {session.status === 'skipped' && <span className="pill">Skipped</span>}
+            {session.status === 'completed' && <span className="pill good">{t('Done')}</span>}
+            {session.status === 'skipped' && <span className="pill">{t('Skipped')}</span>}
           </div>
           <div className="tiny faint" style={{ marginBottom: '0.5rem' }}>
             {session.prescription.estimatedMinutes} min ·{' '}
@@ -202,14 +204,14 @@ export default function DaySheet({ date, onClose }: { date: DayKey; onClose: () 
                   navigate(`/log/${started.id}`);
                 }}
               >
-                Start
+                {t('Start')}
               </button>
               <label className="btn sm" style={{ position: 'relative', overflow: 'hidden' }}>
-                Move
+                {t('Move')}
                 <input
                   type="date"
                   defaultValue={date}
-                  aria-label="Move to date"
+                  aria-label={t('Move to date')}
                   onChange={(event) => {
                     if (event.target.value) void movePlannedSession(session, event.target.value);
                   }}
@@ -217,20 +219,20 @@ export default function DaySheet({ date, onClose }: { date: DayKey; onClose: () 
                 />
               </label>
               <button className="btn sm" onClick={() => void skipPlannedSession(session)}>
-                Skip
+                {t('Skip')}
               </button>
               <button
                 className="btn sm ghost danger"
                 onClick={() => void plannedSessionRepo.remove(session.id)}
               >
-                Remove
+                {t('Remove')}
               </button>
             </div>
           )}
 
           {session.status === 'skipped' && (
             <button className="btn sm" onClick={() => void unskipPlannedSession(session)}>
-              Un-skip
+              {t('Un-skip')}
             </button>
           )}
         </div>
@@ -253,7 +255,7 @@ export default function DaySheet({ date, onClose }: { date: DayKey; onClose: () 
               {session.endedAt ? '' : ' · in progress'}
             </span>
           </span>
-          <span className="pill good">Logged</span>
+          <span className="pill good">{t('Logged')}</span>
         </button>
       ))}
 
@@ -287,7 +289,7 @@ export default function DaySheet({ date, onClose }: { date: DayKey; onClose: () 
           </button>
         ) : (
           <button className="btn ghost block" onClick={() => setBlocking(true)}>
-            Block this day out
+            {t('Block this day out')}
           </button>
         )}
       </div>

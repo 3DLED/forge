@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import PageHeader from '../../ui/PageHeader';
 import { useApp } from '../../ui/AppProvider';
-import { plural } from '../../ui/text';
 import Sheet from '../../ui/Sheet';
 import AskSheet from '../../ui/AskSheet';
 import { DEFAULT_THEME, THEMES } from '../../ui/themes';
@@ -18,9 +17,11 @@ import { testTiming } from '../../domain/fitnessTests';
 import { activeInjuries } from '../../domain/injuries';
 import { todayKey } from '../../domain/dates';
 import { describeRunSettings, runSettingsFor } from '../../domain/runSettings';
+import { useT } from '../../i18n/useT';
 
 export default function MoreView() {
-  const { activeEquipment, exercises, profile, units } = useApp();
+  const t = useT();
+  const { activeEquipment, exercises, profile, units, lang } = useApp();
   const fileInput = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<string | null>(null);
   const today = todayKey();
@@ -56,14 +57,14 @@ export default function MoreView() {
 
   return (
     <>
-      <PageHeader title="More" subtitle={profile.displayName} />
+      <PageHeader title={t('More')} subtitle={profile.displayName} />
 
       <Link to="/more/equipment" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">
-          <strong>Equipment</strong>
+          <strong>{t('Equipment')}</strong>
           <br />
           <span className="tiny faint">
-            {activeEquipment?.name ?? 'Not set'} · {activeEquipment?.items.length ?? 0} items
+            {activeEquipment?.name ?? t('Not set')} · {t.count(activeEquipment?.items.length ?? 0, 'item')}
           </span>
         </span>
         <span className="faint">›</span>
@@ -71,19 +72,19 @@ export default function MoreView() {
 
       <Link to="/more/run" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">
-          <strong>Run alerts</strong>
+          <strong>{t('Run alerts')}</strong>
           <br />
-          <span className="tiny faint">{describeRunSettings(runSettingsFor(units, profile.run))}</span>
+          <span className="tiny faint">{describeRunSettings(runSettingsFor(units, profile.run), lang)}</span>
         </span>
         <span className="faint">›</span>
       </Link>
 
       <Link to="/more/settings" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">
-          <strong>Settings</strong>
+          <strong>{t('Settings')}</strong>
           <br />
           <span className="tiny faint">
-            {profile.units === 'imperial' ? 'Pounds and miles' : 'Kilograms and kilometres'}
+            {profile.units === 'imperial' ? t('Pounds and miles') : t('Kilograms and kilometres')}
           </span>
         </span>
         <span className="faint">›</span>
@@ -91,10 +92,10 @@ export default function MoreView() {
 
       <Link to="/more/appearance" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">
-          <strong>Appearance</strong>
+          <strong>{t('Appearance')}</strong>
           <br />
           <span className="tiny faint">
-            {THEMES.find((t) => t.id === (profile.theme ?? DEFAULT_THEME))?.name ?? 'Forge'} · try the other directions
+            {THEMES.find((t) => t.id === (profile.theme ?? DEFAULT_THEME))?.name ?? 'Forge'} · {t('try the other directions')}
           </span>
         </span>
         <span className="faint">›</span>
@@ -102,12 +103,12 @@ export default function MoreView() {
 
       <Link to="/more/movements" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">
-          <strong>Movements</strong>
+          <strong>{t('Movements')}</strong>
           <br />
           <span className="tiny faint">
             {customCount > 0
-              ? `${plural(exercises.length, 'movement')}, ${customCount} of them yours`
-              : `${plural(exercises.length, 'movement')} — add your own`}
+              ? `${t.count(exercises.length, 'movement')}, ${customCount} ${t('of them yours')}`
+              : `${t.count(exercises.length, 'movement')} — ${t('add your own')}`}
           </span>
         </span>
         <span className="faint">›</span>
@@ -115,12 +116,12 @@ export default function MoreView() {
 
       <Link to="/more/plans" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">
-          <strong>Plans</strong>
+          <strong>{t('Plans')}</strong>
           <br />
           <span className="tiny faint">
             {planCount > 0
-              ? `${plural(planCount, 'plan')} of your own — build, share, import`
-              : 'Build your own week, or open a plan someone sent'}
+              ? `${t.count(planCount, 'plan')} ${t('of your own — build, share, import')}`
+              : t('Build your own week, or open a plan someone sent')}
           </span>
         </span>
         <span className="faint">›</span>
@@ -128,12 +129,12 @@ export default function MoreView() {
 
       <Link to="/more/workouts" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">
-          <strong>Saved workouts</strong>
+          <strong>{t('Saved workouts')}</strong>
           <br />
           <span className="tiny faint">
             {workoutCount > 0
-              ? `${plural(workoutCount, 'workout')} — share, import, tidy up`
-              : 'Workouts you have named come back here'}
+              ? `${t.count(workoutCount, 'workout')} — ${t('share, import, tidy up')}`
+              : t('Workouts you have named come back here')}
           </span>
         </span>
         <span className="faint">›</span>
@@ -141,12 +142,12 @@ export default function MoreView() {
 
       <Link to="/more/tests" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">
-          <strong>Tests</strong>
+          <strong>{t('Tests')}</strong>
           <br />
           <span className="tiny faint">
             {dueTests > 0
-              ? `${plural(dueTests, 'movement')} due a retest`
-              : 'Measure a max, and program from a number instead of a guess'}
+              ? `${t.count(dueTests, 'movement')} ${t('due a retest')}`
+              : t('Measure a max, and program from a number instead of a guess')}
           </span>
         </span>
         <span className="faint">›</span>
@@ -154,12 +155,12 @@ export default function MoreView() {
 
       <Link to="/more/injuries" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">
-          <strong>Injuries</strong>
+          <strong>{t('Injuries')}</strong>
           <br />
           <span className="tiny faint">
             {currentInjuries.length > 0
-              ? `${currentInjuries.map((i) => i.label).join(', ')} — resting`
-              : 'Log something that hurts and the sessions that load it step aside'}
+              ? `${currentInjuries.map((i) => i.label).join(', ')} — ${t('resting')}`
+              : t('Log something that hurts and the sessions that load it step aside')}
           </span>
         </span>
         <span className="faint">›</span>
@@ -167,34 +168,33 @@ export default function MoreView() {
 
       <Link to="/more/body" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">
-          <strong>Bodyweight</strong>
+          <strong>{t('Bodyweight')}</strong>
           <br />
           <span className="tiny faint">
             {profile.bodyweightKg
-              ? `${Math.round(displayWeight(profile.bodyweightKg, profile.units))} ${weightLabel(profile.units)} · the load in every push-up`
-              : 'Not set — bodyweight sets count as no work without it'}
+              ? `${Math.round(displayWeight(profile.bodyweightKg, profile.units))} ${weightLabel(profile.units)} · ${t('the load in every push-up')}`
+              : t('Not set — bodyweight sets count as no work without it')}
           </span>
         </span>
         <span className="faint">›</span>
       </Link>
 
-      <div className="section-title">Your data</div>
+      <div className="section-title">{t('Your data')}</div>
       <div className="card">
         <p className="small muted">
-          Everything lives in this browser on this device. Nothing is uploaded, and no account
-          exists — which also means a cleared browser takes your history with it. Export
-          regularly and keep the file somewhere that syncs.
+          {/* One line on purpose: the copy checker reads `t('...')` as a whole call. */}
+          {t('Everything lives in this browser on this device. Nothing is uploaded, and no account exists — which also means a cleared browser takes your history with it. Export regularly and keep the file somewhere that syncs.')}
         </p>
         <div className="small mono faint" style={{ marginBottom: '0.75rem' }}>
-          {plural(counts?.sessions ?? 0, 'session')} · {counts?.planned ?? 0} planned ·{' '}
-          {plural(exercises.length, 'movement')}
+          {t.count(counts?.sessions ?? 0, 'session')} · {counts?.planned ?? 0} {t('planned')} ·{' '}
+          {t.count(exercises.length, 'movement')}
         </div>
 
         <button
           className="btn block"
-          onClick={async () => setStatus(`Saved ${await downloadBackup()}`)}
+          onClick={async () => setStatus(`${t('Saved')} ${await downloadBackup()}`)}
         >
-          Export backup
+          {t('Export backup')}
         </button>
 
         <input
@@ -213,34 +213,33 @@ export default function MoreView() {
           style={{ marginTop: '0.5rem' }}
           onClick={() => fileInput.current?.click()}
         >
-          Restore from backup
+          {t('Restore from backup')}
         </button>
 
         {status && <p className="small" style={{ marginTop: '0.75rem', marginBottom: 0 }}>{status}</p>}
       </div>
 
       <div className="card">
-        <h3 style={{ marginBottom: '0.4rem' }}>Start over</h3>
+        <h3 style={{ marginBottom: '0.4rem' }}>{t('Start over')}</h3>
         <p className="small muted">
-          Erases every session, plan, and setting on this device and reseeds the movement
-          library from scratch. Export a backup first if there is anything you want.
+          {t('Erases every session, plan, and setting on this device and reseeds the movement library from scratch. Export a backup first if there is anything you want.')}
         </p>
         <button
           className="btn ghost danger block"
           onClick={() => setErasing(true)}
         >
-          Erase all data
+          {t('Erase all data')}
         </button>
       </div>
 
       <p className="tiny faint" style={{ textAlign: 'center' }}>
-        Forge · offline training tracker
+        {t('Forge · offline training tracker')}
       </p>
 
       {pendingRestore && (
-        <Sheet title="Restore backup" onClose={() => setPendingRestore(null)}>
+        <Sheet title={t('Restore backup')} onClose={() => setPendingRestore(null)}>
           <p className="small muted">
-            Restoring <strong>{pendingRestore.name}</strong>. Merging keeps what is already on
+            {t('Restoring')} <strong>{pendingRestore.name}</strong>. Merging keeps what is already on
             this device and lets the newer copy of each record win — the right choice when you
             have trained since the export. Replacing wipes first, for moving to a new phone.
           </p>
@@ -253,7 +252,7 @@ export default function MoreView() {
                 await onFile(file, 'merge');
               }}
             >
-              Merge (recommended)
+              {t('Merge (recommended)')}
             </button>
             <button
               className="btn danger block"
@@ -263,7 +262,7 @@ export default function MoreView() {
                 await onFile(file, 'replace');
               }}
             >
-              Replace everything
+              {t('Replace everything')}
             </button>
           </div>
         </Sheet>
@@ -271,7 +270,7 @@ export default function MoreView() {
 
       {erasing && (
         <AskSheet
-          title="Erase all data"
+          title={t('Erase all data')}
           message="Every session, plan, and setting on this device is deleted. There is no undo without a backup file."
           input={{ label: 'Type ERASE to confirm', placeholder: 'ERASE', mustEqual: 'ERASE' }}
           confirmLabel="Erase everything"

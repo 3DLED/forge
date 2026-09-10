@@ -15,6 +15,7 @@ import { plural } from '../../ui/text';
 import { applyReshuffle } from '../../data/plans';
 import { formatDayLabel, weekdayName, weekdayOf } from '../../domain/dates';
 import type { ReshufflePlan } from '../../domain/reshuffle';
+import { useT } from '../../i18n/useT';
 
 /** "Wed 7 → Thu 8" — the weekday is the part you actually think in. */
 function dayLabel(date: string): string {
@@ -30,11 +31,12 @@ export default function ReshuffleSheet({
   onClose: () => void;
   onApplied: (result: { moved: number; dropped: number }) => void;
 }) {
+  const t = useT();
   const [saving, setSaving] = useState(false);
 
   return (
     <Sheet
-      title="Fit the plan to your week"
+      title={t('Fit the plan to your week')}
       onClose={onClose}
       footer={
         <div className="stack">
@@ -49,14 +51,13 @@ export default function ReshuffleSheet({
             {saving ? 'Moving…' : 'Move them'}
           </button>
           <button className="btn block" onClick={onClose} disabled={saving}>
-            Leave the plan alone
+            {t('Leave the plan alone')}
           </button>
         </div>
       }
     >
       <p className="small muted">
-        Your availability no longer matches where these sessions sit. Completed and skipped
-        sessions are never touched, and nothing before today moves.
+        {t('Your availability no longer matches where these sessions sit. Completed and skipped sessions are never touched, and nothing before today moves.')}
       </p>
 
       {plan.moves.length > 0 && (
@@ -91,8 +92,7 @@ export default function ReshuffleSheet({
             </div>
           ))}
           <p className="tiny faint">
-            Dropped sessions are removed from the plan, not from your history. Your adherence
-            is measured against what remains.
+            {t('Dropped sessions are removed from the plan, not from your history. Your adherence is measured against what remains.')}
           </p>
         </>
       )}

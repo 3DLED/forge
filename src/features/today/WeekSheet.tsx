@@ -19,8 +19,10 @@ import { plannedBetween, sessionsBetween, startFromPlanned } from '../../data/se
 import { monthName, todayKey, weekdayName, weekdayOf } from '../../domain/dates';
 import { sessionLoad } from '../../domain/training';
 import type { DayKey } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export default function WeekSheet({ days, onClose }: { days: DayKey[]; onClose: () => void }) {
+  const t = useT();
   const navigate = useNavigate();
   const today = todayKey();
 
@@ -60,7 +62,7 @@ export default function WeekSheet({ days, onClose }: { days: DayKey[]; onClose: 
               >
                 {weekdayName(weekdayOf(day))} {Number(day.slice(8))}
               </span>
-              {isToday && <span className="pill accent">Today</span>}
+              {isToday && <span className="pill accent">{t('Today')}</span>}
             </div>
 
             {dayLogged.map((session) => (
@@ -71,7 +73,7 @@ export default function WeekSheet({ days, onClose }: { days: DayKey[]; onClose: 
               <div className="card tight" key={entry.id}>
                 <div className="row between">
                   <span className="grow truncate">{entry.prescription.name}</span>
-                  <span className="pill">Planned</span>
+                  <span className="pill">{t('Planned')}</span>
                 </div>
                 {/*
                   Only forward. Starting Tuesday's session on Thursday files the work under the
@@ -87,7 +89,7 @@ export default function WeekSheet({ days, onClose }: { days: DayKey[]; onClose: 
                       navigate(`/log/${session.id}`);
                     }}
                   >
-                    Start
+                    {t('Start')}
                   </button>
                 )}
               </div>

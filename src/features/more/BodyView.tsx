@@ -17,8 +17,10 @@ import { bodyweightEntries, deleteBodyweight, logBodyweight } from '../../data/b
 import { formatDayLabel, todayKey } from '../../domain/dates';
 import { displayWeight, inputWeightToKg, weightLabel } from '../../domain/units';
 import type { Id } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export default function BodyView() {
+  const t = useT();
   const { profile, units } = useApp();
   const entries = useLiveQuery(() => bodyweightEntries(), [], undefined);
 
@@ -56,17 +58,15 @@ export default function BodyView() {
   return (
     <>
       <PageHeader
-        title="Bodyweight"
-        action={<Link to="/more" className="btn ghost sm">Back</Link>}
+        title={t('Bodyweight')}
+        action={<Link to="/more" className="btn ghost sm">{t('Back')}</Link>}
       />
 
       <p className="small muted">
-        This is the load in every push-up, pull-up and lunge you do. Without it those sets show
-        as no work at all on your volume chart. Sessions are valued at what you weighed that
-        week, so logging it today does not rewrite last spring.
+        {t('This is the load in every push-up, pull-up and lunge you do. Without it those sets show as no work at all on your volume chart. Sessions are valued at what you weighed that week, so logging it today does not rewrite last spring.')}
       </p>
 
-      <div className="section-title">Log today</div>
+      <div className="section-title">{t('Log today')}</div>
       <div className="row" style={{ gap: '0.5rem' }}>
         <input
           type="text"
@@ -84,14 +84,13 @@ export default function BodyView() {
 
       {latest && (
         <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
-          Last logged {formatDayLabel(latest.date).toLowerCase()} at{' '}
-          {Math.round(displayWeight(latest.value, units))} {weightLabel(units)}.
+          Last logged {formatDayLabel(latest.date).toLowerCase()} at{' '} {Math.round(displayWeight(latest.value, units))} {weightLabel(units)}.
         </p>
       )}
 
       {scaled.length > 1 && (
         <>
-          <div className="section-title">Trend</div>
+          <div className="section-title">{t('Trend')}</div>
           <BarChart
             bars={scaled}
             formatValue={(v) => `${Math.round(v + floor)} ${weightLabel(units)}`}
@@ -101,7 +100,7 @@ export default function BodyView() {
 
       {entries && entries.length > 0 && (
         <>
-          <div className="section-title">History</div>
+          <div className="section-title">{t('History')}</div>
           {[...entries].reverse().slice(0, 40).map((entry) => (
             <div className="suggest-row" key={entry.id}>
               <span className="grow">
@@ -120,14 +119,14 @@ export default function BodyView() {
       {entries?.length === 0 && (
         <div className="empty">
           <span className="glyph">⚖️</span>
-          <p className="small">No weigh-ins yet.</p>
-          <p className="tiny faint">Once a week is plenty. Daily readings mostly measure lunch.</p>
+          <p className="small">{t('No weigh-ins yet.')}</p>
+          <p className="tiny faint">{t('Once a week is plenty. Daily readings mostly measure lunch.')}</p>
         </div>
       )}
 
       {deleting && (
         <AskSheet
-          title="Delete this weigh-in?"
+          title={t('Delete this weigh-in?')}
           message="Volume for any session valued against it will be recalculated."
           confirmLabel="Delete"
           danger

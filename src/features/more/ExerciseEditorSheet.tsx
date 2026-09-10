@@ -19,6 +19,7 @@ import { CATEGORY_LABELS, categoryOf } from '../../domain/categories';
 import { BAND_LABELS, bandOf } from '../../domain/difficulty';
 import { REGION_LABELS, regionOf } from '../../domain/regions';
 import { ulid } from '../../domain/ids';
+import { useT } from '../../i18n/useT';
 import type {
   EquipmentTag,
   Exercise,
@@ -77,6 +78,7 @@ export default function ExerciseEditorSheet({
   onClose: () => void;
   onSaved: (exercise: Exercise) => void;
 }) {
+  const t = useT();
   const [name, setName] = useState(existing?.name ?? '');
   const [equipment, setEquipment] = useState<EquipmentTag[]>(
     existing?.equipment ?? ['bodyweight'],
@@ -159,15 +161,15 @@ export default function ExerciseEditorSheet({
         </button>
       }
     >
-      <div className="section-title">Name</div>
+      <div className="section-title">{t('Name')}</div>
       <input
         value={name}
-        placeholder="Bulgarian bag spin"
-        aria-label="Movement name"
+        placeholder={t('Bulgarian bag spin')}
+        aria-label={t('Movement name')}
         onChange={(event) => setName(event.target.value)}
       />
 
-      <div className="section-title">What it needs</div>
+      <div className="section-title">{t('What it needs')}</div>
       <div className="row wrap" style={{ gap: '0.4rem' }}>
         {EQUIPMENT.map(({ tag, label }) => (
           <button
@@ -184,7 +186,7 @@ export default function ExerciseEditorSheet({
       {customEquipment.length > 0 && (
         <>
           <div className="tiny faint" style={{ margin: '0.5rem 0 0.35rem' }}>
-            Yours
+            {t('Yours')}
           </div>
           <div className="row wrap" style={{ gap: '0.4rem' }}>
             {customEquipment.map((item) => (
@@ -201,10 +203,10 @@ export default function ExerciseEditorSheet({
         </>
       )}
       <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
-        Everything selected has to be in an equipment profile for this to be offered there.
+        {t('Everything selected has to be in an equipment profile for this to be offered there.')}
       </p>
 
-      <div className="section-title">How it moves</div>
+      <div className="section-title">{t('How it moves')}</div>
       <div className="row wrap" style={{ gap: '0.4rem' }}>
         {PATTERNS.map(({ pattern: option, label }) => (
           <button
@@ -217,7 +219,7 @@ export default function ExerciseEditorSheet({
         ))}
       </div>
 
-      <div className="section-title">What it records</div>
+      <div className="section-title">{t('What it records')}</div>
       <div className="row wrap" style={{ gap: '0.4rem' }}>
         {MEASURES.map(({ metrics: option, label }) => (
           <button
@@ -234,7 +236,7 @@ export default function ExerciseEditorSheet({
         boxes appear when you log it, and which kind of test it takes.
       </p>
 
-      <div className="section-title">How hard</div>
+      <div className="section-title">{t('How hard')}</div>
       <div className="row wrap" style={{ gap: '0.4rem' }}>
         {[1, 2, 3, 4, 5].map((option) => (
           <button
@@ -253,47 +255,46 @@ export default function ExerciseEditorSheet({
 
       <div className="card tight" style={{ marginTop: '0.75rem' }}>
         <div className="small">
-          Files as <strong>{CATEGORY_LABELS[categoryOf(preview)]}</strong> ·{' '}
+          {t('Files as')} <strong>{CATEGORY_LABELS[categoryOf(preview)]}</strong> ·{' '}
           <strong>{REGION_LABELS[regionOf(preview)]}</strong>
         </div>
         <div className="tiny faint" style={{ marginTop: '0.2rem' }}>
-          Worked out from the kit and the pattern, so filtering, suggestions and the injury log
-          all understand it without being told separately.
+          {t('Worked out from the kit and the pattern, so filtering, suggestions and the injury log all understand it without being told separately.')}
         </div>
       </div>
 
-      <div className="section-title">What it trains</div>
+      <div className="section-title">{t('What it trains')}</div>
       <input
         value={muscles}
-        placeholder="shoulders, core"
-        aria-label="Muscles trained"
+        placeholder={t('shoulders, core')}
+        aria-label={t('Muscles trained')}
         onChange={(event) => setMuscles(event.target.value)}
       />
 
-      <div className="section-title">Set up</div>
+      <div className="section-title">{t('Set up')}</div>
       <textarea
         rows={2}
         value={setup}
-        placeholder="Where you and the kit start. Optional."
-        aria-label="Set up"
+        placeholder={t('Where you and the kit start. Optional.')}
+        aria-label={t('Set up')}
         onChange={(event) => setSetup(event.target.value)}
       />
 
-      <div className="section-title">How to do it</div>
+      <div className="section-title">{t('How to do it')}</div>
       <textarea
         rows={3}
         value={cues}
         placeholder={'One cue per line, in the order they happen.'}
-        aria-label="How to do it"
+        aria-label={t('How to do it')}
         onChange={(event) => setCues(event.target.value)}
       />
 
-      <div className="section-title">Watch for</div>
+      <div className="section-title">{t('Watch for')}</div>
       <textarea
         rows={2}
         value={fault}
-        placeholder="The one thing that usually goes wrong. Optional."
-        aria-label="Watch for"
+        placeholder={t('The one thing that usually goes wrong. Optional.')}
+        aria-label={t('Watch for')}
         onChange={(event) => setFault(event.target.value)}
       />
     </Sheet>

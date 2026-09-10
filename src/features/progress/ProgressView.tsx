@@ -19,10 +19,12 @@ import {
   sessionVolumeKg,
 } from '../../domain/training';
 import { formatDistance, formatWeight } from '../../domain/units';
+import { useT } from '../../i18n/useT';
 
 const WEEKS_SHOWN = 12;
 
 export default function ProgressView() {
+  const t = useT();
   const { profile, units, exerciseBySlug } = useApp();
   /** The movement whose record is open, by slug. */
   const [openPr, setOpenPr] = useState<string | null>(null);
@@ -100,17 +102,17 @@ export default function ProgressView() {
   );
   const ratio = acuteChronicRatio(weeks.map((w) => w.load));
 
-  if (!sessions || !allSessions) return <p className="muted">Loading…</p>;
+  if (!sessions || !allSessions) return <p className="muted">{t('Loading…')}</p>;
 
   if (allSessions.length === 0) {
     return (
       <>
-        <PageHeader title="Progress" />
+        <PageHeader title={t('Progress')} />
         <div className="empty">
           <span className="glyph">📈</span>
-          <p>Nothing to chart yet.</p>
+          <p>{t('Nothing to chart yet.')}</p>
           <p className="small faint">
-            Log a few sessions and this fills in — load, mileage, volume, and every personal best.
+            {t('Log a few sessions and this fills in — load, mileage, volume, and every personal best.')}
           </p>
         </div>
       </>
@@ -134,11 +136,11 @@ export default function ProgressView() {
 
   return (
     <>
-      <PageHeader title="Progress" subtitle={`Last ${WEEKS_SHOWN} weeks`} />
+      <PageHeader title={t('Progress')} subtitle={`Last ${WEEKS_SHOWN} weeks`} />
 
       <section className="card">
         <div className="card-head">
-          <h2>Training load</h2>
+          <h2>{t('Training load')}</h2>
           {ratio != null && (
             <span className={`pill ${ratio > 1.5 ? 'warn' : ratio < 0.8 ? '' : 'good'}`}>
               {ratio.toFixed(2)}× 4-wk avg
@@ -147,15 +149,14 @@ export default function ProgressView() {
         </div>
         <BarChart bars={loadBars} />
         <p className="tiny faint" style={{ marginTop: '0.5rem', marginBottom: 0 }}>
-          Effort × minutes, so running and lifting add into one number. Ramping past
-          about 1.5× your four-week average is where injuries cluster.
+          {t('Effort × minutes, so running and lifting add into one number. Ramping past about 1.5× your four-week average is where injuries cluster.')}
         </p>
       </section>
 
       {hasDistance && (
         <section className="card">
           <div className="card-head">
-            <h2>Weekly distance</h2>
+            <h2>{t('Weekly distance')}</h2>
             <span className="pill mono">{formatDistance(weeks.at(-1)!.distanceM, units)}</span>
           </div>
           <BarChart bars={distanceBars} formatValue={(v) => formatDistance(v, units)} />
@@ -165,7 +166,7 @@ export default function ProgressView() {
       {hasVolume && (
         <section className="card">
           <div className="card-head">
-            <h2>Weekly volume</h2>
+            <h2>{t('Weekly volume')}</h2>
             <span className="pill mono">{formatWeight(weeks.at(-1)!.volumeKg, units)}</span>
           </div>
           <BarChart
@@ -181,13 +182,13 @@ export default function ProgressView() {
 
       {!bodyweight.latest && (
         <p className="tiny faint">
-          <Link to="/more/body">Log your bodyweight</Link> and push-ups, pull-ups and lunges
+          <Link to="/more/body">{t('Log your bodyweight')}</Link> and push-ups, pull-ups and lunges
           start counting toward volume instead of reading as no work.
         </p>
       )}
 
-      <div className="section-title">Personal bests</div>
-      {ranked.length === 0 && <p className="small muted">Complete some sets and PRs land here.</p>}
+      <div className="section-title">{t('Personal bests')}</div>
+      {ranked.length === 0 && <p className="small muted">{t('Complete some sets and PRs land here.')}</p>}
 
       {/*
         One mark per movement, so the list can be scanned. Everything a record holds — the

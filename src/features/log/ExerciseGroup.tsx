@@ -13,6 +13,7 @@ import { useApp } from '../../ui/AppProvider';
 import { formatDayLabel } from '../../domain/dates';
 import { formatDistance, formatDuration, formatWeight } from '../../domain/units';
 import type { Exercise, LoggedSet, MetricKey, UnitSystem } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export interface PreviousPerformance {
   session: { date: string };
@@ -85,6 +86,7 @@ export default function ExerciseGroup({
   progression?: { direction: 'up' | 'down'; label: string } | null;
   onUseProgression?: () => void;
 }) {
+  const t = useT();
   /*
    * Effort is recorded once for the whole session unless asked for per set.
    *
@@ -152,8 +154,7 @@ export default function ExerciseGroup({
           </h3>
           {previous && (
             <div className="tiny faint">
-              Last {formatDayLabel(previous.session.date).toLowerCase()}:{' '}
-              {summariseSets(previous.sets, metrics, units)}
+              Last {formatDayLabel(previous.session.date).toLowerCase()}:{' '} {summariseSets(previous.sets, metrics, units)}
             </div>
           )}
           {/*
@@ -192,7 +193,7 @@ export default function ExerciseGroup({
               aria-label={`Swap ${exercise?.name ?? slug} for another version`}
               onClick={() => onSwapExercise(slug)}
             >
-              Swap
+              {t('Swap')}
             </button>
             <button
               className="btn ghost sm"
@@ -249,7 +250,7 @@ export default function ExerciseGroup({
               <button
                 className="set-check hold-start"
                 onClick={() => onStartHold!(set.id)}
-                title="Time this hold"
+                title={t('Time this hold')}
                 aria-label={`Time this hold of ${exercise?.name ?? slug}`}
               >
                 ▶
@@ -321,7 +322,7 @@ export default function ExerciseGroup({
             ▶ Track this run
           </button>
           {onRunSettings && (
-            <button className="btn sm" onClick={onRunSettings} aria-label="Run alerts">
+            <button className="btn sm" onClick={onRunSettings} aria-label={t('Run alerts')}>
               ⚙
             </button>
           )}

@@ -22,6 +22,7 @@ import { plural } from '../../ui/text';
 import { CONTAINER_SLUGS } from '../../domain/training';
 import type { Exercise } from '../../domain/types';
 import type { ExerciseCategory } from '../../domain/categories';
+import { useT } from '../../i18n/useT';
 
 const PATTERN_LABELS: Record<string, string> = {
   squat: 'Squat',
@@ -56,6 +57,7 @@ export default function ExercisePicker({
   /** Session-specific equipment, when it differs from the profile default. */
   available?: Set<string>;
 }) {
+  const t = useT();
   const app = useApp();
   const available = availableOverride ?? app.available;
   const { exercises, exerciseBySlug } = app;
@@ -120,7 +122,7 @@ export default function ExercisePicker({
             {!usable && !swapName && ' · no equipment for this'}
           </span>
         </span>
-        {usable ? <span className="pill accent">Add</span> : <span className="pill">Add anyway</span>}
+        {usable ? <span className="pill accent">{t('Add')}</span> : <span className="pill">{t('Add anyway')}</span>}
       </button>
     );
   };
@@ -129,10 +131,10 @@ export default function ExercisePicker({
   const searching = query.trim().length > 0;
 
   return (
-    <Sheet title="Add exercise" onClose={onClose}>
+    <Sheet title={t('Add exercise')} onClose={onClose}>
       <input
         type="search"
-        placeholder="Search movements, muscles, patterns…"
+        placeholder={t('Search movements, muscles, patterns…')}
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         autoFocus
@@ -167,7 +169,7 @@ export default function ExercisePicker({
           className={`chip${category === 'all' ? ' on' : ''}`}
           onClick={() => setCategory('all')}
         >
-          All
+          {t('All')}
         </button>
         {CATEGORY_ORDER.map((value) => (
           <button
@@ -208,7 +210,7 @@ export default function ExercisePicker({
         <>
           {used.length > 0 && (
             <>
-              <div className="section-title">You train these</div>
+              <div className="section-title">{t('You train these')}</div>
               {used.map(renderRow)}
             </>
           )}
@@ -235,7 +237,7 @@ export default function ExercisePicker({
 
           {common.length > 0 && category !== 'all' && (
             <>
-              <div className="section-title">Common</div>
+              <div className="section-title">{t('Common')}</div>
               {common.map(renderRow)}
             </>
           )}
@@ -248,7 +250,7 @@ export default function ExercisePicker({
           */}
           {rest.length > 0 && (
             <>
-              <div className="section-title">Everything else</div>
+              <div className="section-title">{t('Everything else')}</div>
               {rest.slice(0, BROWSE_LIMIT).map(renderRow)}
               {rest.length > BROWSE_LIMIT && (
                 <p className="tiny faint" style={{ padding: '0.6rem 0.2rem' }}>

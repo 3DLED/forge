@@ -31,6 +31,7 @@ import { loadsForExercise, nextLoadAbove } from '../../domain/equipment';
 import { displayWeight, formatWeight, inputWeightToKg, weightLabel } from '../../domain/units';
 import { formatDayLabel, todayKey } from '../../domain/dates';
 import type { Exercise } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export default function TestRunner({
   exercise,
@@ -44,6 +45,7 @@ export default function TestRunner({
   onClose: () => void;
   onRecorded: (result: TestResult) => void;
 }) {
+  const t = useT();
   const { units, activeEquipment } = useApp();
   const today = todayKey();
   const kind: TestKind = testKindFor(exercise);
@@ -142,13 +144,9 @@ export default function TestRunner({
       {/* Reported, never enforced: a redo after a bad attempt is legitimate. */}
       {timing.state === 'tooSoon' && (
         <div className="card tight" style={{ borderColor: 'var(--warn)' }}>
-          <span className="pill warn">Recently tested</span>
+          <span className="pill warn">{t('Recently tested')}</span>
           <p className="small" style={{ margin: '0.5rem 0 0' }}>
-            You tested this{' '}
-            {timing.daysSince === 0 ? 'today' : `${plural(timing.daysSince, 'day')} ago`}. Inside a
-            week the number reads fatigue as much as strength —{' '}
-            {plural(timing.waitDays, 'more day')} would make it comparable. You can go ahead
-            anyway.
+            You tested this{' '} {timing.daysSince === 0 ? 'today' : `${plural(timing.daysSince, 'day')} ago`}. Inside a week the number reads fatigue as much as strength —{' '} {plural(timing.waitDays, 'more day')} would make it comparable. You can go ahead anyway.
           </p>
         </div>
       )}
@@ -169,7 +167,7 @@ export default function TestRunner({
       {/* A 3RM cannot lay out loads until it knows roughly where you are. */}
       {!started && (
         <>
-          <div className="section-title">What can you do for three?</div>
+          <div className="section-title">{t('What can you do for three?')}</div>
           <div className="row">
             <input
               type="number"
@@ -185,9 +183,7 @@ export default function TestRunner({
             <span className="muted small">{weightLabel(units)}</span>
           </div>
           <p className="tiny faint">
-            A rough guess is fine. Everything is worked out from it, and a wrong one costs an
-            extra attempt rather than the result — what gets recorded is the heaviest set you
-            actually finish.
+            {t('A rough guess is fine. Everything is worked out from it, and a wrong one costs an extra attempt rather than the result — what gets recorded is the heaviest set you actually finish.')}
           </p>
           <button
             className="btn primary block"
@@ -195,7 +191,7 @@ export default function TestRunner({
             disabled={!estimateKg || estimateKg <= 0}
             onClick={() => setStarted(true)}
           >
-            Lay out the test
+            {t('Lay out the test')}
           </button>
         </>
       )}
@@ -203,7 +199,7 @@ export default function TestRunner({
       {started && !done && step && (
         <>
           <div className="section-title">
-            {step.label}
+            {t(step.label)}
             {step.role === 'attempt' && bestKg != null && ` · best so far ${formatWeight(bestKg, units)}`}
           </div>
 
@@ -242,7 +238,7 @@ export default function TestRunner({
                     inputMode="decimal"
                     value={loadDraft}
                     autoFocus
-                    aria-label={`Load for ${step.label} in ${weightLabel(units)}`}
+                    aria-label={`Load for ${t(step.label)} in ${weightLabel(units)}`}
                     onChange={(event) => setLoadDraft(event.target.value)}
                     style={{ maxWidth: '7rem' }}
                   />
@@ -258,10 +254,10 @@ export default function TestRunner({
                       setEditingLoad(false);
                     }}
                   >
-                    Use it
+                    {t('Use it')}
                   </button>
                   <button className="btn sm ghost" onClick={() => setEditingLoad(false)}>
-                    Cancel
+                    {t('Cancel')}
                   </button>
                 </div>
               ) : (
@@ -273,7 +269,7 @@ export default function TestRunner({
                     setEditingLoad(true);
                   }}
                 >
-                  Use a different weight
+                  {t('Use a different weight')}
                 </button>
               )
             )}
@@ -291,13 +287,13 @@ export default function TestRunner({
           {/* An open set — the count or the clock is the result. */}
           {step.role === 'attempt' && kind === 'reps' && (
             <>
-              <div className="section-title">How many did you get?</div>
+              <div className="section-title">{t('How many did you get?')}</div>
               <div className="row">
                 <input
                   type="number"
                   inputMode="numeric"
                   value={openResult}
-                  aria-label="Reps completed"
+                  aria-label={t('Reps completed')}
                   onChange={(event) => setOpenResult(event.target.value)}
                   style={{ maxWidth: '8rem' }}
                 />
@@ -309,7 +305,7 @@ export default function TestRunner({
                 disabled={saving || resting != null || !Number(openResult)}
                 onClick={() => void finish(Number(openResult))}
               >
-                Record it
+                {t('Record it')}
               </button>
             </>
           )}
@@ -335,10 +331,10 @@ export default function TestRunner({
                 disabled={resting != null}
                 onClick={attemptGood}
               >
-                Made it — three good reps
+                {t('Made it — three good reps')}
               </button>
               <button className="btn block" disabled={resting != null} onClick={attemptFailed}>
-                Failed it — stop the test
+                {t('Failed it — stop the test')}
               </button>
             </div>
           )}
@@ -366,13 +362,12 @@ export default function TestRunner({
             <>
               <strong>{formatWeight(bestKg, units)} for three</strong>
               <p className="tiny faint" style={{ margin: '0.3rem 0 0' }}>
-                About {formatWeight(oneRepMaxFromThree(bestKg), units)} for one, by Epley. Stored
-                as it stands today, so improving the formula later cannot rewrite this.
+                About {formatWeight(oneRepMaxFromThree(bestKg), units)} for one, by Epley. Stored as it stands today, so improving the formula later cannot rewrite this.
               </p>
             </>
           ) : (
             <span className="small muted">
-              No attempt was completed, so there is nothing to record. Nothing is saved.
+              {t('No attempt was completed, so there is nothing to record. Nothing is saved.')}
             </span>
           )}
         </div>

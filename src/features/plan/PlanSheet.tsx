@@ -21,6 +21,7 @@ import { endPlan, planProgress } from '../../data/plans';
 import { buildPlanFile, downloadShareFile } from '../../data/share';
 import { daysBetween, formatDayLabel, todayKey } from '../../domain/dates';
 import type { Plan } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export default function PlanSheet({
   plan,
@@ -38,6 +39,7 @@ export default function PlanSheet({
    */
   onEnded: (message: string) => void;
 }) {
+  const t = useT();
   const progress = useLiveQuery(() => planProgress(plan.id), [plan.id]);
   const [ending, setEnding] = useState(false);
   const [shared, setShared] = useState<string | null>(null);
@@ -84,15 +86,15 @@ export default function PlanSheet({
           {(progress?.remaining ?? 0) > 0 && ` · ${progress?.remaining} to go`}
         </div>
 
-        <div className="section-title">Dates</div>
+        <div className="section-title">{t('Dates')}</div>
         <div className="card tight">
           <div className="row between">
-            <span className="grow small">Started</span>
+            <span className="grow small">{t('Started')}</span>
             <span className="tiny faint">{formatDayLabel(plan.startDate)}</span>
           </div>
           {plan.endDate && (
             <div className="row between" style={{ marginTop: '0.2rem' }}>
-              <span className="grow small">Ends</span>
+              <span className="grow small">{t('Ends')}</span>
               <span className="tiny faint">
                 {formatDayLabel(plan.endDate)}
                 {daysBetween(today, plan.endDate) > 0 &&
@@ -102,7 +104,7 @@ export default function PlanSheet({
           )}
           {plan.goal.eventDate && (
             <div className="row between" style={{ marginTop: '0.2rem' }}>
-              <span className="grow small">Race day</span>
+              <span className="grow small">{t('Race day')}</span>
               <span className="tiny faint">
                 {formatDayLabel(plan.goal.eventDate)} ·{' '}
                 {plural(daysBetween(today, plan.goal.eventDate), 'day')} away
@@ -113,7 +115,7 @@ export default function PlanSheet({
 
         {progress?.adherence != null && (
           <>
-            <div className="section-title">Keeping up</div>
+            <div className="section-title">{t('Keeping up')}</div>
             <div className="card tight">
               <div className="row between">
                 <span className="grow small">
@@ -128,8 +130,7 @@ export default function PlanSheet({
                 </span>
               </div>
               <div className="tiny faint" style={{ marginTop: '0.25rem' }}>
-                A different question to the one above — you can be part-way through a plan
-                and have missed most of what it asked for.
+                {t('A different question to the one above — you can be part-way through a plan and have missed most of what it asked for.')}
               </div>
             </div>
           </>
@@ -161,7 +162,7 @@ export default function PlanSheet({
           style={{ marginTop: '0.6rem' }}
           onClick={() => setEnding(true)}
         >
-          End this plan
+          {t('End this plan')}
         </button>
       </Sheet>
 

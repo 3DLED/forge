@@ -35,6 +35,7 @@ import {
 import type { PrimaryGoal } from '../../domain/goals';
 import type { SuggestSpec } from '../../domain/types';
 import type { Exercise, SessionTemplate } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 const MINUTE_OPTIONS = [20, 30, 45, 60];
 
@@ -66,6 +67,7 @@ export default function SuggestWorkoutSheet({
   onUseSaved: (template: SessionTemplate) => void | Promise<void>;
   onClose: () => void;
 }) {
+  const t = useT();
   const { exercises, profile } = useApp();
   const usage = useLiveQuery(() => exerciseUsage(), [], undefined);
 
@@ -149,7 +151,7 @@ export default function SuggestWorkoutSheet({
 
   return (
     <Sheet
-      title="Suggest a workout"
+      title={t('Suggest a workout')}
       onClose={onClose}
       footer={
         <>
@@ -184,7 +186,7 @@ export default function SuggestWorkoutSheet({
       {/* A session you already decided was good beats one generated fresh, so it goes first. */}
       {(saved?.length ?? 0) > 0 && (
         <>
-          <div className="section-title">Your saved sessions</div>
+          <div className="section-title">{t('Your saved sessions')}</div>
           {saved!.map((template) => (
             <SavedWorkoutRow
               key={template.id}
@@ -196,11 +198,11 @@ export default function SuggestWorkoutSheet({
               onUse={() => onUseSaved(template)}
             />
           ))}
-          <div className="section-title">Or build a new one</div>
+          <div className="section-title">{t('Or build a new one')}</div>
         </>
       )}
 
-      <div className="section-title">Train</div>
+      <div className="section-title">{t('Train')}</div>
       {/* Wrapped for the same reason as the goals: "Full body" was off the right edge. */}
       <div className="row wrap" style={{ gap: '0.4rem' }}>
         {BUILDABLE_REGIONS.map((region) => (
@@ -216,7 +218,7 @@ export default function SuggestWorkoutSheet({
           className={`chip${allSelected ? ' on' : ''}`}
           onClick={() => setRegions(allSelected ? ['upper'] : [...BUILDABLE_REGIONS])}
         >
-          Full body
+          {t('Full body')}
         </button>
       </div>
 
@@ -228,7 +230,7 @@ export default function SuggestWorkoutSheet({
         Wrapped rather than scrolled — a row you have to drag sideways hides the two options
         at the end, which happened to be the two that were missing here in the first place.
       */}
-      <div className="section-title">Goal</div>
+      <div className="section-title">{t('Goal')}</div>
       <div className="row wrap" style={{ gap: '0.4rem' }}>
         {PRIMARY_GOAL_ORDER.map((option) => (
           <button
@@ -254,7 +256,7 @@ export default function SuggestWorkoutSheet({
         </p>
       )}
 
-      <div className="section-title">Time</div>
+      <div className="section-title">{t('Time')}</div>
       <div className="chip-row">
         {MINUTE_OPTIONS.map((option) => (
           <button
@@ -274,8 +276,8 @@ export default function SuggestWorkoutSheet({
       {items.length === 0 && (
         <div className="empty">
           <span className="glyph">🤷</span>
-          <p className="small">Nothing available for that combination.</p>
-          <p className="tiny faint">Try another region, or add equipment for this session.</p>
+          <p className="small">{t('Nothing available for that combination.')}</p>
+          <p className="tiny faint">{t('Try another region, or add equipment for this session.')}</p>
         </div>
       )}
 
@@ -290,14 +292,14 @@ export default function SuggestWorkoutSheet({
           </span>
           <button
             className="btn ghost sm"
-            title="Swap for an easier or harder version"
+            title={t('Swap for an easier or harder version')}
             onClick={() => setSwapping(item.pattern)}
           >
-            Swap
+            {t('Swap')}
           </button>
           <button
             className="btn ghost sm danger"
-            title="Drop this movement"
+            title={t('Drop this movement')}
             onClick={() => setDropped((current) => [...current, item.pattern])}
           >
             ✕

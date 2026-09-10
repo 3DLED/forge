@@ -15,6 +15,8 @@
 import { SPLIT_INTERVALS, type SplitUnit } from './pace';
 import type { RunKind, RunShape } from './runPlan';
 import type { UnitSystem } from './types';
+import { translate } from '../i18n/copy';
+import type { Language } from './types';
 
 export interface RunSettings {
   /**
@@ -104,12 +106,15 @@ export function alertsArmed(settings: RunSettings, segmentHasTarget = false): bo
 }
 
 /** One line for the row that opens this screen: "Every mile · pace alerts on". */
-export function describeRunSettings(settings: RunSettings): string {
-  if (!settings.voice) return 'Silent';
+export function describeRunSettings(settings: RunSettings, lang?: Language): string {
+  const say = (english: string) => translate(english, lang);
+  if (!settings.voice) return say('Silent');
 
   const parts: string[] = [];
-  if (settings.splits) parts.push(SPLIT_INTERVALS[settings.splitUnit].label);
-  if (alertsArmed(settings)) parts.push('pace alerts');
-  if (parts.length === 0) return 'Nothing spoken';
+  // The interval labels are English in the constant and translated here, so the data stays a
+  // stable key and the words stay in one file with the rest of the copy.
+  if (settings.splits) parts.push(say(SPLIT_INTERVALS[settings.splitUnit].label));
+  if (alertsArmed(settings)) parts.push(say('pace alerts'));
+  if (parts.length === 0) return say('Nothing spoken');
   return parts.join(' · ');
 }

@@ -15,6 +15,7 @@ import TestsView from './features/more/TestsView';
 import ExerciseLibraryView from './features/more/ExerciseLibraryView';
 import PlansView from './features/more/PlansView';
 import SavedWorkoutsView from './features/more/SavedWorkoutsView';
+import { useT } from './i18n/useT';
 
 const TABS = [
   { to: '/today', glyph: '🔥', label: 'Today' },
@@ -25,6 +26,7 @@ const TABS = [
 ];
 
 export default function App() {
+  const t = useT();
   return (
     <div className="app">
       <main className="app-main">
@@ -58,7 +60,7 @@ export default function App() {
             className={({ isActive }) => (isActive ? 'active' : undefined)}
           >
             <span className="glyph">{tab.glyph}</span>
-            {tab.label}
+            {t(tab.label)}
           </NavLink>
         ))}
       </nav>

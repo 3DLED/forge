@@ -20,6 +20,7 @@ import { addBlackout } from '../../data/plans';
 import { plannedBetween } from '../../data/sessions';
 import { daysBetween, formatDayLabel } from '../../domain/dates';
 import type { DayKey } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export default function BlockOutSheet({
   from,
@@ -31,6 +32,7 @@ export default function BlockOutSheet({
   onClose: () => void;
   onBlocked: () => void;
 }) {
+  const t = useT();
   const [until, setUntil] = useState<DayKey>(from);
   const [reason, setReason] = useState('');
   const [saving, setSaving] = useState(false);
@@ -61,20 +63,20 @@ export default function BlockOutSheet({
       }
     >
       <p className="small muted">
-        Nothing new gets scheduled in a blocked stretch, and applying a plan routes around it.
+        {t('Nothing new gets scheduled in a blocked stretch, and applying a plan routes around it.')}
       </p>
 
-      <div className="section-title">From</div>
+      <div className="section-title">{t('From')}</div>
       <div className="card tight">
         <span className="small">{formatDayLabel(from)}</span>
       </div>
 
-      <div className="section-title">Until</div>
+      <div className="section-title">{t('Until')}</div>
       <input
         type="date"
         value={until}
         min={from}
-        aria-label="Last day to block"
+        aria-label={t('Last day to block')}
         onChange={(event) => setUntil(event.target.value as DayKey)}
       />
       <p className="tiny faint">
@@ -83,11 +85,11 @@ export default function BlockOutSheet({
           : `${formatDayLabel(from)} to ${formatDayLabel(end)}, inclusive.`}
       </p>
 
-      <div className="section-title">Reason</div>
+      <div className="section-title">{t('Reason')}</div>
       <input
         value={reason}
-        placeholder="Travel, rest, work…"
-        aria-label="Reason (optional)"
+        placeholder={t('Travel, rest, work…')}
+        aria-label={t('Reason (optional)')}
         onChange={(event) => setReason(event.target.value)}
       />
 
@@ -97,9 +99,7 @@ export default function BlockOutSheet({
             {plural(affected.length, 'session')} already planned in here
           </strong>
           <div className="tiny faint" style={{ marginTop: '0.3rem' }}>
-            They stay where they are — blocking stops new scheduling, it does not throw away
-            work you had already planned. Skip or move them from their own days if you are
-            not doing them.
+            {t('They stay where they are — blocking stops new scheduling, it does not throw away work you had already planned. Skip or move them from their own days if you are not doing them.')}
           </div>
           <div className="tiny" style={{ marginTop: '0.4rem' }}>
             {affected

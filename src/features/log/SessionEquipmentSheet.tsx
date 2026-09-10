@@ -16,6 +16,7 @@ import { availableSlugs } from '../../domain/equipment';
 import { ALWAYS_AVAILABLE, EQUIPMENT_GROUPS, EQUIPMENT_LABELS } from '../../data/seed/equipment';
 import { plural } from '../../ui/text';
 import type { EquipmentTag } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export default function SessionEquipmentSheet({
   current,
@@ -30,6 +31,7 @@ export default function SessionEquipmentSheet({
   onReset: () => void | Promise<void>;
   onClose: () => void;
 }) {
+  const t = useT();
   const { equipmentProfiles, exercises, activeEquipment } = useApp();
   const [tags, setTags] = useState<EquipmentTag[]>(current);
 
@@ -42,17 +44,17 @@ export default function SessionEquipmentSheet({
 
   return (
     <Sheet
-      title="Equipment for this workout"
+      title={t('Equipment for this workout')}
       onClose={onClose}
       footer={
         <div className="row" style={{ gap: '0.5rem' }}>
           {isOverridden && (
             <button className="btn grow" onClick={() => void onReset()}>
-              Use my default
+              {t('Use my default')}
             </button>
           )}
           <button className="btn primary grow" onClick={() => void onApply(tags)}>
-            Use for this workout
+            {t('Use for this workout')}
           </button>
         </div>
       }
@@ -62,7 +64,7 @@ export default function SessionEquipmentSheet({
         <strong>{activeEquipment?.name ?? 'unset'}</strong>.
       </p>
 
-      <div className="section-title">Start from a profile</div>
+      <div className="section-title">{t('Start from a profile')}</div>
       <div className="chip-row">
         {equipmentProfiles.map((profile) => (
           <button
@@ -74,7 +76,7 @@ export default function SessionEquipmentSheet({
           </button>
         ))}
         <button className="chip" onClick={() => setTags([...ALWAYS_AVAILABLE])}>
-          Nothing but bodyweight
+          {t('Nothing but bodyweight')}
         </button>
       </div>
 
@@ -82,7 +84,7 @@ export default function SessionEquipmentSheet({
 
       {EQUIPMENT_GROUPS.map((group) => (
         <section className="card tight" key={group.label}>
-          <h3 style={{ marginBottom: '0.5rem', fontSize: '0.92rem' }}>{group.label}</h3>
+          <h3 style={{ marginBottom: '0.5rem', fontSize: '0.92rem' }}>{t(group.label)}</h3>
           <div className="row wrap" style={{ gap: '0.4rem' }}>
             {group.tags.map((tag) => (
               <button

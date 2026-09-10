@@ -28,8 +28,10 @@ import type { TestResult } from '../../domain/fitnessTests';
 import { formatWeight } from '../../domain/units';
 import { formatDayLabel, todayKey } from '../../domain/dates';
 import type { Exercise } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export default function TestsView() {
+  const t = useT();
   const { units, exerciseBySlug, available } = useApp();
   const today = todayKey();
   const results = useLiveQuery(() => allTestResults(), []);
@@ -81,9 +83,9 @@ export default function TestsView() {
   return (
     <>
       <PageHeader
-        title="Tests"
+        title={t('Tests')}
         subtitle={tested.length > 0 ? `${plural(tested.length, 'movement')} measured` : undefined}
-        action={<Link to="/more" className="btn ghost sm">Back</Link>}
+        action={<Link to="/more" className="btn ghost sm">{t('Back')}</Link>}
       />
 
       {notice && <p className="tiny faint">{notice}</p>}
@@ -91,10 +93,9 @@ export default function TestsView() {
       {tested.length === 0 && (
         <div className="empty">
           <span className="glyph">📏</span>
-          <p>Nothing measured yet.</p>
+          <p>{t('Nothing measured yet.')}</p>
           <p className="small faint">
-            A test gives the app a real number to program from instead of a guess — and gives
-            you something to beat.
+            {t('A test gives the app a real number to program from instead of a guess — and gives you something to beat.')}
           </p>
         </div>
       )}
@@ -103,8 +104,8 @@ export default function TestsView() {
         <div className="card" key={slug}>
           <div className="card-head" style={{ marginBottom: '0.35rem' }}>
             <h3 className="truncate grow">{exercise?.name ?? slug}</h3>
-            {timing.state === 'due' && <span className="pill warn">Due</span>}
-            {timing.state === 'tooSoon' && <span className="pill">Just tested</span>}
+            {timing.state === 'due' && <span className="pill warn">{t('Due')}</span>}
+            {timing.state === 'tooSoon' && <span className="pill">{t('Just tested')}</span>}
           </div>
           <div className="small muted">
             {show(latest)} · {TEST_KINDS[latest.kind].label.toLowerCase()}
@@ -124,7 +125,7 @@ export default function TestsView() {
               style={{ marginTop: '0.6rem' }}
               onClick={() => startTest(exercise)}
             >
-              Test it again
+              {t('Test it again')}
             </button>
           )}
           <button
@@ -132,7 +133,7 @@ export default function TestsView() {
             style={{ marginTop: '0.25rem' }}
             onClick={() => setDeleting(latest)}
           >
-            Remove this result
+            {t('Remove this result')}
           </button>
         </div>
       ))}
@@ -145,7 +146,7 @@ export default function TestsView() {
           setPicking(true);
         }}
       >
-        Test a movement
+        {t('Test a movement')}
       </button>
 
       {/*
@@ -160,7 +161,7 @@ export default function TestsView() {
           setPicking(true);
         }}
       >
-        Enter a max I already know
+        {t('Enter a max I already know')}
       </button>
 
       <p className="tiny faint" style={{ textAlign: 'center', marginTop: '0.5rem' }}>
@@ -209,7 +210,7 @@ export default function TestsView() {
 
       {deleting && (
         <AskSheet
-          title="Remove this result?"
+          title={t('Remove this result?')}
           message="A result is a record of a day, so it is removed rather than corrected. Test again to replace it."
           confirmLabel="Remove"
           danger

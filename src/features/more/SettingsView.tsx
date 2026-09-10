@@ -14,6 +14,7 @@ import { LANGUAGES } from '../../domain/lang';
 import { speechAvailable, voiceInstalled } from '../../ui/speak';
 import { planReshuffle } from '../../domain/reshuffle';
 import type { Language, Modality, UnitSystem, Weekday } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 /**
  * How far ahead a change to your week is allowed to reach.
@@ -31,6 +32,7 @@ const MODALITIES: { value: Modality; label: string }[] = [
 ];
 
 export default function SettingsView() {
+  const t = useT();
   const { profile } = useApp();
   const [reviewing, setReviewing] = useState(false);
   const [outcome, setOutcome] = useState<string | null>(null);
@@ -82,25 +84,23 @@ export default function SettingsView() {
   return (
     <>
       <PageHeader
-        title="Settings"
-        action={<Link to="/more" className="btn ghost sm">Back</Link>}
+        title={t('Settings')}
+        action={<Link to="/more" className="btn ghost sm">{t('Back')}</Link>}
       />
 
-      <div className="section-title">Name</div>
+      <div className="section-title">{t('Name')}</div>
       <input
         value={profile.displayName}
         onChange={(event) => void profileRepo.update(profile.id, { displayName: event.target.value })}
       />
 
-      <div className="section-title">Training for</div>
+      <div className="section-title">{t('Training for')}</div>
       <GoalPicker profile={profile} />
       <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
-        Orders the plan library, sets what ‘Suggest a workout’ opens on, and shapes the sets
-        and reps in plans you start from here. Plans already on your calendar keep what they
-        prescribed.
+        {t('Orders the plan library, sets what ‘Suggest a workout’ opens on, and shapes the sets and reps in plans you start from here. Plans already on your calendar keep what they prescribed.')}
       </p>
 
-      <div className="section-title">Training max</div>
+      <div className="section-title">{t('Training max')}</div>
       <div className="row wrap" style={{ gap: '0.4rem' }}>
         {[85, 90, 95, 100].map((percent) => (
           <button
@@ -113,13 +113,10 @@ export default function SettingsView() {
         ))}
       </div>
       <p className="tiny faint" style={{ marginTop: '0.35rem' }}>
-        Suggested loads are worked out from this share of your tested max, rather than from the
-        max itself. Ninety per cent is the usual convention: a number computed from your best
-        day is not makeable on an average one, and a programme you miss reps on is one you stop
-        running. At 100% the suggestions come straight off your max.
+        {t('Suggested loads are worked out from this share of your tested max, rather than from the max itself. Ninety per cent is the usual convention: a number computed from your best day is not makeable on an average one, and a programme you miss reps on is one you stop running. At 100% the suggestions come straight off your max.')}
       </p>
 
-      <div className="section-title">Language</div>
+      <div className="section-title">{t('Language')}</div>
       <div className="row" style={{ gap: '0.5rem' }}>
         {LANGUAGES.map(({ code, name }) => (
           <button
@@ -133,11 +130,11 @@ export default function SettingsView() {
       </div>
       <p className="tiny faint">
         {missingVoice
-          ? 'Spoken cues on a run will use whichever voice this device has, which may not be a Spanish one. Adding a Spanish voice in your device settings fixes it.'
-          : 'Changes what the app says out loud on a run. Distances stay on whatever the units below are set to.'}
+          ? t('Spoken cues on a run will use whichever voice this device has, which may not be a Spanish one. Adding a Spanish voice in your device settings fixes it.')
+          : t('Changes what the app says out loud on a run. Distances stay on whatever the units below are set to.')}
       </p>
 
-      <div className="section-title">Units</div>
+      <div className="section-title">{t('Units')}</div>
       <div className="row" style={{ gap: '0.5rem' }}>
         <button
           className={`btn grow${profile.units === 'imperial' ? ' primary' : ''}`}
@@ -153,11 +150,10 @@ export default function SettingsView() {
         </button>
       </div>
       <p className="tiny faint">
-        Stored data does not change — this only affects how numbers are shown, so switching
-        back and forth never rounds your history away.
+        {t('Stored data does not change — this only affects how numbers are shown, so switching back and forth never rounds your history away.')}
       </p>
 
-      <div className="section-title">Week starts on</div>
+      <div className="section-title">{t('Week starts on')}</div>
       <div className="chip-row">
         {([0, 1] as Weekday[]).map((day) => (
           <button
@@ -170,28 +166,26 @@ export default function SettingsView() {
         ))}
       </div>
 
-      <div className="section-title">Effort per set</div>
+      <div className="section-title">{t('Effort per set')}</div>
       <div className="row" style={{ gap: '0.5rem' }}>
         <button
           className={`btn grow${profile.perSetEffort ? '' : ' primary'}`}
           onClick={() => void profileRepo.update(profile.id, { perSetEffort: false })}
         >
-          Once per session
+          {t('Once per session')}
         </button>
         <button
           className={`btn grow${profile.perSetEffort ? ' primary' : ''}`}
           onClick={() => void profileRepo.update(profile.id, { perSetEffort: true })}
         >
-          Every set
+          {t('Every set')}
         </button>
       </div>
       <p className="tiny faint">
-        Per-set effort is how autoregulated strength work picks its loads — a 9 on a triple
-        you wanted at 8 means the next set comes down. It is worth the extra box on every row
-        only if you act on it between sets. Training load uses the session figure either way.
+        {t('Per-set effort is how autoregulated strength work picks its loads — a 9 on a triple you wanted at 8 means the next set comes down. It is worth the extra box on every row only if you act on it between sets. Training load uses the session figure either way.')}
       </p>
 
-      <div className="section-title">Weekly availability</div>
+      <div className="section-title">{t('Weekly availability')}</div>
 
       {/*
         Shown rather than prompted. Toggling four chips to rearrange a week would otherwise
@@ -210,7 +204,7 @@ export default function SettingsView() {
             style={{ marginTop: '0.5rem' }}
             onClick={() => setReviewing(true)}
           >
-            See what would move
+            {t('See what would move')}
           </button>
         </div>
       )}
@@ -223,8 +217,7 @@ export default function SettingsView() {
 
       <div className="card">
         <p className="small muted">
-          Which kinds of training each day can hold. Planning will respect this — a day with
-          nothing selected is a rest day.
+          {t('Which kinds of training each day can hold. Planning will respect this — a day with nothing selected is a rest day.')}
         </p>
         {profile.availability
           .slice()
@@ -233,7 +226,7 @@ export default function SettingsView() {
             <div key={rule.weekday} style={{ padding: '0.4rem 0' }}>
               <div className="row between">
                 <strong className="small">{weekdayName(rule.weekday)}</strong>
-                {rule.allowedModalities.length === 0 && <span className="pill">Rest</span>}
+                {rule.allowedModalities.length === 0 && <span className="pill">{t('Rest')}</span>}
               </div>
               <div className="row wrap" style={{ gap: '0.35rem', marginTop: '0.3rem' }}>
                 {MODALITIES.map((modality) => (

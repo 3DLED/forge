@@ -31,6 +31,7 @@ import {
 import { formatWeight, inputWeightToKg, lbToKg, weightLabel } from '../../domain/units';
 import { plural } from '../../ui/text';
 import type { EquipmentProfile, UnitSystem } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 /** Stored kilos never compare exactly after a pound conversion. */
 const SAME = 0.01;
@@ -64,6 +65,7 @@ export default function RackEditor({
   target: EquipmentProfile;
   units: UnitSystem;
 }) {
+  const t = useT();
   const [adding, setAdding] = useState<'kettlebell' | 'dumbbell' | null>(null);
   const [custom, setCustom] = useState('');
 
@@ -168,10 +170,10 @@ export default function RackEditor({
                 setAdding(null);
               }}
             >
-              Add
+              {t('Add')}
             </button>
             <button className="btn sm ghost" onClick={() => { setCustom(''); setAdding(null); }}>
-              Cancel
+              {t('Cancel')}
             </button>
           </div>
         ) : (
@@ -200,10 +202,9 @@ export default function RackEditor({
 
   return (
     <>
-      <div className="section-title">Weights you own</div>
+      <div className="section-title">{t('Weights you own')}</div>
       <p className="small muted" style={{ marginTop: '-0.25rem' }}>
-        Suggested loads, progressions and test ladders all snap to these. Leave a section empty
-        and that movement falls back to round numbers.
+        {t('Suggested loads, progressions and test ladders all snap to these. Leave a section empty and that movement falls back to round numbers.')}
       </p>
 
       {has('kettlebell') &&
@@ -213,11 +214,11 @@ export default function RackEditor({
       {has('barbell') && (
         <section className="card">
           <div className="row between" style={{ marginBottom: '0.5rem' }}>
-            <h3 className="grow">Barbell</h3>
+            <h3 className="grow">{t('Barbell')}</h3>
             {barLoads.length > 0 && <span className="pill">{barLoads.length}</span>}
           </div>
 
-          <div className="section-title" style={{ marginTop: 0 }}>The bar</div>
+          <div className="section-title" style={{ marginTop: 0 }}>{t('The bar')}</div>
           <div className="row wrap" style={{ gap: '0.4rem' }}>
             {standardLoads(COMMON_BARS, units).map((kg) => {
               const on = Math.abs((barbell?.barKg ?? DEFAULT_BAR_KG) - kg) < SAME;
@@ -234,11 +235,9 @@ export default function RackEditor({
             })}
           </div>
 
-          <div className="section-title">Plates, in pairs</div>
+          <div className="section-title">{t('Plates, in pairs')}</div>
           <p className="tiny faint" style={{ marginTop: '-0.35rem' }}>
-            One pair goes on as two plates, one per side — so a pair of{' '}
-            {formatWeight(standardLoads(COMMON_PLATES, units).at(-1)!, units)} adds twice that
-            to the bar.
+            One pair goes on as two plates, one per side — so a pair of{' '} {formatWeight(standardLoads(COMMON_PLATES, units).at(-1)!, units)} adds twice that to the bar.
           </p>
 
           {[...standardLoads(COMMON_PLATES, units)].reverse().map((kg) => {

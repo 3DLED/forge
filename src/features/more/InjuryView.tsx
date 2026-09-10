@@ -18,8 +18,10 @@ import { SEVERITIES, activeInjuries, isActive } from '../../domain/injuries';
 import type { Injury } from '../../domain/injuries';
 import { REGION_LABELS } from '../../domain/regions';
 import { daysBetween, formatDayLabel, todayKey } from '../../domain/dates';
+import { useT } from '../../i18n/useT';
 
 export default function InjuryView() {
+  const t = useT();
   const today = todayKey();
   const injuries = useLiveQuery(() => allInjuries(), []);
   const [logging, setLogging] = useState(false);
@@ -40,9 +42,9 @@ export default function InjuryView() {
   return (
     <>
       <PageHeader
-        title="Injuries"
+        title={t('Injuries')}
         subtitle={current.length > 0 ? `${plural(current.length, 'current')}` : undefined}
-        action={<Link to="/more" className="btn ghost sm">Back</Link>}
+        action={<Link to="/more" className="btn ghost sm">{t('Back')}</Link>}
       />
 
       {notice && <p className="tiny faint">{notice}</p>}
@@ -50,40 +52,38 @@ export default function InjuryView() {
       {list.length === 0 && (
         <div className="empty">
           <span className="glyph">🩹</span>
-          <p>Nothing logged.</p>
+          <p>{t('Nothing logged.')}</p>
           <p className="small faint">
-            Log something that hurts and the sessions that load it step aside — the rest of your
-            training carries on.
+            {t('Log something that hurts and the sessions that load it step aside — the rest of your training carries on.')}
           </p>
         </div>
       )}
 
-      {current.length > 0 && <div className="section-title">Current</div>}
+      {current.length > 0 && <div className="section-title">{t('Current')}</div>}
       {current.map((injury) => (
         <div className="card" key={injury.id}>
           <div className="card-head" style={{ marginBottom: '0.35rem' }}>
             <h3 className="truncate grow">{injury.label}</h3>
-            <span className="pill warn">{SEVERITIES[injury.severity].label}</span>
+            <span className="pill warn">{t(SEVERITIES[injury.severity].label)}</span>
           </div>
           <div className="small muted">
             {REGION_LABELS[injury.region]} · resting{' '}
             {plural(Math.max(0, daysBetween(today, injury.restUntil) + 1), 'more day')}
           </div>
           <div className="tiny faint" style={{ marginTop: '0.2rem' }}>
-            Since {formatDayLabel(injury.startDate).toLowerCase()}
-            {injury.cause ? ` · ${injury.cause}` : ''}
+            Since {formatDayLabel(injury.startDate).toLowerCase()} {injury.cause ? ` · ${injury.cause}` : ''}
           </div>
           <button
             className="btn primary block"
             style={{ marginTop: '0.6rem' }}
             onClick={() => setHealing(injury)}
           >
-            Mark it healed
+            {t('Mark it healed')}
           </button>
         </div>
       ))}
 
-      {past.length > 0 && <div className="section-title">Healed</div>}
+      {past.length > 0 && <div className="section-title">{t('Healed')}</div>}
       {past.map((injury) => (
         <div className="card tight" key={injury.id}>
           <div className="row between">
@@ -102,7 +102,7 @@ export default function InjuryView() {
             style={{ marginTop: '0.4rem' }}
             onClick={() => setDeleting(injury)}
           >
-            Remove from the log
+            {t('Remove from the log')}
           </button>
         </div>
       ))}
@@ -112,7 +112,7 @@ export default function InjuryView() {
         style={{ marginTop: '1rem' }}
         onClick={() => setLogging(true)}
       >
-        Log an injury
+        {t('Log an injury')}
       </button>
 
       {logging && (
@@ -131,7 +131,7 @@ export default function InjuryView() {
 
       {healing && (
         <AskSheet
-          title="Healed already?"
+          title={t('Healed already?')}
           message={
             recoverable && recoverable > 0
               ? `${plural(recoverable, 'session')} were skipped for this and are still ahead of you. Putting them back returns them to your calendar as planned.`
@@ -153,7 +153,7 @@ export default function InjuryView() {
 
       {deleting && (
         <AskSheet
-          title="Remove this from the log?"
+          title={t('Remove this from the log?')}
           message="It stops counting toward how often this has happened. Sessions it skipped stay as they are."
           confirmLabel="Remove"
           danger

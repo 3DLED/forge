@@ -8,6 +8,8 @@
  */
 
 import type { DayKey, Weekday } from './types';
+import { translate } from '../i18n/copy';
+import type { Language } from './types';
 
 const MS_PER_DAY = 86_400_000;
 
@@ -91,31 +93,67 @@ export function monthGrid(key: DayKey, weekStartsOn: Weekday = 0): DayKey[] {
   return dayRange(first, last);
 }
 
-const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
+/*
+ * Dates are the one piece of copy that is not copy.
+ *
+ * "Wednesday" translated by a table would still be "Wed, Aug 26" in Spanish, where the day
+ * comes before the month and neither is capitalised. `Intl` knows all of that already, and
+ * knows it for every locale rather than the two this app currently offers.
+ *
+ * The language is set once by `AppProvider` rather than threaded through the forty-odd call
+ * sites, which is a deliberate exception to how `units` and the run voice are passed. Those
+ * two change what is said; this changes only how a number is spelled, no test asserts on it,
+ * and a date formatter is the kind of thing that is genuinely ambient.
+ */
+let locale = 'en-US';
+
+/** Called by `AppProvider` when the profile's language is known, and again when it changes. */
+export function setDateLocale(lang: Language | undefined): void {
+  locale = lang === 'es' ? 'es-419' : 'en-US';
+}
+
+/** A date sitting on the given weekday, for asking Intl what that weekday is called. */
+function sample(weekday: Weekday): Date {
+  // 2024-01-07 was a Sunday. UTC throughout, so a westward timezone cannot roll it back a day.
+  return new Date(Date.UTC(2024, 0, 7 + weekday));
+}
 
 export function weekdayName(weekday: Weekday, short = false): string {
-  const name = WEEKDAY_NAMES[weekday];
-  return short ? name.slice(0, 3) : name;
+  return new Intl.DateTimeFormat(locale, {
+    weekday: short ? 'short' : 'long',
+    timeZone: 'UTC',
+  }).format(sample(weekday));
 }
 
 export function monthName(key: DayKey, short = false): string {
-  const name = MONTH_NAMES[Number(key.slice(5, 7)) - 1];
-  return short ? name.slice(0, 3) : name;
+  const month = Number(key.slice(5, 7)) - 1;
+  return new Intl.DateTimeFormat(locale, {
+    month: short ? 'short' : 'long',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(2024, month, 1)));
 }
 
-/** "Today", "Yesterday", "Tomorrow", or "Wed, Aug 26". */
+/** "Today", "Yesterday", "Tomorrow", or "Wed, Aug 26" — and their Spanish equivalents. */
 export function formatDayLabel(key: DayKey, relativeTo: DayKey = todayKey()): string {
   const delta = daysBetween(relativeTo, key);
-  if (delta === 0) return 'Today';
-  if (delta === -1) return 'Yesterday';
-  if (delta === 1) return 'Tomorrow';
+  if (delta === 0) return translate('Today', language());
+  if (delta === -1) return translate('Yesterday', language());
+  if (delta === 1) return translate('Tomorrow', language());
+
   const d = fromDayKey(key);
-  const year = d.getFullYear() === fromDayKey(relativeTo).getFullYear() ? '' : `, ${d.getFullYear()}`;
-  return `${weekdayName(weekdayOf(key), true)}, ${monthName(key, true)} ${d.getDate()}${year}`;
+  // Ordering is the formatter's problem, not ours: "Wed, Aug 26" and "mié, 26 ago" are the
+  // same request answered twice.
+  return new Intl.DateTimeFormat(locale, {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: d.getFullYear() === fromDayKey(relativeTo).getFullYear() ? undefined : 'numeric',
+  }).format(d);
+}
+
+/** The language the locale was set from, for the words Intl has no opinion about. */
+function language(): Language {
+  return locale.startsWith('es') ? 'es' : 'en';
 }
 
 export function isSameMonth(a: DayKey, b: DayKey): boolean {

@@ -24,6 +24,7 @@ import {
 } from '../../data/sessions';
 import type { BlockTimer } from './useBlockTimer';
 import type { LoggedSession } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export default function PinnedTimer({
   session,
@@ -55,6 +56,7 @@ export default function PinnedTimer({
 }
 
 function SessionFace({ session, now }: { session: LoggedSession; now: number }) {
+  const t = useT();
   const running = isStopwatchRunning(session);
   const elapsed = sessionElapsedSec(session, now);
   const started = elapsed > 0 || running;
@@ -62,13 +64,13 @@ function SessionFace({ session, now }: { session: LoggedSession; now: number }) 
   return (
     <>
       <div className="grow">
-        <div className="pinned-label">Session</div>
+        <div className="pinned-label">{t('Session')}</div>
         <div className={`pinned-clock mono${started ? '' : ' idle'}`}>{formatClock(elapsed)}</div>
       </div>
 
       {running ? (
         <button className="btn pinned-action" onClick={() => void pauseStopwatch(session)}>
-          Pause
+          {t('Pause')}
         </button>
       ) : (
         <button
@@ -91,6 +93,7 @@ function BlockFace({
   onExpand: () => void;
   onCloseBlock: () => void;
 }) {
+  const t = useT();
   const { block, running, finished, started } = timer;
   const isAmrap = block.style === 'amrap';
 
@@ -117,7 +120,7 @@ function BlockFace({
         The name and the number open the full timer; the control beside them does not. Two
         targets, so reaching for "tap round" mid-set cannot collapse the thing you are using.
       */}
-      <button className="pinned-open grow" onClick={onExpand} aria-label="Open the full timer">
+      <button className="pinned-open grow" onClick={onExpand} aria-label={t('Open the full timer')}>
         <div className="pinned-label">
           {blockTitle(block)}
           {finished ? ' · done' : ''}
@@ -139,18 +142,18 @@ function BlockFace({
         <button
           className="pinned-round"
           onClick={timer.logRound}
-          aria-label="Record a completed round"
+          aria-label={t('Record a completed round')}
         >
           <span className="pinned-round-count mono">{timer.splits.length}</span>
-          <span className="pinned-round-label">Round</span>
+          <span className="pinned-round-label">{t('Round')}</span>
         </button>
       ) : running ? (
         <button className="btn pinned-action" onClick={timer.pause}>
-          Pause
+          {t('Pause')}
         </button>
       ) : finished ? (
         <button className="btn primary pinned-action" onClick={onExpand}>
-          Save
+          {t('Save')}
         </button>
       ) : (
         <button className="btn primary pinned-action" onClick={timer.start}>

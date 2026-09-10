@@ -28,6 +28,7 @@ import {
 } from '../../domain/dates';
 import { resolveDayAvailability } from '../../domain/scheduling';
 import type { DayKey, Plan, Weekday } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 /** How far a finger has to travel across the grid before it counts as a month change. */
 const SWIPE_PX = 50;
@@ -44,6 +45,7 @@ function shiftMonth(key: DayKey, delta: -1 | 1): DayKey {
 }
 
 export default function PlanView() {
+  const t = useT();
   const { profile } = useApp();
   const today = todayKey();
   const [anchor, setAnchor] = useState(() => startOfMonth(today));
@@ -161,23 +163,23 @@ export default function PlanView() {
   return (
     <>
       <PageHeader
-        title="Plan"
+        title={t('Plan')}
         subtitle={`${monthName(anchor)} ${anchor.slice(0, 4)}`}
         action={
           <span className="row" style={{ gap: '0.25rem' }}>
             <button
               className="btn sm"
-              aria-label="Previous month"
+              aria-label={t('Previous month')}
               onClick={() => setAnchor((current) => shiftMonth(current, -1))}
             >
               ‹
             </button>
             <button className="btn sm" onClick={() => setAnchor(startOfMonth(today))}>
-              Today
+              {t('Today')}
             </button>
             <button
               className="btn sm"
-              aria-label="Next month"
+              aria-label={t('Next month')}
               onClick={() => setAnchor((current) => shiftMonth(current, 1))}
             >
               ›
@@ -196,7 +198,7 @@ export default function PlanView() {
             style={{ marginTop: '0.5rem' }}
             onClick={() => setPlanNotice(null)}
           >
-            Dismiss
+            {t('Dismiss')}
           </button>
         </div>
       )}
@@ -278,14 +280,14 @@ export default function PlanView() {
       </div>
 
       <div className="cal-legend">
-        <span><i className="cal-dot" /> Planned</span>
-        <span><i className="cal-dot done" /> Done</span>
-        <span><i className="cal-dot skipped" /> Skipped</span>
-        <span style={{ opacity: 0.6 }}>Striped = blocked out</span>
+        <span><i className="cal-dot" /> {t('Planned')}</span>
+        <span><i className="cal-dot done" /> {t('Done')}</span>
+        <span><i className="cal-dot skipped" /> {t('Skipped')}</span>
+        <span style={{ opacity: 0.6 }}>{t('Striped = blocked out')}</span>
       </div>
 
       <p className="tiny faint" style={{ textAlign: 'center', marginTop: '0.35rem' }}>
-        Swipe the calendar to change month.
+        {t('Swipe the calendar to change month.')}
       </p>
 
       <button
@@ -307,7 +309,7 @@ export default function PlanView() {
 
       {running.length === 0 && (
         <p className="tiny faint" style={{ textAlign: 'center', marginTop: '0.5rem' }}>
-          Or tap any day to add a single session.
+          {t('Or tap any day to add a single session.')}
         </p>
       )}
 

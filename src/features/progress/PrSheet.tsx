@@ -16,6 +16,7 @@ import { formatDayLabel } from '../../domain/dates';
 import { formatDistance, formatDuration, formatPace, formatWeight } from '../../domain/units';
 import type { PersonalRecord, PrKind } from '../../domain/training';
 import type { UnitSystem } from '../../domain/types';
+import { useT } from '../../i18n/useT';
 
 export interface PrMark {
   kind: PrKind;
@@ -104,6 +105,7 @@ export default function PrSheet({
   units: UnitSystem;
   onClose: () => void;
 }) {
+  const t = useT();
   const marks = prMarks(record, units);
 
   return (
@@ -148,7 +150,7 @@ export default function PrSheet({
         );
       })}
 
-      {marks.length === 0 && <p className="small muted">Nothing recorded for this movement yet.</p>}
+      {marks.length === 0 && <p className="small muted">{t('Nothing recorded for this movement yet.')}</p>}
     </Sheet>
   );
 }

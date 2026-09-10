@@ -12,6 +12,7 @@ import {
 } from '../domain/training';
 import type { LoggedSession } from '../domain/types';
 import type { PrEvent } from '../domain/training';
+import { useT } from '../i18n/useT';
 
 /**
  * One line that describes any session, whatever it was made of. A lift reads as volume, a
@@ -76,6 +77,7 @@ export default function SessionCard({
    */
   prs?: PrEvent[];
 }) {
+  const t = useT();
   const { units, exerciseBySlug, profile } = useApp();
   const inProgress = !session.endedAt;
   const load = sessionLoad(session);
@@ -90,7 +92,7 @@ export default function SessionCard({
           </span>
         )}
         {inProgress ? (
-          <span className="pill accent">In progress</span>
+          <span className="pill accent">{t('In progress')}</span>
         ) : (
           load > 0 && <span className="pill">load {load}</span>
         )}
