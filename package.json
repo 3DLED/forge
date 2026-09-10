@@ -15,7 +15,8 @@
     "android": "npm run sync && cap open android",
     "ios": "npm run sync && cap open ios",
     "seed:lock": "node tools/seed-crypto.mjs lock",
-    "seed:unlock": "node tools/seed-crypto.mjs unlock"
+    "seed:unlock": "node tools/seed-crypto.mjs unlock",
+    "copy:check": "python tools/copy_check.py"
   },
   "dependencies": {
     "@capacitor-community/background-geolocation": "1.2.26",

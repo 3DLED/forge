@@ -22,6 +22,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { lockScroll } from '../../ui/scrollLock';
 import { useApp } from '../../ui/AppProvider';
+import { useT } from '../../i18n/useT';
 import { useRunTracker } from './useRunTracker';
 import { buildRunPlan, describeSegment, type RunKind, type RunPlan } from '../../domain/runPlan';
 import { runSettingsFor, describeRunSettings, shapeFor } from '../../domain/runSettings';
@@ -48,6 +49,7 @@ export default function RunScreen({
   onClose: () => void;
 }) {
   const { profile, units, lang } = useApp();
+  const t = useT();
   const navigate = useNavigate();
   const settings = runSettingsFor(units, profile.run);
   const shape = shapeFor(settings, runKind);
@@ -88,8 +90,8 @@ export default function RunScreen({
   const remaining = (() => {
     const progress = run.progress;
     if (!progress) return null;
-    if (progress.remainingM != null) return `${formatDistance(progress.remainingM, units)} to go`;
-    if (progress.remainingSec != null) return `${formatClock(Math.ceil(progress.remainingSec))} to go`;
+    if (progress.remainingM != null) return `${formatDistance(progress.remainingM, units)} ${t('to go')}`;
+    if (progress.remainingSec != null) return `${formatClock(Math.ceil(progress.remainingSec))} ${t('to go')}`;
     return null;
   })();
 
@@ -111,12 +113,12 @@ export default function RunScreen({
           <button
             className="btn ghost sm"
             onClick={() => navigate(`/more/run?for=${slug}`)}
-            aria-label="Run alerts"
+            aria-label={t('Run alerts')}
           >
             ⚙
           </button>
         )}
-        <button className="btn ghost sm" onClick={onClose} aria-label="Close">
+        <button className="btn ghost sm" onClick={onClose} aria-label={t('Close')}>
           ✕
         </button>
       </header>
@@ -125,25 +127,25 @@ export default function RunScreen({
       <div className="run-pace-big">
         <span className="run-pace-value mono">{pace == null ? '—' : formatPace(pace, units).split(' ')[0]}</span>
         <span className="run-pace-unit tiny faint">
-          {units === 'imperial' ? 'per mile' : 'per kilometre'}
-          {run.reading && !run.reading.moving && started ? ' · stopped' : ''}
+          {units === 'imperial' ? t('per mile') : t('per kilometre')}
+          {run.reading && !run.reading.moving && started ? ` · ${t('stopped')}` : ''}
         </span>
       </div>
 
       <div className="run-stats">
         <div>
           <div className="run-stat mono">{formatDistance(run.distanceM, units)}</div>
-          <div className="tiny faint">distance</div>
+          <div className="tiny faint">{t('distance')}</div>
         </div>
         <div>
           <div className="run-stat mono">{formatClock(Math.floor(run.elapsedSec))}</div>
-          <div className="tiny faint">time</div>
+          <div className="tiny faint">{t('time')}</div>
         </div>
         <div>
           <div className="run-stat mono">
             {run.averageSecPerKm == null ? '—' : formatPace(run.averageSecPerKm, units).split(' ')[0]}
           </div>
-          <div className="tiny faint">average</div>
+          <div className="tiny faint">{t('average')}</div>
         </div>
       </div>
 
@@ -151,7 +153,7 @@ export default function RunScreen({
 
       {started && run.reading && run.reading.discarded > 3 && run.distanceM === 0 && (
         <p className="tiny faint">
-          Waiting for a decent fix. Under trees or between tall buildings this can take a minute.
+          {t('Waiting for a decent fix. Under trees or between tall buildings this can take a minute.')}
         </p>
       )}
 
@@ -191,7 +193,7 @@ export default function RunScreen({
       ) : (
         <div className="run-notes">
           {run.notes.length === 0 && started && (
-            <p className="tiny faint">Cues will appear here as they are said.</p>
+            <p className="tiny faint">{t('Cues will appear here as they are said.')}</p>
           )}
           {run.notes.map((note) => (
             <div key={`${note.at}-${note.text}`} className={`run-note ${note.kind}`}>
@@ -204,33 +206,33 @@ export default function RunScreen({
       <div className="run-actions">
         {run.status === 'idle' && (
           <button className="btn primary block" onClick={run.start}>
-            Start run
+            {t('Start run')}
           </button>
         )}
         {run.status === 'running' && (
           <>
             <button className="btn block grow" onClick={run.pause}>
-              Pause
+              {t('Pause')}
             </button>
             <button className="btn primary block grow" onClick={run.finish}>
-              Finish
+              {t('Finish')}
             </button>
           </>
         )}
         {run.status === 'paused' && (
           <>
             <button className="btn primary block grow" onClick={run.resume}>
-              Resume
+              {t('Resume')}
             </button>
             <button className="btn block grow" onClick={run.finish}>
-              Finish
+              {t('Finish')}
             </button>
           </>
         )}
         {run.status === 'finished' && (
           <>
             <button className="btn block grow" onClick={onClose}>
-              Discard
+              {t('Discard')}
             </button>
             <button
               className="btn primary block grow"
@@ -238,7 +240,7 @@ export default function RunScreen({
                 onSave({ distanceM: Math.round(run.distanceM), timeSec: Math.round(run.elapsedSec) })
               }
             >
-              Save to workout
+              {t('Save to workout')}
             </button>
           </>
         )}

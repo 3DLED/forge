@@ -5,8 +5,8 @@ import PageHeader from '../../ui/PageHeader';
 import SessionCard from '../../ui/SessionCard';
 import LogRunSheet from '../log/LogRunSheet';
 import WeekSheet from './WeekSheet';
-import { plural } from '../../ui/text';
 import { useApp } from '../../ui/AppProvider';
+import { useT, type Translator } from '../../i18n/useT';
 import { plannedBetween, sessionsBetween, startFromPlanned, startSession } from '../../data/sessions';
 import {
   addDays,
@@ -23,6 +23,7 @@ export default function TodayView() {
   const [loggingRun, setLoggingRun] = useState(false);
   const [openWeek, setOpenWeek] = useState(false);
   const { profile, activeEquipment } = useApp();
+  const t = useT();
   const today = todayKey();
   const week = weekDays(today, profile.weekStartsOn);
 
@@ -58,14 +59,14 @@ export default function TodayView() {
   );
 
   const start = async () => {
-    const session = await startSession({ name: defaultSessionName() });
+    const session = await startSession({ name: defaultSessionName(t) });
     navigate(`/log/${session.id}`);
   };
 
   return (
     <>
       <PageHeader
-        title="Today"
+        title={t('Today')}
         subtitle={`${weekdayName(weekdayOf(today))}, ${monthName(today, true)} ${Number(today.slice(8))}`}
       />
 
@@ -80,13 +81,13 @@ export default function TodayView() {
       <button
         className="card tight week-strip"
         onClick={() => setOpenWeek(true)}
-        aria-label="Show this week's workouts"
+        aria-label={t("Show this week's workouts")}
       >
         <div className="row between" style={{ marginBottom: '0.5rem' }}>
           <span className="tiny faint" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>
-            This week
+            {t('This week')}
           </span>
-          {weekLoad > 0 && <span className="pill">load {weekLoad}</span>}
+          {weekLoad > 0 && <span className="pill">{t('load')} {weekLoad}</span>}
         </div>
         <div className="row" style={{ justifyContent: 'space-between' }}>
           {week.map((day) => {
@@ -112,13 +113,13 @@ export default function TodayView() {
           })}
         </div>
         <div className="tiny faint" style={{ marginTop: '0.4rem' }}>
-          Tap for the week
+          {t('Tap for the week')}
         </div>
       </button>
 
       {openWeek && <WeekSheet days={week} onClose={() => setOpenWeek(false)} />}
 
-      {todayPlanned.length > 0 && <div className="section-title">Planned for today</div>}
+      {todayPlanned.length > 0 && <div className="section-title">{t('Planned for today')}</div>}
       {todayPlanned.map((planned) => {
         const underway = planned.loggedSessionId != null && shownByPlan.has(planned.loggedSessionId);
         return (
@@ -126,15 +127,15 @@ export default function TodayView() {
             <div className="card-head" style={{ marginBottom: '0.35rem' }}>
               <h3 className="truncate grow">{planned.prescription.name}</h3>
               {underway ? (
-                <span className="pill">In progress</span>
+                <span className="pill">{t('In progress')}</span>
               ) : (
                 planned.prescription.estimatedMinutes && (
-                  <span className="pill">{planned.prescription.estimatedMinutes} min</span>
+                  <span className="pill">{planned.prescription.estimatedMinutes} {t('min')}</span>
                 )
               )}
             </div>
             <div className="small muted">
-              {plural(planned.prescription.blocks.reduce((n, b) => n + b.items.length, 0), 'movement')}
+              {t.count(planned.prescription.blocks.reduce((n, b) => n + b.items.length, 0), 'movement')}
             </div>
             <button
               className="btn primary block"
@@ -144,14 +145,14 @@ export default function TodayView() {
                 navigate(`/log/${session.id}`);
               }}
             >
-              {underway ? 'Continue' : 'Start'}
+              {underway ? t('Continue') : t('Start')}
             </button>
           </div>
         );
       })}
 
       {todaySessions.some((s) => !shownByPlan.has(s.id)) && (
-        <div className="section-title">Today's sessions</div>
+        <div className="section-title">{t("Today's sessions")}</div>
       )}
       {todaySessions
         .filter((session) => !shownByPlan.has(session.id))
@@ -162,9 +163,9 @@ export default function TodayView() {
       {todaySessions.length === 0 && todayPlanned.length === 0 && (
         <div className="empty">
           <span className="glyph">🔥</span>
-          <p>Nothing logged today.</p>
+          <p>{t('Nothing logged today.')}</p>
           <p className="small faint">
-            Training as <strong>{activeEquipment?.name ?? 'no equipment set'}</strong>.
+            {t('Training as')} <strong>{activeEquipment?.name ?? t('no equipment set')}</strong>.
           </p>
         </div>
       )}
@@ -180,7 +181,7 @@ export default function TodayView() {
           style={{ marginTop: '0.5rem' }}
           onClick={() => navigate(`/log/${inProgress.id}`)}
         >
-          Continue {inProgress.name}
+          {t('Continue')} {inProgress.name}
         </button>
       )}
 
@@ -189,7 +190,7 @@ export default function TodayView() {
         onClick={start}
         style={{ marginTop: '0.5rem' }}
       >
-        {inProgress ? 'Start a separate workout' : 'Start a workout'}
+        {inProgress ? t('Start a separate workout') : t('Start a workout')}
       </button>
 
       {/*
@@ -197,7 +198,7 @@ export default function TodayView() {
         session flow at all — it wants somewhere to put three numbers.
       */}
       <button className="btn block" onClick={() => setLoggingRun(true)} style={{ marginTop: '0.5rem' }}>
-        🏃 Log a run
+        🏃 {t('Log a run')}
       </button>
 
       {loggingRun && (
@@ -214,23 +215,30 @@ export default function TodayView() {
   );
 }
 
-/** Time-of-day naming, because "Workout" as a default title ages badly in a long history. */
-function defaultSessionName(): string {
+/**
+ * Time-of-day naming, because "Workout" as a default title ages badly in a long history.
+ *
+ * Translated at the moment the session is created rather than when it is shown: this becomes
+ * the record's name and is read back for years, so it should be in the language it was
+ * trained in, not in whatever the app happens to be set to later.
+ */
+function defaultSessionName(t: Translator): string {
   const hour = new Date().getHours();
-  if (hour < 11) return 'Morning session';
-  if (hour < 16) return 'Midday session';
-  if (hour < 21) return 'Evening session';
-  return 'Late session';
+  if (hour < 11) return t('Morning session');
+  if (hour < 16) return t('Midday session');
+  if (hour < 21) return t('Evening session');
+  return t('Late session');
 }
 
 function YesterdayHint() {
+  const t = useT();
   const yesterday = addDays(todayKey(), -1);
   const sessions = useLiveQuery(() => sessionsBetween(yesterday, yesterday), [yesterday]);
   if (!sessions || sessions.length === 0) return null;
 
   return (
     <>
-      <div className="section-title">Yesterday</div>
+      <div className="section-title">{t('Yesterday')}</div>
       {sessions.map((session) => (
         <SessionCard key={session.id} session={session} />
       ))}
