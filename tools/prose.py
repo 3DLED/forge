@@ -36,8 +36,18 @@ CRLF = chr(13) + NL
 
 
 def quoted(block):
-    """Every single-quoted string in a block of TypeScript source."""
-    return re.findall(Q + r"([^" + Q + r"]*)" + Q, block)
+    """Every single-quoted string in a block of TypeScript source.
+
+    Escaped quotes are the reason this is not a one-liner. Forty strings in the catalogue
+    contain one -- "forming a \\'Y\\' shape with your body" -- and a pattern that stops at the
+    first apostrophe chops them into fragments. Those fragments are keys that can never match
+    anything at runtime, so translating them is work nobody ever sees, and the real sentence
+    stays English no matter how much of it is done.
+    """
+    escape = chr(92)
+    # Doubled inside the character class, where a lone backslash would escape the bracket.
+    found = re.findall(Q + r"((?:[^" + Q + escape * 2 + r"]|" + escape * 2 + r".)*)" + Q, block)
+    return [text.replace(escape + Q, Q).replace(escape + escape, escape) for text in found]
 
 
 def curated():
@@ -69,8 +79,16 @@ def curated():
     path = os.path.join(SEED, "enrichment.ts")
     if os.path.exists(path):
         source = io.open(path, encoding="utf-8").read()
-        for slug, text in re.findall(r"'([a-z0-9-]+)': \{[^}]*?description: " + Q + r"([^" + Q + r"]*)" + Q, source, re.S):
-            out.setdefault(slug, []).append(text)
+        # One record per line, so the line is the record. Anchoring on anything cleverer than
+        # that cost 92 descriptions the last time it was tried.
+        for line in source.split(NL):
+            slug = re.match(r"\s*'([a-z0-9-]+)': \{", line)
+            at = line.find("description: " + Q)
+            if not slug or at == -1:
+                continue
+            text = quoted(line[at + len("description: "):])
+            if text and text[0]:
+                out.setdefault(slug.group(1), []).append(text[0])
     return out
 
 
@@ -89,9 +107,11 @@ def imported():
             # "Repeat for the desired number of repetitions" is dropped before display, so
             # translating it would be work nobody sees.
             strings += [s for s in quoted(steps.group(1)) if not re.match(r"repeat (for|the)", s, re.I)]
-        description = re.search(r"description: " + Q + r"([^" + Q + r"]*)" + Q, record)
-        if description and description.group(1):
-            strings.append(description.group(1))
+        at = record.find("description: " + Q)
+        if at != -1:
+            text = quoted(record[at + len("description: "):])
+            if text and text[0]:
+                strings.append(text[0])
         out[slug] = strings
     return out
 
