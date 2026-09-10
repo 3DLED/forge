@@ -28,6 +28,8 @@
 
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import type { TextToSpeechPlugin } from '@capacitor-community/text-to-speech';
+import { speechTag } from '../domain/lang';
+import type { Language } from '../domain/types';
 
 /**
  * Registered rather than imported from the package, so a web build pulls in the type
@@ -52,13 +54,42 @@ const FLUSH = 0;
 interface Voice {
   available: () => boolean;
   unlock: () => void;
-  say: (text: string) => void;
+  say: (text: string, tag: string) => void;
   stop: () => void;
 }
 
 function synth(): SpeechSynthesis | null {
   if (typeof window === 'undefined') return null;
   return window.speechSynthesis ?? null;
+}
+
+/**
+ * A voice that speaks the language being asked for.
+ *
+ * Setting `lang` on the utterance alone is not enough on most engines: they honour whichever
+ * voice is selected and read Spanish text with an English one, which is worse than silence
+ * because it sounds like a fault in the app rather than a missing voice. So the voice is
+ * matched explicitly, on the base language rather than the full tag — a device with es-MX
+ * installed should speak es-419 rather than fall back to English.
+ *
+ * Null is ordinary: the list is populated asynchronously in some browsers and empty in
+ * others, and an unmatched request still speaks, just in the default voice.
+ */
+function voiceFor(tag: string): SpeechSynthesisVoice | null {
+  const engine = synth();
+  if (!engine) return null;
+  let available: SpeechSynthesisVoice[];
+  try {
+    available = engine.getVoices();
+  } catch {
+    return null;
+  }
+  const base = tag.split('-')[0].toLowerCase();
+  return (
+    available.find((v) => v.lang.toLowerCase() === tag.toLowerCase()) ??
+    available.find((v) => v.lang.toLowerCase().split('-')[0] === base) ??
+    null
+  );
 }
 
 /** The web view's own synthesis — every browser build, and the fallback everywhere else. */
@@ -75,7 +106,7 @@ const browserVoice: Voice = {
     }
   },
 
-  say(text) {
+  say(text, tag) {
     if (!browserVoice.available()) return;
     try {
       const engine = synth();
@@ -84,6 +115,9 @@ const browserVoice: Voice = {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = RATE;
       utterance.volume = 1;
+      utterance.lang = tag;
+      const matched = voiceFor(tag);
+      if (matched) utterance.voice = matched;
       engine.speak(utterance);
     } catch {
       // As above.
@@ -120,16 +154,24 @@ const nativeVoice: Voice = {
   // Native engines have no user-gesture rule; there is no door to open.
   unlock() {},
 
-  say(text) {
+  say(text, tag) {
     void TextToSpeech.speak({
       text,
-      lang: 'en-US',
+      lang: tag,
       rate: RATE,
       // Drop whatever is still being said. A late cue is worse than a missing one.
       queueStrategy: FLUSH,
       category: 'playback',
     }).catch(() => {
-      // Unsupported language, engine not installed, a call that outlived the run.
+      /*
+       * Unsupported language, engine not installed, a call that outlived the run.
+       *
+       * The plugin rejects outright when the language has no voice on the device, which is
+       * the ordinary case for Spanish on an Android handset that has never been asked for
+       * one. It exposes `openInstall()` for exactly that, but a cue mid-run is the wrong
+       * moment to send somebody to a system settings screen, so this stays quiet and the
+       * settings screen is where the offer belongs.
+       */
     });
   },
 
@@ -161,9 +203,21 @@ export function unlockSpeech(): void {
 }
 
 /** Says it, dropping whatever was still being said. */
-export function speak(text: string): void {
+export function speak(text: string, lang?: Language): void {
   if (!text.trim()) return;
-  voice().say(text);
+  voice().say(text, speechTag(lang));
+}
+
+/**
+ * Whether this device can speak the language, as opposed to speaking at all.
+ *
+ * Browser only, and best-effort: the native engines answer this asynchronously and are asked
+ * at the point of speaking instead. Used to warn on the settings screen rather than to gate
+ * anything, so a false negative costs a sentence nobody needed.
+ */
+export function voiceInstalled(lang?: Language): boolean {
+  if (Capacitor.isNativePlatform()) return true;
+  return voiceFor(speechTag(lang)) !== null;
 }
 
 /** Stops mid-sentence — for pausing, or for finishing the run early. */

@@ -47,7 +47,7 @@ export default function RunScreen({
   onSave: (result: { distanceM: number; timeSec: number }) => void;
   onClose: () => void;
 }) {
-  const { profile, units } = useApp();
+  const { profile, units, lang } = useApp();
   const navigate = useNavigate();
   const settings = runSettingsFor(units, profile.run);
   const shape = shapeFor(settings, runKind);
@@ -70,7 +70,7 @@ export default function RunScreen({
     return buildRunPlan(shape, aim);
   }, [plannedDistanceM, plannedPaceSecPerKm, shape, settings.targetSecPerKm]);
 
-  const run = useRunTracker({ settings, units, plan });
+  const run = useRunTracker({ settings, units, lang, plan });
 
   useEffect(() => lockScroll(), []);
 
@@ -176,7 +176,7 @@ export default function RunScreen({
                 className={`run-piece${isCurrent ? ' current' : piece ? ' done' : ' ahead'}`}
               >
                 <span className="run-piece-mark">{piece ? '✓' : isCurrent ? '▶' : position + 1}</span>
-                <span className="run-piece-what">{describeSegment(segment, units)}</span>
+                <span className="run-piece-what">{describeSegment(segment, units, lang)}</span>
                 <span className="run-piece-note tiny">
                   {piece
                     ? `${formatDistance(piece.distanceM, units)} · ${formatClock(Math.round(piece.seconds))}`

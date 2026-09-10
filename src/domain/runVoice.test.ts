@@ -300,7 +300,7 @@ describe('building a plan from a handful of numbers', () => {
   it('runs a steady piece at the target it is handed', () => {
     const plan = buildRunPlan({ kind: 'steady', distanceM: 8000 }, 330)!;
     expect(plan.segments[0].targetSecPerKm).toBe(330);
-    expect(describeSegment(plan.segments[0], 'metric')).toBe('Steady 8 kilometres at 5:30 /km');
+    expect(describeSegment(plan.segments[0], 'metric', 'en')).toBe('Steady 8 kilometres at 5:30 /km');
   });
 
   it('leaves a steady piece unpaced when there is no target to hand', () => {

@@ -46,7 +46,7 @@ import {
 import { alertsArmed, type RunSettings } from '../../domain/runSettings';
 import { sayChange, sayDrift, saySplit, sayStart, speakable } from '../../domain/runVoice';
 import { speak, stopSpeaking, unlockSpeech } from '../../ui/speak';
-import type { UnitSystem } from '../../domain/types';
+import type { Language, UnitSystem } from '../../domain/types';
 
 /** One thing that was said, kept so the screen can show what the ear may have missed. */
 export interface RunNote {
@@ -102,12 +102,14 @@ export interface RunTracker {
 export function useRunTracker(options: {
   settings: RunSettings;
   units: UnitSystem;
+  /** Absent means English. Decides the words and the voice, never the units. */
+  lang?: Language;
   /** Absent for an unstructured run — splits and drift alerts still work. */
   plan?: RunPlan | null;
   /** Defaults to the right one for the platform; passed explicitly only by tests. */
   source?: LocationSource;
 }): RunTracker {
-  const { settings, units, plan, source = locationSource() } = options;
+  const { settings, units, lang, plan, source = locationSource() } = options;
 
   const [status, setStatus] = useState<RunStatus>('idle');
   const [distanceM, setDistanceM] = useState(0);
@@ -143,6 +145,8 @@ export function useRunTracker(options: {
   planRef.current = plan ?? null;
   const unitsRef = useRef(units);
   unitsRef.current = units;
+  const langRef = useRef(lang);
+  langRef.current = lang;
 
   const runSeconds = useCallback(
     (now: number) => banked.current + (since.current == null ? 0 : (now - since.current) / 1000),
@@ -151,7 +155,7 @@ export function useRunTracker(options: {
 
   const say = useCallback((text: string, kind: RunNote['kind'], at: number) => {
     setNotes((current) => [{ at, text, kind }, ...current].slice(0, 40));
-    if (settingsRef.current.voice) speak(speakable(text));
+    if (settingsRef.current.voice) speak(speakable(text, langRef.current), langRef.current);
   }, []);
 
   /** One fix: distance, pace, and then everything that might need saying about them. */
@@ -217,7 +221,7 @@ export function useRunTracker(options: {
            */
           cueState.current = { last: null, lastAt: now, startedAt: now };
 
-          const sentence = current.segmentCues ? sayChange(change, unitsRef.current) : null;
+          const sentence = current.segmentCues ? sayChange(change, unitsRef.current, langRef.current) : null;
           if (sentence) {
             say(sentence, 'segment', now);
             return;
@@ -261,7 +265,7 @@ export function useRunTracker(options: {
         splitState.current = decision.state;
         if (decision.cue) {
           say(
-            saySplit({ cue: decision.cue, interval: current.splitUnit, units: unitsRef.current, elapsedSec: seconds }),
+            saySplit({ cue: decision.cue, interval: current.splitUnit, units: unitsRef.current, lang: langRef.current, elapsedSec: seconds }),
             'split',
             now,
           );
@@ -279,7 +283,7 @@ export function useRunTracker(options: {
         const decision = decideCue({ reading: paceNow, target, state: cueState.current, now });
         cueState.current = decision.state;
         if (decision.kind) {
-          say(sayDrift({ kind: decision.kind, reading: paceNow, target, units: unitsRef.current }), 'drift', now);
+          say(sayDrift({ kind: decision.kind, reading: paceNow, target, units: unitsRef.current, lang: langRef.current }), 'drift', now);
         }
       }
     },
@@ -311,7 +315,7 @@ export function useRunTracker(options: {
     setError(null);
     setStatus('running');
 
-    const opening = sayStart(planRef.current?.segments[0] ?? null, unitsRef.current);
+    const opening = sayStart(planRef.current?.segments[0] ?? null, unitsRef.current, langRef.current);
     say(opening, 'start', now);
 
     void source

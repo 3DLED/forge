@@ -16,7 +16,8 @@
 
 import { M_PER_KM, M_PER_MILE } from './units';
 import { formatPace } from './units';
-import type { UnitSystem } from './types';
+import { words } from './lang';
+import type { Language, UnitSystem } from './types';
 
 export type SegmentKind = 'warmup' | 'work' | 'recovery' | 'steady' | 'cooldown';
 
@@ -173,23 +174,12 @@ export function advanceRun(options: {
 
 // --- saying it out loud ------------------------------------------------------
 
-/** "1 mile" but "0.5 miles" — the singular only at exactly one. */
-function plural(value: number, noun: string): string {
-  return `${value} ${value === 1 ? noun : `${noun}s`}`;
-}
-
-const KIND_VERB: Record<SegmentKind, string> = {
-  warmup: 'Warm up',
-  work: 'Run',
-  /*
-   * "Jog", not "Recover". Recovery is what the segment is for; jogging is what you do, and an
-   * instruction shouted at someone mid-session should name the action. It also matches the
-   * word the settings screen uses to set it up.
-   */
-  recovery: 'Jog',
-  steady: 'Steady',
-  cooldown: 'Cool down',
-};
+/*
+ * Every function below takes a language as well as a unit system, for the same reason it
+ * takes a unit system: it produces words, and words differ. The wording itself lives in
+ * `lang.ts` — what is here is which pieces go in what order, which is a judgement about
+ * running rather than about Spanish.
+ */
 
 /**
  * "800 metres" / "0.25 miles" / "5 kilometres" — a distance in the words a runner uses.
@@ -200,6 +190,7 @@ const KIND_VERB: Record<SegmentKind, string> = {
 export function distanceWords(
   metres: number,
   units: UnitSystem,
+  lang: Language | undefined,
   /**
    * Set for a distance that was measured rather than asked for.
    *
@@ -210,8 +201,9 @@ export function distanceWords(
    */
   measured = false,
 ): string {
+  const w = words(lang);
   if (units === 'imperial') {
-    if (measured) return plural(Number((metres / M_PER_MILE).toFixed(2)), 'mile');
+    if (measured) return w.count('mile', metres / M_PER_MILE);
     const miles = metres / M_PER_MILE;
     /*
      * Track reps are said in metres even in a country that measures everything else in miles.
@@ -224,26 +216,25 @@ export function distanceWords(
      */
     const quarters = miles * 4;
     const chosenInMiles = Math.abs(quarters - Math.round(quarters)) < 0.005;
-    if (!chosenInMiles && metres < M_PER_MILE) return `${Math.round(metres)} metres`;
-    return plural(Number(miles.toFixed(2)), 'mile');
+    if (!chosenInMiles && metres < M_PER_MILE) return w.count('metre', Math.round(metres));
+    return w.count('mile', miles);
   }
 
-  if (measured) return plural(Number((metres / M_PER_KM).toFixed(2)), 'kilometre');
+  if (measured) return w.count('kilometre', metres / M_PER_KM);
   return metres < M_PER_KM
-    ? `${Math.round(metres)} metres`
-    : plural(Number((metres / M_PER_KM).toFixed(2)), 'kilometre');
+    ? w.count('metre', Math.round(metres))
+    : w.count('kilometre', metres / M_PER_KM);
 }
 
 /** "800 metres" / "5 minutes" — how long the thing lasts, in its own currency. */
-function extentOf(segment: RunSegment, units: UnitSystem): string {
+function extentOf(segment: RunSegment, units: UnitSystem, lang: Language | undefined): string {
+  const w = words(lang);
   if (segment.durationSec != null) {
     const minutes = Math.round(segment.durationSec / 60);
-    return minutes >= 1
-      ? plural(minutes, 'minute')
-      : `${segment.durationSec} seconds`;
+    return minutes >= 1 ? w.count('minute', minutes) : w.count('second', segment.durationSec);
   }
-  if (segment.distanceM == null) return 'until you say';
-  return distanceWords(segment.distanceM, units);
+  if (segment.distanceM == null) return w.phrase.untilYouSay;
+  return distanceWords(segment.distanceM, units, lang);
 }
 
 /**
@@ -253,19 +244,31 @@ function extentOf(segment: RunSegment, units: UnitSystem): string {
  * because the same words read perfectly well on screen. "Run 800 metres at 4:30 per kilometre"
  * is the instruction; anything shorter needs the runner to remember what the plan said.
  */
-export function describeSegment(segment: RunSegment, units: UnitSystem): string {
+export function describeSegment(
+  segment: RunSegment,
+  units: UnitSystem,
+  lang: Language | undefined,
+): string {
+  // A label somebody typed is already in whatever language they typed it in.
   if (segment.label) return segment.label;
 
-  const verb = KIND_VERB[segment.kind];
-  const extent = extentOf(segment, units);
+  const w = words(lang);
+  const verb = w.verb[segment.kind];
+  const extent = extentOf(segment, units, lang);
   if (segment.targetSecPerKm == null) return `${verb} ${extent}`;
 
-  return `${verb} ${extent} at ${formatPace(segment.targetSecPerKm, units)}`;
+  return `${verb} ${extent} ${w.phrase.at} ${formatPace(segment.targetSecPerKm, units)}`;
 }
 
 /** "Next: run 800 metres at 4:30 / km" — spoken as one segment gives way to the next. */
-export function describeNext(segment: RunSegment | null, units: UnitSystem): string {
-  return segment ? `Next, ${describeSegment(segment, units).toLowerCase()}` : 'Last one done';
+export function describeNext(
+  segment: RunSegment | null,
+  units: UnitSystem,
+  lang: Language | undefined,
+): string {
+  const w = words(lang);
+  if (!segment) return w.phrase.lastOneDone;
+  return `${w.phrase.next} ${w.lower(describeSegment(segment, units, lang))}`;
 }
 
 // --- building one from a handful of numbers ----------------------------------

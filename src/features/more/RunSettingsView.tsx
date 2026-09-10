@@ -106,7 +106,7 @@ function blankShape(kind: RunShape['kind'], units: UnitSystem): RunShape {
 }
 
 export default function RunSettingsView() {
-  const { profile, units, exerciseBySlug } = useApp();
+  const { profile, units, lang, exerciseBySlug } = useApp();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const settings = runSettingsFor(units, profile.run);
@@ -411,7 +411,7 @@ export default function RunSettingsView() {
           <ol className="run-plan-list">
             {plan.segments.map((segment, index) => (
               <li key={index} className="small">
-                {describeSegment(segment, units)}
+                {describeSegment(segment, units, lang)}
               </li>
             ))}
           </ol>

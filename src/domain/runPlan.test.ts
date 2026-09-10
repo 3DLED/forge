@@ -135,40 +135,40 @@ describe('reaching the end', () => {
 
 describe('saying what is coming', () => {
   it('gives the instruction, not a set of fields', () => {
-    expect(describeSegment(seg({ distanceM: 800, targetSecPerKm: 270 }), 'metric')).toBe(
+    expect(describeSegment(seg({ distanceM: 800, targetSecPerKm: 270 }), 'metric', 'en')).toBe(
       'Run 800 metres at 4:30 /km',
     );
   });
 
   it('speaks in the units you use', () => {
-    const said = describeSegment(seg({ distanceM: 1609.344, targetSecPerKm: 300 }), 'imperial');
+    const said = describeSegment(seg({ distanceM: 1609.344, targetSecPerKm: 300 }), 'imperial', 'en');
     expect(said).toContain('1 mile');
     expect(said).toContain('/mi');
   });
 
   it('says minutes for a timed segment', () => {
-    expect(describeSegment(seg({ kind: 'warmup', durationSec: 300 }), 'metric')).toBe(
+    expect(describeSegment(seg({ kind: 'warmup', durationSec: 300 }), 'metric', 'en')).toBe(
       'Warm up 5 minutes',
     );
   });
 
   it('leaves the pace out when the segment does not set one', () => {
-    expect(describeSegment(seg({ kind: 'recovery', distanceM: 400 }), 'metric')).toBe(
+    expect(describeSegment(seg({ kind: 'recovery', distanceM: 400 }), 'metric', 'en')).toBe(
       'Jog 400 metres',
     );
   });
 
   it('uses a label when one was written', () => {
-    expect(describeSegment(seg({ distanceM: 400, label: 'Strides' }), 'metric')).toBe('Strides');
+    expect(describeSegment(seg({ distanceM: 400, label: 'Strides' }), 'metric', 'en')).toBe('Strides');
   });
 
   it('names the next one as it starts', () => {
     const change = run(intervals, 1100, 300);
-    expect(describeNext(change.entering, 'metric')).toBe('Next, run 800 metres at 4:30 /km');
+    expect(describeNext(change.entering, 'metric', 'en')).toBe('Next, run 800 metres at 4:30 /km');
   });
 
   it('says so at the end rather than naming nothing', () => {
-    expect(describeNext(null, 'metric')).toBe('Last one done');
+    expect(describeNext(null, 'metric', 'en')).toBe('Last one done');
   });
 });
 

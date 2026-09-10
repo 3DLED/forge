@@ -10,8 +10,10 @@ import { profileRepo } from '../../data/repos';
 import { calendarExceptions } from '../../data/plans';
 import { plannedBetween } from '../../data/sessions';
 import { addDays, todayKey, weekdayName } from '../../domain/dates';
+import { LANGUAGES } from '../../domain/lang';
+import { speechAvailable, voiceInstalled } from '../../ui/speak';
 import { planReshuffle } from '../../domain/reshuffle';
-import type { Modality, UnitSystem, Weekday } from '../../domain/types';
+import type { Language, Modality, UnitSystem, Weekday } from '../../domain/types';
 
 /**
  * How far ahead a change to your week is allowed to reach.
@@ -54,6 +56,17 @@ export default function SettingsView() {
   );
 
   const setUnits = (units: UnitSystem) => void profileRepo.update(profile.id, { units });
+  const setLanguage = (language: Language) => void profileRepo.update(profile.id, { language });
+
+  /*
+   * Whether this device can actually say the chosen language.
+   *
+   * Worth warning about rather than hiding the option over: a phone with no Spanish voice
+   * reads Spanish text in an English one, which sounds like a fault in the app instead of a
+   * missing voice. Browser-only, so it is quiet on a native build, where the engine answers
+   * asynchronously and is asked at the point of speaking instead.
+   */
+  const missingVoice = !voiceInstalled(profile.language) && speechAvailable();
 
   const toggleModality = (weekday: Weekday, modality: Modality) => {
     const availability = profile.availability.map((rule) => {
@@ -104,6 +117,24 @@ export default function SettingsView() {
         max itself. Ninety per cent is the usual convention: a number computed from your best
         day is not makeable on an average one, and a programme you miss reps on is one you stop
         running. At 100% the suggestions come straight off your max.
+      </p>
+
+      <div className="section-title">Language</div>
+      <div className="row" style={{ gap: '0.5rem' }}>
+        {LANGUAGES.map(({ code, name }) => (
+          <button
+            key={code}
+            className={`btn grow${(profile.language ?? 'en') === code ? ' primary' : ''}`}
+            onClick={() => setLanguage(code)}
+          >
+            {name}
+          </button>
+        ))}
+      </div>
+      <p className="tiny faint">
+        {missingVoice
+          ? 'Spoken cues on a run will use whichever voice this device has, which may not be a Spanish one. Adding a Spanish voice in your device settings fixes it.'
+          : 'Changes what the app says out loud on a run. Distances stay on whatever the units below are set to.'}
       </p>
 
       <div className="section-title">Units</div>

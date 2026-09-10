@@ -19,6 +19,7 @@ import type {
   EquipmentProfile,
   EquipmentTag,
   Exercise,
+  Language,
   Profile,
   UnitSystem,
 } from '../domain/types';
@@ -33,6 +34,8 @@ import { DEFAULT_THEME, isThemeId } from './themes';
 interface AppState {
   profile: Profile;
   units: UnitSystem;
+  /** What the app speaks and writes in. Absent on the profile means English. */
+  lang: Language;
   exercises: Exercise[];
   /** Kit added by the athlete, alongside the seeded vocabulary. */
   customEquipment: CustomEquipment[];
@@ -108,6 +111,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return {
       profile,
       units: profile.units,
+      lang: profile.language ?? 'en',
       exercises: unique,
       exerciseBySlug: new Map((everyExercise ?? exercises).map((e) => [e.slug, e])),
       equipmentProfiles,

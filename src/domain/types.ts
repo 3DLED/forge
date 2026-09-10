@@ -611,9 +611,21 @@ import type { BarbellRack } from './rack';
 
 export type UnitSystem = 'imperial' | 'metric';
 
+/**
+ * What the app speaks and writes in.
+ *
+ * Separate from `UnitSystem` on purpose. Somebody running in Texas in Spanish still wants
+ * miles, and somebody running in Spain in English still wants kilometres, so tying the two
+ * together would be wrong for both. Absent means English, which is what every profile
+ * written before this existed has been running in.
+ */
+export type Language = 'en' | 'es';
+
 export interface Profile extends Entity {
   displayName: string;
   units: UnitSystem;
+  /** Absent means English — see `Language`. */
+  language?: Language;
   bodyweightKg?: number;
   activeEquipmentProfileId?: Id;
   availability: AvailabilityRule[];

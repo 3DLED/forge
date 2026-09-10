@@ -15,12 +15,20 @@
  * 3. **Screens and speech want different strings.** "4:30 /km" reads correctly and speaks
  *    as "four thirty slash km", so anything going to the speech engine goes through
  *    `speakable` first. Same sentence, two renderings, one place to change it.
+ *
+ * The words themselves are in `lang.ts`, one set per language. What stays here is the
+ * assembly: which pieces a cue is made of and in what order. Those three rules are about
+ * running rather than about English, so they hold in both languages and are decided once.
  */
 
 import { M_PER_KM, M_PER_MILE, displayPace, formatClock, formatPace } from './units';
 import { SPLIT_INTERVALS, type CueKind, type PaceReading, type PaceTarget, type SplitCue, type SplitUnit } from './pace';
 import { describeSegment, distanceWords, type RunSegment, type SegmentChange } from './runPlan';
-import type { UnitSystem } from './types';
+import { words } from './lang';
+import type { Language, UnitSystem } from './types';
+
+/** "11:00", "6:58", "1:04:15" — every colon in these sentences separates a duration. */
+const CLOCK = /(\d+):([0-5]\d)(?::([0-5]\d))?/g;
 
 /**
  * The same sentence, said rather than shown.
@@ -28,33 +36,33 @@ import type { UnitSystem } from './types';
  * Abbreviations that read cleanly are exactly the ones a speech engine mangles, and the fix
  * is not to drop them from the screen — it is to expand them on the way out.
  */
-/** "11:00", "6:58", "1:04:15" — every colon in these sentences separates a duration. */
-const CLOCK = /(\d+):([0-5]\d)(?::([0-5]\d))?/g;
-
-export function speakable(text: string): string {
-  return text
-    .replace(/\/km/g, 'per kilometre')
-    .replace(/\/mi/g, 'per mile')
-    .replace(/×/g, 'by')
-    // The separator is a full stop in speech, not a word — " · " would leave a stray one
-    // floating between two spaces, which some engines read aloud as "dot".
-    .replace(/ · /g, '. ')
-    .replace(/·/g, '.')
-    .replace(CLOCK, (_whole, a: string, b: string, c?: string) =>
-      c == null ? spokenDuration(0, Number(a), Number(b)) : spokenDuration(Number(a), Number(b), Number(c)),
-    )
-    /*
-     * The separator became a full stop, so what follows it is the start of a sentence.
-     *
-     * Engines lower the pitch and pause at a sentence boundary, which is exactly the reading
-     * these fragments want: "Mile two. On pace." The space in the pattern is what keeps a
-     * decimal point out of it — "1.03 miles" has no space after its stop.
-     */
-    .replace(/\. ([a-z])/g, (_whole, letter: string) => `. ${letter.toUpperCase()}`);
-}
-
-function count(value: number, noun: string): string {
-  return `${value} ${value === 1 ? noun : `${noun}s`}`;
+export function speakable(text: string, lang?: Language): string {
+  const w = words(lang);
+  return (
+    text
+      .replace(/\/km/g, w.phrase.perKm)
+      .replace(/\/mi/g, w.phrase.perMile)
+      .replace(/×/g, w.phrase.by)
+      // The separator is a full stop in speech, not a word — " · " would leave a stray one
+      // floating between two spaces, which some engines read aloud as "dot".
+      .replace(/ · /g, '. ')
+      .replace(/·/g, '.')
+      .replace(CLOCK, (_whole, a: string, b: string, c?: string) =>
+        c == null
+          ? spokenDuration(0, Number(a), Number(b), lang)
+          : spokenDuration(Number(a), Number(b), Number(c), lang),
+      )
+      /*
+       * The separator became a full stop, so what follows it is the start of a sentence.
+       *
+       * Engines lower the pitch and pause at a sentence boundary, which is exactly the reading
+       * these fragments want: "Mile two. On pace." The space in the pattern is what keeps a
+       * decimal point out of it — "1.03 miles" has no space after its stop.
+       *
+       * Unicode-aware, because the Spanish sentence after a stop can begin with an accent.
+       */
+      .replace(/\. (\p{Ll})/gu, (_whole, letter: string) => `. ${letter.toUpperCase()}`)
+  );
 }
 
 /**
@@ -68,17 +76,13 @@ function count(value: number, noun: string): string {
  * Empty units are dropped, which is the difference between "eleven minutes" and "eleven
  * minutes zero seconds", and between "forty-five seconds" and "zero minutes forty-five".
  */
-function spokenDuration(hours: number, minutes: number, seconds: number): string {
+function spokenDuration(hours: number, minutes: number, seconds: number, lang?: Language): string {
+  const w = words(lang);
   const parts: string[] = [];
-  if (hours > 0) parts.push(count(hours, 'hour'));
-  if (minutes > 0) parts.push(count(minutes, 'minute'));
-  if (seconds > 0) parts.push(count(seconds, 'second'));
-  return parts.length > 0 ? parts.join(' ') : '0 seconds';
-}
-
-/** "1.5" rather than "1.50", and "1" rather than "1.0". */
-function trim(value: number): string {
-  return String(Number(value.toFixed(2)));
+  if (hours > 0) parts.push(w.count('hour', hours));
+  if (minutes > 0) parts.push(w.count('minute', minutes));
+  if (seconds > 0) parts.push(w.count('second', seconds));
+  return parts.length > 0 ? parts.join(' ') : w.count('second', 0);
 }
 
 /**
@@ -88,17 +92,16 @@ function trim(value: number): string {
  * spoken about. The fractions do not: "half-mile number five" is a sum, where "two and a half
  * miles" is a place. So the whole units count, and the fractions report the distance reached.
  */
-export function splitPlace(index: number, interval: SplitUnit): string {
-  if (interval === 'mile') return `Mile ${index}`;
-  if (interval === 'km') return `Kilometre ${index}`;
+export function splitPlace(index: number, interval: SplitUnit, lang?: Language): string {
+  const w = words(lang);
+  if (interval === 'mile') return w.place('mile', index);
+  if (interval === 'km') return w.place('km', index);
 
   const metres = SPLIT_INTERVALS[interval].metres * index;
   if (SPLIT_INTERVALS[interval].units === 'imperial') {
-    const miles = metres / M_PER_MILE;
-    return `${trim(miles)} ${miles === 1 ? 'mile' : 'miles'}`;
+    return w.count('mile', metres / M_PER_MILE);
   }
-  const km = metres / M_PER_KM;
-  return `${trim(km)} ${km === 1 ? 'kilometre' : 'kilometres'}`;
+  return w.count('kilometre', metres / M_PER_KM);
 }
 
 /**
@@ -108,16 +111,22 @@ export function splitPlace(index: number, interval: SplitUnit): string {
  * kilometre is being off by sixty-four a mile, and "9:04 per mile, 40 seconds slow" quietly
  * invites a runner to make up forty seconds over a distance where they are sixty-four down.
  */
-function offWords(offSecPerKm: number, slow: boolean, units: UnitSystem): string {
+function offWords(
+  offSecPerKm: number,
+  slow: boolean,
+  units: UnitSystem,
+  lang: Language | undefined,
+): string {
+  const w = words(lang);
   const seconds = Math.round(Math.abs(displayPace(offSecPerKm, units)));
-  if (seconds === 0) return 'on pace';
-  return `${seconds} ${seconds === 1 ? 'second' : 'seconds'} ${slow ? 'slow' : 'fast'}`;
+  if (seconds === 0) return w.phrase.onPace;
+  return `${w.count('second', seconds)} ${slow ? w.phrase.slow : w.phrase.fast}`;
 }
 
-function offBy(cue: SplitCue, units: UnitSystem): string | null {
+function offBy(cue: SplitCue, units: UnitSystem, lang: Language | undefined): string | null {
   if (cue.offSecPerKm == null) return null;
-  if (cue.kind === 'onPace') return 'on pace';
-  return offWords(cue.offSecPerKm, cue.kind === 'tooSlow', units);
+  if (cue.kind === 'onPace') return words(lang).phrase.onPace;
+  return offWords(cue.offSecPerKm, cue.kind === 'tooSlow', units, lang);
 }
 
 /**
@@ -130,13 +139,14 @@ export function saySplit(options: {
   cue: SplitCue;
   interval: SplitUnit;
   units: UnitSystem;
+  lang?: Language;
   /** Total elapsed time, spoken at whole units only — nobody needs it every quarter mile. */
   elapsedSec?: number;
 }): string {
-  const { cue, interval, units, elapsedSec } = options;
-  const parts = [splitPlace(cue.index, interval), formatPace(cue.splitSecPerKm, units)];
+  const { cue, interval, units, lang, elapsedSec } = options;
+  const parts = [splitPlace(cue.index, interval, lang), formatPace(cue.splitSecPerKm, units)];
 
-  const off = offBy(cue, units);
+  const off = offBy(cue, units, lang);
   if (off) parts.push(off);
   /*
    * Total time from the second whole unit onwards.
@@ -163,19 +173,23 @@ export function sayDrift(options: {
   reading: PaceReading;
   target: PaceTarget;
   units: UnitSystem;
+  lang?: Language;
 }): string {
-  const { kind, reading, target, units } = options;
+  const { kind, reading, target, units, lang } = options;
+  const w = words(lang);
   const now = reading.paceSecPerKm == null ? null : formatPace(reading.paceSecPerKm, units);
 
-  if (kind === 'backOnPace') return now ? `Back on pace · ${now}` : 'Back on pace';
+  if (kind === 'backOnPace') {
+    return now ? `${w.phrase.backOnPace} · ${now}` : w.phrase.backOnPace;
+  }
 
   const off =
     reading.paceSecPerKm == null
       ? null
-      : offWords(reading.paceSecPerKm - target.targetSecPerKm, kind === 'tooSlow', units);
+      : offWords(reading.paceSecPerKm - target.targetSecPerKm, kind === 'tooSlow', units, lang);
   const tail = [now, off].filter(Boolean).join(' · ');
 
-  const lead = kind === 'tooSlow' ? 'Pick it up' : 'Ease back';
+  const lead = kind === 'tooSlow' ? w.phrase.pickUp : w.phrase.easeBack;
   return tail ? `${lead} · ${tail}` : lead;
 }
 
@@ -187,12 +201,18 @@ export function sayDrift(options: {
  * was written in: an 800 is an 800. A timed piece finishes wherever you got to, and that is a
  * measurement — "1591 metres" is nobody's cool-down, "0.99 miles" is the distance you covered.
  */
-function sayCovered(segment: RunSegment, covered: { distanceM: number; seconds: number }, units: UnitSystem): string {
+function sayCovered(
+  segment: RunSegment,
+  covered: { distanceM: number; seconds: number },
+  units: UnitSystem,
+  lang: Language | undefined,
+): string {
   if (segment.durationSec != null) {
     // Whatever it took was always going to be exactly the time asked for, so no time here.
-    return distanceWords(covered.distanceM, units, true);
+    return distanceWords(covered.distanceM, units, lang, true);
   }
-  return `${distanceWords(covered.distanceM, units)} in ${formatClock(Math.round(covered.seconds))}`;
+  const w = words(lang);
+  return `${distanceWords(covered.distanceM, units, lang)} ${w.phrase.in} ${formatClock(Math.round(covered.seconds))}`;
 }
 
 /**
@@ -202,22 +222,31 @@ function sayCovered(segment: RunSegment, covered: { distanceM: number; seconds: 
  * session that is "two kilometres in 8:12. Next, jog 400 metres at 6:30 per kilometre" — the
  * shape of the whole instruction, without needing to remember what the plan said.
  */
-export function sayChange(change: SegmentChange, units: UnitSystem): string | null {
+export function sayChange(
+  change: SegmentChange,
+  units: UnitSystem,
+  lang?: Language,
+): string | null {
   if (!change.leaving) return null;
 
+  const w = words(lang);
   const parts: string[] = [];
-  if (change.covered) parts.push(sayCovered(change.leaving, change.covered, units));
+  if (change.covered) parts.push(sayCovered(change.leaving, change.covered, units, lang));
 
   parts.push(
     change.entering
-      ? `Next, ${describeSegment(change.entering, units).toLowerCase()}`
-      : 'Session done',
+      ? `${w.phrase.next} ${w.lower(describeSegment(change.entering, units, lang))}`
+      : w.phrase.sessionDone,
   );
 
   return parts.join(' · ');
 }
 
 /** Said once as the run starts, so the first instruction is not a surprise a mile in. */
-export function sayStart(first: RunSegment | null, units: UnitSystem): string {
-  return first ? describeSegment(first, units) : 'Run started';
+export function sayStart(
+  first: RunSegment | null,
+  units: UnitSystem,
+  lang?: Language,
+): string {
+  return first ? describeSegment(first, units, lang) : words(lang).phrase.runStarted;
 }
