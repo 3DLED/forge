@@ -53,6 +53,7 @@ exercisedb-*/
 src/data/seed/catalogue.ts
 src/data/seed/enrichment.ts
 src/data/seed/names.es.ts
+src/data/seed/prose.es.ts
 .forge-seed-key
 
 # Python bytecode from the tools.

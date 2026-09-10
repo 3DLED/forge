@@ -37,6 +37,13 @@ interface AppState {
   units: UnitSystem;
   /** What the app speaks and writes in. Absent on the profile means English. */
   lang: Language;
+  /**
+   * Instructions and descriptions in the chosen language, or null.
+   *
+   * Null covers both "reading English" and "not loaded yet", which behave identically: the
+   * English is shown. Reached through `useT().prose` rather than directly.
+   */
+  prose: Record<string, string> | null;
   exercises: Exercise[];
   /** Kit added by the athlete, alongside the seeded vocabulary. */
   customEquipment: CustomEquipment[];
@@ -101,9 +108,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
    */
   const language = profiles?.[0]?.language;
   const [movementNames, setMovementNames] = useState<Record<string, string> | null>(null);
+  const [prose, setProse] = useState<Record<string, string> | null>(null);
   useEffect(() => {
     if (language !== 'es') {
       setMovementNames(null);
+      setProse(null);
       return;
     }
     let live = true;
@@ -113,6 +122,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
       })
       .catch(() => {
         // Names stay English. Nothing else depends on this resolving.
+      });
+    void import('../data/seed/prose.es')
+      .then((module) => {
+        if (live) setProse(module.PROSE_ES);
+      })
+      .catch(() => {
+        // Instructions stay English, which is what half of them do anyway.
       });
     return () => {
       live = false;
@@ -155,6 +171,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       profile,
       units: profile.units,
       lang: profile.language ?? 'en',
+      prose,
       exercises: unique,
       exerciseBySlug: new Map((everyExercise ?? exercises).map((e) => [e.slug, e])),
       equipmentProfiles,
@@ -163,7 +180,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       customEquipment: customKit ?? [],
       equipmentName: (tag: EquipmentTag) => equipmentLabel(tag, customByTag),
     };
-  }, [profiles, exercises, everyExercise, equipmentProfiles, customKit, movementNames]);
+  }, [profiles, exercises, everyExercise, equipmentProfiles, customKit, movementNames, prose]);
 
   /*
    * Deliberately untranslated.

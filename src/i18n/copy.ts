@@ -77,6 +77,7 @@ const PLURALS: Partial<Record<Language, Record<string, [string, string]>>> = {
     note: ['nota', 'notas'],
     'more movement': ['movimiento más', 'movimientos más'],
     round: ['ronda', 'rondas'],
+    'stand-in': ['sustituto', 'sustitutos'],
     minute: ['minuto', 'minutos'],
     second: ['segundo', 'segundos'],
   },

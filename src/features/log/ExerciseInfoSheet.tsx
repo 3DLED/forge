@@ -15,7 +15,6 @@ import { exerciseMediaUrl } from '../../data/exerciseMedia';
 import { coachingOf } from '../../domain/coaching';
 import { BAND_LABELS, bandOf, levelOf, levelPips } from '../../domain/difficulty';
 import { CATEGORY_LABELS, categoryOf } from '../../domain/categories';
-import { plural } from '../../ui/text';
 import type { Exercise } from '../../domain/types';
 import { useT } from '../../i18n/useT';
 import { useApp } from '../../ui/AppProvider';
@@ -80,17 +79,17 @@ export default function ExerciseInfoSheet({
         instead, which does the same job for a movement whose name already tells you what it
         is. This is for the long tail, where the name often does not.
       */}
-      {exercise.description && <p className="small">{exercise.description}</p>}
+      {exercise.description && <p className="small">{t.prose(exercise.description)}</p>}
 
       {coaching ? (
         <>
           <div className="section-title">{t('Set up')}</div>
-          <p className="small">{coaching.setup}</p>
+          <p className="small">{t.prose(coaching.setup)}</p>
 
           <div className="section-title">{t('How to do it')}</div>
           <ol className="cue-list">
             {coaching.cues.map((cue) => (
-              <li key={cue}>{cue}</li>
+              <li key={cue}>{t.prose(cue)}</li>
             ))}
           </ol>
 
@@ -102,7 +101,7 @@ export default function ExerciseInfoSheet({
           {coaching.fault && (
             <>
               <div className="section-title">{t('Watch for')}</div>
-              <p className="small">{coaching.fault}</p>
+              <p className="small">{t.prose(coaching.fault)}</p>
             </>
           )}
         </>
@@ -115,7 +114,7 @@ export default function ExerciseInfoSheet({
       {exercise.notes && (
         <>
           <div className="section-title">{t('Note')}</div>
-          <p className="small faint">{exercise.notes}</p>
+          <p className="small faint">{t.prose(exercise.notes)}</p>
         </>
       )}
 
@@ -145,7 +144,7 @@ export default function ExerciseInfoSheet({
 
       {exercise.substitutes.length > 0 && (
         <p className="tiny faint" style={{ marginTop: '0.5rem' }}>
-          {plural(exercise.substitutes.length, 'stand-in')} if your equipment changes.
+          {t.count(exercise.substitutes.length, 'stand-in')} {t('if your equipment changes.')}
         </p>
       )}
     </Sheet>

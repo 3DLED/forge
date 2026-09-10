@@ -36,6 +36,7 @@ const FILES = [
   'src/data/seed/enrichment.ts',
   // Derived from the two above, so it carries the same obligation.
   'src/data/seed/names.es.ts',
+  'src/data/seed/prose.es.ts',
 ];
 
 const SALT_BYTES = 16;

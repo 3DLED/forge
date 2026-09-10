@@ -19,13 +19,22 @@ export interface Translator {
   (english: string): string;
   /** "3 movements" — a count and a noun that agrees with it. */
   count: (value: number, noun: string) => string;
+  /**
+   * A sentence about a movement: an instruction, a cue, a description.
+   *
+   * Separate from `t` because it is answered by a different, much larger table that is
+   * fetched only when it is wanted. Falls through to the English, which is the ordinary case
+   * while the chunk is in flight and for everything not yet translated.
+   */
+  prose: (english: string) => string;
 }
 
 export function useT(): Translator {
-  const { lang } = useApp();
+  const { lang, prose } = useApp();
   return useMemo(() => {
     const t = ((english: string) => translate(english, lang)) as Translator;
     t.count = (value: number, noun: string) => count(value, noun, lang);
+    t.prose = (english: string) => (english && prose?.[english]) || english;
     return t;
-  }, [lang]);
+  }, [lang, prose]);
 }

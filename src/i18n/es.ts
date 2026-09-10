@@ -208,6 +208,7 @@ export const ES: Record<string, string> = {
   Trains: 'Trabaja',
   also: 'también',
   'Watch for': 'Cuidado con',
+  'if your equipment changes.': 'si cambia tu equipo.',
 
   // --- suggesting a workout --------------------------------------------------
   Train: 'Entrenar',
