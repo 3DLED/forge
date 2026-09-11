@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   acuteChronicRatio,
+  consistency,
   effortBand,
   effortMinutes,
   estimate1RM,
@@ -13,7 +14,7 @@ import {
   setVolumeKg,
   workoutKey,
 } from './training';
-import type { Exercise, LoggedSession, LoggedSet } from './types';
+import type { Exercise, LoggedSession, LoggedSet, PlannedSession } from './types';
 
 /**
  * Fixtures are built by hand rather than imported from the seed library: a test that breaks
@@ -209,6 +210,68 @@ describe('effortMinutes', () => {
   it('ignores a session nobody rated rather than assuming it was easy', () => {
     const s = { ...session('a', '2026-01-01', [set('squat', { reps: 5 })]), durationMin: 60 };
     expect(effortMinutes([s])).toEqual({ easy: 0, moderate: 0, hard: 0 });
+  });
+});
+
+describe('consistency', () => {
+  const slot = (date: string, status: string): PlannedSession =>
+    ({ id: `${date}-${status}`, date, status, prescription: {} }) as PlannedSession;
+
+  const done = (date: string, plannedSessionId?: string): LoggedSession => ({
+    ...session(`log-${date}-${plannedSessionId ?? 'free'}`, date, []),
+    plannedSessionId,
+  });
+
+  it('splits what was due into done, skipped and missed', () => {
+    const out = consistency(
+      [
+        slot('2026-01-01', 'completed'),
+        slot('2026-01-02', 'skipped'),
+        slot('2026-01-03', 'planned'),
+      ],
+      [],
+      '2026-01-05',
+    );
+    expect(out).toMatchObject({ due: 3, done: 1, skipped: 1, missed: 1 });
+  });
+
+  /*
+   * A week still running is counted to today. Otherwise every current week opens at nought
+   * and climbs, which reads as failure until Sunday.
+   */
+  it('does not count days that have not happened yet', () => {
+    const out = consistency(
+      [slot('2026-01-01', 'completed'), slot('2026-01-09', 'planned')],
+      [],
+      '2026-01-05',
+    );
+    expect(out.due).toBe(1);
+    expect(out.missed).toBe(0);
+  });
+
+  /*
+   * Otherwise shifting a session from Tuesday to Thursday scores worse than not training:
+   * a miss where it left and a bonus where it landed.
+   */
+  it('ignores a slot that moved, since it counts where it went', () => {
+    const out = consistency([slot('2026-01-01', 'moved')], [], '2026-01-05');
+    expect(out).toMatchObject({ due: 0, missed: 0 });
+  });
+
+  it('counts a session no plan asked for as extra rather than adherence', () => {
+    const out = consistency([slot('2026-01-01', 'completed')], [done('2026-01-02')], '2026-01-05');
+    expect(out.done).toBe(1);
+    expect(out.extra).toBe(1);
+    expect(out.due).toBe(1);
+  });
+
+  it('does not count a planned session twice by also calling it extra', () => {
+    const out = consistency(
+      [slot('2026-01-01', 'completed')],
+      [done('2026-01-01', '2026-01-01-completed')],
+      '2026-01-05',
+    );
+    expect(out.extra).toBe(0);
   });
 });
 

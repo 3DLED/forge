@@ -9,10 +9,15 @@ import BarChart, { type Bar } from '../../ui/BarChart';
 import PrSheet, { prMarks } from './PrSheet';
 import StackedBarChart from '../../ui/StackedBarChart';
 import { useApp } from '../../ui/AppProvider';
-import { sessionsBetween } from '../../data/sessions';
+import { plannedBetween, sessionsBetween } from '../../data/sessions';
 import { addWeeks, monthName, startOfWeek, todayKey, weekDays } from '../../domain/dates';
 import {
   acuteChronicRatio,
+  consistency,
+  CONSISTENCY_LABELS,
+  CONSISTENCY_PARTS,
+  type Consistency,
+  type ConsistencyPart,
   EFFORT_BANDS,
   EFFORT_LABELS,
   effortMinutes,
@@ -42,6 +47,10 @@ export default function ProgressView() {
     [firstWeekStart, lastWeekEnd],
   );
   const allSessions = useLiveQuery(() => sessionsBetween('0000-01-01', '9999-12-31'), []);
+  const plannedRows = useLiveQuery(
+    () => plannedBetween(firstWeekStart, lastWeekEnd),
+    [firstWeekStart, lastWeekEnd],
+  );
   const weighIns = useLiveQuery(() => bodyweightEntries(), [], undefined);
   /* Round records are keyed by saved workout, so their names come from the templates. */
   const saved = useLiveQuery(() => savedWorkouts(), []);
@@ -78,10 +87,15 @@ export default function ProgressView() {
           0,
         ),
         effort: effortMinutes(inWeek),
+        consistency: consistency(
+          (plannedRows ?? []).filter((p) => p.date >= days[0] && p.date <= days[6]),
+          inWeek,
+          todayKey(),
+        ),
         count: inWeek.length,
       };
     });
-  }, [sessions, firstWeekStart, profile.weekStartsOn, exerciseBySlug, bodyweight]);
+  }, [sessions, plannedRows, firstWeekStart, profile.weekStartsOn, exerciseBySlug, bodyweight]);
 
   const records = useMemo(
     () => personalRecords(allSessions ?? [], bodyweight),
@@ -125,6 +139,33 @@ export default function ProgressView() {
   }, [weeks]);
 
   const effortTotal = EFFORT_BANDS.reduce((sum, band) => sum + effortTotals[band], 0);
+
+  /*
+   * Adherence over the window, matching `planProgress`: of the slots whose day came, how many
+   * were completed. Extra sessions are outside it on purpose — unplanned work is training, but
+   * it is not evidence a plan is being followed, and letting it push the figure over 100%
+   * would turn the one number that measures discipline into a number that rewards ignoring it.
+   */
+  const consistencyTotals = useMemo(() => {
+    const totals: Consistency = { due: 0, done: 0, skipped: 0, missed: 0, extra: 0 };
+    for (const week of weeks) {
+      totals.due += week.consistency.due;
+      totals.done += week.consistency.done;
+      totals.skipped += week.consistency.skipped;
+      totals.missed += week.consistency.missed;
+      totals.extra += week.consistency.extra;
+    }
+    return totals;
+  }, [weeks]);
+
+  const adherence = consistencyTotals.due > 0 ? consistencyTotals.done / consistencyTotals.due : null;
+
+  const PART_FILL: Record<ConsistencyPart, string> = {
+    done: 'var(--good)',
+    extra: 'var(--accent)',
+    skipped: 'var(--warn)',
+    missed: 'var(--danger)',
+  };
 
   const BAND_FILL: Record<EffortBand, string> = {
     easy: 'var(--good)',
@@ -236,6 +277,54 @@ export default function ProgressView() {
 
           <p className="tiny faint" style={{ marginTop: '0.5rem', marginBottom: 0 }}>
             {t('Minutes, by how hard they were. Most weeks want to be mostly easy with a little genuinely hard — it is the middle that quietly eats a training block, tiring enough to need recovering from and not hard enough to change anything.')}
+          </p>
+        </section>
+      )}
+
+      {/*
+        Only when a plan exists to be consistent with. Without one every bar would be a solid
+        block of "extra", which says nothing about adherence and quietly implies a failing.
+      */}
+      {consistencyTotals.due > 0 && adherence != null && (
+        <section className="card">
+          <div className="card-head">
+            <h2>{t('Consistency')}</h2>
+            <span className={`pill ${adherence >= 0.8 ? 'good' : adherence < 0.5 ? 'warn' : ''}`}>
+              {Math.round(adherence * 100)}% {t('of what was due')}
+            </span>
+          </div>
+          <StackedBarChart
+            bars={weeks.map((week) => ({
+              label: week.label,
+              segments: CONSISTENCY_PARTS.map((part) => ({
+                key: part,
+                label: t(CONSISTENCY_LABELS[part]),
+                value: week.consistency[part],
+                fill: PART_FILL[part],
+              })),
+            }))}
+          />
+
+          <div className="cal-legend">
+            {CONSISTENCY_PARTS.map((part) => (
+              <span key={part}>
+                <i
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 2,
+                    background: PART_FILL[part],
+                    display: 'inline-block',
+                  }}
+                />
+                {t(CONSISTENCY_LABELS[part])}{' '}
+                <span className="mono">{consistencyTotals[part]}</span>
+              </span>
+            ))}
+          </div>
+
+          <p className="tiny faint" style={{ marginTop: '0.5rem', marginBottom: 0 }}>
+            {t('Plan slots whose day has come, and what became of them. A skipped session counts against the figure, because deciding not to train is something that happened to the plan. Sessions no plan asked for are counted apart — they are training, but they are not evidence the plan is being followed.')}
           </p>
         </section>
       )}

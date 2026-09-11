@@ -473,6 +473,13 @@ export const ES: Record<string, string> = {
   'Training load': 'Carga de entrenamiento',
   'Weekly volume': 'Volumen semanal',
   'Weekly distance': 'Distancia semanal',
+  Consistency: 'Constancia',
+  Completed: 'Completadas',
+  Extra: 'Extra',
+  Missed: 'Perdidas',
+  'of what was due': 'de lo que tocaba',
+  'Plan slots whose day has come, and what became of them. A skipped session counts against the figure, because deciding not to train is something that happened to the plan. Sessions no plan asked for are counted apart — they are training, but they are not evidence the plan is being followed.':
+    'Las sesiones del plan cuyo día ya llegó, y en qué quedaron. Una sesión omitida cuenta en contra, porque decidir no entrenar es algo que le pasó al plan. Las sesiones que ningún plan pedía se cuentan aparte: son entrenamiento, pero no son prueba de que el plan se esté cumpliendo.',
   Easy: 'Fácil',
   Moderate: 'Moderado',
   Hard: 'Duro',

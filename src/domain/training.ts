@@ -8,7 +8,15 @@
  */
 
 import type { BodyweightLookup } from './bodyweight';
-import type { DayKey, Exercise, Id, LoggedBlock, LoggedSession, LoggedSet } from './types';
+import type {
+  DayKey,
+  Exercise,
+  Id,
+  LoggedBlock,
+  LoggedSession,
+  LoggedSet,
+  PlannedSession,
+} from './types';
 
 // --- per-set --------------------------------------------------------------
 
@@ -217,6 +225,75 @@ export function effortMinutes(sessions: LoggedSession[]): Record<EffortBand, num
     minutes[effortBand(rpe)] += session.durationMin ?? estimateDurationMin(session);
   }
   return minutes;
+}
+
+export type ConsistencyPart = 'done' | 'extra' | 'skipped' | 'missed';
+
+/** Drawn bottom-up, so the week reads from what you did to what you did not. */
+export const CONSISTENCY_PARTS: ConsistencyPart[] = ['done', 'extra', 'skipped', 'missed'];
+
+/**
+ * Chart labels, here rather than in the component so the translation check collects them.
+ *
+ * "Completed" rather than "Done" on purpose: "Done" is already a button in this app and its
+ * Spanish is the button's, which is the wrong word for a count of sessions.
+ */
+export const CONSISTENCY_LABELS: Record<ConsistencyPart, string> = {
+  done: 'Completed',
+  extra: 'Extra',
+  skipped: 'Skipped',
+  missed: 'Missed',
+};
+
+export interface Consistency {
+  /** Plan slots whose day has arrived. The denominator adherence divides by. */
+  due: number;
+  done: number;
+  skipped: number;
+  /** Due, still sitting there, day gone. */
+  missed: number;
+  /** Sessions you did that no plan asked for. */
+  extra: number;
+}
+
+/**
+ * What a week's plan asked for against what happened.
+ *
+ * The definition of adherence is `planProgress`'s and deliberately not a second one: of the
+ * slots whose day has come, how many were completed. An app that answers "how consistent am
+ * I" two different ways in two places has answered it zero times.
+ *
+ * Three consequences worth stating, because each is a judgement rather than arithmetic.
+ *
+ * **Only what was due.** A week still in progress is counted to today, otherwise every current
+ * week opens at nought per cent and climbs, which reads as failure until Sunday.
+ *
+ * **A skipped session counts against you.** It is the uncomfortable reading, and it is the
+ * right one: deciding not to train is a thing that happened to the plan. Dropping a session
+ * outright is the separate gesture that removes it from the reckoning, which is what the plan
+ * sheet means by measuring against what remains.
+ *
+ * **Moved slots are counted where they went.** Otherwise a session shifted from Tuesday to
+ * Thursday is a miss on Tuesday and a bonus on Thursday, and rearranging your week to fit it
+ * in would score worse than not training.
+ *
+ * `extra` is here because a chart of plan slots alone tells someone who trained four times
+ * off-plan that they did nothing. It is reported apart from adherence rather than folded in:
+ * unplanned work is training, but it is not evidence that a plan is being followed.
+ */
+export function consistency(
+  planned: PlannedSession[],
+  logged: LoggedSession[],
+  today: DayKey,
+): Consistency {
+  const due = planned.filter((slot) => slot.status !== 'moved' && slot.date <= today);
+  return {
+    due: due.length,
+    done: due.filter((slot) => slot.status === 'completed').length,
+    skipped: due.filter((slot) => slot.status === 'skipped').length,
+    missed: due.filter((slot) => slot.status === 'planned').length,
+    extra: logged.filter((session) => session.endedAt && !session.plannedSessionId).length,
+  };
 }
 
 /** Trailing weeks that must contain real training before the ratio means anything. */
