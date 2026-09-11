@@ -161,6 +161,46 @@ export function sessionDistanceM(session: LoggedSession): number {
   );
 }
 
+/**
+ * Distance that was not covered on your feet.
+ *
+ * A denylist rather than a list of what counts, because the set of movements that record a
+ * distance at all is small and closed — the cardio library, loaded carries, and the two
+ * crawls — and everything in it except these is ground taken a step at a time. Stated the
+ * other way round, a sled drag somebody adds themselves would silently stop counting.
+ *
+ * Monkey bars are in here despite being neither wheeled nor wet: the distance is real and your
+ * feet are nowhere near it.
+ */
+export const OFF_FEET_SLUGS = new Set([
+  'row-erg',
+  'ski-erg',
+  'bike-erg',
+  'air-bike',
+  'swim',
+  'open-water-swim',
+  'monkey-bars',
+]);
+
+/**
+ * Distance taken step by step, which is the only kind a mileage ramp can reason about.
+ *
+ * Twenty-five kilometres on a stationary bike and twenty-five kilometres on tarmac are the
+ * same number and nothing else. Totalling them makes a figure that rises when you take the
+ * impact *out* of a week, which is precisely backwards for the thing the ratio warns about —
+ * bone and tendon do not care how far the flywheel went.
+ */
+export function sessionFootDistanceM(session: LoggedSession): number {
+  const blockFor = blockOf(session);
+  return session.sets.reduce(
+    (total, set) =>
+      OFF_FEET_SLUGS.has(set.exerciseSlug)
+        ? total
+        : total + timesPerformed(set, blockFor(set)) * setDistanceM(set),
+    0,
+  );
+}
+
 export function sessionWorkSec(session: LoggedSession): number {
   const setSec = session.sets.reduce(
     (total, set) => total + (set.completed ? (set.values.timeSec ?? 0) : 0),
@@ -296,6 +336,69 @@ export function consistency(
     missed: due.filter((slot) => slot.status === 'planned').length,
     extra: logged.filter((session) => session.endedAt && !session.plannedSessionId).length,
   };
+}
+
+/**
+ * The movements whose pace is a running pace.
+ *
+ * A list rather than a rule, because no field in the library separates these from the rest of
+ * `gait`: a walk, a ruck, a row and a bike ride are all cardio covering ground, and the honest
+ * way to say "not those" is to say which ones. Averaging a ruck into a running pace produces a
+ * figure that describes neither the ruck nor the run.
+ *
+ * Sprints are in. A sprint session is running, and the average is weighted by distance, so
+ * four hundred metres of it moves a thirty-kilometre week by about as much as it should.
+ *
+ * A cardio movement somebody adds themselves is not here and will not be counted. That is the
+ * cost of the list, and it is the right way round: leaving a run out understates a chart,
+ * where letting a bike in makes it say something false.
+ */
+export const RUN_SLUGS = new Set([
+  'easy-run',
+  'recovery-run',
+  'long-run',
+  'tempo-run',
+  'interval-run',
+  'hill-sprint',
+  'hill-repeats',
+  'race-pace-run',
+  'progression-run',
+  'trail-run',
+  'treadmill-run',
+  'sprint',
+]);
+
+export interface RunTotals {
+  distanceM: number;
+  timeSec: number;
+}
+
+/**
+ * Ground run and the time it took, for the sets where both were recorded.
+ *
+ * Both or neither. A run logged with a distance and no clock cannot contribute to a pace, and
+ * quietly letting its distance into the denominator would report every week as faster than it
+ * was — the bug would look like progress, which is the worst kind.
+ *
+ * Summing distance and time separately and dividing once at the end is what makes the average
+ * distance-weighted. Averaging each run's pace instead would let a warm-up mile count as much
+ * as a twenty-mile long run, and the number would move on what you did least of.
+ */
+export function runTotals(sessions: LoggedSession[]): RunTotals {
+  const totals: RunTotals = { distanceM: 0, timeSec: 0 };
+  for (const session of sessions) {
+    const blockFor = blockOf(session);
+    for (const set of session.sets) {
+      if (!RUN_SLUGS.has(set.exerciseSlug)) continue;
+      const distanceM = set.values.distanceM ?? 0;
+      const timeSec = set.values.timeSec ?? 0;
+      if (distanceM <= 0 || timeSec <= 0) continue;
+      const times = timesPerformed(set, blockFor(set));
+      totals.distanceM += times * distanceM;
+      totals.timeSec += times * timeSec;
+    }
+  }
+  return totals;
 }
 
 export interface PatternTotals {

@@ -8,8 +8,10 @@ import {
   personalRecords,
   prEventsBySession,
   pushPullRatio,
+  runTotals,
   scanRecords,
   sessionDistanceM,
+  sessionFootDistanceM,
   sessionLoad,
   sessionVolumeKg,
   setVolumeKg,
@@ -274,6 +276,100 @@ describe('consistency', () => {
       '2026-01-05',
     );
     expect(out.extra).toBe(0);
+  });
+});
+
+describe('sessionFootDistanceM', () => {
+  it('drops the distance covered on a machine or in water', () => {
+    const s = session('a', '2026-01-01', [
+      set('easy-run', { distanceM: 10000, timeSec: 3000 }),
+      set('bike-erg', { distanceM: 25000, timeSec: 3000 }),
+      set('swim', { distanceM: 2000, timeSec: 2400 }),
+    ]);
+    expect(sessionFootDistanceM(s)).toBe(10000);
+    // The general figure still totals everything, which is what one session's card shows.
+    expect(sessionDistanceM(s)).toBe(37000);
+  });
+
+  it('keeps walking, rucking and loaded carries, which are all on your feet', () => {
+    const s = session('a', '2026-01-01', [
+      set('walk', { distanceM: 3000, timeSec: 2100 }),
+      set('ruck', { distanceM: 5000, timeSec: 4000 }),
+      set('farmers-carry', { distanceM: 40, weightKg: 32 }),
+    ]);
+    expect(sessionFootDistanceM(s)).toBe(8040);
+  });
+});
+
+describe('runTotals', () => {
+  it('adds distance and time across every run in the window', () => {
+    const out = runTotals([
+      session('a', '2026-01-01', [set('easy-run', { distanceM: 8000, timeSec: 2400 })]),
+      session('b', '2026-01-03', [set('long-run', { distanceM: 16000, timeSec: 5400 })]),
+    ]);
+    expect(out).toEqual({ distanceM: 24000, timeSec: 7800 });
+  });
+
+  /*
+   * A ruck and a bike ride are cardio covering ground, and neither has a running pace. Letting
+   * one in produces an average that describes nothing that happened.
+   */
+  it('leaves out cardio that is not running', () => {
+    const out = runTotals([
+      session('a', '2026-01-01', [
+        set('easy-run', { distanceM: 5000, timeSec: 1500 }),
+        set('ruck', { distanceM: 5000, timeSec: 4000 }),
+        set('bike-erg', { distanceM: 20000, timeSec: 2400 }),
+        set('walk', { distanceM: 3000, timeSec: 2100 }),
+      ]),
+    ]);
+    expect(out).toEqual({ distanceM: 5000, timeSec: 1500 });
+  });
+
+  /*
+   * Distance with no clock cannot make a pace, and letting it into the denominator alone would
+   * report the week as faster than it was — a bug that looks like progress.
+   */
+  it('ignores a run recorded without both a distance and a time', () => {
+    const out = runTotals([
+      session('a', '2026-01-01', [
+        set('easy-run', { distanceM: 5000 }),
+        set('easy-run', { timeSec: 1500 }),
+        set('trail-run', { distanceM: 4000, timeSec: 1600 }),
+      ]),
+    ]);
+    expect(out).toEqual({ distanceM: 4000, timeSec: 1600 });
+  });
+
+  it('leaves an unticked run out', () => {
+    const out = runTotals([
+      session('a', '2026-01-01', [set('easy-run', { distanceM: 5000, timeSec: 1500 }, false)]),
+    ]);
+    expect(out).toEqual({ distanceM: 0, timeSec: 0 });
+  });
+
+  it('counts each round of a timed block', () => {
+    const intervals = {
+      ...session('a', '2026-01-01', [
+        { ...set('interval-run', { distanceM: 400, timeSec: 90 }, false), blockId: 'b1' },
+      ]),
+      blocks: [{ id: 'b1', style: 'emom' as const, rounds: 8 }],
+    } as LoggedSession;
+    expect(runTotals([intervals])).toEqual({ distanceM: 3200, timeSec: 720 });
+  });
+
+  /*
+   * Summed then divided once, rather than averaging each run's own pace. Otherwise a one-mile
+   * shakeout counts as much as a twenty-mile long run and the figure moves on what you did
+   * least of.
+   */
+  it('weights the average by distance, not by how many runs there were', () => {
+    const out = runTotals([
+      // 1 km at 4:00, then 9 km at 5:00. Distance-weighted that is 4:54, not 4:30.
+      session('a', '2026-01-01', [set('tempo-run', { distanceM: 1000, timeSec: 240 })]),
+      session('b', '2026-01-02', [set('easy-run', { distanceM: 9000, timeSec: 2700 })]),
+    ]);
+    expect((out.timeSec / out.distanceM) * 1000).toBeCloseTo(294, 0);
   });
 });
 

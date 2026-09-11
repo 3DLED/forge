@@ -471,8 +471,14 @@ export const ES: Record<string, string> = {
     'Todo lo que registras aparece aquí, lo más reciente primero.',
   'Personal bests': 'Récords personales',
   'Training load': 'Carga de entrenamiento',
+  '4-wk avg': 'media de 4 sem',
   'Weekly volume': 'Volumen semanal',
   'Weekly distance': 'Distancia semanal',
+  Pace: 'Ritmo',
+  'Mileage on its own, against its own four-week average. Training load mixes running into lifting, which can hold the combined figure flat while the miles underneath it double — and it is the miles that break bone. Lungs adapt in weeks, tendon and bone over months, so the week that felt fine is the one to watch.':
+    'El kilometraje por su cuenta, frente a su propia media de cuatro semanas. La carga de entrenamiento mezcla correr con levantar, lo que puede mantener plana la cifra combinada mientras los kilómetros de debajo se duplican, y son los kilómetros los que rompen el hueso. Los pulmones se adaptan en semanas; el tendón y el hueso, en meses. Por eso la semana que te pareció llevadera es la que hay que vigilar.',
+  'Average pace across every run that week, weighted by distance, so a long run counts for more than a shakeout. Taller is faster, and the axis starts just below your slowest week rather than at a standstill. Walks, rucks, rows and rides are left out — averaging them into a running pace describes none of them.':
+    'El ritmo medio de todas las carreras de esa semana, ponderado por distancia, para que una tirada larga pese más que un trote suave. Más alto es más rápido, y el eje empieza justo por debajo de tu semana más lenta, no en parado. Las caminatas, las marchas con mochila, el remo y la bici quedan fuera: promediarlos dentro de un ritmo de carrera no describe a ninguno.',
   Consistency: 'Constancia',
   Completed: 'Completadas',
   Extra: 'Extra',

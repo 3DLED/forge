@@ -25,14 +25,15 @@ import {
   type EffortBand,
   personalRecords,
   workoutIdFromKey,
-  sessionDistanceM,
+  sessionFootDistanceM,
   sessionLoad,
   sessionVolumeKg,
   pushPullRatio,
+  runTotals,
   volumeByPattern,
 } from '../../domain/training';
 import { PATTERN_LABELS } from '../../domain/regions';
-import { formatDistance, formatWeight } from '../../domain/units';
+import { formatDistance, formatPace, formatWeight, paceSecPerKm } from '../../domain/units';
 import { useT } from '../../i18n/useT';
 
 const WEEKS_SHOWN = 12;
@@ -85,12 +86,13 @@ export default function ProgressView() {
         start,
         label: `${monthName(start, true)} ${Number(start.slice(8))}`,
         load: inWeek.reduce((total, s) => total + sessionLoad(s), 0),
-        distanceM: inWeek.reduce((total, s) => total + sessionDistanceM(s), 0),
+        distanceM: inWeek.reduce((total, s) => total + sessionFootDistanceM(s), 0),
         volumeKg: inWeek.reduce(
           (total, s) => total + sessionVolumeKg(s, exerciseBySlug, bodyweight.at(s.date)),
           0,
         ),
         effort: effortMinutes(inWeek),
+        run: runTotals(inWeek),
         consistency: consistency(
           (plannedRows ?? []).filter((p) => p.date >= days[0] && p.date <= days[6]),
           inWeek,
@@ -125,6 +127,16 @@ export default function ProgressView() {
     [records, units],
   );
   const ratio = acuteChronicRatio(weeks.map((w) => w.load));
+
+  /*
+   * The same ratio again, over mileage alone.
+   *
+   * Not a duplicate of the load one. Load adds running and lifting into a single number, which
+   * is what makes it useful for judging a whole week and useless for judging a ramp: a big
+   * lifting block can hold the combined figure flat while the running underneath it doubles,
+   * and it is the running that breaks bone. Miles get their own denominator.
+   */
+  const mileageRatio = acuteChronicRatio(weeks.map((w) => w.distanceM));
 
   /*
    * Effort is summed across the whole window rather than read off the latest week.
@@ -176,6 +188,48 @@ export default function ProgressView() {
     () => volumeByPattern(sessions ?? [], exerciseBySlug, bodyweight).filter((r) => r.pattern !== 'gait'),
     [sessions, exerciseBySlug, bodyweight],
   );
+
+  /*
+   * Pace over the window, summed before dividing, so it is weighted by ground covered rather
+   * than by how many times you went out.
+   */
+  const runWindow = useMemo(
+    () => weeks.reduce(
+      (total, week) => ({
+        distanceM: total.distanceM + week.run.distanceM,
+        timeSec: total.timeSec + week.run.timeSec,
+      }),
+      { distanceM: 0, timeSec: 0 },
+    ),
+    [weeks],
+  );
+  const windowPace = paceSecPerKm(runWindow.distanceM, runWindow.timeSec);
+
+  /*
+   * Bars are speed rather than pace, so the taller bar is the faster week — pace read as
+   * height draws a good week short, which is the one way a chart can be read exactly
+   * backwards. The values are then formatted back into a pace, which is what a runner thinks
+   * in.
+   */
+  const paceBars = useMemo(
+    () =>
+      weeks.map((week, index) => ({
+        label: week.label,
+        value: week.run.timeSec > 0 ? week.run.distanceM / week.run.timeSec : 0,
+        highlight: index === weeks.length - 1,
+      })),
+    [weeks],
+  );
+
+  /*
+   * Running speeds sit in a narrow band well away from zero, so a zero axis draws every week
+   * at the same height whatever happened. A tenth below the slowest week leaves that week a
+   * visible bar and gives the rest somewhere to be taller than.
+   */
+  const paceFloor = useMemo(() => {
+    const speeds = paceBars.map((bar) => bar.value).filter((v) => v > 0);
+    return speeds.length > 1 ? Math.min(...speeds) * 0.9 : 0;
+  }, [paceBars]);
 
   const patternSets = patternRows.reduce((total, row) => total + row.sets, 0);
   const pushPull = pushPullRatio(patternRows);
@@ -234,7 +288,7 @@ export default function ProgressView() {
           <h2>{t('Training load')}</h2>
           {ratio != null && (
             <span className={`pill ${ratio > 1.5 ? 'warn' : ratio < 0.8 ? '' : 'good'}`}>
-              {ratio.toFixed(2)}× 4-wk avg
+              {ratio.toFixed(2)}× {t('4-wk avg')}
             </span>
           )}
         </div>
@@ -353,9 +407,47 @@ export default function ProgressView() {
         <section className="card">
           <div className="card-head">
             <h2>{t('Weekly distance')}</h2>
-            <span className="pill mono">{formatDistance(weeks.at(-1)!.distanceM, units)}</span>
+            {/*
+              The ramp when there is enough history to compute one, and this week's mileage
+              until then. Two pills would crowd the head on a phone, and the figure the ratio
+              replaces is already on the chart twice — as the last bar, and in the peak line.
+            */}
+            {mileageRatio != null ? (
+              <span
+                className={`pill ${mileageRatio > 1.5 ? 'warn' : mileageRatio < 0.8 ? '' : 'good'}`}
+              >
+                {mileageRatio.toFixed(2)}× {t('4-wk avg')}
+              </span>
+            ) : (
+              <span className="pill mono">{formatDistance(weeks.at(-1)!.distanceM, units)}</span>
+            )}
           </div>
           <BarChart bars={distanceBars} formatValue={(v) => formatDistance(v, units)} />
+          <p className="tiny faint" style={{ marginTop: '0.5rem', marginBottom: 0 }}>
+            {t('Mileage on its own, against its own four-week average. Training load mixes running into lifting, which can hold the combined figure flat while the miles underneath it double — and it is the miles that break bone. Lungs adapt in weeks, tendon and bone over months, so the week that felt fine is the one to watch.')}
+          </p>
+        </section>
+      )}
+
+      {/*
+        Beside distance rather than beside load: how far and how fast are the two halves of
+        the same question, and a mileage jump that came with a pace jump is a different week
+        from a mileage jump that came at the same effort.
+      */}
+      {windowPace != null && (
+        <section className="card">
+          <div className="card-head">
+            <h2>{t('Pace')}</h2>
+            <span className="pill mono">{formatPace(windowPace, units)}</span>
+          </div>
+          <BarChart
+            bars={paceBars}
+            floor={paceFloor}
+            formatValue={(mps) => (mps > 0 ? formatPace(1000 / mps, units) : '—')}
+          />
+          <p className="tiny faint" style={{ marginTop: '0.5rem', marginBottom: 0 }}>
+            {t('Average pace across every run that week, weighted by distance, so a long run counts for more than a shakeout. Taller is faster, and the axis starts just below your slowest week rather than at a standstill. Walks, rucks, rows and rides are left out — averaging them into a running pace describes none of them.')}
+          </p>
         </section>
       )}
 
