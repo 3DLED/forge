@@ -236,6 +236,10 @@ export default function PlanView() {
         {grid.map((day) => {
           const dayPlanned = (planned ?? []).filter((p) => p.date === day);
           const dayLogged = (logged ?? []).filter((s) => s.date === day && s.endedAt);
+          const daySkipped = dayPlanned.filter((p) => p.status === 'skipped');
+          const dayOpen = dayPlanned.filter(
+            (p) => p.status !== 'skipped' && p.status !== 'completed',
+          );
           const availability = resolveDayAvailability(day, profile.availability, exceptions ?? []);
           const isBlackout = (exceptions ?? []).some(
             (e) => e.kind === 'blackout' && day >= e.startDate && day <= e.endDate,
@@ -258,7 +262,20 @@ export default function PlanView() {
                 if (swiped.current) return;
                 setOpenDay(day);
               }}
-              aria-label={`${day}, ${dayPlanned.length} planned, ${dayLogged.length} completed`}
+              /*
+                Skipped counted apart from planned, for the same reason the marker is a shape
+                and not a shade: read aloud, "one planned" was all a skipped day ever said,
+                which is the visual problem in its least recoverable form. Empty counts are
+                left out so the common case stays short.
+              */
+              aria-label={[
+                day,
+                dayLogged.length > 0 ? `${dayLogged.length} done` : null,
+                daySkipped.length > 0 ? `${daySkipped.length} skipped` : null,
+                dayOpen.length > 0 ? `${dayOpen.length} planned` : null,
+              ]
+                .filter(Boolean)
+                .join(', ')}
             >
               {Number(day.slice(8))}
               <span className="cal-dots">
