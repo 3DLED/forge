@@ -100,6 +100,26 @@ jobs:
           echo "Identities now visible to codesign:"
           security find-identity -v -p codesigning "$KEYCHAIN"
 
+      # Capacitor ships its frameworks as binary targets, which Swift Package Manager fetches
+      # from GitHub's release downloads at build time. That endpoint returns a 500 often enough
+      # to matter, and when it does the archive fails outright after doing all the signing work
+      # first. Resolving up front and retrying turns a lost run into a pause.
+      - name: Resolve Swift packages
+        working-directory: ios/App
+        run: |
+          set -uo pipefail
+          for attempt in 1 2 3 4 5; do
+            if xcodebuild -resolvePackageDependencies -project App.xcodeproj -scheme App; then
+              echo "resolved on attempt $attempt"
+              exit 0
+            fi
+            echo "attempt $attempt failed; waiting $(( attempt * 15 ))s"
+            sleep $(( attempt * 15 ))
+          done
+          echo "Swift package resolution failed five times. Check whether the release assets"
+          echo "at github.com/ionic-team/capacitor-swift-pm are actually being served."
+          exit 1
+
       - name: Archive
         working-directory: ios/App
         run: |
@@ -180,7 +200,7 @@ jobs:
       # not survive the runner. Ninety days is longer than a test round.
       - name: Keep the archive
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: xcarchive-${{ github.run_number }}
           path: ${{ runner.temp }}/App.xcarchive
