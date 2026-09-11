@@ -8,7 +8,7 @@
  */
 
 import type { BodyweightLookup } from './bodyweight';
-import type { DayKey, Exercise, Id, LoggedSession, LoggedSet } from './types';
+import type { DayKey, Exercise, Id, LoggedBlock, LoggedSession, LoggedSet } from './types';
 
 // --- per-set --------------------------------------------------------------
 
@@ -102,21 +102,53 @@ export function estimateDurationMin(session: LoggedSession): number {
   return session.sets.filter((s) => s.completed).length * 3;
 }
 
+/**
+ * How many times a set's numbers actually happened.
+ *
+ * One for an ordinary set, and nothing until it is ticked. Inside a timed block the rules
+ * change, because the data means something else there: a set is the recipe for one round
+ * rather than one performance of it, and the block's round count is the record that it
+ * happened at all. Nobody ticks four movements seven times at AMRAP pace, and the block flow
+ * never asks them to — it writes the rounds and leaves the sets alone. Reading `completed`
+ * there returns nothing for a session that was quite hard.
+ *
+ * A set ticked by hand is the exception, and it is why this is not simply "rounds". Folding a
+ * workout into a block keeps sets already recorded rather than collapsing them, and those are
+ * facts about single performances. Multiplying one by the round count would invent work.
+ */
+function timesPerformed(set: LoggedSet, block: LoggedBlock | undefined): number {
+  if (!block) return set.completed ? 1 : 0;
+  if (set.completed) return 1;
+  return block.rounds ?? 0;
+}
+
+function blockOf(session: LoggedSession): (set: LoggedSet) => LoggedBlock | undefined {
+  const byId = new Map((session.blocks ?? []).map((block) => [block.id, block]));
+  return (set) => (set.blockId ? byId.get(set.blockId) : undefined);
+}
+
 export function sessionVolumeKg(
   session: LoggedSession,
   bySlug: Map<string, Exercise>,
   /** Bodyweight as of this session's date — see `domain/bodyweight.ts`. */
   bodyweightKg?: number,
 ): number {
+  const blockFor = blockOf(session);
   return session.sets.reduce(
     (total, set) =>
-      total + (set.completed ? setVolumeKg(set, bySlug.get(set.exerciseSlug), bodyweightKg) : 0),
+      total +
+      timesPerformed(set, blockFor(set)) *
+        setVolumeKg(set, bySlug.get(set.exerciseSlug), bodyweightKg),
     0,
   );
 }
 
 export function sessionDistanceM(session: LoggedSession): number {
-  return session.sets.reduce((total, set) => total + (set.completed ? setDistanceM(set) : 0), 0);
+  const blockFor = blockOf(session);
+  return session.sets.reduce(
+    (total, set) => total + timesPerformed(set, blockFor(set)) * setDistanceM(set),
+    0,
+  );
 }
 
 export function sessionWorkSec(session: LoggedSession): number {

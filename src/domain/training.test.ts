@@ -5,6 +5,7 @@ import {
   personalRecords,
   prEventsBySession,
   scanRecords,
+  sessionDistanceM,
   sessionLoad,
   sessionVolumeKg,
   setVolumeKg,
@@ -81,6 +82,60 @@ describe('setVolumeKg', () => {
       set('squat', { reps: 5, weightKg: 100 }, false),
     ]);
     expect(sessionVolumeKg(s, bySlug)).toBeCloseTo(500);
+  });
+});
+
+/*
+ * Inside a timed block a set is the recipe for one round, not one performance of it, and the
+ * block's round count is the record that it happened. Both halves of that matter: counting
+ * the recipe once undercounts an AMRAP by however many rounds were done, and waiting for a
+ * tick that the block flow never applies counts it as nothing at all.
+ */
+describe('sessionVolumeKg inside a timed block', () => {
+  const bySlug = new Map([['kb-swing', exercise()]]);
+
+  function amrap(rounds: number | undefined, sets: LoggedSet[]): LoggedSession {
+    return {
+      ...session('a', '2026-01-01', sets),
+      blocks: [{ id: 'b1', style: 'amrap', rounds }],
+    } as LoggedSession;
+  }
+
+  const inBlock = (values: LoggedSet['values'], completed = false): LoggedSet => ({
+    ...set('kb-swing', values, completed),
+    blockId: 'b1',
+  });
+
+  it('counts every round, not just the one the set describes', () => {
+    // Seven rounds of ten swings with a 12 kg bell.
+    const s = amrap(7, [inBlock({ reps: 10, weightKg: 12 })]);
+    expect(sessionVolumeKg(s, bySlug)).toBeCloseTo(840);
+  });
+
+  it('counts the work even though nothing inside the block was ticked', () => {
+    const s = amrap(3, [inBlock({ reps: 5, weightKg: 20 })]);
+    expect(sessionVolumeKg(s, bySlug)).toBeCloseTo(300);
+  });
+
+  it('counts nothing for a block that was never run', () => {
+    const s = amrap(undefined, [inBlock({ reps: 10, weightKg: 12 })]);
+    expect(sessionVolumeKg(s, bySlug)).toBe(0);
+  });
+
+  /*
+   * A set ticked by hand is a fact about one performance, and `convertSessionToBlock` keeps
+   * those when it folds a workout into a block. Multiplying them by the rounds would invent
+   * work that was recorded precisely because it was not part of the recipe.
+   */
+  it('counts a hand-ticked set once rather than once per round', () => {
+    const s = amrap(7, [inBlock({ reps: 10, weightKg: 12 }, true)]);
+    expect(sessionVolumeKg(s, bySlug)).toBeCloseTo(120);
+  });
+
+  it('counts the distance in every round too', () => {
+    // A 200 m shuttle inside each of five rounds is a kilometre.
+    const s = amrap(5, [inBlock({ distanceM: 200 })]);
+    expect(sessionDistanceM(s)).toBeCloseTo(1000);
   });
 });
 
