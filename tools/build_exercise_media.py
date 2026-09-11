@@ -133,6 +133,50 @@ ALIASES = {
     "seated-cable-row": "cable low seated row",
     "cable-fly": "0227",  # cable standing fly
     "band-curl": "band alternating biceps curl",
+    # The kettlebell pass. Twenty-two kettlebell movements had no picture, and the first
+    # surprise was that six of them did not need a substitute at all: the catalogue has
+    # forty-two kettlebell exercises and the matcher had simply been too cautious. Grip is
+    # what it kept getting wrong, so each of these was checked one-armed against two-armed
+    # before being written down.
+    "kb-front-squat": "0533",  # kettlebell front squat; Forge's is the double, as is this
+    "weighted-pistol-squat": "0544",  # kettlebell pistol squat
+    "kb-push-press": "0540",  # kettlebell one arm push press; both single-armed
+    "kb-press": "0539",  # kettlebell one arm military press; both single-armed
+    "kb-gorilla-row": "0522",  # kettlebell alternating row, which is what a gorilla row is
+    "kb-floor-press": "0519",  # kettlebell alternating press on floor; two bells, as Forge has
+    # Shown with a dumbbell, because the catalogue has no kettlebell version and the movement
+    # is identical but for the handle. Every one of these is listed in SHOWN_WITH below, and
+    # the app says so under the picture. A substitution nobody is told about is the thing this
+    # whole file exists to avoid.
+    "kb-deadlift": "0300",  # dumbbell deadlift
+    "kb-romanian-deadlift": "1459",  # dumbbell romanian deadlift
+    "single-leg-rdl": "1757",  # dumbbell single leg deadlift
+    "kb-walking-lunge": "0336",  # dumbbell lunge, walking
+    "kb-reverse-lunge": "0381",  # dumbbell rear lunge; rear and reverse are the same lunge
+    "kb-bulgarian-split-squat": "0410",  # dumbbell single leg split squat
+    "kb-step-up": "0431",  # dumbbell step-up
+    "kb-curl": "0294",  # dumbbell biceps curl
+}
+
+#: Pictures that show a different implement to the one the movement calls for.
+#:
+#: The app prints this under the picture. Swapping a dumbbell in for a kettlebell is honest
+#: when the movement is the same shape — a rear lunge is a rear lunge whatever is hanging off
+#: your hands — and dishonest the moment nobody mentions it, because a person looking up a
+#: movement they do not know has no way to tell they are being shown the wrong kit.
+#:
+#: Which is also why the list is shorter than it could be. A single-arm swing shown two-handed,
+#: a front rack lunge shown with the weight at the sides, a bottoms-up press shown any other
+#: way: in those the implement *is* the movement, and there is no picture instead.
+SHOWN_WITH = {
+    "kb-deadlift": "a dumbbell",
+    "kb-romanian-deadlift": "a dumbbell",
+    "single-leg-rdl": "a dumbbell",
+    "kb-walking-lunge": "a dumbbell",
+    "kb-reverse-lunge": "a dumbbell",
+    "kb-bulgarian-split-squat": "a dumbbell",
+    "kb-step-up": "a dumbbell",
+    "kb-curl": "a dumbbell",
 }
 
 #: Movements to leave without a picture, whatever the matcher thinks.
@@ -370,6 +414,21 @@ def main():
     ]
     for slug, (record, _how) in sorted(matched.items()):
         lines.append(f"  '{slug}': '{record['id']}', // {record['name']}")
+    lines.append("};")
+    lines.append("")
+    lines += [
+        "/**",
+        " * Where the picture shows a different implement to the one the movement calls for.",
+        " *",
+        " * Rendered under the animation, because a substitution nobody is told about is worse",
+        " * than no picture at all. Only movements whose shape survives the swap are in here.",
+        " */",
+        "",
+        "export const SHOWN_WITH: Record<string, string> = {",
+    ]
+    for slug in sorted(SHOWN_WITH):
+        if slug in matched:
+            lines.append(f"  '{slug}': '{SHOWN_WITH[slug]}',")
     lines.append("};")
     lines.append("")
     io.open(OUT, "w", encoding="utf-8", newline="\r\n").write("\n".join(lines))

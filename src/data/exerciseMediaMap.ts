@@ -57,13 +57,25 @@ export const EXERCISE_MEDIA: Record<string, string> = {
   'inverted-row': '0499', // inverted row
   'jump-rope': '2612', // jump rope
   'jump-squat': '0514', // jump squat
+  'kb-bulgarian-split-squat': '0410', // dumbbell single leg split squat
   'kb-clean': '0535', // kettlebell hang clean
+  'kb-curl': '0294', // dumbbell biceps curl
+  'kb-deadlift': '0300', // dumbbell deadlift
+  'kb-floor-press': '0519', // kettlebell alternating press on floor
+  'kb-front-squat': '0533', // kettlebell front squat
+  'kb-gorilla-row': '0522', // kettlebell alternating row
   'kb-high-pull': '0548', // kettlebell sumo high pull
+  'kb-press': '0539', // kettlebell one arm military press to the side
+  'kb-push-press': '0540', // kettlebell one arm push press
+  'kb-reverse-lunge': '0381', // dumbbell rear lunge
+  'kb-romanian-deadlift': '1459', // dumbbell romanian deadlift
   'kb-row': '0541', // kettlebell one arm row
   'kb-single-arm-floor-press': '1298', // kettlebell one arm floor press
   'kb-snatch': '0542', // kettlebell one arm snatch
+  'kb-step-up': '0431', // dumbbell step-up
   'kb-swing': '0549', // kettlebell swing
   'kb-thruster': '0550', // kettlebell thruster
+  'kb-walking-lunge': '0336', // dumbbell lunge
   'kb-windmill': '0554', // kettlebell windmill
   'l-sit': '3419', // l-sit on floor
   'lateral-raise': '0334', // dumbbell lateral raise
@@ -87,6 +99,7 @@ export const EXERCISE_MEDIA: Record<string, string> = {
   'russian-twist': '0687', // russian twist
   'scapular-pull': '0688', // scapular pull-up
   'seated-cable-row': '0180', // cable low seated row
+  'single-leg-rdl': '1757', // dumbbell single leg deadlift
   'sissy-squat': '1489', // sissy squat
   'sit-up': '0735', // sit-up v. 2
   'slam-ball': '1354', // medicine ball overhead slam
@@ -96,7 +109,26 @@ export const EXERCISE_MEDIA: Record<string, string> = {
   'trap-bar-deadlift': '0811', // trap bar deadlift
   'turkish-get-up': '0551', // kettlebell turkish get up (squat style)
   'walking-lunge': '1460', // walking lunge
+  'weighted-pistol-squat': '0544', // kettlebell pistol squat
   'weighted-pull-up': '0841', // weighted pull-up
   'weighted-russian-twist': '0846', // weighted russian twist
   'weighted-sit-up': '3670', // weighted decline sit-up
+};
+
+/**
+ * Where the picture shows a different implement to the one the movement calls for.
+ *
+ * Rendered under the animation, because a substitution nobody is told about is worse
+ * than no picture at all. Only movements whose shape survives the swap are in here.
+ */
+
+export const SHOWN_WITH: Record<string, string> = {
+  'kb-bulgarian-split-squat': 'a dumbbell',
+  'kb-curl': 'a dumbbell',
+  'kb-deadlift': 'a dumbbell',
+  'kb-reverse-lunge': 'a dumbbell',
+  'kb-romanian-deadlift': 'a dumbbell',
+  'kb-step-up': 'a dumbbell',
+  'kb-walking-lunge': 'a dumbbell',
+  'single-leg-rdl': 'a dumbbell',
 };

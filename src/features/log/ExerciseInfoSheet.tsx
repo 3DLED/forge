@@ -11,7 +11,7 @@
  */
 
 import Sheet from '../../ui/Sheet';
-import { exerciseMediaUrl } from '../../data/exerciseMedia';
+import { exerciseMediaUrl, showsDifferentKit } from '../../data/exerciseMedia';
 import { coachingOf } from '../../domain/coaching';
 import { BAND_LABELS, bandOf, levelOf, levelPips } from '../../domain/difficulty';
 import { CATEGORY_LABELS, categoryOf } from '../../domain/categories';
@@ -65,6 +65,18 @@ export default function ExerciseInfoSheet({
           width={180}
           height={180}
         />
+      )}
+
+      {/*
+        Said out loud, because the alternative is letting somebody believe the picture. A few
+        kettlebell movements are drawn with a dumbbell — the licensed set has no kettlebell
+        version and the shape of the movement survives the swap — and that is only honest if
+        the swap is on the screen next to it.
+      */}
+      {media && showsDifferentKit(exercise) && (
+        <p className="tiny faint" style={{ textAlign: 'center' }}>
+          {t('Shown with a dumbbell')}
+        </p>
       )}
 
       <p className="small muted">

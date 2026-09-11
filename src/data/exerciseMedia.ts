@@ -27,7 +27,7 @@
  * them reasonable: the full set costs about a third of what the GIFs did.
  */
 
-import { EXERCISE_MEDIA } from './exerciseMediaMap';
+import { EXERCISE_MEDIA, SHOWN_WITH } from './exerciseMediaMap';
 import type { Exercise } from '../domain/types';
 
 /** Enough of a movement to find its picture. */
@@ -54,4 +54,21 @@ export function exerciseMediaUrl(exercise: Illustrated): string | null {
 /** Whether a picture exists, for laying out around one without fetching it. */
 export function hasExerciseMedia(exercise: Illustrated): boolean {
   return mediaIdOf(exercise) != null;
+}
+
+/**
+ * True when the picture shows different kit to the one the movement calls for.
+ *
+ * Eight kettlebell movements are illustrated with a dumbbell, because the licensed set has no
+ * kettlebell version and the movement is the same shape either way — a reverse lunge is a
+ * reverse lunge whatever is hanging off your hands. The swap is fine; doing it silently is
+ * not, because somebody looking up a movement they do not know cannot tell.
+ *
+ * Every substitution today is a dumbbell, which is why the caption is one fixed sentence
+ * rather than built from the table. `SHOWN_WITH` in the generated map says which implement
+ * each one actually shows; a future substitution that is not a dumbbell needs a second string
+ * here, and the table is where you would notice.
+ */
+export function showsDifferentKit(exercise: Illustrated): boolean {
+  return SHOWN_WITH[exercise.slug] != null && mediaIdOf(exercise) != null;
 }
