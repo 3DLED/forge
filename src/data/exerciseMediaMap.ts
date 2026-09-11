@@ -37,13 +37,16 @@ export const EXERCISE_MEDIA: Record<string, string> = {
   'db-romanian-deadlift': '1459', // dumbbell romanian deadlift
   'db-row': '0293', // dumbbell bent over row
   'db-shoulder-press': '0405', // dumbbell seated shoulder press
+  'db-walking-lunge': '0336', // dumbbell lunge
   'dead-bug': '0276', // dead bug
   'deadlift': '0032', // barbell deadlift
   'decline-push-up': '0279', // decline push-up
   'diamond-push-up': '0283', // diamond push-up
   'dip': '0251', // chest dip
   'double-unders': '3885', // double under jump rope
+  'feet-elevated-inverted-row': '2298', // inverted row on bench
   'forward-lunge': '3470', // forward lunge (male)
+  'freestanding-handstand-hold': '3302', // handstand
   'freestanding-handstand-push-up': '0471', // handstand push-up
   'front-squat': '0042', // barbell front squat
   'ghr': '3193', // glute-ham raise
@@ -75,20 +78,23 @@ export const EXERCISE_MEDIA: Record<string, string> = {
   'kb-step-up': '0431', // dumbbell step-up
   'kb-swing': '0549', // kettlebell swing
   'kb-thruster': '0550', // kettlebell thruster
-  'kb-walking-lunge': '0336', // dumbbell lunge
   'kb-windmill': '0554', // kettlebell windmill
   'l-sit': '3419', // l-sit on floor
+  'lat-pulldown': '2330', // cable lat pulldown full range of motion
   'lateral-raise': '0334', // dumbbell lateral raise
   'leg-curl': '0586', // lever lying leg curl
   'leg-extension': '0585', // lever leg extension
   'leg-press': '0739', // sled 45° leg press
+  'lying-leg-raise': '0865', // lying leg-hip raise
   'machine-row': '1350', // lever seated row
   'mountain-climber': '0630', // mountain climber
   'muscle-up': '0631', // muscle up
+  'one-arm-push-up': '0725', // single arm push-up
   'overhead-carry': '4244', // kettlebell overhead carry
   'overhead-press': '0091', // barbell seated overhead press
   'pallof-press': '0979', // band horizontal pallof press
   'pendlay-row': '3017', // barbell pendlay row
+  'pistol-squat': '1759', // single leg squat (pistol) male
   'pull-up': '0651', // pull up (neutral grip)
   'push-up': '0662', // push-up
   'renegade-row': '0521', // kettlebell alternating renegade row
@@ -99,10 +105,12 @@ export const EXERCISE_MEDIA: Record<string, string> = {
   'russian-twist': '0687', // russian twist
   'scapular-pull': '0688', // scapular pull-up
   'seated-cable-row': '0180', // cable low seated row
+  'single-leg-glute-bridge': '3645', // single leg bridge with outstretched leg
   'single-leg-rdl': '1757', // dumbbell single leg deadlift
   'sissy-squat': '1489', // sissy squat
   'sit-up': '0735', // sit-up v. 2
   'slam-ball': '1354', // medicine ball overhead slam
+  'smith-squat': '0770', // smith squat
   'split-squat': '2368', // split squats
   'sumo-deadlift': '0117', // barbell sumo deadlift
   'thruster': '3305', // barbell thruster
@@ -129,6 +137,5 @@ export const SHOWN_WITH: Record<string, string> = {
   'kb-reverse-lunge': 'a dumbbell',
   'kb-romanian-deadlift': 'a dumbbell',
   'kb-step-up': 'a dumbbell',
-  'kb-walking-lunge': 'a dumbbell',
   'single-leg-rdl': 'a dumbbell',
 };

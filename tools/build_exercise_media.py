@@ -151,11 +151,33 @@ ALIASES = {
     "kb-deadlift": "0300",  # dumbbell deadlift
     "kb-romanian-deadlift": "1459",  # dumbbell romanian deadlift
     "single-leg-rdl": "1757",  # dumbbell single leg deadlift
-    "kb-walking-lunge": "0336",  # dumbbell lunge, walking
+    # No alias for the kettlebell walking lunge. It had 0336 for one commit, until the
+    # bodyweight pass noticed that 0336 *is* a dumbbell walking lunge and Forge has one of
+    # those with no picture. The exact match outranks the substitute, and the same picture
+    # cannot serve both without one of them being a lie.
     "kb-reverse-lunge": "0381",  # dumbbell rear lunge; rear and reverse are the same lunge
     "kb-bulgarian-split-squat": "0410",  # dumbbell single leg split squat
     "kb-step-up": "0431",  # dumbbell step-up
     "kb-curl": "0294",  # dumbbell biceps curl
+    # The bodyweight and floor pass. Seventy-five movements went in and nine came out, which
+    # is the right ratio for a pool this size: the catalogue has 357 bodyweight exercises and
+    # almost none of them are the plain version of anything. There is no plank in it, no
+    # hollow hold, no bird dog, no v-up that is not banded, and no hanging knee raise that is
+    # not either assisted or twisting.
+    #
+    # Every one of these was opened and looked at. Two of them changed my mind:
+    # 2298 is described as lying under a bench and is actually a bar with the feet up on one,
+    # and 0865 turns out to be on a bench rather than the floor, which is a surface and not an
+    # implement, so it is not flagged as a substitution.
+    "smith-squat": "0770",  # smith squat
+    "pistol-squat": "1759",  # single leg squat (pistol) male
+    "single-leg-glute-bridge": "3645",  # single leg bridge with outstretched leg
+    "one-arm-push-up": "0725",  # single arm push-up
+    "freestanding-handstand-hold": "3302",  # handstand, kicking up with no wall in shot
+    "lat-pulldown": "2330",  # cable lat pulldown full range of motion
+    "lying-leg-raise": "0865",  # lying leg-hip raise; on a bench, same movement
+    "feet-elevated-inverted-row": "2298",  # inverted row, feet up on a bench
+    "db-walking-lunge": "0336",  # dumbbell lunge, stepping forward
 }
 
 #: Pictures that show a different implement to the one the movement calls for.
@@ -172,7 +194,6 @@ SHOWN_WITH = {
     "kb-deadlift": "a dumbbell",
     "kb-romanian-deadlift": "a dumbbell",
     "single-leg-rdl": "a dumbbell",
-    "kb-walking-lunge": "a dumbbell",
     "kb-reverse-lunge": "a dumbbell",
     "kb-bulgarian-split-squat": "a dumbbell",
     "kb-step-up": "a dumbbell",
