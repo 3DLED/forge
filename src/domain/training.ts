@@ -8,6 +8,7 @@
  */
 
 import type { BodyweightLookup } from './bodyweight';
+import { MOVEMENT_PATTERNS } from './regions';
 import type {
   DayKey,
   Exercise,
@@ -15,6 +16,7 @@ import type {
   LoggedBlock,
   LoggedSession,
   LoggedSet,
+  MovementPattern,
   PlannedSession,
 } from './types';
 
@@ -294,6 +296,84 @@ export function consistency(
     missed: due.filter((slot) => slot.status === 'planned').length,
     extra: logged.filter((session) => session.endedAt && !session.plannedSessionId).length,
   };
+}
+
+export interface PatternTotals {
+  pattern: MovementPattern;
+  /** Sets performed. A round of an AMRAP counts each of its movements once, as volume does. */
+  sets: number;
+  volumeKg: number;
+}
+
+/**
+ * Patterns counted as pushing and as pulling, for the balance reading.
+ *
+ * Horizontal and vertical are kept together here on purpose. Splitting the ratio four ways
+ * produces two numbers off small counts that swing wildly week to week, and the imbalance
+ * worth catching — a chest and shoulders habit with nothing rowing behind it — shows up in
+ * the combined figure just as clearly.
+ */
+export const PUSH_PATTERNS: MovementPattern[] = ['pushHorizontal', 'pushVertical'];
+export const PULL_PATTERNS: MovementPattern[] = ['pullHorizontal', 'pullVertical'];
+
+/**
+ * Sets and tonnage per movement pattern.
+ *
+ * Both numbers, because they answer different questions and only one of them can be read
+ * across rows. Tonnage is the app's usual sense of volume and it is the honest figure for how
+ * a pattern is trending against itself — but comparing a hinge to an overhead press by kg-reps
+ * says only that a deadlift is heavier than a press, which was never in doubt. Sets are the
+ * currency the volume-landmark literature actually uses for exactly that reason, and they are
+ * what makes "am I neglecting this" a question the chart can answer.
+ *
+ * Every pattern appears, including the ones with nothing in them. A chart that quietly drops
+ * empty rows would answer "what did I train" while hiding "what did I not", and the second is
+ * the one worth opening the page for.
+ *
+ * Only completed work counts. A set left unticked is a set that did not happen, and a plan for
+ * pulling that never got done should read as no pulling rather than as balance.
+ */
+export function volumeByPattern(
+  sessions: LoggedSession[],
+  bySlug: Map<string, Exercise>,
+  bodyweight?: BodyweightLookup,
+): PatternTotals[] {
+  const totals = new Map<MovementPattern, PatternTotals>(
+    MOVEMENT_PATTERNS.map((pattern) => [pattern, { pattern, sets: 0, volumeKg: 0 }]),
+  );
+
+  for (const session of sessions) {
+    const blockFor = blockOf(session);
+    const bodyweightKg = bodyweight?.at(session.date);
+    for (const set of session.sets) {
+      const exercise = bySlug.get(set.exerciseSlug);
+      const row = exercise && totals.get(exercise.pattern);
+      if (!row) continue;
+      const times = timesPerformed(set, blockFor(set));
+      if (times <= 0) continue;
+      row.sets += times;
+      row.volumeKg += times * setVolumeKg(set, exercise, bodyweightKg);
+    }
+  }
+
+  // Most-trained first, so the tail of the list is the answer to what is being neglected.
+  return [...totals.values()].sort((a, b) => b.sets - a.sets || b.volumeKg - a.volumeKg);
+}
+
+/**
+ * Pushing sets per pulling set.
+ *
+ * Null when either side is empty rather than reported as zero or infinity. Both of those are
+ * numbers pretending to be a ratio, and the case they hide — no pulling at all — is already
+ * the loudest thing on the chart, sitting at the bottom of the list at nought.
+ */
+export function pushPullRatio(totals: PatternTotals[]): number | null {
+  const sum = (patterns: MovementPattern[]) =>
+    totals.filter((row) => patterns.includes(row.pattern)).reduce((n, row) => n + row.sets, 0);
+  const push = sum(PUSH_PATTERNS);
+  const pull = sum(PULL_PATTERNS);
+  if (push <= 0 || pull <= 0) return null;
+  return push / pull;
 }
 
 /** Trailing weeks that must contain real training before the ratio means anything. */

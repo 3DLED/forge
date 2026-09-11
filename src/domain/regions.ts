@@ -31,6 +31,14 @@ const REGION_OF: Record<MovementPattern, BodyRegion> = {
   gait: 'cardio',
 };
 
+/**
+ * Every pattern, for callers that need to walk them all.
+ *
+ * Read off the region map rather than written out again, so it cannot fall behind the union:
+ * adding a pattern without a region is already a type error, and this inherits that.
+ */
+export const MOVEMENT_PATTERNS = Object.keys(REGION_OF) as MovementPattern[];
+
 export function regionOf(exercise: Exercise): BodyRegion {
   return REGION_OF[exercise.pattern];
 }
@@ -58,4 +66,29 @@ export const PATTERNS_IN_REGION: Record<BodyRegion, MovementPattern[]> = {
   core: ['core'],
   conditioning: ['fullBody', 'carry'],
   cardio: ['gait'],
+};
+
+/**
+ * What each pattern is called on screen.
+ *
+ * Short enough to head a chart row, and named the way a lifter would say it rather than the
+ * way the field is spelled: `pullHorizontal` is a row, `pushVertical` is overhead work.
+ *
+ * Here rather than beside the one screen that first needed it, so that the movement picker
+ * and the balance chart cannot drift into calling the same pattern two different things —
+ * and so the translation check collects them, which it only does for a `_LABELS` map in the
+ * domain. They were English on a Spanish screen for as long as they lived in a component.
+ */
+export const PATTERN_LABELS: Record<MovementPattern, string> = {
+  squat: 'Squat',
+  hinge: 'Hinge',
+  lunge: 'Lunge',
+  pushHorizontal: 'Push',
+  pushVertical: 'Overhead',
+  pullHorizontal: 'Row',
+  pullVertical: 'Pull-up',
+  carry: 'Carry / grip',
+  core: 'Core',
+  gait: 'Run',
+  fullBody: 'Full body',
 };

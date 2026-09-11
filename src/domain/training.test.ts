@@ -7,11 +7,13 @@ import {
   estimate1RM,
   personalRecords,
   prEventsBySession,
+  pushPullRatio,
   scanRecords,
   sessionDistanceM,
   sessionLoad,
   sessionVolumeKg,
   setVolumeKg,
+  volumeByPattern,
   workoutKey,
 } from './training';
 import type { Exercise, LoggedSession, LoggedSet, PlannedSession } from './types';
@@ -272,6 +274,136 @@ describe('consistency', () => {
       '2026-01-05',
     );
     expect(out.extra).toBe(0);
+  });
+});
+
+describe('volumeByPattern', () => {
+  const bySlug = new Map<string, Exercise>([
+    ['bench', exercise({ pattern: 'pushHorizontal' })],
+    ['press', exercise({ pattern: 'pushVertical' })],
+    ['row', exercise({ pattern: 'pullHorizontal' })],
+    ['squat', exercise({ pattern: 'squat' })],
+    ['push-up', exercise({ pattern: 'pushHorizontal', bodyweightFactor: 0.65 })],
+  ]);
+
+  const find = (rows: ReturnType<typeof volumeByPattern>, pattern: string) =>
+    rows.find((row) => row.pattern === pattern)!;
+
+  it('adds sets and tonnage into the pattern the movement belongs to', () => {
+    const rows = volumeByPattern(
+      [
+        session('a', '2026-01-01', [
+          set('bench', { reps: 5, weightKg: 60 }),
+          set('press', { reps: 5, weightKg: 40 }),
+        ]),
+      ],
+      bySlug,
+    );
+    expect(find(rows, 'pushHorizontal')).toMatchObject({ sets: 1, volumeKg: 300 });
+    expect(find(rows, 'pushVertical')).toMatchObject({ sets: 1, volumeKg: 200 });
+  });
+
+  /*
+   * The point of the chart is the rows with nothing in them. Dropping them would answer what
+   * was trained while hiding what was not, which is the question worth opening the page for.
+   */
+  it('reports every pattern, including the ones with no work in them', () => {
+    const rows = volumeByPattern([session('a', '2026-01-01', [set('squat', { reps: 5 })])], bySlug);
+    expect(rows).toHaveLength(11);
+    expect(find(rows, 'pullVertical')).toMatchObject({ sets: 0, volumeKg: 0 });
+  });
+
+  it('puts the most-trained pattern first, so the tail is what is being neglected', () => {
+    const rows = volumeByPattern(
+      [
+        session('a', '2026-01-01', [
+          set('bench', { reps: 5, weightKg: 60 }),
+          set('bench', { reps: 5, weightKg: 60 }),
+          set('row', { reps: 5, weightKg: 50 }),
+        ]),
+      ],
+      bySlug,
+    );
+    expect(rows[0].pattern).toBe('pushHorizontal');
+    expect(rows.at(-1)!.sets).toBe(0);
+  });
+
+  it('counts each round of a timed block, the way volume does', () => {
+    const amrap = {
+      ...session('a', '2026-01-01', [
+        { ...set('row', { reps: 10, weightKg: 20 }, false), blockId: 'b1' },
+      ]),
+      blocks: [{ id: 'b1', style: 'amrap' as const, rounds: 6 }],
+    } as LoggedSession;
+    expect(find(volumeByPattern([amrap], bySlug), 'pullHorizontal')).toMatchObject({
+      sets: 6,
+      volumeKg: 1200,
+    });
+  });
+
+  it('leaves an unticked set out entirely, rather than counting it as a set of nothing', () => {
+    const rows = volumeByPattern(
+      [session('a', '2026-01-01', [set('squat', { reps: 5, weightKg: 100 }, false)])],
+      bySlug,
+    );
+    expect(find(rows, 'squat')).toMatchObject({ sets: 0, volumeKg: 0 });
+  });
+
+  it('values a bodyweight set at what was weighed that day', () => {
+    const lookup = {
+      entries: [],
+      latest: 90,
+      latestDate: undefined,
+      at: (date: string) => (date < '2026-06-01' ? 80 : 90),
+    };
+    const rows = volumeByPattern(
+      [
+        session('a', '2026-01-01', [set('push-up', { reps: 10 })]),
+        session('b', '2026-07-01', [set('push-up', { reps: 10 })]),
+      ],
+      bySlug,
+      lookup,
+    );
+    // 0.65 x 80 x 10, then 0.65 x 90 x 10.
+    expect(find(rows, 'pushHorizontal').volumeKg).toBeCloseTo(520 + 585);
+  });
+
+  it('ignores a set whose movement is not in the library', () => {
+    const rows = volumeByPattern(
+      [session('a', '2026-01-01', [set('mystery', { reps: 5, weightKg: 50 })])],
+      bySlug,
+    );
+    expect(rows.every((row) => row.sets === 0)).toBe(true);
+  });
+});
+
+describe('pushPullRatio', () => {
+  const rows = (over: Record<string, number>) =>
+    Object.entries(over).map(([pattern, sets]) => ({
+      pattern,
+      sets,
+      volumeKg: 0,
+    })) as ReturnType<typeof volumeByPattern>;
+
+  it('folds horizontal and vertical into one figure on each side', () => {
+    expect(
+      pushPullRatio(
+        rows({ pushHorizontal: 6, pushVertical: 4, pullHorizontal: 3, pullVertical: 2 }),
+      ),
+    ).toBeCloseTo(2);
+  });
+
+  /*
+   * Zero pulling is the case the number exists to catch, and it is the one case a ratio cannot
+   * state. The chart says it instead, with two empty rows at the bottom of the list.
+   */
+  it('declines to report a ratio when one side has nothing in it', () => {
+    expect(pushPullRatio(rows({ pushHorizontal: 10, pullHorizontal: 0 }))).toBeNull();
+    expect(pushPullRatio(rows({ pushHorizontal: 0, pullHorizontal: 10 }))).toBeNull();
+  });
+
+  it('ignores everything that is neither a push nor a pull', () => {
+    expect(pushPullRatio(rows({ pushHorizontal: 5, pullHorizontal: 5, squat: 40 }))).toBeCloseTo(1);
   });
 });
 

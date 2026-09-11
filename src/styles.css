@@ -1183,6 +1183,60 @@ section[id^='movement-'] {
   color: var(--faint);
 }
 
+/* --- labelled horizontal bars -------------------------------------------- */
+
+/*
+ * One grid for the whole chart rather than one per row, so every bar starts and ends in the
+ * same place. Bars beginning at a ragged edge would be compared by eye against each other's
+ * start, which is the one thing this chart exists to make easy.
+ *
+ * The label column sizes itself to the longest label instead of being pinned at some width
+ * that happened to fit the English. Spanish is reliably the longer of the two, and a fixed
+ * column is how you get a chart that reads fine in one language and truncated in the other.
+ */
+.rowchart {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(3rem, 1fr) auto;
+  align-items: center;
+  gap: 0.3rem 0.5rem;
+}
+
+.rowchart-row {
+  display: contents;
+}
+
+.rowchart-label {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/*
+ * Track one step lighter than the card, fill several steps above that. The vertical charts
+ * get away with a `--surface-3` bar because it sits on the card itself; put the same colour
+ * inside a track and the filled part stops being distinguishable from the empty part, which
+ * loses the reading this chart is for.
+ */
+.rowchart-track {
+  height: 9px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-3);
+  overflow: hidden;
+}
+
+.rowchart-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  /* A zero-width bar still reads as a row that exists and holds nothing. */
+  min-width: 0;
+}
+
+.rowchart-detail {
+  font-size: 0.7rem;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
 /* --- week-by-week plan preview ------------------------------------------- */
 
 .week-row {

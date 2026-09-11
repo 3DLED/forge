@@ -486,6 +486,10 @@ export const ES: Record<string, string> = {
   easy: 'fácil',
   'Minutes, by how hard they were. Most weeks want to be mostly easy with a little genuinely hard — it is the middle that quietly eats a training block, tiring enough to need recovering from and not hard enough to change anything.':
     'Minutos, según lo duros que fueron. La mayoría de las semanas deberían ser sobre todo fáciles con algo de trabajo realmente duro; es la zona intermedia la que se come un bloque de entrenamiento sin que lo notes, lo bastante cansada como para necesitar recuperación y no lo bastante dura como para cambiar nada.',
+  'Movement balance': 'Equilibrio de movimientos',
+  'push per pull': 'empuje por tracción',
+  'Bars are sets, because sets are the one measure that compares across patterns — a hinge outweighs an overhead press whatever you do, so the tonnage beside each row only means something against the same pattern a month ago. Read the bottom of the list, not the top. Running is left out; its volume is distance.':
+    'Las barras son series, porque las series son la única medida que se puede comparar entre patrones: una bisagra mueve más peso que un empuje vertical hagas lo que hagas, así que el tonelaje junto a cada fila solo significa algo frente al mismo patrón hace un mes. Lee el final de la lista, no el principio. Correr queda fuera; su volumen es distancia.',
   'Log your bodyweight': 'Registra tu peso corporal',
   'Nothing to chart yet.': 'Aún no hay nada que graficar.',
   'Complete some sets and PRs land here.': 'Completa algunas series y los récords aparecerán aquí.',
@@ -512,6 +516,15 @@ export const ES: Record<string, string> = {
   'Max hold': 'Máximo sostenido',
   'Short hold': 'Sostenido corto',
   'Known max': 'Máximo conocido',
+  Squat: 'Sentadilla',
+  Hinge: 'Bisagra',
+  Lunge: 'Zancada',
+  Push: 'Empuje',
+  Overhead: 'Empuje vertical',
+  Row: 'Remo',
+  'Pull-up': 'Dominada',
+  'Carry / grip': 'Acarreo / agarre',
+  Run: 'Correr',
 
   // --- the explanatory notes under each control -------------------------------
   //

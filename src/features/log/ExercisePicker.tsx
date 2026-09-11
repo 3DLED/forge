@@ -22,21 +22,8 @@ import { plural } from '../../ui/text';
 import { CONTAINER_SLUGS } from '../../domain/training';
 import type { Exercise } from '../../domain/types';
 import type { ExerciseCategory } from '../../domain/categories';
+import { PATTERN_LABELS } from '../../domain/regions';
 import { useT } from '../../i18n/useT';
-
-const PATTERN_LABELS: Record<string, string> = {
-  squat: 'Squat',
-  hinge: 'Hinge',
-  lunge: 'Lunge',
-  pushHorizontal: 'Push',
-  pushVertical: 'Overhead',
-  pullHorizontal: 'Row',
-  pullVertical: 'Pull-up',
-  carry: 'Carry / grip',
-  core: 'Core',
-  gait: 'Run',
-  fullBody: 'Full body',
-};
 
 /**
  * How much of the long tail an unfiltered picker shows.
@@ -80,7 +67,7 @@ export default function ExercisePicker({
         exercise.name.toLowerCase().includes(needle) ||
         exercise.slug.includes(needle) ||
         exercise.primaryMuscles.some((m) => m.includes(needle)) ||
-        (PATTERN_LABELS[exercise.pattern] ?? '').toLowerCase().includes(needle)
+        t(PATTERN_LABELS[exercise.pattern] ?? '').toLowerCase().includes(needle)
       );
     });
 
@@ -99,7 +86,7 @@ export default function ExercisePicker({
       rest: matches.filter((e) => !e.common && !(usage?.get(e.slug) ?? 0)).sort(byRank),
       total: matches.length,
     };
-  }, [exercises, query, category, available, usage]);
+  }, [exercises, query, category, available, usage, t]);
 
   const renderRow = (exercise: Exercise) => {
     const usable = available.has(exercise.slug);
@@ -116,7 +103,7 @@ export default function ExercisePicker({
           <span style={{ fontWeight: 600 }}>{exercise.name}</span>
           <br />
           <span className="tiny faint">
-            {PATTERN_LABELS[exercise.pattern] ?? exercise.pattern}
+            {t(PATTERN_LABELS[exercise.pattern] ?? exercise.pattern)}
             {exercise.primaryMuscles.length > 0 && ` · ${exercise.primaryMuscles.join(', ')}`}
             {!usable && swapName && ` · try ${swapName} instead`}
             {!usable && !swapName && ' · no equipment for this'}

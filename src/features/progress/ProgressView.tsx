@@ -8,6 +8,7 @@ import PageHeader from '../../ui/PageHeader';
 import BarChart, { type Bar } from '../../ui/BarChart';
 import PrSheet, { prMarks } from './PrSheet';
 import StackedBarChart from '../../ui/StackedBarChart';
+import RowChart from '../../ui/RowChart';
 import { useApp } from '../../ui/AppProvider';
 import { plannedBetween, sessionsBetween } from '../../data/sessions';
 import { addWeeks, monthName, startOfWeek, todayKey, weekDays } from '../../domain/dates';
@@ -27,7 +28,10 @@ import {
   sessionDistanceM,
   sessionLoad,
   sessionVolumeKg,
+  pushPullRatio,
+  volumeByPattern,
 } from '../../domain/training';
+import { PATTERN_LABELS } from '../../domain/regions';
 import { formatDistance, formatWeight } from '../../domain/units';
 import { useT } from '../../i18n/useT';
 
@@ -159,6 +163,22 @@ export default function ProgressView() {
   }, [weeks]);
 
   const adherence = consistencyTotals.due > 0 ? consistencyTotals.done / consistencyTotals.due : null;
+
+  /*
+   * Summed over the window rather than per week, for the same reason effort is: one week's
+   * split is a description of one week, and nobody has a balanced Tuesday. A neglected pattern
+   * is only a neglected pattern if it stayed that way.
+   *
+   * Running is dropped. Its volume is distance, it has two charts of its own above, and a row
+   * reading "Run: 14 sets" alongside a row of squats measures nothing anyone would want.
+   */
+  const patternRows = useMemo(
+    () => volumeByPattern(sessions ?? [], exerciseBySlug, bodyweight).filter((r) => r.pattern !== 'gait'),
+    [sessions, exerciseBySlug, bodyweight],
+  );
+
+  const patternSets = patternRows.reduce((total, row) => total + row.sets, 0);
+  const pushPull = pushPullRatio(patternRows);
 
   const PART_FILL: Record<ConsistencyPart, string> = {
     done: 'var(--good)',
@@ -353,6 +373,40 @@ export default function ProgressView() {
             }))}
             formatValue={(v) => formatWeight(v, units)}
           />
+        </section>
+      )}
+
+      {/*
+        Under weekly volume, because it divides it up. That chart says a week held more work
+        than the last one; this says which patterns the work went into, and whether any of
+        them have been getting none of it for three months.
+      */}
+      {patternSets > 0 && (
+        <section className="card">
+          <div className="card-head">
+            <h2>{t('Movement balance')}</h2>
+            {pushPull != null && (
+              <span className={`pill ${pushPull >= 0.75 && pushPull <= 1.35 ? 'good' : 'warn'}`}>
+                {pushPull.toFixed(1)} {t('push per pull')}
+              </span>
+            )}
+          </div>
+          <RowChart
+            rows={patternRows.map((row) => ({
+              key: row.pattern,
+              label: t(PATTERN_LABELS[row.pattern]),
+              value: row.sets,
+              detail:
+                row.sets === 0
+                  ? '—'
+                  : row.volumeKg > 0
+                    ? `${t.count(row.sets, 'set')} · ${formatWeight(row.volumeKg, units)}`
+                    : t.count(row.sets, 'set'),
+            }))}
+          />
+          <p className="tiny faint" style={{ marginTop: '0.6rem', marginBottom: 0 }}>
+            {t('Bars are sets, because sets are the one measure that compares across patterns — a hinge outweighs an overhead press whatever you do, so the tonnage beside each row only means something against the same pattern a month ago. Read the bottom of the list, not the top. Running is left out; its volume is distance.')}
+          </p>
         </section>
       )}
 
