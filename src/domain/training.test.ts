@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   acuteChronicRatio,
+  effortBand,
+  effortMinutes,
   estimate1RM,
   personalRecords,
   prEventsBySession,
@@ -159,6 +161,54 @@ describe('sessionLoad', () => {
   it('is zero when nothing rated the effort at all', () => {
     const s = { ...session('a', '2026-01-01', [set('squat', { reps: 5 })]), durationMin: 60 };
     expect(sessionLoad(s)).toBe(0);
+  });
+});
+
+describe('effortMinutes', () => {
+  const rated = (rpe: number, durationMin: number): LoggedSession => ({
+    ...session(`s${rpe}-${durationMin}`, '2026-01-01', []),
+    sessionRpe: rpe,
+    durationMin,
+  });
+
+  it('splits the week by how hard the work was', () => {
+    const out = effortMinutes([rated(3, 60), rated(6, 45), rated(9, 30)]);
+    expect(out).toEqual({ easy: 60, moderate: 45, hard: 30 });
+  });
+
+  /*
+   * The boundaries themselves, because they are a judgement rather than a fact and a silent
+   * change to one would move every chart in the app without failing anything.
+   */
+  it('puts the boundaries at 4 and 7', () => {
+    expect(effortBand(4)).toBe('easy');
+    expect(effortBand(5)).toBe('moderate');
+    expect(effortBand(7)).toBe('moderate');
+    expect(effortBand(8)).toBe('hard');
+  });
+
+  it('weights by minutes rather than counting sessions', () => {
+    // One long easy run outweighs two short hard ones, which is the point of the chart.
+    const out = effortMinutes([rated(3, 120), rated(9, 20), rated(9, 20)]);
+    expect(out.easy).toBe(120);
+    expect(out.hard).toBe(40);
+  });
+
+  it('falls back to the average set effort when the session was never rated', () => {
+    const s = {
+      ...session('a', '2026-01-01', [set('squat', { reps: 5, rpe: 9 })]),
+      durationMin: 30,
+    };
+    expect(effortMinutes([s]).hard).toBe(30);
+  });
+
+  /*
+   * Counting an unrated session as easy would flatter the ratio in exactly the direction
+   * that makes it useless: the sessions people forget to rate are rarely the gentle ones.
+   */
+  it('ignores a session nobody rated rather than assuming it was easy', () => {
+    const s = { ...session('a', '2026-01-01', [set('squat', { reps: 5 })]), durationMin: 60 };
+    expect(effortMinutes([s])).toEqual({ easy: 0, moderate: 0, hard: 0 });
   });
 });
 

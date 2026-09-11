@@ -161,6 +161,64 @@ export function sessionWorkSec(session: LoggedSession): number {
 
 // --- across sessions ------------------------------------------------------
 
+export type EffortBand = 'easy' | 'moderate' | 'hard';
+
+export const EFFORT_BANDS: EffortBand[] = ['easy', 'moderate', 'hard'];
+
+/**
+ * What each band is called on screen.
+ *
+ * Here rather than in the component because the translation check collects copy that reaches
+ * the translator through a constant from the domain, and a label looked up by key is exactly
+ * that. In a component it would be a Spanish screen with three English words on it.
+ */
+export const EFFORT_LABELS: Record<EffortBand, string> = {
+  easy: 'Easy',
+  moderate: 'Moderate',
+  hard: 'Hard',
+};
+
+/**
+ * Which band an effort rating falls in.
+ *
+ * Three, not two, and the middle one is the whole point. The well-supported finding is that
+ * successful endurance training is mostly easy with a little genuinely hard, and that the way
+ * people get stuck is by spending their week in between — hard enough to need recovering
+ * from, easy enough not to drive much adaptation. A chart that only said easy against hard
+ * would hide exactly the thing worth seeing.
+ *
+ * The cuts are on the app's 1-10 effort scale: up to 4 is work you could hold a conversation
+ * through, 8 and above is work you are counting down. Published zone models disagree about
+ * the exact boundaries by a point either way, and no threshold here is worth defending to
+ * that precision — what the chart is for is the shape of a month, not the grading of a day.
+ */
+export function effortBand(rpe: number): EffortBand {
+  if (rpe <= 4) return 'easy';
+  if (rpe <= 7) return 'moderate';
+  return 'hard';
+}
+
+/**
+ * Minutes spent in each effort band.
+ *
+ * Minutes rather than sessions, because a twenty-minute shakeout and a two-hour long run are
+ * not the same amount of easy, and counting them as one each is how a polarised week and a
+ * badly balanced one produce the same picture.
+ *
+ * A session nobody rated contributes nothing at all. It cannot be placed, and the tempting
+ * default — treat it as easy — would flatter the number in precisely the direction that makes
+ * the chart useless, since the sessions people forget to rate are rarely the gentle ones.
+ */
+export function effortMinutes(sessions: LoggedSession[]): Record<EffortBand, number> {
+  const minutes: Record<EffortBand, number> = { easy: 0, moderate: 0, hard: 0 };
+  for (const session of sessions) {
+    const rpe = session.sessionRpe ?? averageSetRpe(session);
+    if (rpe == null || rpe <= 0) continue;
+    minutes[effortBand(rpe)] += session.durationMin ?? estimateDurationMin(session);
+  }
+  return minutes;
+}
+
 /** Trailing weeks that must contain real training before the ratio means anything. */
 const MIN_WEEKS_FOR_RATIO = 3;
 

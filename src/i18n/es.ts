@@ -473,6 +473,12 @@ export const ES: Record<string, string> = {
   'Training load': 'Carga de entrenamiento',
   'Weekly volume': 'Volumen semanal',
   'Weekly distance': 'Distancia semanal',
+  Easy: 'Fácil',
+  Moderate: 'Moderado',
+  Hard: 'Duro',
+  easy: 'fácil',
+  'Minutes, by how hard they were. Most weeks want to be mostly easy with a little genuinely hard — it is the middle that quietly eats a training block, tiring enough to need recovering from and not hard enough to change anything.':
+    'Minutos, según lo duros que fueron. La mayoría de las semanas deberían ser sobre todo fáciles con algo de trabajo realmente duro; es la zona intermedia la que se come un bloque de entrenamiento sin que lo notes, lo bastante cansada como para necesitar recuperación y no lo bastante dura como para cambiar nada.',
   'Log your bodyweight': 'Registra tu peso corporal',
   'Nothing to chart yet.': 'Aún no hay nada que graficar.',
   'Complete some sets and PRs land here.': 'Completa algunas series y los récords aparecerán aquí.',

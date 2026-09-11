@@ -7,11 +7,16 @@ import { bodyweightLookup } from '../../domain/bodyweight';
 import PageHeader from '../../ui/PageHeader';
 import BarChart, { type Bar } from '../../ui/BarChart';
 import PrSheet, { prMarks } from './PrSheet';
+import StackedBarChart from '../../ui/StackedBarChart';
 import { useApp } from '../../ui/AppProvider';
 import { sessionsBetween } from '../../data/sessions';
 import { addWeeks, monthName, startOfWeek, todayKey, weekDays } from '../../domain/dates';
 import {
   acuteChronicRatio,
+  EFFORT_BANDS,
+  EFFORT_LABELS,
+  effortMinutes,
+  type EffortBand,
   personalRecords,
   workoutIdFromKey,
   sessionDistanceM,
@@ -72,6 +77,7 @@ export default function ProgressView() {
           (total, s) => total + sessionVolumeKg(s, exerciseBySlug, bodyweight.at(s.date)),
           0,
         ),
+        effort: effortMinutes(inWeek),
         count: inWeek.length,
       };
     });
@@ -101,6 +107,30 @@ export default function ProgressView() {
     [records, units],
   );
   const ratio = acuteChronicRatio(weeks.map((w) => w.load));
+
+  /*
+   * Effort is summed across the whole window rather than read off the latest week.
+   *
+   * The eighty-twenty finding is about a training block, not a Tuesday. One week that ran hard
+   * is a week, and a pill that swung between 40% and 90% as the week filled in would be read
+   * as a verdict on each one — which is both wrong and the kind of number that makes people
+   * train to the chart.
+   */
+  const effortTotals = useMemo(() => {
+    const totals: Record<EffortBand, number> = { easy: 0, moderate: 0, hard: 0 };
+    for (const week of weeks) {
+      for (const band of EFFORT_BANDS) totals[band] += week.effort[band];
+    }
+    return totals;
+  }, [weeks]);
+
+  const effortTotal = EFFORT_BANDS.reduce((sum, band) => sum + effortTotals[band], 0);
+
+  const BAND_FILL: Record<EffortBand, string> = {
+    easy: 'var(--good)',
+    moderate: 'var(--warn)',
+    hard: 'var(--danger)',
+  };
 
   if (!sessions || !allSessions) return <p className="muted">{t('Loading…')}</p>;
 
@@ -152,6 +182,63 @@ export default function ProgressView() {
           {t('Effort × minutes, so running and lifting add into one number. Ramping past about 1.5× your four-week average is where injuries cluster.')}
         </p>
       </section>
+
+      {/*
+        Under load, because it explains it. Load says how much a week cost; this says what it
+        was spent on, and the two together are the difference between "I did a lot" and "I did
+        a lot of the same middling thing".
+      */}
+      {effortTotal > 0 && (
+        <section className="card">
+          <div className="card-head">
+            <h2>{t('Effort')}</h2>
+            <span className={`pill ${effortTotals.easy / effortTotal >= 0.75 ? 'good' : ''}`}>
+              {Math.round((effortTotals.easy / effortTotal) * 100)}% {t('easy')}
+            </span>
+          </div>
+          <StackedBarChart
+            bars={weeks.map((week) => ({
+              label: week.label,
+              segments: EFFORT_BANDS.map((band) => ({
+                key: band,
+                label: t(EFFORT_LABELS[band]),
+                value: week.effort[band],
+                fill: BAND_FILL[band],
+              })),
+            }))}
+            formatValue={(v) => `${Math.round(v)} min`}
+          />
+
+          {/*
+            The legend carries the numbers, not just the colours. Green, amber and red is the
+            one palette a colour-blind reader cannot separate, and a stacked bar has no shape
+            to fall back on, so the figures have to be readable on their own.
+          */}
+          <div className="cal-legend">
+            {EFFORT_BANDS.map((band) => (
+              <span key={band}>
+                <i
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 2,
+                    background: BAND_FILL[band],
+                    display: 'inline-block',
+                  }}
+                />
+                {t(EFFORT_LABELS[band])}{' '}
+                <span className="mono">
+                  {Math.round((effortTotals[band] / effortTotal) * 100)}%
+                </span>
+              </span>
+            ))}
+          </div>
+
+          <p className="tiny faint" style={{ marginTop: '0.5rem', marginBottom: 0 }}>
+            {t('Minutes, by how hard they were. Most weeks want to be mostly easy with a little genuinely hard — it is the middle that quietly eats a training block, tiring enough to need recovering from and not hard enough to change anything.')}
+          </p>
+        </section>
+      )}
 
       {hasDistance && (
         <section className="card">
