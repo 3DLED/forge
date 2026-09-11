@@ -25,7 +25,7 @@ AREAS: list[tuple[str, str, tuple[str, ...]]] = [
     ("WORDS", "Wording used across screens", ("src/domain/", "src/data/")),
 ]
 
-PREFACE = """# Forge — every word the app says
+PREFACE = """# Hybrid Forge — every word the app says
 
 This is all the user-facing text in the app, pulled straight from the source. Edit the text in
 place and send it back; the ids in brackets are how each line is matched to where it lives, so

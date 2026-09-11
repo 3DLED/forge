@@ -19,211 +19,211 @@
  },
  {
   "file": "src/data/seed/equipment.ts",
-  "line": 65,
+  "line": 72,
   "kind": "label",
   "text": "Free weights"
  },
  {
   "file": "src/data/seed/equipment.ts",
-  "line": 66,
+  "line": 73,
   "kind": "label",
   "text": "Hanging & bars"
  },
  {
   "file": "src/data/seed/equipment.ts",
-  "line": 72,
+  "line": 79,
   "kind": "label",
   "text": "Odd objects"
  },
  {
   "file": "src/data/seed/equipment.ts",
-  "line": 74,
+  "line": 81,
   "kind": "label",
   "text": "Places to train"
  },
  {
   "file": "src/data/seed/equipment.ts",
-  "line": 85,
+  "line": 92,
   "kind": "name",
   "text": "Bodyweight only"
  },
  {
   "file": "src/data/seed/equipment.ts",
-  "line": 90,
+  "line": 97,
   "kind": "name",
   "text": "Road & bodyweight"
  },
  {
   "file": "src/data/seed/equipment.ts",
-  "line": 95,
+  "line": 102,
   "kind": "name",
   "text": "Home — kettlebells"
  },
  {
   "file": "src/data/seed/equipment.ts",
-  "line": 101,
+  "line": 108,
   "kind": "name",
   "text": "Full gym"
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 16,
+  "line": 17,
   "kind": "notes",
   "text": "Three seconds down, one second pause, three seconds up. Load without weight."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 76,
+  "line": 77,
   "kind": "notes",
   "text": "Hold a doorframe or counter for balance, or sit back to a box."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 110,
+  "line": 111,
   "kind": "notes",
   "text": "Hip snap, not a squat. The single best conditioning tool for one bell."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 183,
+  "line": 184,
   "kind": "notes",
   "text": "Heels on towels or furniture sliders. Works on any smooth floor."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 224,
+  "line": 225,
   "kind": "notes",
   "text": "A chair, couch, or bed step works as the rear-foot elevation."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 240,
+  "line": 241,
   "kind": "notes",
   "text": "A hybrid-race staple. Tall box, over the top, alternating."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 259,
+  "line": 260,
   "kind": "notes",
   "text": "Hands on a counter or stair. The regression that actually works."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 397,
+  "line": 398,
   "kind": "notes",
   "text": "Brutal grip and shoulder-stability work with a light bell."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 426,
+  "line": 427,
   "kind": "notes",
   "text": "A sturdy table is the no-equipment answer to horizontal pulling."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 494,
+  "line": 495,
   "kind": "notes",
   "text": "Jump to the top, lower for five seconds. The fastest route to a first pull-up."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 526,
+  "line": 527,
   "kind": "notes",
   "text": "Anchor a band overhead. The only vertical pull available with no bar."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 560,
+  "line": 561,
   "kind": "notes",
   "text": "One bell only. The anti-lateral-flexion demand is the whole point."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 566,
+  "line": 567,
   "kind": "notes",
   "text": "Grip work disguised as a carry. A light bell is plenty."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 573,
+  "line": 574,
   "kind": "notes",
   "text": "A common obstacle-race carry. A five-gallon bucket of gravel is the honest rehearsal."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 583,
+  "line": 584,
   "kind": "notes",
   "text": "The single best predictor of holding on to an obstacle."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 671,
+  "line": 672,
   "kind": "notes",
   "text": "Five minutes of get-ups is a full-body session when you own one bell."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 679,
+  "line": 680,
   "kind": "notes",
   "text": "The OCR tax. Every failed obstacle costs 30 of these."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 695,
+  "line": 696,
   "kind": "notes",
   "text": "Burpee into a snatch. Miserable, and extremely effective with one bell."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 715,
+  "line": 716,
   "kind": "notes",
   "text": "Clean, press, squat, row, swing without setting the bell down."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 722,
+  "line": 723,
   "kind": "notes",
   "text": "As many rounds as possible inside a time cap."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 726,
+  "line": 727,
   "kind": "notes",
   "text": "Every minute on the minute. The rest is whatever the minute leaves you."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 730,
+  "line": 731,
   "kind": "notes",
   "text": "Fixed work, clock running. The score is the time."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 736,
+  "line": 737,
   "kind": "notes",
   "text": "Conversational. Most of your weekly mileage belongs here."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 740,
+  "line": 741,
   "kind": "notes",
   "text": "The single most important session in any distance plan."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 743,
+  "line": 744,
   "kind": "notes",
   "text": "Comfortably hard, roughly one-hour race effort."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 751,
+  "line": 752,
   "kind": "notes",
   "text": "Where OCR fitness actually gets built — uneven ground and real vert."
  },
  {
   "file": "src/data/seed/exercises.ts",
-  "line": 764,
+  "line": 765,
   "kind": "notes",
   "text": "Low-impact cardio on a mini trampoline. Scored by time — the health bounce is small and quick, not high."
  },
@@ -364,6 +364,72 @@
   "line": 299,
   "kind": "description",
   "text": "Twelve weeks of compromised running — the thing that actually decides a hybrid fitness race. Strength, a race simulation, intervals, and one long run each week."
+ },
+ {
+  "file": "src/domain/categories.ts",
+  "line": 23,
+  "kind": "lookup",
+  "text": "Weights"
+ },
+ {
+  "file": "src/domain/categories.ts",
+  "line": 24,
+  "kind": "lookup",
+  "text": "Calisthenics"
+ },
+ {
+  "file": "src/domain/categories.ts",
+  "line": 25,
+  "kind": "lookup",
+  "text": "Cardio"
+ },
+ {
+  "file": "src/domain/categories.ts",
+  "line": 26,
+  "kind": "lookup",
+  "text": "Skill"
+ },
+ {
+  "file": "src/domain/categories.ts",
+  "line": 27,
+  "kind": "lookup",
+  "text": "Mobility"
+ },
+ {
+  "file": "src/domain/dates.ts",
+  "line": 118,
+  "kind": "translated",
+  "text": "Today"
+ },
+ {
+  "file": "src/domain/dates.ts",
+  "line": 119,
+  "kind": "translated",
+  "text": "Yesterday"
+ },
+ {
+  "file": "src/domain/dates.ts",
+  "line": 120,
+  "kind": "translated",
+  "text": "Tomorrow"
+ },
+ {
+  "file": "src/domain/difficulty.ts",
+  "line": 25,
+  "kind": "lookup",
+  "text": "Beginner"
+ },
+ {
+  "file": "src/domain/difficulty.ts",
+  "line": 26,
+  "kind": "lookup",
+  "text": "Intermediate"
+ },
+ {
+  "file": "src/domain/difficulty.ts",
+  "line": 27,
+  "kind": "lookup",
+  "text": "Advanced"
  },
  {
   "file": "src/domain/fitnessTests.ts",
@@ -654,6 +720,54 @@
   "text": "Every kilometre"
  },
  {
+  "file": "src/domain/regions.ts",
+  "line": 31,
+  "kind": "lookup",
+  "text": "Upper body"
+ },
+ {
+  "file": "src/domain/regions.ts",
+  "line": 32,
+  "kind": "lookup",
+  "text": "Lower body"
+ },
+ {
+  "file": "src/domain/regions.ts",
+  "line": 33,
+  "kind": "lookup",
+  "text": "Core"
+ },
+ {
+  "file": "src/domain/regions.ts",
+  "line": 34,
+  "kind": "lookup",
+  "text": "Conditioning"
+ },
+ {
+  "file": "src/domain/regions.ts",
+  "line": 35,
+  "kind": "lookup",
+  "text": "Cardio"
+ },
+ {
+  "file": "src/domain/runSettings.ts",
+  "line": 68,
+  "kind": "translated",
+  "text": "Silent"
+ },
+ {
+  "file": "src/domain/runSettings.ts",
+  "line": 74,
+  "kind": "translated",
+  "text": "pace alerts"
+ },
+ {
+  "file": "src/domain/runSettings.ts",
+  "line": 75,
+  "kind": "translated",
+  "text": "Nothing spoken"
+ },
+ {
   "file": "src/domain/scheduling.ts",
   "line": 120,
   "kind": "reason",
@@ -667,1273 +781,1795 @@
  },
  {
   "file": "src/features/history/HistoryView.tsx",
-  "line": 46,
-  "kind": "on screen",
+  "line": 36,
+  "kind": "translated",
+  "text": "Loading…"
+ },
+ {
+  "file": "src/features/history/HistoryView.tsx",
+  "line": 41,
+  "kind": "translated",
+  "text": "History"
+ },
+ {
+  "file": "src/features/history/HistoryView.tsx",
+  "line": 48,
+  "kind": "translated",
   "text": "No sessions yet."
  },
  {
   "file": "src/features/history/HistoryView.tsx",
-  "line": 47,
-  "kind": "on screen",
+  "line": 49,
+  "kind": "translated",
   "text": "Everything you log shows up here, newest first."
  },
  {
   "file": "src/features/history/HistoryView.tsx",
-  "line": 67,
-  "kind": "on screen",
+  "line": 70,
+  "kind": "translated",
   "text": "Load more"
  },
  {
   "file": "src/features/log/ExerciseGroup.tsx",
-  "line": 193,
-  "kind": "title",
+  "line": 146,
+  "kind": "translated",
+  "text": "Swap"
+ },
+ {
+  "file": "src/features/log/ExerciseGroup.tsx",
+  "line": 194,
+  "kind": "translated",
   "text": "Time this hold"
  },
  {
   "file": "src/features/log/ExerciseGroup.tsx",
-  "line": 247,
+  "line": 248,
   "kind": "on screen",
   "text": "▶ Track this run"
  },
  {
   "file": "src/features/log/ExerciseGroup.tsx",
-  "line": 251,
-  "kind": "aria-label",
+  "line": 252,
+  "kind": "translated",
   "text": "Run alerts"
  },
  {
   "file": "src/features/log/ExerciseGroup.tsx",
-  "line": 260,
+  "line": 261,
   "kind": "on screen",
   "text": "+ Set"
  },
  {
   "file": "src/features/log/ExerciseGroup.tsx",
-  "line": 264,
+  "line": 265,
   "kind": "on screen",
   "text": "− Set"
  },
  {
   "file": "src/features/log/ExerciseInfoSheet.tsx",
-  "line": 29,
-  "kind": "on screen",
+  "line": 36,
+  "kind": "translated",
   "text": "Swap for another version"
  },
  {
   "file": "src/features/log/ExerciseInfoSheet.tsx",
-  "line": 42,
-  "kind": "on screen",
+  "line": 64,
+  "kind": "translated",
   "text": "Set up"
  },
  {
   "file": "src/features/log/ExerciseInfoSheet.tsx",
-  "line": 45,
-  "kind": "on screen",
+  "line": 67,
+  "kind": "translated",
   "text": "How to do it"
  },
  {
   "file": "src/features/log/ExerciseInfoSheet.tsx",
-  "line": 52,
-  "kind": "on screen",
+  "line": 77,
+  "kind": "translated",
   "text": "Watch for"
  },
  {
   "file": "src/features/log/ExerciseInfoSheet.tsx",
-  "line": 56,
-  "kind": "on screen",
+  "line": 84,
+  "kind": "translated",
   "text": "No write-up for this one yet — it is likely a movement you added yourself."
  },
  {
   "file": "src/features/log/ExerciseInfoSheet.tsx",
-  "line": 84,
-  "kind": "on screen",
+  "line": 90,
+  "kind": "translated",
+  "text": "Note"
+ },
+ {
+  "file": "src/features/log/ExerciseInfoSheet.tsx",
+  "line": 95,
+  "kind": "translated",
+  "text": "Trains"
+ },
+ {
+  "file": "src/features/log/ExerciseInfoSheet.tsx",
+  "line": 101,
+  "kind": "translated",
+  "text": "also"
+ },
+ {
+  "file": "src/features/log/ExerciseInfoSheet.tsx",
+  "line": 108,
+  "kind": "translated",
+  "text": "Needs"
+ },
+ {
+  "file": "src/features/log/ExerciseInfoSheet.tsx",
+  "line": 115,
+  "kind": "translated",
   "text": "Trained one side at a time — log both sides, or double the sets."
  },
  {
+  "file": "src/features/log/ExerciseInfoSheet.tsx",
+  "line": 121,
+  "kind": "translated",
+  "text": "if your equipment changes."
+ },
+ {
+  "file": "src/features/log/ExerciseInfoSheet.tsx",
+  "line": 121,
+  "kind": "counted",
+  "text": "stand-in"
+ },
+ {
   "file": "src/features/log/ExercisePicker.tsx",
-  "line": 102,
-  "kind": "on screen",
+  "line": 108,
+  "kind": "translated",
+  "text": "Add"
+ },
+ {
+  "file": "src/features/log/ExercisePicker.tsx",
+  "line": 108,
+  "kind": "translated",
   "text": "Add anyway"
  },
  {
   "file": "src/features/log/ExercisePicker.tsx",
-  "line": 110,
-  "kind": "title",
+  "line": 116,
+  "kind": "translated",
   "text": "Add exercise"
  },
  {
   "file": "src/features/log/ExercisePicker.tsx",
-  "line": 113,
-  "kind": "placeholder",
+  "line": 119,
+  "kind": "translated",
   "text": "Search movements, muscles, patterns…"
  },
  {
   "file": "src/features/log/ExercisePicker.tsx",
-  "line": 178,
-  "kind": "on screen",
+  "line": 146,
+  "kind": "translated",
+  "text": "All"
+ },
+ {
+  "file": "src/features/log/ExercisePicker.tsx",
+  "line": 184,
+  "kind": "translated",
   "text": "You train these"
  },
  {
   "file": "src/features/log/ExercisePicker.tsx",
-  "line": 208,
-  "kind": "on screen",
+  "line": 207,
+  "kind": "translated",
+  "text": "Common"
+ },
+ {
+  "file": "src/features/log/ExercisePicker.tsx",
+  "line": 215,
+  "kind": "translated",
   "text": "Everything else"
  },
  {
+  "file": "src/features/log/HoldTimer.tsx",
+  "line": 56,
+  "kind": "translated",
+  "text": "Cancel"
+ },
+ {
+  "file": "src/features/log/HoldTimer.tsx",
+  "line": 62,
+  "kind": "translated",
+  "text": "Done"
+ },
+ {
   "file": "src/features/log/LogRunSheet.tsx",
-  "line": 88,
-  "kind": "title",
+  "line": 90,
+  "kind": "translated",
   "text": "Log a run"
  },
  {
   "file": "src/features/log/LogRunSheet.tsx",
-  "line": 176,
+  "line": 116,
+  "kind": "translated",
+  "text": "Today"
+ },
+ {
+  "file": "src/features/log/LogRunSheet.tsx",
+  "line": 122,
+  "kind": "translated",
+  "text": "Yesterday"
+ },
+ {
+  "file": "src/features/log/LogRunSheet.tsx",
+  "line": 143,
+  "kind": "translated",
+  "text": "Time"
+ },
+ {
+  "file": "src/features/log/LogRunSheet.tsx",
+  "line": 166,
+  "kind": "translated",
+  "text": "Effort"
+ },
+ {
+  "file": "src/features/log/LogRunSheet.tsx",
+  "line": 178,
   "kind": "on screen",
   "text": "1 is a walk, 10 is everything you had. This is what your training load is built from, so it is worth a moment's thought."
  },
  {
   "file": "src/features/log/LogRunSheet.tsx",
-  "line": 184,
-  "kind": "placeholder",
+  "line": 183,
+  "kind": "translated",
+  "text": "Notes"
+ },
+ {
+  "file": "src/features/log/LogRunSheet.tsx",
+  "line": 186,
+  "kind": "translated",
   "text": "Felt flat, humid, new shoes…"
  },
  {
   "file": "src/features/log/NewBlockSheet.tsx",
-  "line": 16,
+  "line": 17,
   "kind": "blurb",
   "text": "As many rounds as possible before the cap. Tap a big button for each round."
  },
  {
   "file": "src/features/log/NewBlockSheet.tsx",
-  "line": 21,
+  "line": 22,
   "kind": "blurb",
   "text": "Every minute on the minute — a cue at each interval, for a set number of rounds."
  },
  {
   "file": "src/features/log/NewBlockSheet.tsx",
-  "line": 25,
+  "line": 26,
   "kind": "label",
   "text": "For time"
  },
  {
   "file": "src/features/log/NewBlockSheet.tsx",
-  "line": 26,
+  "line": 27,
   "kind": "blurb",
   "text": "Fixed work, clock running. The score is how long it took."
  },
  {
   "file": "src/features/log/NewBlockSheet.tsx",
-  "line": 42,
+  "line": 43,
   "kind": "on screen",
   "text": "void | Promise"
  },
  {
   "file": "src/features/log/NewBlockSheet.tsx",
-  "line": 86,
-  "kind": "on screen",
+  "line": 88,
+  "kind": "translated",
   "text": "Your saved timed workouts"
  },
  {
   "file": "src/features/log/NewBlockSheet.tsx",
-  "line": 95,
-  "kind": "on screen",
+  "line": 97,
+  "kind": "translated",
   "text": "Or build a new one"
  },
  {
+  "file": "src/features/log/NewBlockSheet.tsx",
+  "line": 135,
+  "kind": "translated",
+  "text": "Interval"
+ },
+ {
+  "file": "src/features/log/NewBlockSheet.tsx",
+  "line": 148,
+  "kind": "translated",
+  "text": "Rounds"
+ },
+ {
   "file": "src/features/log/PinnedTimer.tsx",
-  "line": 98,
-  "kind": "aria-label",
+  "line": 55,
+  "kind": "translated",
+  "text": "Session"
+ },
+ {
+  "file": "src/features/log/PinnedTimer.tsx",
+  "line": 61,
+  "kind": "translated",
+  "text": "Pause"
+ },
+ {
+  "file": "src/features/log/PinnedTimer.tsx",
+  "line": 101,
+  "kind": "translated",
   "text": "Open the full timer"
  },
  {
   "file": "src/features/log/PinnedTimer.tsx",
-  "line": 117,
-  "kind": "aria-label",
+  "line": 120,
+  "kind": "translated",
   "text": "Record a completed round"
  },
  {
+  "file": "src/features/log/PinnedTimer.tsx",
+  "line": 123,
+  "kind": "translated",
+  "text": "Round"
+ },
+ {
+  "file": "src/features/log/PinnedTimer.tsx",
+  "line": 131,
+  "kind": "translated",
+  "text": "Save"
+ },
+ {
   "file": "src/features/log/RunScreen.tsx",
-  "line": 85,
-  "kind": "aria-label",
+  "line": 67,
+  "kind": "translated",
+  "text": "to go"
+ },
+ {
+  "file": "src/features/log/RunScreen.tsx",
+  "line": 87,
+  "kind": "translated",
   "text": "Run alerts"
  },
  {
   "file": "src/features/log/RunScreen.tsx",
-  "line": 124,
-  "kind": "on screen",
+  "line": 92,
+  "kind": "translated",
+  "text": "Close"
+ },
+ {
+  "file": "src/features/log/RunScreen.tsx",
+  "line": 101,
+  "kind": "translated",
+  "text": "per kilometre"
+ },
+ {
+  "file": "src/features/log/RunScreen.tsx",
+  "line": 101,
+  "kind": "translated",
+  "text": "per mile"
+ },
+ {
+  "file": "src/features/log/RunScreen.tsx",
+  "line": 102,
+  "kind": "translated",
+  "text": "stopped"
+ },
+ {
+  "file": "src/features/log/RunScreen.tsx",
+  "line": 109,
+  "kind": "translated",
+  "text": "distance"
+ },
+ {
+  "file": "src/features/log/RunScreen.tsx",
+  "line": 113,
+  "kind": "translated",
+  "text": "time"
+ },
+ {
+  "file": "src/features/log/RunScreen.tsx",
+  "line": 119,
+  "kind": "translated",
+  "text": "average"
+ },
+ {
+  "file": "src/features/log/RunScreen.tsx",
+  "line": 127,
+  "kind": "translated",
   "text": "Waiting for a decent fix. Under trees or between tall buildings this can take a minute."
  },
  {
   "file": "src/features/log/RunScreen.tsx",
-  "line": 159,
-  "kind": "on screen",
+  "line": 161,
+  "kind": "translated",
   "text": "Cues will appear here as they are said."
  },
  {
   "file": "src/features/log/RunScreen.tsx",
-  "line": 171,
-  "kind": "on screen",
+  "line": 174,
+  "kind": "translated",
   "text": "Start run"
  },
  {
   "file": "src/features/log/RunScreen.tsx",
-  "line": 205,
-  "kind": "on screen",
+  "line": 180,
+  "kind": "translated",
+  "text": "Pause"
+ },
+ {
+  "file": "src/features/log/RunScreen.tsx",
+  "line": 183,
+  "kind": "translated",
+  "text": "Finish"
+ },
+ {
+  "file": "src/features/log/RunScreen.tsx",
+  "line": 190,
+  "kind": "translated",
+  "text": "Resume"
+ },
+ {
+  "file": "src/features/log/RunScreen.tsx",
+  "line": 200,
+  "kind": "translated",
+  "text": "Discard"
+ },
+ {
+  "file": "src/features/log/RunScreen.tsx",
+  "line": 208,
+  "kind": "translated",
   "text": "Save to workout"
  },
  {
   "file": "src/features/log/SavedWorkoutRow.tsx",
-  "line": 12,
+  "line": 13,
+  "kind": "on screen",
+  "text": "void | Promise"
+ },
+ {
+  "file": "src/features/log/SavedWorkoutRow.tsx",
+  "line": 25,
+  "kind": "translated",
+  "text": "Use"
+ },
+ {
+  "file": "src/features/log/SavedWorkoutsSheet.tsx",
+  "line": 18,
   "kind": "on screen",
   "text": "void | Promise"
  },
  {
   "file": "src/features/log/SavedWorkoutsSheet.tsx",
-  "line": 17,
-  "kind": "on screen",
-  "text": "void | Promise"
- },
- {
-  "file": "src/features/log/SavedWorkoutsSheet.tsx",
-  "line": 27,
-  "kind": "title",
+  "line": 29,
+  "kind": "translated",
   "text": "Your saved workouts"
  },
  {
   "file": "src/features/log/SavedWorkoutsSheet.tsx",
-  "line": 31,
-  "kind": "on screen",
+  "line": 33,
+  "kind": "translated",
   "text": "Nothing saved yet."
  },
  {
   "file": "src/features/log/SavedWorkoutsSheet.tsx",
-  "line": 32,
-  "kind": "on screen",
+  "line": 35,
+  "kind": "translated",
   "text": "Name a workout you have built and it comes back here, ready to run again — and, if it is timed, with its own best to beat."
  },
  {
   "file": "src/features/log/SavedWorkoutsSheet.tsx",
-  "line": 48,
-  "kind": "on screen",
+  "line": 40,
+  "kind": "translated",
+  "text": "Timed"
+ },
+ {
+  "file": "src/features/log/SavedWorkoutsSheet.tsx",
+  "line": 49,
+  "kind": "translated",
   "text": "Straight sets"
  },
  {
   "file": "src/features/log/SavedWorkoutsSheet.tsx",
-  "line": 61,
+  "line": 62,
   "kind": "on screen",
   "text": "Share, import or tidy these up in More → Saved workouts."
  },
  {
   "file": "src/features/log/SavedWorkoutsSheet.tsx",
-  "line": 98,
-  "kind": "on screen",
+  "line": 101,
+  "kind": "translated",
   "text": "Run it again"
  },
  {
   "file": "src/features/log/SessionEquipmentSheet.tsx",
-  "line": 20,
+  "line": 21,
   "kind": "on screen",
   "text": "void | Promise"
  },
  {
   "file": "src/features/log/SessionEquipmentSheet.tsx",
-  "line": 36,
-  "kind": "title",
+  "line": 38,
+  "kind": "translated",
   "text": "Equipment for this workout"
  },
  {
   "file": "src/features/log/SessionEquipmentSheet.tsx",
-  "line": 41,
-  "kind": "on screen",
+  "line": 44,
+  "kind": "translated",
   "text": "Use my default"
  },
  {
   "file": "src/features/log/SessionEquipmentSheet.tsx",
-  "line": 45,
-  "kind": "on screen",
+  "line": 48,
+  "kind": "translated",
   "text": "Use for this workout"
  },
  {
   "file": "src/features/log/SessionEquipmentSheet.tsx",
-  "line": 56,
-  "kind": "on screen",
+  "line": 58,
+  "kind": "translated",
   "text": "Start from a profile"
  },
  {
   "file": "src/features/log/SessionEquipmentSheet.tsx",
-  "line": 67,
-  "kind": "on screen",
+  "line": 70,
+  "kind": "translated",
   "text": "Nothing but bodyweight"
- },
- {
-  "file": "src/features/log/SessionLogger.tsx",
-  "line": 87,
-  "kind": "label",
-  "text": "💪 Great"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
   "line": 88,
   "kind": "label",
-  "text": "🙂 Good"
+  "text": "💪 Great"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
   "line": 89,
   "kind": "label",
-  "text": "😐 OK"
+  "text": "🙂 Good"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
   "line": 90,
   "kind": "label",
-  "text": "😮‍💨 Rough"
+  "text": "😐 OK"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
   "line": 91,
   "kind": "label",
+  "text": "😮‍💨 Rough"
+ },
+ {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 92,
+  "kind": "label",
   "text": "🥴 Bad"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 463,
-  "kind": "on screen",
+  "line": 460,
+  "kind": "translated",
+  "text": "Loading…"
+ },
+ {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 465,
+  "kind": "translated",
   "text": "That session is gone."
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 464,
-  "kind": "on screen",
+  "line": 466,
+  "kind": "translated",
   "text": "Back to today"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 711,
-  "kind": "aria-label",
+  "line": 713,
+  "kind": "translated",
   "text": "Session name"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 751,
-  "kind": "on screen",
+  "line": 754,
+  "kind": "translated",
   "text": "Finished workout — reviewing. Tap Edit to change anything."
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 774,
-  "kind": "on screen",
+  "line": 777,
+  "kind": "translated",
   "text": "Editing a finished workout. Changes save as you make them."
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 778,
+  "line": 780,
   "kind": "on screen",
   "text": "⏱ Add block"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 798,
-  "kind": "on screen",
+  "line": 800,
+  "kind": "translated",
   "text": "Add a movement, or start an AMRAP or EMOM block."
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 900,
-  "kind": "on screen",
+  "line": 899,
+  "kind": "translated",
   "text": "Each round"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 928,
+  "line": 927,
   "kind": "on screen",
   "text": "+ Add movement to this block"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 948,
+  "line": 947,
   "kind": "on screen",
   "text": "⏱ Edit timed workout"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
   "line": 987,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "Ungroup block"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1001,
+  "line": 1000,
   "kind": "on screen",
   "text": "+ Add exercise"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1009,
+  "line": 1008,
   "kind": "on screen",
   "text": "✨ Suggest a workout"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1021,
+  "line": 1020,
   "kind": "on screen",
   "text": "💾 Save as a workout"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1032,
+  "line": 1031,
   "kind": "on screen",
   "text": "📂 Browse saved workouts"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1043,
+  "line": 1042,
   "kind": "on screen",
   "text": "⏱ Make this a timed workout"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
   "line": 1061,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "Discard session"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1148,
-  "kind": "title",
+  "line": 1147,
+  "kind": "translated",
   "text": "Save this workout"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1153,
+  "line": 1152,
   "kind": "placeholder",
   "text": "Upper A"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1261,
-  "kind": "title",
+  "line": 1260,
+  "kind": "translated",
   "text": "Edit timed workout"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1332,
-  "kind": "title",
+  "line": 1331,
+  "kind": "translated",
   "text": "Discard this session?"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
   "line": 1439,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "Worth doing before you save"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1467,
-  "kind": "placeholder",
+  "line": 1451,
+  "kind": "translated",
+  "text": "Add"
+ },
+ {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1465,
+  "kind": "translated",
   "text": "Cindy, Tuesday burner…"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1468,
-  "kind": "aria-label",
+  "line": 1466,
+  "kind": "translated",
   "text": "Name this workout"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1477,
-  "kind": "on screen",
+  "line": 1476,
+  "kind": "translated",
   "text": "Name it"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1484,
-  "kind": "on screen",
+  "line": 1483,
+  "kind": "translated",
   "text": "Optional — saving without them is fine."
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1490,
-  "kind": "on screen",
+  "line": 1489,
+  "kind": "translated",
   "text": "How hard was the whole session? This is what makes running and lifting comparable — effort × minutes is the one load number that spans both."
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1508,
+  "line": 1492,
+  "kind": "translated",
+  "text": "Effort"
+ },
+ {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1505,
   "kind": "on screen",
   "text": "1 = barely moved · 5 = solid work · 8 = hard · 10 = everything you had"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1520,
-  "kind": "aria-label",
+  "line": 1509,
+  "kind": "translated",
+  "text": "Duration"
+ },
+ {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1517,
+  "kind": "translated",
   "text": "Duration in minutes"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1526,
-  "kind": "on screen",
+  "line": 1523,
+  "kind": "translated",
   "text": "How did it feel?"
  },
  {
   "file": "src/features/log/SessionLogger.tsx",
-  "line": 1543,
-  "kind": "placeholder",
+  "line": 1536,
+  "kind": "translated",
+  "text": "Notes"
+ },
+ {
+  "file": "src/features/log/SessionLogger.tsx",
+  "line": 1540,
+  "kind": "translated",
   "text": "Anything worth remembering next time…"
  },
  {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
-  "line": 45,
+  "line": 46,
   "kind": "on screen",
   "text": "void | Promise"
  },
  {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
-  "line": 128,
-  "kind": "title",
+  "line": 130,
+  "kind": "translated",
   "text": "Suggest a workout"
  },
  {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
-  "line": 148,
+  "line": 150,
   "kind": "on screen",
   "text": "⏱ Add as a timed workout"
  },
  {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
-  "line": 158,
-  "kind": "on screen",
+  "line": 160,
+  "kind": "translated",
   "text": "Your saved sessions"
  },
  {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
-  "line": 170,
-  "kind": "on screen",
+  "line": 172,
+  "kind": "translated",
   "text": "Or build a new one"
  },
  {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
-  "line": 189,
-  "kind": "on screen",
+  "line": 176,
+  "kind": "translated",
+  "text": "Train"
+ },
+ {
+  "file": "src/features/log/SuggestWorkoutSheet.tsx",
+  "line": 192,
+  "kind": "translated",
   "text": "Full body"
  },
  {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
-  "line": 241,
-  "kind": "on screen",
+  "line": 197,
+  "kind": "translated",
+  "text": "Goal"
+ },
+ {
+  "file": "src/features/log/SuggestWorkoutSheet.tsx",
+  "line": 223,
+  "kind": "translated",
+  "text": "Time"
+ },
+ {
+  "file": "src/features/log/SuggestWorkoutSheet.tsx",
+  "line": 243,
+  "kind": "translated",
   "text": "Nothing available for that combination."
  },
  {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
-  "line": 242,
-  "kind": "on screen",
+  "line": 244,
+  "kind": "translated",
   "text": "Try another region, or add equipment for this session."
  },
  {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
-  "line": 257,
-  "kind": "title",
+  "line": 259,
+  "kind": "translated",
   "text": "Swap for an easier or harder version"
  },
  {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
-  "line": 264,
-  "kind": "title",
+  "line": 262,
+  "kind": "translated",
+  "text": "Swap"
+ },
+ {
+  "file": "src/features/log/SuggestWorkoutSheet.tsx",
+  "line": 266,
+  "kind": "translated",
   "text": "Drop this movement"
  },
  {
   "file": "src/features/log/SuggestWorkoutSheet.tsx",
-  "line": 283,
+  "line": 285,
   "kind": "on screen",
   "text": "🎲 Suggest something else"
  },
  {
   "file": "src/features/log/TestRunner.tsx",
-  "line": 126,
-  "kind": "on screen",
+  "line": 128,
+  "kind": "translated",
   "text": "Recently tested"
  },
  {
   "file": "src/features/log/TestRunner.tsx",
-  "line": 153,
-  "kind": "on screen",
+  "line": 151,
+  "kind": "translated",
   "text": "What can you do for three?"
  },
  {
   "file": "src/features/log/TestRunner.tsx",
-  "line": 168,
-  "kind": "on screen",
+  "line": 167,
+  "kind": "translated",
   "text": "A rough guess is fine. Everything is worked out from it, and a wrong one costs an extra attempt rather than the result — what gets recorded is the heaviest set you actually finish."
  },
  {
   "file": "src/features/log/TestRunner.tsx",
-  "line": 178,
-  "kind": "on screen",
+  "line": 175,
+  "kind": "translated",
   "text": "Lay out the test"
  },
  {
   "file": "src/features/log/TestRunner.tsx",
-  "line": 235,
-  "kind": "on screen",
+  "line": 232,
+  "kind": "translated",
   "text": "Use it"
  },
  {
   "file": "src/features/log/TestRunner.tsx",
-  "line": 250,
-  "kind": "on screen",
+  "line": 235,
+  "kind": "translated",
+  "text": "Cancel"
+ },
+ {
+  "file": "src/features/log/TestRunner.tsx",
+  "line": 247,
+  "kind": "translated",
   "text": "Use a different weight"
  },
  {
   "file": "src/features/log/TestRunner.tsx",
-  "line": 261,
-  "kind": "on screen",
+  "line": 257,
+  "kind": "translated",
   "text": "How many did you get?"
  },
  {
   "file": "src/features/log/TestRunner.tsx",
-  "line": 267,
-  "kind": "aria-label",
+  "line": 263,
+  "kind": "translated",
   "text": "Reps completed"
  },
  {
   "file": "src/features/log/TestRunner.tsx",
-  "line": 278,
-  "kind": "on screen",
+  "line": 275,
+  "kind": "translated",
   "text": "Record it"
  },
  {
   "file": "src/features/log/TestRunner.tsx",
-  "line": 293,
+  "line": 289,
   "kind": "on screen",
   "text": "▶ Start the hold"
  },
  {
   "file": "src/features/log/TestRunner.tsx",
-  "line": 304,
-  "kind": "on screen",
+  "line": 301,
+  "kind": "translated",
   "text": "Made it — three good reps"
  },
  {
   "file": "src/features/log/TestRunner.tsx",
-  "line": 307,
-  "kind": "on screen",
+  "line": 304,
+  "kind": "translated",
   "text": "Failed it — stop the test"
  },
  {
   "file": "src/features/log/TestRunner.tsx",
-  "line": 341,
-  "kind": "on screen",
+  "line": 337,
+  "kind": "translated",
   "text": "No attempt was completed, so there is nothing to record. Nothing is saved."
  },
  {
   "file": "src/features/log/VariationSheet.tsx",
-  "line": 25,
+  "line": 26,
+  "kind": "on screen",
+  "text": "void | Promise"
+ },
+ {
+  "file": "src/features/log/VariationSheet.tsx",
+  "line": 80,
+  "kind": "translated",
+  "text": "Current"
+ },
+ {
+  "file": "src/features/log/VariationSheet.tsx",
+  "line": 82,
+  "kind": "translated",
+  "text": "Swap"
+ },
+ {
+  "file": "src/features/log/WorkoutTimer.tsx",
+  "line": 23,
   "kind": "on screen",
   "text": "void | Promise"
  },
  {
   "file": "src/features/log/WorkoutTimer.tsx",
-  "line": 22,
-  "kind": "on screen",
-  "text": "void | Promise"
+  "line": 37,
+  "kind": "translated",
+  "text": "Pause"
  },
  {
   "file": "src/features/log/WorkoutTimer.tsx",
-  "line": 79,
-  "kind": "on screen",
+  "line": 50,
+  "kind": "translated",
+  "text": "Save"
+ },
+ {
+  "file": "src/features/log/WorkoutTimer.tsx",
+  "line": 56,
+  "kind": "translated",
+  "text": "Reset"
+ },
+ {
+  "file": "src/features/log/WorkoutTimer.tsx",
+  "line": 81,
+  "kind": "translated",
   "text": "The clock keeps running in the strip at the top — closing this does not stop it."
  },
  {
   "file": "src/features/log/WorkoutTimer.tsx",
-  "line": 86,
-  "kind": "on screen",
+  "line": 87,
+  "kind": "translated",
   "text": "Each round"
  },
  {
   "file": "src/features/log/WorkoutTimer.tsx",
-  "line": 101,
-  "kind": "aria-label",
+  "line": 102,
+  "kind": "translated",
   "text": "Record a completed round"
  },
  {
   "file": "src/features/log/WorkoutTimer.tsx",
-  "line": 112,
-  "kind": "on screen",
+  "line": 114,
+  "kind": "translated",
   "text": "Undo round"
  },
  {
   "file": "src/features/log/WorkoutTimer.tsx",
-  "line": 139,
-  "kind": "on screen",
+  "line": 121,
+  "kind": "translated",
+  "text": "Sound"
+ },
+ {
+  "file": "src/features/log/WorkoutTimer.tsx",
+  "line": 141,
+  "kind": "translated",
   "text": "This browser has no audio support — the timer still runs, silently."
  },
  {
   "file": "src/features/more/AppearanceView.tsx",
-  "line": 21,
-  "kind": "on screen",
+  "line": 18,
+  "kind": "translated",
+  "text": "Appearance"
+ },
+ {
+  "file": "src/features/more/AppearanceView.tsx",
+  "line": 20,
+  "kind": "translated",
+  "text": "Back"
+ },
+ {
+  "file": "src/features/more/AppearanceView.tsx",
+  "line": 24,
+  "kind": "translated",
   "text": "These are four different directions, not four palettes. Each one changes the shape of things, the type, and how tightly the screen is packed."
  },
  {
   "file": "src/features/more/AppearanceView.tsx",
-  "line": 73,
-  "kind": "on screen",
+  "line": 51,
+  "kind": "translated",
+  "text": "Aa"
+ },
+ {
+  "file": "src/features/more/AppearanceView.tsx",
+  "line": 58,
+  "kind": "translated",
+  "text": "Active"
+ },
+ {
+  "file": "src/features/more/AppearanceView.tsx",
+  "line": 75,
+  "kind": "translated",
   "text": "Nothing here touches your data — it is a display setting stored with your profile, so it travels in your backup."
  },
  {
   "file": "src/features/more/BodyView.tsx",
-  "line": 52,
-  "kind": "on screen",
+  "line": 50,
+  "kind": "translated",
+  "text": "Bodyweight"
+ },
+ {
+  "file": "src/features/more/BodyView.tsx",
+  "line": 51,
+  "kind": "translated",
+  "text": "Back"
+ },
+ {
+  "file": "src/features/more/BodyView.tsx",
+  "line": 55,
+  "kind": "translated",
   "text": "This is the load in every push-up, pull-up and lunge you do. Without it those sets show as no work at all on your volume chart. Sessions are valued at what you weighed that week, so logging it today does not rewrite last spring."
  },
  {
   "file": "src/features/more/BodyView.tsx",
   "line": 58,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "Log today"
  },
  {
   "file": "src/features/more/BodyView.tsx",
-  "line": 112,
-  "kind": "on screen",
+  "line": 82,
+  "kind": "translated",
+  "text": "Trend"
+ },
+ {
+  "file": "src/features/more/BodyView.tsx",
+  "line": 92,
+  "kind": "translated",
+  "text": "History"
+ },
+ {
+  "file": "src/features/more/BodyView.tsx",
+  "line": 111,
+  "kind": "translated",
   "text": "No weigh-ins yet."
  },
  {
   "file": "src/features/more/BodyView.tsx",
-  "line": 113,
-  "kind": "on screen",
+  "line": 112,
+  "kind": "translated",
   "text": "Once a week is plenty. Daily readings mostly measure lunch."
  },
  {
   "file": "src/features/more/BodyView.tsx",
-  "line": 119,
-  "kind": "title",
+  "line": 118,
+  "kind": "translated",
   "text": "Delete this weigh-in?"
  },
  {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 163,
+  "line": 127,
+  "kind": "translated",
+  "text": "Equipment"
+ },
+ {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 129,
+  "kind": "translated",
+  "text": "Back"
+ },
+ {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 132,
+  "kind": "translated",
+  "text": "Profiles"
+ },
+ {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 152,
+  "kind": "translated",
+  "text": "Active"
+ },
+ {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 165,
   "kind": "on screen",
   "text": "+ New profile"
  },
  {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 169,
-  "kind": "title",
+  "line": 171,
+  "kind": "translated",
   "text": "New equipment profile"
  },
  {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 171,
+  "line": 173,
   "kind": "placeholder",
   "text": "Hotel gym"
  },
  {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 253,
-  "kind": "on screen",
+  "line": 241,
+  "kind": "translated",
+  "text": "Rename"
+ },
+ {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 252,
+  "kind": "translated",
+  "text": "Delete"
+ },
+ {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 256,
+  "kind": "translated",
   "text": "This is your only profile. Make another before deleting this one — the app has to know what you can train with."
  },
  {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 297,
+  "line": 298,
   "kind": "on screen",
   "text": "✎ Tick what you have"
  },
  {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 302,
+  "line": 303,
   "kind": "on screen",
   "text": "+ Add"
  },
  {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 326,
+  "line": 327,
   "kind": "on screen",
   "text": "✎ Rename"
  },
  {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 338,
-  "kind": "on screen",
+  "line": 333,
+  "kind": "translated",
+  "text": "Cancel"
+ },
+ {
+  "file": "src/features/more/EquipmentView.tsx",
+  "line": 340,
+  "kind": "translated",
   "text": "Tap the kit you added — the square-cornered ones — to mark it. One at a time to rename, any number to delete. Built-in kit cannot be changed."
  },
  {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 405,
-  "kind": "on screen",
+  "line": 406,
+  "kind": "translated",
   "text": "Save kit"
  },
  {
   "file": "src/features/more/EquipmentView.tsx",
   "line": 420,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "Biggest gaps"
  },
  {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 422,
-  "kind": "on screen",
+  "line": 423,
+  "kind": "translated",
   "text": "What one more piece of kit would unlock, on top of this profile."
  },
  {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 448,
-  "kind": "title",
+  "line": 449,
+  "kind": "translated",
   "text": "Add a piece of kit"
  },
  {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 464,
-  "kind": "on screen",
+  "line": 466,
+  "kind": "translated",
   "text": "Whatever you train with that the list does not name. It behaves like any other equipment: tick it into a profile, and movements can require it."
  },
  {
   "file": "src/features/more/EquipmentView.tsx",
   "line": 469,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "What is it"
  },
  {
   "file": "src/features/more/EquipmentView.tsx",
   "line": 473,
-  "kind": "aria-label",
+  "kind": "translated",
   "text": "Equipment name"
  },
  {
   "file": "src/features/more/EquipmentView.tsx",
   "line": 474,
-  "kind": "placeholder",
+  "kind": "translated",
   "text": "Rebounder, macebell, sledgehammer…"
  },
  {
   "file": "src/features/more/EquipmentView.tsx",
   "line": 478,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "Where it belongs"
  },
  {
   "file": "src/features/more/EquipmentView.tsx",
-  "line": 491,
-  "kind": "on screen",
+  "line": 492,
+  "kind": "translated",
   "text": "Which shelf it shows up on. It will have square corners either way, which is how kit you added is told apart from the built-in list."
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 25,
+  "line": 26,
   "kind": "label",
   "text": "Pull-up bar"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 29,
+  "line": 30,
   "kind": "label",
   "text": "Jump rope"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 37,
+  "line": 38,
   "kind": "label",
   "text": "Push (forward)"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 38,
+  "line": 39,
   "kind": "label",
   "text": "Push (overhead)"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 39,
+  "line": 40,
   "kind": "label",
   "text": "Pull (row)"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 40,
+  "line": 41,
   "kind": "label",
   "text": "Pull (chin)"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 43,
+  "line": 44,
   "kind": "label",
   "text": "Full body"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 44,
+  "line": 45,
   "kind": "label",
   "text": "Run / walk"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 48,
+  "line": 49,
   "kind": "blurb",
   "text": "A loaded lift."
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 48,
+  "line": 49,
   "kind": "label",
   "text": "Weight & reps"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 49,
+  "line": 50,
   "kind": "blurb",
   "text": "Bodyweight, counted."
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 50,
+  "line": 51,
   "kind": "blurb",
   "text": "A plank, a hang, a wall sit."
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 50,
+  "line": 51,
   "kind": "label",
   "text": "Time held"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 51,
+  "line": 52,
   "kind": "blurb",
   "text": "A run, a row, a carry."
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 51,
+  "line": 52,
   "kind": "label",
   "text": "Distance & time"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 149,
-  "kind": "placeholder",
+  "line": 148,
+  "kind": "translated",
+  "text": "Name"
+ },
+ {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 151,
+  "kind": "translated",
   "text": "Bulgarian bag spin"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 150,
-  "kind": "aria-label",
+  "line": 152,
+  "kind": "translated",
   "text": "Movement name"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 154,
-  "kind": "on screen",
+  "line": 156,
+  "kind": "translated",
   "text": "What it needs"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 187,
-  "kind": "on screen",
+  "line": 173,
+  "kind": "translated",
+  "text": "Yours"
+ },
+ {
+  "file": "src/features/more/ExerciseEditorSheet.tsx",
+  "line": 190,
+  "kind": "translated",
   "text": "Everything selected has to be in an equipment profile for this to be offered there."
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 191,
-  "kind": "on screen",
+  "line": 193,
+  "kind": "translated",
   "text": "How it moves"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 204,
-  "kind": "on screen",
+  "line": 206,
+  "kind": "translated",
   "text": "What it records"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 221,
-  "kind": "on screen",
+  "line": 223,
+  "kind": "translated",
   "text": "How hard"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 239,
-  "kind": "on screen",
+  "line": 242,
+  "kind": "translated",
   "text": "Files as"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 243,
-  "kind": "on screen",
+  "line": 246,
+  "kind": "translated",
   "text": "Worked out from the kit and the pattern, so filtering, suggestions and the injury log all understand it without being told separately."
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 249,
-  "kind": "on screen",
+  "line": 250,
+  "kind": "translated",
   "text": "What it trains"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 252,
-  "kind": "placeholder",
+  "line": 253,
+  "kind": "translated",
   "text": "shoulders, core"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 253,
-  "kind": "aria-label",
+  "line": 254,
+  "kind": "translated",
   "text": "Muscles trained"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 257,
-  "kind": "on screen",
+  "line": 258,
+  "kind": "translated",
   "text": "Set up"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 261,
-  "kind": "placeholder",
+  "line": 262,
+  "kind": "translated",
   "text": "Where you and the kit start. Optional."
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 266,
-  "kind": "on screen",
+  "line": 267,
+  "kind": "translated",
   "text": "How to do it"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 270,
+  "line": 271,
   "kind": "placeholder",
   "text": "One cue per line, in the order they happen."
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 275,
-  "kind": "on screen",
+  "line": 276,
+  "kind": "translated",
   "text": "Watch for"
  },
  {
   "file": "src/features/more/ExerciseEditorSheet.tsx",
-  "line": 279,
-  "kind": "placeholder",
+  "line": 280,
+  "kind": "translated",
   "text": "The one thing that usually goes wrong. Optional."
  },
  {
   "file": "src/features/more/ExerciseLibraryView.tsx",
-  "line": 88,
-  "kind": "placeholder",
+  "line": 72,
+  "kind": "translated",
+  "text": "Edit"
+ },
+ {
+  "file": "src/features/more/ExerciseLibraryView.tsx",
+  "line": 75,
+  "kind": "translated",
+  "text": "Delete"
+ },
+ {
+  "file": "src/features/more/ExerciseLibraryView.tsx",
+  "line": 85,
+  "kind": "translated",
+  "text": "Movements"
+ },
+ {
+  "file": "src/features/more/ExerciseLibraryView.tsx",
+  "line": 86,
+  "kind": "counted",
+  "text": "movement"
+ },
+ {
+  "file": "src/features/more/ExerciseLibraryView.tsx",
+  "line": 87,
+  "kind": "translated",
+  "text": "Back"
+ },
+ {
+  "file": "src/features/more/ExerciseLibraryView.tsx",
+  "line": 92,
+  "kind": "translated",
   "text": "Search movements"
  },
  {
   "file": "src/features/more/ExerciseLibraryView.tsx",
-  "line": 117,
-  "kind": "on screen",
-  "text": "+ Add a movement"
+  "line": 103,
+  "kind": "translated",
+  "text": "All"
  },
  {
   "file": "src/features/more/ExerciseLibraryView.tsx",
-  "line": 124,
-  "kind": "on screen",
+  "line": 122,
+  "kind": "translated",
+  "text": "Add a movement"
+ },
+ {
+  "file": "src/features/more/ExerciseLibraryView.tsx",
+  "line": 125,
+  "kind": "translated",
+  "text": "Yours"
+ },
+ {
+  "file": "src/features/more/ExerciseLibraryView.tsx",
+  "line": 128,
+  "kind": "translated",
   "text": "Built in"
  },
  {
+  "file": "src/features/more/ExerciseLibraryView.tsx",
+  "line": 135,
+  "kind": "counted",
+  "text": "more movement"
+ },
+ {
   "file": "src/features/more/ImportSheet.tsx",
-  "line": 53,
+  "line": 55,
   "kind": "message",
   "text": "That file could not be read. It may have been altered or truncated."
  },
  {
   "file": "src/features/more/ImportSheet.tsx",
-  "line": 93,
+  "line": 95,
   "kind": "message",
   "text": "That import did not work."
  },
  {
   "file": "src/features/more/ImportSheet.tsx",
-  "line": 120,
-  "kind": "aria-label",
+  "line": 122,
+  "kind": "translated",
   "text": "Choose a file"
  },
  {
   "file": "src/features/more/ImportSheet.tsx",
-  "line": 144,
-  "kind": "on screen",
+  "line": 146,
+  "kind": "translated",
   "text": "What is in it"
  },
  {
   "file": "src/features/more/ImportSheet.tsx",
-  "line": 168,
-  "kind": "on screen",
+  "line": 171,
+  "kind": "translated",
   "text": "They will be added so this works. Anything you already have is left alone."
  },
  {
   "file": "src/features/more/ImportSheet.tsx",
-  "line": 200,
-  "kind": "on screen",
+  "line": 202,
+  "kind": "translated",
   "text": "Start it on"
  },
  {
   "file": "src/features/more/ImportSheet.tsx",
-  "line": 204,
-  "kind": "aria-label",
+  "line": 206,
+  "kind": "translated",
   "text": "Plan start date"
  },
  {
   "file": "src/features/more/ImportSheet.tsx",
-  "line": 207,
-  "kind": "on screen",
+  "line": 210,
+  "kind": "translated",
   "text": "Sessions are spaced the way the plan author laid them out, counted from this day. It comes in switched off — starting it is a separate choice."
  },
  {
   "file": "src/features/more/InjurySheet.tsx",
-  "line": 70,
-  "kind": "title",
+  "line": 72,
+  "kind": "translated",
   "text": "Log an injury"
  },
  {
   "file": "src/features/more/InjurySheet.tsx",
-  "line": 86,
-  "kind": "on screen",
+  "line": 88,
+  "kind": "translated",
   "text": "What hurts"
  },
  {
   "file": "src/features/more/InjurySheet.tsx",
-  "line": 102,
-  "kind": "placeholder",
+  "line": 104,
+  "kind": "translated",
   "text": "Left shoulder"
  },
  {
   "file": "src/features/more/InjurySheet.tsx",
-  "line": 103,
-  "kind": "aria-label",
+  "line": 105,
+  "kind": "translated",
   "text": "What hurts, in your words"
  },
  {
   "file": "src/features/more/InjurySheet.tsx",
-  "line": 107,
-  "kind": "on screen",
+  "line": 109,
+  "kind": "translated",
   "text": "How bad"
  },
  {
   "file": "src/features/more/InjurySheet.tsx",
-  "line": 123,
-  "kind": "on screen",
+  "line": 125,
+  "kind": "translated",
   "text": "Rest until"
  },
  {
   "file": "src/features/more/InjurySheet.tsx",
-  "line": 137,
-  "kind": "on screen",
+  "line": 139,
+  "kind": "translated",
   "text": "How it happened"
  },
  {
   "file": "src/features/more/InjurySheet.tsx",
-  "line": 140,
-  "kind": "placeholder",
+  "line": 142,
+  "kind": "translated",
   "text": "Optional — third set of overhead press"
  },
  {
   "file": "src/features/more/InjurySheet.tsx",
   "line": 164,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "Skipped, not deleted — mark the injury healed early and you can take them back."
  },
  {
   "file": "src/features/more/InjuryView.tsx",
-  "line": 47,
-  "kind": "on screen",
+  "line": 39,
+  "kind": "translated",
+  "text": "Injuries"
+ },
+ {
+  "file": "src/features/more/InjuryView.tsx",
+  "line": 41,
+  "kind": "translated",
+  "text": "Back"
+ },
+ {
+  "file": "src/features/more/InjuryView.tsx",
+  "line": 49,
+  "kind": "translated",
   "text": "Nothing logged."
  },
  {
   "file": "src/features/more/InjuryView.tsx",
-  "line": 48,
-  "kind": "on screen",
+  "line": 51,
+  "kind": "translated",
   "text": "Log something that hurts and the sessions that load it step aside — the rest of your training carries on."
  },
  {
   "file": "src/features/more/InjuryView.tsx",
-  "line": 74,
-  "kind": "on screen",
+  "line": 56,
+  "kind": "translated",
+  "text": "Current"
+ },
+ {
+  "file": "src/features/more/InjuryView.tsx",
+  "line": 75,
+  "kind": "translated",
   "text": "Mark it healed"
  },
  {
   "file": "src/features/more/InjuryView.tsx",
-  "line": 98,
-  "kind": "on screen",
+  "line": 80,
+  "kind": "translated",
+  "text": "Healed"
+ },
+ {
+  "file": "src/features/more/InjuryView.tsx",
+  "line": 99,
+  "kind": "translated",
   "text": "Remove from the log"
  },
  {
   "file": "src/features/more/InjuryView.tsx",
-  "line": 108,
-  "kind": "on screen",
+  "line": 109,
+  "kind": "translated",
   "text": "Log an injury"
  },
  {
   "file": "src/features/more/InjuryView.tsx",
   "line": 128,
-  "kind": "title",
+  "kind": "translated",
   "text": "Healed already?"
  },
  {
   "file": "src/features/more/InjuryView.tsx",
   "line": 150,
-  "kind": "title",
+  "kind": "translated",
   "text": "Remove this from the log?"
  },
  {
   "file": "src/features/more/KnownMaxSheet.tsx",
-  "line": 106,
-  "kind": "on screen",
+  "line": 108,
+  "kind": "translated",
   "text": "The lift"
  },
  {
   "file": "src/features/more/KnownMaxSheet.tsx",
-  "line": 128,
-  "kind": "on screen",
+  "line": 124,
+  "kind": "translated",
+  "text": "Reps"
+ },
+ {
+  "file": "src/features/more/KnownMaxSheet.tsx",
+  "line": 131,
+  "kind": "translated",
   "text": "A single, a triple, whatever you know it as. One rep means you are giving a true max."
  },
  {
   "file": "src/features/more/KnownMaxSheet.tsx",
-  "line": 136,
-  "kind": "on screen",
+  "line": 138,
+  "kind": "translated",
   "text": "Your best set"
- },
- {
-  "file": "src/features/more/KnownMaxSheet.tsx",
-  "line": 147,
-  "kind": "on screen",
-  "text": "reps, unbroken"
  },
  {
   "file": "src/features/more/KnownMaxSheet.tsx",
   "line": 149,
   "kind": "on screen",
+  "text": "reps, unbroken"
+ },
+ {
+  "file": "src/features/more/KnownMaxSheet.tsx",
+  "line": 152,
+  "kind": "translated",
   "text": "The most you can do in one set with good form, stopping when the form goes — not a total across a session."
  },
  {
   "file": "src/features/more/KnownMaxSheet.tsx",
-  "line": 158,
-  "kind": "on screen",
+  "line": 159,
+  "kind": "translated",
   "text": "Your best hold"
  },
  {
   "file": "src/features/more/KnownMaxSheet.tsx",
-  "line": 171,
-  "kind": "on screen",
+  "line": 166,
+  "kind": "translated",
+  "text": "Seconds"
+ },
+ {
+  "file": "src/features/more/KnownMaxSheet.tsx",
+  "line": 173,
+  "kind": "translated",
   "text": "The longest you can hold the position before it breaks down."
  },
  {
   "file": "src/features/more/KnownMaxSheet.tsx",
-  "line": 185,
-  "kind": "on screen",
+  "line": 178,
+  "kind": "translated",
+  "text": "When"
+ },
+ {
+  "file": "src/features/more/KnownMaxSheet.tsx",
+  "line": 187,
+  "kind": "translated",
   "text": "Dating it honestly matters — an old result is still used, and the app says when it is getting stale rather than quietly trusting it forever."
  },
  {
   "file": "src/features/more/KnownMaxSheet.tsx",
-  "line": 200,
-  "kind": "on screen",
+  "line": 199,
+  "kind": "translated",
   "text": "Works out at"
  },
  {
   "file": "src/features/more/KnownMaxSheet.tsx",
-  "line": 202,
+  "line": 201,
   "kind": "on screen",
   "text": "for one"
  },
@@ -1957,530 +2593,896 @@
  },
  {
   "file": "src/features/more/MoreView.tsx",
-  "line": 53,
+  "line": 54,
   "kind": "message",
   "text": "Could not read that file."
  },
  {
   "file": "src/features/more/MoreView.tsx",
-  "line": 74,
-  "kind": "on screen",
+  "line": 60,
+  "kind": "translated",
+  "text": "More"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 64,
+  "kind": "translated",
+  "text": "Equipment"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 67,
+  "kind": "translated",
+  "text": "Not set"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 67,
+  "kind": "counted",
+  "text": "item"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 75,
+  "kind": "translated",
   "text": "Run alerts"
  },
  {
   "file": "src/features/more/MoreView.tsx",
-  "line": 131,
-  "kind": "on screen",
+  "line": 84,
+  "kind": "translated",
+  "text": "Settings"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 87,
+  "kind": "translated",
+  "text": "Kilograms and kilometres"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 87,
+  "kind": "translated",
+  "text": "Pounds and miles"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 95,
+  "kind": "translated",
+  "text": "Appearance"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 98,
+  "kind": "translated",
+  "text": "try the other directions"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 106,
+  "kind": "translated",
+  "text": "Movements"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 110,
+  "kind": "counted",
+  "text": "movement"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 110,
+  "kind": "translated",
+  "text": "of them yours"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 111,
+  "kind": "translated",
+  "text": "add your own"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 119,
+  "kind": "translated",
+  "text": "Plans"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 123,
+  "kind": "translated",
+  "text": "of your own — build, share, import"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 123,
+  "kind": "counted",
+  "text": "plan"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 124,
+  "kind": "translated",
+  "text": "Build your own week, or open a plan someone sent"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 132,
+  "kind": "translated",
   "text": "Saved workouts"
  },
  {
   "file": "src/features/more/MoreView.tsx",
-  "line": 181,
-  "kind": "on screen",
+  "line": 136,
+  "kind": "translated",
+  "text": "share, import, tidy up"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 136,
+  "kind": "counted",
+  "text": "workout"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 137,
+  "kind": "translated",
+  "text": "Workouts you have named come back here"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 145,
+  "kind": "translated",
+  "text": "Tests"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 149,
+  "kind": "translated",
+  "text": "due a retest"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 150,
+  "kind": "translated",
+  "text": "Measure a max, and program from a number instead of a guess"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 158,
+  "kind": "translated",
+  "text": "Injuries"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 162,
+  "kind": "translated",
+  "text": "resting"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 163,
+  "kind": "translated",
+  "text": "Log something that hurts and the sessions that load it step aside"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 171,
+  "kind": "translated",
+  "text": "Bodyweight"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 175,
+  "kind": "translated",
+  "text": "the load in every push-up"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 176,
+  "kind": "translated",
+  "text": "Not set — bodyweight sets count as no work without it"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 182,
+  "kind": "translated",
   "text": "Your data"
  },
  {
   "file": "src/features/more/MoreView.tsx",
-  "line": 183,
-  "kind": "on screen",
+  "line": 186,
+  "kind": "translated",
   "text": "Everything lives in this browser on this device. Nothing is uploaded, and no account exists — which also means a cleared browser takes your history with it. Export regularly and keep the file somewhere that syncs."
  },
  {
   "file": "src/features/more/MoreView.tsx",
-  "line": 196,
-  "kind": "on screen",
+  "line": 189,
+  "kind": "translated",
+  "text": "planned"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 189,
+  "kind": "counted",
+  "text": "session"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 195,
+  "kind": "translated",
+  "text": "Saved"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
+  "line": 197,
+  "kind": "translated",
   "text": "Export backup"
  },
  {
   "file": "src/features/more/MoreView.tsx",
-  "line": 215,
-  "kind": "on screen",
+  "line": 216,
+  "kind": "translated",
   "text": "Restore from backup"
  },
  {
   "file": "src/features/more/MoreView.tsx",
   "line": 223,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "Start over"
  },
  {
   "file": "src/features/more/MoreView.tsx",
-  "line": 224,
-  "kind": "on screen",
+  "line": 225,
+  "kind": "translated",
   "text": "Erases every session, plan, and setting on this device and reseeds the movement library from scratch. Export a backup first if there is anything you want."
  },
  {
   "file": "src/features/more/MoreView.tsx",
   "line": 231,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "Erase all data"
  },
  {
   "file": "src/features/more/MoreView.tsx",
   "line": 236,
-  "kind": "on screen",
-  "text": "Forge · offline training tracker"
+  "kind": "translated",
+  "text": "Hybrid Forge · offline training tracker"
  },
  {
   "file": "src/features/more/MoreView.tsx",
-  "line": 241,
-  "kind": "title",
+  "line": 240,
+  "kind": "translated",
   "text": "Restore backup"
  },
  {
   "file": "src/features/more/MoreView.tsx",
-  "line": 243,
+  "line": 242,
   "kind": "on screen",
   "text": ". Merging keeps what is already on this device and lets the newer copy of each record win — the right choice when you have trained since the export. Replacing wipes first, for moving to a new phone."
  },
  {
   "file": "src/features/more/MoreView.tsx",
+  "line": 242,
+  "kind": "translated",
+  "text": "Restoring"
+ },
+ {
+  "file": "src/features/more/MoreView.tsx",
   "line": 255,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "Merge (recommended)"
  },
  {
   "file": "src/features/more/MoreView.tsx",
   "line": 265,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "Replace everything"
  },
  {
   "file": "src/features/more/MoreView.tsx",
-  "line": 276,
+  "line": 275,
   "kind": "label",
   "text": "Type ERASE to confirm"
  },
  {
   "file": "src/features/more/PlansView.tsx",
-  "line": 74,
-  "kind": "on screen",
+  "line": 40,
+  "kind": "translated",
+  "text": "Plans"
+ },
+ {
+  "file": "src/features/more/PlansView.tsx",
+  "line": 42,
+  "kind": "translated",
+  "text": "Back"
+ },
+ {
+  "file": "src/features/more/PlansView.tsx",
+  "line": 51,
+  "kind": "translated",
+  "text": "Dismiss"
+ },
+ {
+  "file": "src/features/more/PlansView.tsx",
+  "line": 76,
+  "kind": "translated",
   "text": "No plans of your own yet."
  },
  {
   "file": "src/features/more/PlansView.tsx",
-  "line": 75,
-  "kind": "on screen",
+  "line": 78,
+  "kind": "translated",
   "text": "Lay out a week — which days you train and what you do on them — and it repeats for as long as you set it to."
  },
  {
   "file": "src/features/more/PlansView.tsx",
-  "line": 82,
+  "line": 83,
   "kind": "on screen",
   "text": "+ Build a plan"
  },
  {
   "file": "src/features/more/PlansView.tsx",
-  "line": 86,
+  "line": 87,
   "kind": "on screen",
   "text": "📥 Import a plan"
  },
  {
   "file": "src/features/more/RackEditor.tsx",
-  "line": 166,
+  "line": 157,
+  "kind": "translated",
+  "text": "Add"
+ },
+ {
+  "file": "src/features/more/RackEditor.tsx",
+  "line": 160,
+  "kind": "translated",
+  "text": "Cancel"
+ },
+ {
+  "file": "src/features/more/RackEditor.tsx",
+  "line": 168,
   "kind": "on screen",
   "text": "+ Another size"
  },
  {
   "file": "src/features/more/RackEditor.tsx",
-  "line": 187,
-  "kind": "on screen",
+  "line": 189,
+  "kind": "translated",
   "text": "Weights you own"
  },
  {
   "file": "src/features/more/RackEditor.tsx",
-  "line": 188,
-  "kind": "on screen",
+  "line": 191,
+  "kind": "translated",
   "text": "Suggested loads, progressions and test ladders all snap to these. Leave a section empty and that movement falls back to round numbers."
  },
  {
   "file": "src/features/more/RackEditor.tsx",
-  "line": 204,
-  "kind": "on screen",
+  "line": 201,
+  "kind": "translated",
+  "text": "Barbell"
+ },
+ {
+  "file": "src/features/more/RackEditor.tsx",
+  "line": 205,
+  "kind": "translated",
   "text": "The bar"
  },
  {
   "file": "src/features/more/RackEditor.tsx",
-  "line": 221,
-  "kind": "on screen",
+  "line": 222,
+  "kind": "translated",
   "text": "Plates, in pairs"
  },
  {
   "file": "src/features/more/ReshuffleSheet.tsx",
-  "line": 28,
-  "kind": "title",
+  "line": 30,
+  "kind": "translated",
   "text": "Fit the plan to your week"
  },
  {
   "file": "src/features/more/ReshuffleSheet.tsx",
-  "line": 42,
-  "kind": "on screen",
+  "line": 45,
+  "kind": "translated",
   "text": "Leave the plan alone"
  },
  {
   "file": "src/features/more/ReshuffleSheet.tsx",
-  "line": 48,
-  "kind": "on screen",
+  "line": 51,
+  "kind": "translated",
   "text": "Your availability no longer matches where these sessions sit. Completed and skipped sessions are never touched, and nothing before today moves."
  },
  {
   "file": "src/features/more/ReshuffleSheet.tsx",
-  "line": 84,
-  "kind": "on screen",
+  "line": 86,
+  "kind": "translated",
   "text": "Dropped sessions are removed from the plan, not from your history. Your adherence is measured against what remains."
- },
- {
-  "file": "src/features/more/RunSettingsView.tsx",
-  "line": 32,
-  "kind": "label",
-  "text": "200 m"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
   "line": 33,
   "kind": "label",
-  "text": "400 m"
+  "text": "200 m"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
   "line": 34,
   "kind": "label",
-  "text": "800 m"
+  "text": "400 m"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
   "line": 35,
   "kind": "label",
-  "text": "1 km"
+  "text": "800 m"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
   "line": 36,
   "kind": "label",
-  "text": "1600 m"
+  "text": "1 km"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 40,
+  "line": 37,
   "kind": "label",
-  "text": "¼ mi"
+  "text": "1600 m"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
   "line": 41,
   "kind": "label",
-  "text": "½ mi"
+  "text": "¼ mi"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
   "line": 42,
   "kind": "label",
+  "text": "½ mi"
+ },
+ {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 43,
+  "kind": "label",
   "text": "1 mi"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 54,
+  "line": 55,
   "kind": "label",
   "text": "Just run"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 62,
+  "line": 63,
   "kind": "label",
   "text": "Easy or long"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 124,
-  "kind": "title",
+  "line": 126,
+  "kind": "translated",
   "text": "Run alerts"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 135,
-  "kind": "on screen",
+  "line": 130,
+  "kind": "translated",
+  "text": "Back"
+ },
+ {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 138,
+  "kind": "translated",
   "text": "This browser cannot speak, so cues will appear on screen only. Everything below still decides what gets shown."
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 147,
-  "kind": "on screen",
+  "line": 143,
+  "kind": "translated",
+  "text": "Voice"
+ },
+ {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 149,
+  "kind": "translated",
   "text": "Speak cues"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 157,
-  "kind": "on screen",
+  "line": 155,
+  "kind": "translated",
+  "text": "Silent"
+ },
+ {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 159,
+  "kind": "translated",
   "text": "Silent keeps every cue on screen and says none of them — for a race, a group run, or a track session where someone is already shouting at you."
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
+  "line": 162,
+  "kind": "translated",
+  "text": "Splits"
+ },
+ {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 168,
+  "kind": "translated",
+  "text": "On"
+ },
+ {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 174,
+  "kind": "translated",
+  "text": "Off"
+ },
+ {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 193,
+  "kind": "translated",
+  "text": ", with the pace for that piece alone and how it compares to your target. Distance rather than a timer, so standing at a crossing does not count."
+ },
+ {
+  "file": "src/features/more/RunSettingsView.tsx",
   "line": 217,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "Each kind of run keeps its own setup, so a track session does not turn Sunday's long run into four by eight hundred."
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 302,
-  "kind": "on screen",
+  "line": 286,
+  "kind": "translated",
+  "text": "Reps"
+ },
+ {
+  "file": "src/features/more/RunSettingsView.tsx",
+  "line": 301,
+  "kind": "translated",
   "text": "Each rep"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 324,
-  "kind": "on screen",
+  "line": 323,
+  "kind": "translated",
   "text": "Jog between"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 382,
-  "kind": "on screen",
+  "line": 380,
+  "kind": "translated",
   "text": "Pace alerts"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 400,
-  "kind": "on screen",
+  "line": 399,
+  "kind": "translated",
   "text": "Say something once I am off by"
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 418,
-  "kind": "on screen",
+  "line": 417,
+  "kind": "translated",
   "text": "Measured against the target above, or on a tempo or interval session against the pace of the piece you are on. Drifting is normal, so this waits — half a minute off pace before it says anything, and longer before it says the same thing twice."
  },
  {
   "file": "src/features/more/RunSettingsView.tsx",
-  "line": 494,
-  "kind": "on screen",
+  "line": 491,
+  "kind": "translated",
   "text": "Minutes and seconds, like 8:30"
  },
  {
   "file": "src/features/more/SavedWorkoutsView.tsx",
-  "line": 48,
-  "kind": "title",
+  "line": 50,
+  "kind": "translated",
   "text": "Saved workouts"
  },
  {
   "file": "src/features/more/SavedWorkoutsView.tsx",
-  "line": 80,
-  "kind": "on screen",
+  "line": 52,
+  "kind": "translated",
+  "text": "Back"
+ },
+ {
+  "file": "src/features/more/SavedWorkoutsView.tsx",
+  "line": 61,
+  "kind": "translated",
+  "text": "Dismiss"
+ },
+ {
+  "file": "src/features/more/SavedWorkoutsView.tsx",
+  "line": 82,
+  "kind": "translated",
   "text": "Nothing saved yet."
  },
  {
   "file": "src/features/more/SavedWorkoutsView.tsx",
-  "line": 81,
-  "kind": "on screen",
+  "line": 84,
+  "kind": "translated",
   "text": "Name a workout you have built and it comes back here, ready to run again — and, if it is timed, with its own best to beat."
  },
  {
   "file": "src/features/more/SavedWorkoutsView.tsx",
-  "line": 88,
+  "line": 89,
   "kind": "on screen",
   "text": "📥 Import a workout"
  },
  {
   "file": "src/features/more/SettingsView.tsx",
-  "line": 74,
-  "kind": "on screen",
-  "text": "Training for"
+  "line": 72,
+  "kind": "translated",
+  "text": "Settings"
+ },
+ {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 73,
+  "kind": "translated",
+  "text": "Back"
  },
  {
   "file": "src/features/more/SettingsView.tsx",
   "line": 76,
-  "kind": "on screen",
-  "text": "Orders the plan library, sets what ‘Suggest a workout’ opens on, and shapes the sets and reps in plans you start from here. Plans already on your calendar keep what they prescribed."
+  "kind": "translated",
+  "text": "Name"
  },
  {
   "file": "src/features/more/SettingsView.tsx",
   "line": 82,
-  "kind": "on screen",
+  "kind": "translated",
+  "text": "Training for"
+ },
+ {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 85,
+  "kind": "translated",
+  "text": "Orders the plan library, sets what ‘Suggest a workout’ opens on, and shapes the sets and reps in plans you start from here. Plans already on your calendar keep what they prescribed."
+ },
+ {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 88,
+  "kind": "translated",
   "text": "Training max"
  },
  {
   "file": "src/features/more/SettingsView.tsx",
-  "line": 94,
-  "kind": "on screen",
+  "line": 101,
+  "kind": "translated",
   "text": "Suggested loads are worked out from this share of your tested max, rather than from the max itself. Ninety per cent is the usual convention: a number computed from your best day is not makeable on an average one, and a programme you miss reps on is one you stop running. At 100% the suggestions come straight off your max."
  },
  {
   "file": "src/features/more/SettingsView.tsx",
-  "line": 106,
+  "line": 104,
+  "kind": "translated",
+  "text": "Language"
+ },
+ {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 118,
+  "kind": "translated",
+  "text": "Spoken cues on a run will use whichever voice this device has, which may not be a Spanish one. Adding a Spanish voice in your device settings fixes it."
+ },
+ {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 119,
+  "kind": "translated",
+  "text": "Changes what the app says out loud on a run. Distances stay on whatever the units below are set to."
+ },
+ {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 122,
+  "kind": "translated",
+  "text": "Units"
+ },
+ {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 127,
   "kind": "on screen",
   "text": "lb / miles"
  },
  {
   "file": "src/features/more/SettingsView.tsx",
-  "line": 112,
+  "line": 133,
   "kind": "on screen",
   "text": "kg / km"
  },
  {
   "file": "src/features/more/SettingsView.tsx",
-  "line": 116,
-  "kind": "on screen",
+  "line": 138,
+  "kind": "translated",
   "text": "Stored data does not change — this only affects how numbers are shown, so switching back and forth never rounds your history away."
  },
  {
   "file": "src/features/more/SettingsView.tsx",
-  "line": 121,
-  "kind": "on screen",
+  "line": 141,
+  "kind": "translated",
   "text": "Week starts on"
  },
  {
   "file": "src/features/more/SettingsView.tsx",
-  "line": 134,
-  "kind": "on screen",
+  "line": 154,
+  "kind": "translated",
   "text": "Effort per set"
  },
  {
   "file": "src/features/more/SettingsView.tsx",
-  "line": 139,
-  "kind": "on screen",
+  "line": 160,
+  "kind": "translated",
   "text": "Once per session"
  },
  {
   "file": "src/features/more/SettingsView.tsx",
-  "line": 145,
-  "kind": "on screen",
+  "line": 166,
+  "kind": "translated",
   "text": "Every set"
  },
  {
   "file": "src/features/more/SettingsView.tsx",
-  "line": 149,
-  "kind": "on screen",
+  "line": 170,
+  "kind": "translated",
   "text": "Per-set effort is how autoregulated strength work picks its loads — a 9 on a triple you wanted at 8 means the next set comes down. It is worth the extra box on every row only if you act on it between sets. Training load uses the session figure either way."
  },
  {
   "file": "src/features/more/SettingsView.tsx",
-  "line": 155,
-  "kind": "on screen",
+  "line": 173,
+  "kind": "translated",
   "text": "Weekly availability"
  },
  {
   "file": "src/features/more/SettingsView.tsx",
-  "line": 169,
-  "kind": "on screen",
+  "line": 188,
+  "kind": "translated",
   "text": "See what would move"
  },
  {
   "file": "src/features/more/SettingsView.tsx",
-  "line": 182,
-  "kind": "on screen",
+  "line": 201,
+  "kind": "translated",
   "text": "Which kinds of training each day can hold. Planning will respect this — a day with nothing selected is a rest day."
  },
  {
+  "file": "src/features/more/SettingsView.tsx",
+  "line": 210,
+  "kind": "translated",
+  "text": "Rest"
+ },
+ {
   "file": "src/features/more/TestsView.tsx",
-  "line": 83,
-  "kind": "on screen",
+  "line": 75,
+  "kind": "translated",
+  "text": "Tests"
+ },
+ {
+  "file": "src/features/more/TestsView.tsx",
+  "line": 77,
+  "kind": "translated",
+  "text": "Back"
+ },
+ {
+  "file": "src/features/more/TestsView.tsx",
+  "line": 85,
+  "kind": "translated",
   "text": "Nothing measured yet."
  },
  {
   "file": "src/features/more/TestsView.tsx",
-  "line": 84,
-  "kind": "on screen",
+  "line": 87,
+  "kind": "translated",
   "text": "A test gives the app a real number to program from instead of a guess — and gives you something to beat."
  },
  {
   "file": "src/features/more/TestsView.tsx",
   "line": 96,
-  "kind": "on screen",
+  "kind": "translated",
+  "text": "Due"
+ },
+ {
+  "file": "src/features/more/TestsView.tsx",
+  "line": 97,
+  "kind": "translated",
   "text": "Just tested"
  },
  {
   "file": "src/features/more/TestsView.tsx",
-  "line": 115,
-  "kind": "on screen",
+  "line": 117,
+  "kind": "translated",
   "text": "Test it again"
  },
  {
   "file": "src/features/more/TestsView.tsx",
-  "line": 123,
-  "kind": "on screen",
+  "line": 125,
+  "kind": "translated",
   "text": "Remove this result"
  },
  {
   "file": "src/features/more/TestsView.tsx",
-  "line": 136,
-  "kind": "on screen",
+  "line": 138,
+  "kind": "translated",
   "text": "Test a movement"
  },
  {
   "file": "src/features/more/TestsView.tsx",
-  "line": 148,
-  "kind": "on screen",
+  "line": 150,
+  "kind": "translated",
   "text": "Enter a max I already know"
  },
  {
   "file": "src/features/more/TestsView.tsx",
-  "line": 198,
-  "kind": "title",
+  "line": 199,
+  "kind": "translated",
   "text": "Remove this result?"
  },
  {
   "file": "src/features/plan/ApplyPlanSheet.tsx",
-  "line": 180,
-  "kind": "on screen",
+  "line": 183,
+  "kind": "translated",
   "text": "Optional. Without it the plan is generated exactly as written."
  },
  {
   "file": "src/features/plan/ApplyPlanSheet.tsx",
-  "line": 188,
-  "kind": "on screen",
+  "line": 190,
+  "kind": "translated",
   "text": "Already planned"
  },
  {
   "file": "src/features/plan/ApplyPlanSheet.tsx",
-  "line": 210,
-  "kind": "on screen",
+  "line": 212,
+  "kind": "translated",
   "text": "Testing days"
  },
  {
   "file": "src/features/plan/ApplyPlanSheet.tsx",
-  "line": 229,
-  "kind": "on screen",
+  "line": 231,
+  "kind": "translated",
   "text": "Heads up"
  },
  {
   "file": "src/features/plan/ApplyPlanSheet.tsx",
   "line": 240,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "Race day"
  },
  {
   "file": "src/features/plan/ApplyPlanSheet.tsx",
   "line": 246,
-  "kind": "aria-label",
+  "kind": "translated",
   "text": "Race date"
  },
  {
   "file": "src/features/plan/ApplyPlanSheet.tsx",
+  "line": 258,
+  "kind": "translated",
+  "text": "Start"
+ },
+ {
+  "file": "src/features/plan/ApplyPlanSheet.tsx",
   "line": 263,
-  "kind": "aria-label",
+  "kind": "translated",
   "text": "Start date"
  },
  {
   "file": "src/features/plan/ApplyPlanSheet.tsx",
   "line": 273,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "How many weeks to lay down"
  },
  {
   "file": "src/features/plan/ApplyPlanSheet.tsx",
-  "line": 285,
-  "kind": "on screen",
+  "line": 286,
+  "kind": "translated",
   "text": "This plan has no end. Lay down a stretch now and extend it whenever you like."
  },
  {
   "file": "src/features/plan/ApplyPlanSheet.tsx",
   "line": 291,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "What you'll get"
  },
  {
   "file": "src/features/plan/ApplyPlanSheet.tsx",
   "line": 312,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "Swapped for your equipment"
  },
  {
@@ -2491,602 +3493,920 @@
  },
  {
   "file": "src/features/plan/ApplyPlanSheet.tsx",
+  "line": 315,
+  "kind": "translated",
+  "text": "Using"
+ },
+ {
+  "file": "src/features/plan/ApplyPlanSheet.tsx",
   "line": 333,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "No substitute"
  },
  {
   "file": "src/features/plan/ApplyPlanSheet.tsx",
   "line": 346,
-  "kind": "on screen",
+  "kind": "translated",
   "text": "Couldn't be scheduled"
  },
  {
   "file": "src/features/plan/BlockOutSheet.tsx",
-  "line": 50,
-  "kind": "on screen",
+  "line": 53,
+  "kind": "translated",
   "text": "Nothing new gets scheduled in a blocked stretch, and applying a plan routes around it."
  },
  {
   "file": "src/features/plan/BlockOutSheet.tsx",
-  "line": 64,
-  "kind": "aria-label",
+  "line": 56,
+  "kind": "translated",
+  "text": "From"
+ },
+ {
+  "file": "src/features/plan/BlockOutSheet.tsx",
+  "line": 61,
+  "kind": "translated",
+  "text": "Until"
+ },
+ {
+  "file": "src/features/plan/BlockOutSheet.tsx",
+  "line": 66,
+  "kind": "translated",
   "text": "Last day to block"
  },
  {
   "file": "src/features/plan/BlockOutSheet.tsx",
-  "line": 76,
-  "kind": "placeholder",
+  "line": 75,
+  "kind": "translated",
+  "text": "Reason"
+ },
+ {
+  "file": "src/features/plan/BlockOutSheet.tsx",
+  "line": 78,
+  "kind": "translated",
   "text": "Travel, rest, work…"
  },
  {
   "file": "src/features/plan/BlockOutSheet.tsx",
-  "line": 77,
-  "kind": "aria-label",
+  "line": 79,
+  "kind": "translated",
   "text": "Reason (optional)"
  },
  {
   "file": "src/features/plan/BlockOutSheet.tsx",
-  "line": 86,
-  "kind": "on screen",
+  "line": 89,
+  "kind": "translated",
   "text": "They stay where they are — blocking stops new scheduling, it does not throw away work you had already planned. Skip or move them from their own days if you are not doing them."
  },
  {
   "file": "src/features/plan/CustomPlanBuilder.tsx",
-  "line": 98,
-  "kind": "aria-label",
+  "line": 97,
+  "kind": "translated",
+  "text": "Name"
+ },
+ {
+  "file": "src/features/plan/CustomPlanBuilder.tsx",
+  "line": 100,
+  "kind": "translated",
   "text": "Plan name"
  },
  {
   "file": "src/features/plan/CustomPlanBuilder.tsx",
-  "line": 99,
-  "kind": "placeholder",
+  "line": 101,
+  "kind": "translated",
   "text": "Winter base"
  },
  {
   "file": "src/features/plan/CustomPlanBuilder.tsx",
-  "line": 103,
-  "kind": "on screen",
+  "line": 105,
+  "kind": "translated",
   "text": "What it is for"
  },
  {
   "file": "src/features/plan/CustomPlanBuilder.tsx",
-  "line": 117,
-  "kind": "on screen",
+  "line": 119,
+  "kind": "translated",
   "text": "How long"
  },
  {
   "file": "src/features/plan/CustomPlanBuilder.tsx",
-  "line": 131,
-  "kind": "on screen",
+  "line": 133,
+  "kind": "translated",
   "text": "Your week"
  },
  {
   "file": "src/features/plan/CustomPlanBuilder.tsx",
-  "line": 132,
-  "kind": "on screen",
+  "line": 135,
+  "kind": "translated",
   "text": "This repeats. The weights climb from what you actually lift, not from the plan."
  },
  {
   "file": "src/features/plan/CustomPlanBuilder.tsx",
-  "line": 229,
+  "line": 232,
   "kind": "on screen",
   "text": "😴 Rest day"
  },
  {
   "file": "src/features/plan/CustomPlanBuilder.tsx",
-  "line": 253,
-  "kind": "placeholder",
+  "line": 237,
+  "kind": "translated",
+  "text": "Clear"
+ },
+ {
+  "file": "src/features/plan/CustomPlanBuilder.tsx",
+  "line": 256,
+  "kind": "translated",
   "text": "Search sessions"
  },
  {
   "file": "src/features/plan/CustomPlanBuilder.tsx",
-  "line": 260,
-  "kind": "on screen",
+  "line": 263,
+  "kind": "translated",
   "text": "Decide on the day"
  },
  {
   "file": "src/features/plan/CustomPlanBuilder.tsx",
-  "line": 274,
+  "line": 277,
   "kind": "on screen",
   "text": "✨ Suggest a session"
  },
  {
   "file": "src/features/plan/CustomPlanBuilder.tsx",
-  "line": 276,
-  "kind": "on screen",
+  "line": 280,
+  "kind": "translated",
   "text": "Filled in when the day arrives, from your kit and what you have been training."
  },
  {
   "file": "src/features/plan/CustomPlanBuilder.tsx",
-  "line": 312,
-  "kind": "on screen",
+  "line": 287,
+  "kind": "translated",
+  "text": "Train"
+ },
+ {
+  "file": "src/features/plan/CustomPlanBuilder.tsx",
+  "line": 315,
+  "kind": "translated",
   "text": "For about"
  },
  {
   "file": "src/features/plan/CustomPlanBuilder.tsx",
-  "line": 328,
-  "kind": "on screen",
+  "line": 331,
+  "kind": "translated",
   "text": "Your saved workouts"
  },
  {
   "file": "src/features/plan/CustomPlanBuilder.tsx",
-  "line": 353,
-  "kind": "on screen",
+  "line": 356,
+  "kind": "translated",
   "text": "Yours · copied into the plan"
  },
  {
   "file": "src/features/plan/CustomPlanBuilder.tsx",
-  "line": 358,
-  "kind": "on screen",
+  "line": 361,
+  "kind": "translated",
   "text": "Built in"
  },
  {
   "file": "src/features/plan/DaySheet.tsx",
-  "line": 96,
-  "kind": "title",
+  "line": 98,
+  "kind": "translated",
   "text": "Add a session"
  },
  {
   "file": "src/features/plan/DaySheet.tsx",
-  "line": 99,
-  "kind": "placeholder",
+  "line": 101,
+  "kind": "translated",
   "text": "Search workouts…"
  },
  {
   "file": "src/features/plan/DaySheet.tsx",
-  "line": 110,
-  "kind": "on screen",
+  "line": 112,
+  "kind": "translated",
   "text": "Your saved workouts"
  },
  {
   "file": "src/features/plan/DaySheet.tsx",
-  "line": 129,
-  "kind": "on screen",
+  "line": 128,
+  "kind": "translated",
+  "text": "Add"
+ },
+ {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 131,
+  "kind": "translated",
   "text": "From the library"
  },
  {
   "file": "src/features/plan/DaySheet.tsx",
-  "line": 160,
-  "kind": "on screen",
+  "line": 150,
+  "kind": "translated",
+  "text": "Cancel"
+ },
+ {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 162,
+  "kind": "translated",
   "text": "Rest day"
  },
  {
   "file": "src/features/plan/DaySheet.tsx",
-  "line": 171,
-  "kind": "on screen",
+  "line": 173,
+  "kind": "translated",
   "text": "Nothing scheduled or logged on this day."
  },
  {
   "file": "src/features/plan/DaySheet.tsx",
-  "line": 202,
-  "kind": "aria-label",
+  "line": 180,
+  "kind": "translated",
+  "text": "Done"
+ },
+ {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 181,
+  "kind": "translated",
+  "text": "Skipped"
+ },
+ {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 197,
+  "kind": "translated",
+  "text": "Start"
+ },
+ {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 200,
+  "kind": "translated",
+  "text": "Move"
+ },
+ {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 204,
+  "kind": "translated",
   "text": "Move to date"
  },
  {
   "file": "src/features/plan/DaySheet.tsx",
-  "line": 253,
+  "line": 212,
+  "kind": "translated",
+  "text": "Skip"
+ },
+ {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 218,
+  "kind": "translated",
+  "text": "Remove"
+ },
+ {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 225,
+  "kind": "translated",
+  "text": "Un-skip"
+ },
+ {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 248,
+  "kind": "translated",
+  "text": "Logged"
+ },
+ {
+  "file": "src/features/plan/DaySheet.tsx",
+  "line": 255,
   "kind": "on screen",
   "text": "+ Add a planned session"
  },
  {
   "file": "src/features/plan/DaySheet.tsx",
-  "line": 276,
-  "kind": "on screen",
+  "line": 279,
+  "kind": "translated",
   "text": "Block this day out"
  },
  {
   "file": "src/features/plan/PlanLibrary.tsx",
-  "line": 29,
+  "line": 30,
   "kind": "label",
   "text": "Race training"
  },
  {
   "file": "src/features/plan/PlanLibrary.tsx",
-  "line": 30,
+  "line": 31,
   "kind": "blurb",
   "text": "Set a race date and the plan counts backwards to it."
  },
  {
   "file": "src/features/plan/PlanLibrary.tsx",
-  "line": 34,
+  "line": 35,
   "kind": "label",
   "text": "Obstacle & hybrid racing"
  },
  {
   "file": "src/features/plan/PlanLibrary.tsx",
-  "line": 35,
+  "line": 36,
   "kind": "blurb",
   "text": "Running and strength in one plan, with grip work that matters on a rig."
  },
  {
   "file": "src/features/plan/PlanLibrary.tsx",
-  "line": 39,
+  "line": 40,
   "kind": "label",
   "text": "Strength & muscle"
  },
  {
   "file": "src/features/plan/PlanLibrary.tsx",
-  "line": 40,
+  "line": 41,
   "kind": "blurb",
   "text": "Ongoing splits with no end date. Pick the one that matches your week."
  },
  {
   "file": "src/features/plan/PlanLibrary.tsx",
-  "line": 44,
+  "line": 45,
   "kind": "label",
   "text": "Everything at once"
  },
  {
   "file": "src/features/plan/PlanLibrary.tsx",
-  "line": 45,
+  "line": 46,
   "kind": "blurb",
   "text": "Stay strong and keep a running base without training for anything in particular."
  },
  {
   "file": "src/features/plan/PlanLibrary.tsx",
-  "line": 115,
-  "kind": "on screen",
+  "line": 110,
+  "kind": "translated",
+  "text": "Plans"
+ },
+ {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 117,
+  "kind": "translated",
   "text": "Currently active"
  },
  {
   "file": "src/features/plan/PlanLibrary.tsx",
-  "line": 125,
-  "kind": "on screen",
+  "line": 128,
+  "kind": "translated",
   "text": "End plan"
  },
  {
   "file": "src/features/plan/PlanLibrary.tsx",
-  "line": 141,
-  "kind": "on screen",
+  "line": 143,
+  "kind": "translated",
   "text": "Yours, not running"
  },
  {
   "file": "src/features/plan/PlanLibrary.tsx",
-  "line": 162,
-  "kind": "on screen",
+  "line": 154,
+  "kind": "translated",
+  "text": "Start"
+ },
+ {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 163,
+  "kind": "translated",
   "text": "Built by you"
  },
  {
   "file": "src/features/plan/PlanLibrary.tsx",
-  "line": 196,
+  "line": 175,
+  "kind": "translated",
+  "text": "Use"
+ },
+ {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 188,
+  "kind": "translated",
+  "text": "Edit"
+ },
+ {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 191,
+  "kind": "translated",
+  "text": "Delete"
+ },
+ {
+  "file": "src/features/plan/PlanLibrary.tsx",
+  "line": 197,
   "kind": "on screen",
   "text": "+ Build a plan"
  },
  {
   "file": "src/features/plan/PlanLibrary.tsx",
-  "line": 200,
-  "kind": "on screen",
+  "line": 202,
+  "kind": "translated",
   "text": "Every plan is a starting point — once it is on your calendar you can move, skip, or rewrite any session in it."
  },
  {
   "file": "src/features/plan/PlanSheet.tsx",
-  "line": 90,
-  "kind": "on screen",
+  "line": 74,
+  "kind": "translated",
+  "text": "Dates"
+ },
+ {
+  "file": "src/features/plan/PlanSheet.tsx",
+  "line": 77,
+  "kind": "translated",
+  "text": "Started"
+ },
+ {
+  "file": "src/features/plan/PlanSheet.tsx",
+  "line": 82,
+  "kind": "translated",
+  "text": "Ends"
+ },
+ {
+  "file": "src/features/plan/PlanSheet.tsx",
+  "line": 92,
+  "kind": "translated",
   "text": "Race day"
  },
  {
   "file": "src/features/plan/PlanSheet.tsx",
-  "line": 101,
-  "kind": "on screen",
+  "line": 103,
+  "kind": "translated",
   "text": "Keeping up"
  },
  {
   "file": "src/features/plan/PlanSheet.tsx",
-  "line": 115,
-  "kind": "on screen",
+  "line": 118,
+  "kind": "translated",
   "text": "A different question to the one above — you can be part-way through a plan and have missed most of what it asked for."
  },
  {
   "file": "src/features/plan/PlanSheet.tsx",
-  "line": 131,
+  "line": 132,
   "kind": "on screen",
   "text": "↗ Share this plan"
  },
  {
   "file": "src/features/plan/PlanSheet.tsx",
-  "line": 145,
-  "kind": "on screen",
+  "line": 147,
+  "kind": "translated",
   "text": "End this plan"
  },
  {
   "file": "src/features/plan/PlanView.tsx",
-  "line": 141,
-  "kind": "aria-label",
+  "line": 137,
+  "kind": "translated",
+  "text": "Plan"
+ },
+ {
+  "file": "src/features/plan/PlanView.tsx",
+  "line": 143,
+  "kind": "translated",
   "text": "Previous month"
  },
  {
   "file": "src/features/plan/PlanView.tsx",
-  "line": 151,
-  "kind": "aria-label",
+  "line": 149,
+  "kind": "translated",
+  "text": "Today"
+ },
+ {
+  "file": "src/features/plan/PlanView.tsx",
+  "line": 153,
+  "kind": "translated",
   "text": "Next month"
  },
  {
   "file": "src/features/plan/PlanView.tsx",
+  "line": 172,
+  "kind": "translated",
+  "text": "Dismiss"
+ },
+ {
+  "file": "src/features/plan/PlanView.tsx",
+  "line": 250,
+  "kind": "translated",
+  "text": "Planned"
+ },
+ {
+  "file": "src/features/plan/PlanView.tsx",
   "line": 251,
-  "kind": "on screen",
+  "kind": "translated",
+  "text": "Done"
+ },
+ {
+  "file": "src/features/plan/PlanView.tsx",
+  "line": 252,
+  "kind": "translated",
+  "text": "Skipped"
+ },
+ {
+  "file": "src/features/plan/PlanView.tsx",
+  "line": 253,
+  "kind": "translated",
   "text": "Striped = blocked out"
  },
  {
   "file": "src/features/plan/PlanView.tsx",
-  "line": 254,
-  "kind": "on screen",
+  "line": 257,
+  "kind": "translated",
   "text": "Swipe the calendar to change month."
  },
  {
   "file": "src/features/plan/PlanView.tsx",
-  "line": 271,
+  "line": 273,
   "kind": "on screen",
   "text": "📥 Import a plan"
  },
  {
   "file": "src/features/plan/PlanView.tsx",
-  "line": 276,
-  "kind": "on screen",
+  "line": 279,
+  "kind": "translated",
   "text": "Or tap any day to add a single session."
  },
  {
   "file": "src/features/plan/RampEditor.tsx",
-  "line": 54,
+  "line": 56,
   "kind": "on screen",
   "text": "📈 Make it grow each week"
  },
  {
   "file": "src/features/plan/RampEditor.tsx",
-  "line": 72,
-  "kind": "on screen",
+  "line": 74,
+  "kind": "translated",
   "text": "Grows each week"
  },
  {
   "file": "src/features/plan/RampEditor.tsx",
-  "line": 73,
-  "kind": "on screen",
+  "line": 76,
+  "kind": "translated",
   "text": "Turn off"
  },
  {
   "file": "src/features/plan/RampEditor.tsx",
-  "line": 100,
-  "kind": "on screen",
+  "line": 103,
+  "kind": "translated",
   "text": "Start at"
  },
  {
   "file": "src/features/plan/RampEditor.tsx",
-  "line": 107,
-  "kind": "aria-label",
+  "line": 109,
+  "kind": "translated",
   "text": "Starting value"
  },
  {
   "file": "src/features/plan/RampEditor.tsx",
-  "line": 115,
-  "kind": "on screen",
+  "line": 117,
+  "kind": "translated",
   "text": "By how much"
  },
  {
   "file": "src/features/plan/RampEditor.tsx",
-  "line": 128,
-  "kind": "on screen",
+  "line": 131,
+  "kind": "translated",
   "text": "Ten per cent a week is the conventional ceiling for adding distance. Past it the injuries tend to arrive before the fitness does."
  },
  {
   "file": "src/features/plan/RampEditor.tsx",
-  "line": 133,
-  "kind": "on screen",
+  "line": 134,
+  "kind": "translated",
   "text": "Stop at"
  },
  {
   "file": "src/features/plan/RampEditor.tsx",
-  "line": 138,
-  "kind": "aria-label",
+  "line": 139,
+  "kind": "translated",
   "text": "Maximum value"
  },
  {
   "file": "src/features/plan/RampEditor.tsx",
-  "line": 139,
-  "kind": "placeholder",
+  "line": 140,
+  "kind": "translated",
   "text": "no limit"
  },
  {
   "file": "src/features/plan/RampEditor.tsx",
-  "line": 149,
-  "kind": "on screen",
+  "line": 151,
+  "kind": "translated",
   "text": "Where the build-up levels off. Without one it keeps climbing for the whole plan."
  },
  {
   "file": "src/features/plan/RampEditor.tsx",
-  "line": 155,
-  "kind": "on screen",
+  "line": 156,
+  "kind": "translated",
   "text": "Week 1"
  },
  {
   "file": "src/features/progress/PrSheet.tsx",
-  "line": 25,
+  "line": 26,
   "kind": "label",
   "text": "Estimated 1RM"
  },
  {
   "file": "src/features/progress/PrSheet.tsx",
-  "line": 27,
+  "line": 28,
   "kind": "note",
   "text": "Calculated from the heaviest set you completed, not a single you actually lifted."
  },
  {
   "file": "src/features/progress/PrSheet.tsx",
-  "line": 35,
+  "line": 36,
   "kind": "label",
   "text": "Relative strength"
  },
  {
   "file": "src/features/progress/PrSheet.tsx",
-  "line": 37,
+  "line": 38,
   "kind": "note",
   "text": "Against what you weighed that day, so it stays honest across a bulk or a cut."
  },
  {
   "file": "src/features/progress/PrSheet.tsx",
-  "line": 42,
+  "line": 43,
   "kind": "label",
   "text": "Most reps in a set"
  },
  {
   "file": "src/features/progress/PrSheet.tsx",
-  "line": 48,
+  "line": 49,
   "kind": "label",
   "text": "Most rounds"
  },
  {
   "file": "src/features/progress/PrSheet.tsx",
-  "line": 52,
+  "line": 53,
   "kind": "note",
   "text": "Only comparable against the same window — 9 rounds in 20 minutes is not a better score than 7 in 12."
  },
  {
   "file": "src/features/progress/PrSheet.tsx",
-  "line": 57,
+  "line": 58,
   "kind": "label",
   "text": "Longest hold"
  },
  {
   "file": "src/features/progress/PrSheet.tsx",
-  "line": 71,
+  "line": 72,
   "kind": "label",
   "text": "Fastest pace"
  },
  {
   "file": "src/features/progress/PrSheet.tsx",
-  "line": 73,
+  "line": 74,
   "kind": "note",
   "text": "Over at least a kilometre."
  },
  {
   "file": "src/features/progress/PrSheet.tsx",
-  "line": 127,
-  "kind": "on screen",
+  "line": 129,
+  "kind": "translated",
   "text": "Nothing recorded for this movement yet."
  },
  {
   "file": "src/features/progress/ProgressView.tsx",
-  "line": 100,
-  "kind": "on screen",
+  "line": 94,
+  "kind": "translated",
+  "text": "Loading…"
+ },
+ {
+  "file": "src/features/progress/ProgressView.tsx",
+  "line": 99,
+  "kind": "translated",
+  "text": "Progress"
+ },
+ {
+  "file": "src/features/progress/ProgressView.tsx",
+  "line": 102,
+  "kind": "translated",
   "text": "Nothing to chart yet."
  },
  {
   "file": "src/features/progress/ProgressView.tsx",
-  "line": 101,
-  "kind": "on screen",
+  "line": 104,
+  "kind": "translated",
   "text": "Log a few sessions and this fills in — load, mileage, volume, and every personal best."
  },
  {
   "file": "src/features/progress/ProgressView.tsx",
-  "line": 130,
-  "kind": "on screen",
+  "line": 132,
+  "kind": "translated",
   "text": "Training load"
  },
  {
   "file": "src/features/progress/ProgressView.tsx",
-  "line": 147,
-  "kind": "on screen",
+  "line": 141,
+  "kind": "translated",
+  "text": "Effort × minutes, so running and lifting add into one number. Ramping past about 1.5× your four-week average is where injuries cluster."
+ },
+ {
+  "file": "src/features/progress/ProgressView.tsx",
+  "line": 148,
+  "kind": "translated",
   "text": "Weekly distance"
  },
  {
   "file": "src/features/progress/ProgressView.tsx",
-  "line": 157,
-  "kind": "on screen",
+  "line": 158,
+  "kind": "translated",
   "text": "Weekly volume"
  },
  {
   "file": "src/features/progress/ProgressView.tsx",
-  "line": 173,
-  "kind": "on screen",
+  "line": 174,
+  "kind": "translated",
   "text": "Log your bodyweight"
  },
  {
   "file": "src/features/progress/ProgressView.tsx",
-  "line": 173,
+  "line": 174,
   "kind": "on screen",
   "text": "and push-ups, pull-ups and lunges start counting toward volume instead of reading as no work."
  },
  {
   "file": "src/features/progress/ProgressView.tsx",
-  "line": 178,
-  "kind": "on screen",
+  "line": 179,
+  "kind": "translated",
   "text": "Personal bests"
  },
  {
   "file": "src/features/progress/ProgressView.tsx",
-  "line": 179,
-  "kind": "on screen",
+  "line": 180,
+  "kind": "translated",
   "text": "Complete some sets and PRs land here."
  },
  {
   "file": "src/features/today/TodayView.tsx",
-  "line": 72,
-  "kind": "on screen",
+  "line": 62,
+  "kind": "translated",
+  "text": "Today"
+ },
+ {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 70,
+  "kind": "translated",
+  "text": "Show this week's workouts"
+ },
+ {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 74,
+  "kind": "translated",
   "text": "This week"
  },
  {
   "file": "src/features/today/TodayView.tsx",
-  "line": 100,
-  "kind": "on screen",
+  "line": 76,
+  "kind": "translated",
+  "text": "load"
+ },
+ {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 102,
+  "kind": "translated",
   "text": "Tap for the week"
  },
  {
   "file": "src/features/today/TodayView.tsx",
-  "line": 107,
-  "kind": "on screen",
+  "line": 108,
+  "kind": "translated",
   "text": "Planned for today"
  },
  {
   "file": "src/features/today/TodayView.tsx",
-  "line": 115,
-  "kind": "on screen",
+  "line": 116,
+  "kind": "translated",
   "text": "In progress"
  },
  {
   "file": "src/features/today/TodayView.tsx",
-  "line": 140,
-  "kind": "on screen",
+  "line": 119,
+  "kind": "translated",
+  "text": "min"
+ },
+ {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 134,
+  "kind": "translated",
+  "text": "Continue"
+ },
+ {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 134,
+  "kind": "translated",
+  "text": "Start"
+ },
+ {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 141,
+  "kind": "translated",
   "text": "Today's sessions"
  },
  {
   "file": "src/features/today/TodayView.tsx",
-  "line": 151,
-  "kind": "on screen",
+  "line": 152,
+  "kind": "translated",
   "text": "Nothing logged today."
  },
  {
   "file": "src/features/today/TodayView.tsx",
-  "line": 152,
-  "kind": "on screen",
+  "line": 154,
+  "kind": "translated",
   "text": "Training as"
  },
  {
   "file": "src/features/today/TodayView.tsx",
-  "line": 178,
-  "kind": "on screen",
-  "text": "🏃 Log a run"
+  "line": 154,
+  "kind": "translated",
+  "text": "no equipment set"
+ },
+ {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 175,
+  "kind": "translated",
+  "text": "Start a separate workout"
+ },
+ {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 175,
+  "kind": "translated",
+  "text": "Start a workout"
+ },
+ {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 180,
+  "kind": "translated",
+  "text": "Log a run"
+ },
+ {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 200,
+  "kind": "translated",
+  "text": "Morning session"
+ },
+ {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 201,
+  "kind": "translated",
+  "text": "Midday session"
+ },
+ {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 202,
+  "kind": "translated",
+  "text": "Evening session"
+ },
+ {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 203,
+  "kind": "translated",
+  "text": "Late session"
+ },
+ {
+  "file": "src/features/today/TodayView.tsx",
+  "line": 214,
+  "kind": "translated",
+  "text": "Yesterday"
+ },
+ {
+  "file": "src/features/today/WeekSheet.tsx",
+  "line": 55,
+  "kind": "translated",
+  "text": "Today"
+ },
+ {
+  "file": "src/features/today/WeekSheet.tsx",
+  "line": 66,
+  "kind": "translated",
+  "text": "Planned"
+ },
+ {
+  "file": "src/features/today/WeekSheet.tsx",
+  "line": 79,
+  "kind": "translated",
+  "text": "Start"
  },
  {
   "file": "src/ui/AppProvider.tsx",
-  "line": 104,
+  "line": 152,
   "kind": "on screen",
   "text": "Could not open your training data"
  },
  {
   "file": "src/ui/AppProvider.tsx",
-  "line": 106,
+  "line": 154,
   "kind": "on screen",
   "text": "Private browsing blocks local storage in some browsers. Try a normal window."
  },
  {
   "file": "src/ui/AskSheet.tsx",
-  "line": 31,
+  "line": 32,
   "kind": "on screen",
   "text": "void | Promise"
  },
  {
+  "file": "src/ui/AskSheet.tsx",
+  "line": 57,
+  "kind": "translated",
+  "text": "Cancel"
+ },
+ {
   "file": "src/ui/SessionCard.tsx",
-  "line": 78,
-  "kind": "on screen",
+  "line": 80,
+  "kind": "translated",
   "text": "In progress"
+ },
+ {
+  "file": "src/ui/Sheet.tsx",
+  "line": 83,
+  "kind": "translated",
+  "text": "Close"
  }
 ]
