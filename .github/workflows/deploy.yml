@@ -46,6 +46,18 @@ jobs:
       # rather than shipping.
       - run: npm run build
 
+      # The pictures are unlocked for the native builds, which have to carry them: a Capacitor
+      # app serves from the device and cannot fetch one later. Pages is the opposite case. It is
+      # a public website, the filenames are the ExerciseDB ids in sequence, and anybody who
+      # notices that can walk the whole set — which is the "endpoint allowing bulk download"
+      # clause 13 is about. So they are dropped before the artifact is uploaded, and the web
+      # build lays out around a missing picture the way it already does for a custom movement.
+      #
+      # This is a licence decision rather than a technical one. If it is ever judged that
+      # serving them inside the app is covered by clause 9 the same way displaying them is,
+      # delete this step and they ship.
+      - run: rm -rf dist/exercise-media
+
       - uses: actions/configure-pages@v6
 
       - uses: actions/upload-pages-artifact@v5

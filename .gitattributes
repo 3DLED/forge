@@ -16,3 +16,8 @@ gradlew text eol=lf
 *.png binary
 *.gif binary
 *.ico binary
+
+# The locked seed data and pictures. Base64 so that checkouts behave identically everywhere,
+# but there is nothing in a diff of a ciphertext blob that anybody wants to read, and the
+# pictures alone are twelve megabytes of it.
+*.enc -diff
