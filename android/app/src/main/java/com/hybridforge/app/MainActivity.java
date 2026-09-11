@@ -1,4 +1,4 @@
-package com.forgetraining.app;
+package com.hybridforge.app;
 
 import com.getcapacitor.BridgeActivity;
 

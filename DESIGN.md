@@ -122,7 +122,7 @@ Each milestone ends with something usable, not a half-app.
   browser can call it directly; what it lacks is PKCE, and `client_secret` is required for
   both exchange and refresh. Either the athlete registers their own API app and the secret
   stays on their device, or a proxy holds it — the first does not scale to a public release.
-  Strava's bulk export carries `activities.csv`, which has everything Forge stores, so that
+  Strava's bulk export carries `activities.csv`, which has everything Hybrid Forge stores, so that
   path needs no FIT or GPX parsing at all.
 - **Done — exercise write-ups.** Setup, cues and the common fault for all 234 real movements,
   in `data/seed/coaching.ts`. Authored rather than sourced, for the licensing reason below.

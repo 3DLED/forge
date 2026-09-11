@@ -325,10 +325,10 @@ export function parseShareFile(json: string): ShareFile {
 
   const file = parsed as Partial<ShareFile>;
   if (!file || typeof file !== 'object' || file.app !== 'forge') {
-    throw new ShareFileError('That does not look like a Forge file.');
+    throw new ShareFileError('That does not look like a Hybrid Forge file.');
   }
   if (typeof file.format !== 'number' || file.format > SHARE_FORMAT) {
-    throw new ShareFileError('That file was made by a newer version of Forge.');
+    throw new ShareFileError('That file was made by a newer version of Hybrid Forge.');
   }
   if (file.kind === 'workout') {
     if (!file.workout?.name || !Array.isArray(file.workout.blocks)) {

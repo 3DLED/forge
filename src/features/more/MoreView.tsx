@@ -233,7 +233,7 @@ export default function MoreView() {
       </div>
 
       <p className="tiny faint" style={{ textAlign: 'center' }}>
-        {t('Forge · offline training tracker')}
+        {t('Hybrid Forge · offline training tracker')}
       </p>
 
       {pendingRestore && (

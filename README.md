@@ -1,4 +1,4 @@
-# Forge
+# Hybrid Forge
 
 An offline-first training planner and log for people who run *and* lift *and* do bodyweight
 work — built because the paid apps make you pick one, and charge monthly for the privilege.

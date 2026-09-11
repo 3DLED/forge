@@ -97,7 +97,7 @@ export async function restoreBackup(
   mode: 'merge' | 'replace' = 'merge',
 ): Promise<ImportResult> {
   const parsed: unknown = JSON.parse(json);
-  if (!isBackup(parsed)) throw new Error('That does not look like a Forge backup file.');
+  if (!isBackup(parsed)) throw new Error('That does not look like a Hybrid Forge backup file.');
   if (parsed.format > BACKUP_FORMAT) {
     throw new Error('That backup was made by a newer version of the app.');
   }

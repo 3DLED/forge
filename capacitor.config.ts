@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.forgetraining.app',
+  appId: 'com.hybridforge.app',
   appName: 'Forge',
   webDir: 'dist'
 };

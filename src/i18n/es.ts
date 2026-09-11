@@ -524,8 +524,8 @@ export const ES: Record<string, string> = {
     'No lo lograste — detener la prueba',
   'Finished workout — reviewing. Tap Edit to change anything.':
     'Entrenamiento terminado — en revisión. Toca Editar para cambiar algo.',
-  'Forge · offline training tracker':
-    'Forge — registro de entrenamiento sin conexión',
+  'Hybrid Forge · offline training tracker':
+    'Hybrid Forge — registro de entrenamiento sin conexión',
   'How hard was the whole session? This is what makes running and lifting comparable — effort × minutes is the one load number that spans both.':
     '¿Qué tan duro fue toda la sesión? Esto es lo que hace comparables correr y levantar — esfuerzo por minutos es el único número de carga que abarca ambos.',
   'Lay out a week — which days you train and what you do on them — and it repeats for as long as you set it to.':

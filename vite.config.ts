@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => {
       registerType: 'autoUpdate',
       includeAssets: ['icons/*.png'],
       manifest: {
-        name: 'Forge — Training Tracker',
+        name: 'Hybrid Forge — Training Tracker',
         short_name: 'Forge',
         description: 'Offline-first planner and log for running, lifting, and hybrid training.',
         theme_color: '#000000',

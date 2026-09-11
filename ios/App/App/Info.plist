@@ -75,9 +75,9 @@
 	  a pocket and the screen off, which is the whole reason for the native shell.
 	-->
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Forge uses your location to measure pace and distance while you run.</string>
+	<string>Hybrid Forge uses your location to measure pace and distance while you run.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Forge needs location in the background so pace alerts keep working with your phone in a pocket and the screen off.</string>
+	<string>Hybrid Forge needs location in the background so pace alerts keep working with your phone in a pocket and the screen off.</string>
 	<!--
 	  Background modes. `location` is what lets the app keep receiving fixes when it is not in
 	  front of you; `audio` is what stops iOS suspending the web view while it does, and is
@@ -91,7 +91,7 @@
 	<!--
 	  Export compliance, answered once here instead of on every upload.
 	
-	  Forge makes no network calls at all: no accounts, no sync, no analytics, and the
+	  Hybrid Forge makes no network calls at all: no accounts, no sync, no analytics, and the
 	  exercise pictures are files on disk. There is no encryption to declare, so this is
 	  false in the plain sense rather than the "exempt" sense, and App Store Connect
 	  stops asking.
