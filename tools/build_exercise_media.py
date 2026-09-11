@@ -35,6 +35,13 @@ the slow way to do it; the eye catches a farmer's walk on a suitcase carry in ab
 Both are gitignored and must stay that way -- see the note in `data/exerciseMedia.ts`.
 
 Only the matched GIFs are copied: the full set is 530 MB and Forge has uses for a fraction.
+
+**`--copy` is superseded and should not be used to fill `public/exercise-media/`.** The app now
+reads `<id>.webp`, produced for the whole referenced set by `tools/convert_exercise_media.py`,
+and the reasoning in the second paragraph above no longer holds: a Capacitor build has to carry
+its pictures, so "a fraction" is not an option. Copying GIFs in now leaves files nothing reads,
+sitting beside the ones that matter. The matching in this file is still the only thing that
+produces `exerciseMediaMap.ts` for the curated library, so run it without `--copy`.
 """
 
 import io

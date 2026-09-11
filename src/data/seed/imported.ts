@@ -47,6 +47,10 @@ function toSeed(entry: CatalogueEntry): SeedExercise {
   const hold = entry.modality === 'mobility';
   return {
     slug: entry.slug,
+    // Carried through so the info sheet can find the picture without a lookup table. The
+    // curated library needs one because its movements were authored here; these came from
+    // the set that numbers them.
+    mediaId: entry.mediaId,
     name: entry.name,
     modality: entry.modality,
     pattern: entry.pattern,

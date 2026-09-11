@@ -148,6 +148,15 @@ export interface Exercise extends Entity {
   name: string;
   /** Stable slug for seeded movements, so plan templates can reference them by name. */
   slug: string;
+  /**
+   * The licensed set's id for this movement, which is also its picture's filename.
+   *
+   * Only the imported catalogue carries one, because it came from that set and states the id
+   * per entry. Curated movements are matched to a picture by slug instead, through the table
+   * in `exerciseMediaMap.ts`, since they were authored here and have no id of their own.
+   * Undefined is the ordinary case for anything a user made.
+   */
+  mediaId?: string;
   modality: Modality;
   pattern: MovementPattern;
   /** All tags must be present in an equipment profile for this to be available. */

@@ -103,6 +103,7 @@ async function syncSeedFlags(library: SeedExercise[]): Promise<number> {
       seed.level !== (exercise.level ?? 0) ||
       seed.bodyweightFactor !== (exercise.bodyweightFactor ?? -1) ||
       seed.description !== exercise.description ||
+      seed.mediaId !== exercise.mediaId ||
       seed.primaryMuscles.join() !== exercise.primaryMuscles.join() ||
       seed.secondaryMuscles.join() !== exercise.secondaryMuscles.join()
     );
@@ -122,6 +123,7 @@ async function syncSeedFlags(library: SeedExercise[]): Promise<number> {
         primaryMuscles: seed.primaryMuscles,
         secondaryMuscles: seed.secondaryMuscles,
         description: seed.description,
+        mediaId: seed.mediaId,
       };
     }),
   );

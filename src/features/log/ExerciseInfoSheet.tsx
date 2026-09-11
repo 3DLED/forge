@@ -34,7 +34,7 @@ export default function ExerciseInfoSheet({
   const { lang } = useApp();
   const coaching = coachingOf(exercise);
   const level = levelOf(exercise);
-  const media = exerciseMediaUrl(exercise.slug);
+  const media = exerciseMediaUrl(exercise);
 
   return (
     <Sheet

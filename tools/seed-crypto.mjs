@@ -24,7 +24,7 @@
  */
 
 import { createCipheriv, createDecipheriv, createHmac, scryptSync } from 'node:crypto';
-import { mkdirSync, readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -52,7 +52,17 @@ const FILES = [
  * are: one nonce over the whole set, unchanged pictures in, byte-identical ciphertext out.
  */
 const MEDIA_DIR = 'public/exercise-media';
-const MEDIA_BLOB = 'src/data/seed/exercise-media.enc';
+const MEDIA_PREFIX = 'src/data/seed/exercise-media';
+
+/**
+ * Split, and raw bytes rather than base64.
+ *
+ * The whole illustrated library is about 63 MB of WebP. Base64 would make that 84 MB for no
+ * benefit — the text encoding existed so git would not need a binary attribute, and there is
+ * one now — and GitHub starts warning about single files at 50 MB, so it is written in pieces
+ * under that. Reassembly is concatenation in name order, which sorting the parts gives us.
+ */
+const MEDIA_CHUNK = 32 * 1024 * 1024;
 
 const SALT_BYTES = 16;
 const IV_BYTES = 12;
@@ -119,6 +129,17 @@ function decrypt(blob, label) {
   }
 }
 
+/** The media parts that exist, in the order they concatenate back together. */
+function mediaParts() {
+  const dir = join(ROOT, dirname(MEDIA_PREFIX));
+  const stem = `${MEDIA_PREFIX.split('/').pop()}.`;
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir)
+    .filter((name) => name.startsWith(stem) && name.endsWith('.enc'))
+    .sort()
+    .map((name) => join(dir, name));
+}
+
 /** Name length, name, body length, body — repeated, in sorted order so it reproduces. */
 function packMedia(dir) {
   const parts = [];
@@ -165,13 +186,26 @@ function lock() {
 
   const dir = join(ROOT, MEDIA_DIR);
   if (!existsSync(dir)) {
-    throw new Error(`${MEDIA_DIR} is missing. Run tools/build_exercise_media.py against the set first.`);
+    throw new Error(
+      `${MEDIA_DIR} is missing. Run tools/convert_exercise_media.py against the set first.`,
+    );
   }
   const packed = packMedia(dir);
   const blob = encrypt(packed);
-  writeFileSync(join(ROOT, MEDIA_BLOB), wrap(blob.toString('base64')));
+
+  // Clear the old parts first: a set that shrinks would otherwise leave a tail of stale ones
+  // behind, and unlock concatenates whatever it finds.
+  for (const stale of mediaParts()) unlinkSync(stale);
+
+  let parts = 0;
+  for (let at = 0; at < blob.length; at += MEDIA_CHUNK) {
+    const name = `${MEDIA_PREFIX}.${String(parts + 1).padStart(3, '0')}.enc`;
+    writeFileSync(join(ROOT, name), blob.subarray(at, at + MEDIA_CHUNK));
+    parts += 1;
+  }
   console.log(
-    `locked   ${MEDIA_DIR}  ${readdirSync(dir).length} files, ${(blob.length / 1048576).toFixed(1)} MB`,
+    `locked   ${MEDIA_DIR}  ${readdirSync(dir).length} files, ` +
+      `${(blob.length / 1048576).toFixed(1)} MB in ${parts} part${parts === 1 ? '' : 's'}`,
   );
 }
 
@@ -185,11 +219,11 @@ function unlock() {
     console.log(`unlocked ${file}  ${(plain.length / 1024).toFixed(0)} KB`);
   }
 
-  const source = join(ROOT, MEDIA_BLOB);
-  if (!existsSync(source)) throw new Error(`${MEDIA_BLOB} is missing.`);
-  const blob = Buffer.from(readFileSync(source, 'utf8').replace(/\s+/g, ''), 'base64');
-  const files = unpackMedia(decrypt(blob, MEDIA_BLOB), join(ROOT, MEDIA_DIR));
-  console.log(`unlocked ${MEDIA_DIR}  ${files} files`);
+  const parts = mediaParts();
+  if (parts.length === 0) throw new Error(`${MEDIA_PREFIX}.*.enc are missing.`);
+  const blob = Buffer.concat(parts.map((part) => readFileSync(part)));
+  const files = unpackMedia(decrypt(blob, `${MEDIA_PREFIX}.*.enc`), join(ROOT, MEDIA_DIR));
+  console.log(`unlocked ${MEDIA_DIR}  ${files} files from ${parts.length} parts`);
 }
 
 /** Fixed-width lines, so a diff on the blob is at least scrollable. */
