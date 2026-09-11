@@ -1,0 +1,194 @@
+# Signs the iOS app and puts it on TestFlight.
+#
+# Kept apart from `ios.yml` deliberately. That job answers "does this compile" on every push and
+# is unsigned on purpose; this one claims a TestFlight build number and puts a binary in front of
+# people, so it runs only when somebody asks for it.
+#
+# Manual signing rather than Xcode's automatic kind. Automatic signing wants account credentials
+# at build time and is free to mint new certificates when it cannot find one, which is not a
+# thing to hand an unattended runner. The certificate and the profile are pinned instead, and the
+# build fails loudly if either stops matching.
+#
+# None of the setup needed a Mac. The signing request was made with openssl on Windows, and the
+# profile and API key came out of Apple's web portals.
+
+name: TestFlight
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One at a time. Two runs racing would claim the same build number, and the loser is rejected
+# after twenty minutes of work rather than at the start.
+concurrency:
+  group: testflight
+  cancel-in-progress: false
+
+env:
+  # None of these three are secret: all of them are readable out of any build that ships.
+  TEAM_ID: BC3Z2Z2Q2F
+  BUNDLE_ID: com.hybridforge.app
+  PROFILE_NAME: Hybrid Forge App Store
+
+jobs:
+  upload:
+    runs-on: macos-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      # The licensed seed data is committed encrypted, because the repo is public and the
+      # ExerciseDB licence forbids publishing the raw materials.
+      - run: npm run seed:unlock
+        env:
+          FORGE_SEED_KEY: ${{ secrets.FORGE_SEED_KEY }}
+
+      # The native bundle, which differs from the web one by having no service worker.
+      - run: npm run build:native
+
+      # Copies the bundle into ios/ and re-reads the plugin list. Capacitor 8 resolves plugins
+      # through Swift Package Manager, so there is no CocoaPods step.
+      - run: npx cap sync ios
+
+      - name: Install the certificate and profile
+        env:
+          CERT_P12: ${{ secrets.IOS_DIST_CERT_P12 }}
+          CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+          PROFILE: ${{ secrets.IOS_PROVISIONING_PROFILE }}
+        run: |
+          set -euo pipefail
+
+          # A throwaway keychain, so nothing is left behind on a shared runner image and the
+          # login keychain is never touched. The password only has to outlive this job.
+          KEYCHAIN="$RUNNER_TEMP/signing.keychain-db"
+          KEYCHAIN_PASSWORD="$(uuidgen)"
+          echo "KEYCHAIN=$KEYCHAIN" >> "$GITHUB_ENV"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+
+          echo "$CERT_P12" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security import "$RUNNER_TEMP/cert.p12" -P "$CERT_PASSWORD" \
+            -A -t cert -f pkcs12 -k "$KEYCHAIN"
+
+          # Without this, codesign asks the keychain for permission, finds nobody at the
+          # keyboard, and the build hangs until the job times out.
+          security set-key-partition-list -S apple-tool:,apple: \
+            -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" > /dev/null
+
+          security list-keychain -d user -s "$KEYCHAIN" login.keychain-db
+
+          # Xcode 16 reads profiles from a different directory than its predecessors did, and
+          # which one is in use is not worth discovering the hard way. Both is harmless.
+          for dir in "$HOME/Library/MobileDevice/Provisioning Profiles" \
+                     "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"; do
+            mkdir -p "$dir"
+            echo "$PROFILE" | base64 --decode > "$dir/$PROFILE_NAME.mobileprovision"
+          done
+
+          echo "Identities now visible to codesign:"
+          security find-identity -v -p codesigning "$KEYCHAIN"
+
+      - name: Archive
+        working-directory: ios/App
+        run: |
+          set -euo pipefail
+
+          # Signing is set here rather than in the project file, so that opening the project in
+          # Xcode later still behaves like a normal local checkout.
+          #
+          # The build number is the run number: TestFlight refuses a build it has already seen,
+          # and something monotonic that nobody has to remember to bump is the whole point.
+          #
+          # Not piped through a log formatter. The default shell does not set pipefail, so a pipe
+          # would hand back the formatter's exit code and let a failed build report success.
+          xcodebuild archive \
+            -project App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
+            CURRENT_PROJECT_VERSION="${{ github.run_number }}"
+
+      - name: Export the ipa
+        run: |
+          set -euo pipefail
+
+          # `app-store-connect` is what Xcode 15.3 and later call this. Older Xcode called it
+          # `app-store`, and gets a hard error rather than a warning if it meets the new name.
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>teamID</key><string>$TEAM_ID</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>$BUNDLE_ID</key><string>$PROFILE_NAME</string>
+            </dict>
+            <key>uploadSymbols</key><true/>
+          </dict>
+          </plist>
+          PLIST
+
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/export"
+
+          ls -lh "$RUNNER_TEMP/export"
+
+      - name: Upload to TestFlight
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+
+          # altool looks for the key by name in a fixed set of directories and will not be told
+          # where it is, so it goes where altool expects to find it.
+          mkdir -p "$HOME/.appstoreconnect/private_keys"
+          echo "$ASC_KEY_P8" | base64 --decode \
+            > "$HOME/.appstoreconnect/private_keys/AuthKey_$ASC_KEY_ID.p8"
+
+          IPA="$(find "$RUNNER_TEMP/export" -maxdepth 1 -name '*.ipa' | head -1)"
+          test -n "$IPA" || { echo "no ipa was exported"; exit 1; }
+          echo "uploading $IPA"
+
+          xcrun altool --upload-app -f "$IPA" -t ios \
+            --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+
+      # The archive is the only way to symbolicate a crash from this build later, and it does
+      # not survive the runner. Ninety days is longer than a test round.
+      - name: Keep the archive
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcarchive-${{ github.run_number }}
+          path: ${{ runner.temp }}/App.xcarchive
+          retention-days: 90
+          if-no-files-found: ignore
+
+      - name: Remove the keychain and key
+        if: always()
+        run: |
+          security delete-keychain "$KEYCHAIN" || true
+          rm -rf "$HOME/.appstoreconnect" "$RUNNER_TEMP/cert.p12"
