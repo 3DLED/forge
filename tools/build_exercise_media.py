@@ -178,6 +178,9 @@ ALIASES = {
     "lying-leg-raise": "0865",  # lying leg-hip raise; on a bench, same movement
     "feet-elevated-inverted-row": "2298",  # inverted row, feet up on a bench
     "db-walking-lunge": "0336",  # dumbbell lunge, stepping forward
+    # Banded, because the catalogue has no other kind of either. Listed in SHOWN_WITH.
+    "v-up": "1014",  # band v-up
+    "bicycle-crunch": "0972",  # band bicycle crunch
 }
 
 #: Pictures that show a different implement to the one the movement calls for.
@@ -190,14 +193,22 @@ ALIASES = {
 #: Which is also why the list is shorter than it could be. A single-arm swing shown two-handed,
 #: a front rack lunge shown with the weight at the sides, a bottoms-up press shown any other
 #: way: in those the implement *is* the movement, and there is no picture instead.
+#: The value names the implement, and the app turns it into a sentence. A new one here needs a
+#: matching line in `ExerciseInfoSheet`, which is deliberate: the caption has to be a literal
+#: for the translation check to see it, so adding a kit means writing the sentence too.
 SHOWN_WITH = {
-    "kb-deadlift": "a dumbbell",
-    "kb-romanian-deadlift": "a dumbbell",
-    "single-leg-rdl": "a dumbbell",
-    "kb-reverse-lunge": "a dumbbell",
-    "kb-bulgarian-split-squat": "a dumbbell",
-    "kb-step-up": "a dumbbell",
-    "kb-curl": "a dumbbell",
+    "kb-deadlift": "dumbbell",
+    "kb-romanian-deadlift": "dumbbell",
+    "single-leg-rdl": "dumbbell",
+    "kb-reverse-lunge": "dumbbell",
+    "kb-bulgarian-split-squat": "dumbbell",
+    "kb-step-up": "dumbbell",
+    "kb-curl": "dumbbell",
+    # The catalogue has no unbanded v-up and no unbanded bicycle crunch. The band is plainly
+    # visible in both, anchored at the feet, but the body does the same thing either way and
+    # the shape is what somebody opens the picture for.
+    "v-up": "band",
+    "bicycle-crunch": "band",
 }
 
 #: Movements to leave without a picture, whatever the matcher thinks.
@@ -441,8 +452,9 @@ def main():
         "/**",
         " * Where the picture shows a different implement to the one the movement calls for.",
         " *",
-        " * Rendered under the animation, because a substitution nobody is told about is worse",
-        " * than no picture at all. Only movements whose shape survives the swap are in here.",
+        " * The value names the implement; the sheet turns it into a sentence. Rendered under",
+        " * the animation, because a substitution nobody is told about is worse than no picture",
+        " * at all. Only movements whose shape survives the swap are in here.",
         " */",
         "",
         "export const SHOWN_WITH: Record<string, string> = {",

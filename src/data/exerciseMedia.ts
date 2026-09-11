@@ -57,18 +57,20 @@ export function hasExerciseMedia(exercise: Illustrated): boolean {
 }
 
 /**
- * True when the picture shows different kit to the one the movement calls for.
+ * The kit the picture actually shows, when it is not the kit the movement calls for.
  *
- * Eight kettlebell movements are illustrated with a dumbbell, because the licensed set has no
- * kettlebell version and the movement is the same shape either way — a reverse lunge is a
- * reverse lunge whatever is hanging off your hands. The swap is fine; doing it silently is
- * not, because somebody looking up a movement they do not know cannot tell.
+ * Some kettlebell movements are illustrated with a dumbbell and two core movements with a
+ * resistance band, because the licensed set has no version without, and the body does the
+ * same thing either way — a reverse lunge is a reverse lunge whatever is hanging off your
+ * hands. The swap is fine; doing it silently is not, because somebody looking up a movement
+ * they do not know cannot tell.
  *
- * Every substitution today is a dumbbell, which is why the caption is one fixed sentence
- * rather than built from the table. `SHOWN_WITH` in the generated map says which implement
- * each one actually shows; a future substitution that is not a dumbbell needs a second string
- * here, and the table is where you would notice.
+ * Returns the implement rather than a sentence, and the sheet writes the sentence, because
+ * the translation check only sees copy that is spelled out at the point of use. Adding a kit
+ * here means adding a line there, which is the right amount of friction for a claim the app
+ * is making about a picture.
  */
-export function showsDifferentKit(exercise: Illustrated): boolean {
-  return SHOWN_WITH[exercise.slug] != null && mediaIdOf(exercise) != null;
+export function shownWith(exercise: Illustrated): string | null {
+  if (mediaIdOf(exercise) == null) return null;
+  return SHOWN_WITH[exercise.slug] ?? null;
 }

@@ -209,6 +209,7 @@ export const ES: Record<string, string> = {
   also: 'también',
   'Watch for': 'Cuidado con',
   'Shown with a dumbbell': 'Se muestra con una mancuerna',
+  'Shown with a resistance band': 'Se muestra con una banda elástica',
   'if your equipment changes.': 'si cambia tu equipo.',
 
   // --- suggesting a workout --------------------------------------------------

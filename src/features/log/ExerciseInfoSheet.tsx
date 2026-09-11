@@ -11,7 +11,7 @@
  */
 
 import Sheet from '../../ui/Sheet';
-import { exerciseMediaUrl, showsDifferentKit } from '../../data/exerciseMedia';
+import { exerciseMediaUrl, shownWith } from '../../data/exerciseMedia';
 import { coachingOf } from '../../domain/coaching';
 import { BAND_LABELS, bandOf, levelOf, levelPips } from '../../domain/difficulty';
 import { CATEGORY_LABELS, categoryOf } from '../../domain/categories';
@@ -35,6 +35,7 @@ export default function ExerciseInfoSheet({
   const coaching = coachingOf(exercise);
   const level = levelOf(exercise);
   const media = exerciseMediaUrl(exercise);
+  const substitute = shownWith(exercise);
 
   return (
     <Sheet
@@ -68,14 +69,20 @@ export default function ExerciseInfoSheet({
       )}
 
       {/*
-        Said out loud, because the alternative is letting somebody believe the picture. A few
-        kettlebell movements are drawn with a dumbbell — the licensed set has no kettlebell
-        version and the shape of the movement survives the swap — and that is only honest if
-        the swap is on the screen next to it.
+        Said out loud, because the alternative is letting somebody believe the picture. Some
+        kettlebell movements are drawn with a dumbbell and two core ones with a band — the
+        licensed set has no version without, and the shape of the movement survives the swap —
+        and that is only honest if the swap is on the screen next to it.
+
+        Spelled out rather than built from the implement, because copy that is assembled at
+        runtime is copy the translation check cannot see, and a caption nobody translated is
+        an English sentence on a Spanish screen.
       */}
-      {media && showsDifferentKit(exercise) && (
+      {media && substitute && (
         <p className="tiny faint" style={{ textAlign: 'center' }}>
-          {t('Shown with a dumbbell')}
+          {substitute === 'band'
+            ? t('Shown with a resistance band')
+            : t('Shown with a dumbbell')}
         </p>
       )}
 

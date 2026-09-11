@@ -25,6 +25,7 @@ export const EXERCISE_MEDIA: Record<string, string> = {
   'bench-dip': '0129', // bench dip (knees bent)
   'bench-press': '0025', // barbell bench press
   'bicep-curl': '0294', // dumbbell biceps curl
+  'bicycle-crunch': '0972', // band bicycle crunch
   'broad-jump': '1472', // forward jump
   'burpee': '1160', // burpee
   'cable-fly': '0227', // cable standing fly
@@ -116,6 +117,7 @@ export const EXERCISE_MEDIA: Record<string, string> = {
   'thruster': '3305', // barbell thruster
   'trap-bar-deadlift': '0811', // trap bar deadlift
   'turkish-get-up': '0551', // kettlebell turkish get up (squat style)
+  'v-up': '1014', // band v-up
   'walking-lunge': '1460', // walking lunge
   'weighted-pistol-squat': '0544', // kettlebell pistol squat
   'weighted-pull-up': '0841', // weighted pull-up
@@ -126,16 +128,19 @@ export const EXERCISE_MEDIA: Record<string, string> = {
 /**
  * Where the picture shows a different implement to the one the movement calls for.
  *
- * Rendered under the animation, because a substitution nobody is told about is worse
- * than no picture at all. Only movements whose shape survives the swap are in here.
+ * The value names the implement; the sheet turns it into a sentence. Rendered under
+ * the animation, because a substitution nobody is told about is worse than no picture
+ * at all. Only movements whose shape survives the swap are in here.
  */
 
 export const SHOWN_WITH: Record<string, string> = {
-  'kb-bulgarian-split-squat': 'a dumbbell',
-  'kb-curl': 'a dumbbell',
-  'kb-deadlift': 'a dumbbell',
-  'kb-reverse-lunge': 'a dumbbell',
-  'kb-romanian-deadlift': 'a dumbbell',
-  'kb-step-up': 'a dumbbell',
-  'single-leg-rdl': 'a dumbbell',
+  'bicycle-crunch': 'band',
+  'kb-bulgarian-split-squat': 'dumbbell',
+  'kb-curl': 'dumbbell',
+  'kb-deadlift': 'dumbbell',
+  'kb-reverse-lunge': 'dumbbell',
+  'kb-romanian-deadlift': 'dumbbell',
+  'kb-step-up': 'dumbbell',
+  'single-leg-rdl': 'dumbbell',
+  'v-up': 'band',
 };
