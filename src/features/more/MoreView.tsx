@@ -91,6 +91,17 @@ export default function MoreView() {
         <span className="faint">›</span>
       </Link>
 
+      <Link to="/more/health" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">
+          <strong>{t('Apple Health')}</strong>
+          <br />
+          <span className="tiny faint">
+            {profile.appleHealth ? t('Heart rate from your watch') : t('Not connected')}
+          </span>
+        </span>
+        <span className="faint">›</span>
+      </Link>
+
       <Link to="/more/settings" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">
           <strong>{t('Settings')}</strong>

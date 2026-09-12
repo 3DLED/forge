@@ -89,6 +89,16 @@
 		<string>audio</string>
 	</array>
 	<!--
+	  HealthKit. iOS shows this string verbatim in the permission sheet, so it is the only
+	  place to say what is read and that nothing is written.
+
+	  There is deliberately no NSHealthUpdateUsageDescription. The app requests no share
+	  types at all, and declaring a write description it never uses would claim access to
+	  somebody's health record that it does not want and does not take.
+	-->
+	<key>NSHealthShareUsageDescription</key>
+	<string>Hybrid Forge reads the heart rate your watch recorded, so a logged session can show what your heart was doing. It never writes anything to Health.</string>
+	<!--
 	  Export compliance, answered once here instead of on every upload.
 	
 	  Hybrid Forge makes no network calls at all: no accounts, no sync, no analytics, and the

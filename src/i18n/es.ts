@@ -294,6 +294,31 @@ export const ES: Record<string, string> = {
   'Export backup': 'Exportar copia de seguridad',
   'Could not save the file.': 'No se pudo guardar el archivo.',
 
+  // --- apple health -------------------------------------------------------------
+  'Apple Health': 'Apple Salud',
+  'Not connected': 'Sin conectar',
+  'Heart rate from your watch': 'Frecuencia cardíaca de tu reloj',
+  'Heart rate': 'Frecuencia cardíaca',
+  'Read from Health': 'Leer de Salud',
+  'Leave it alone': 'No usarlo',
+  'Catch up': 'Ponerse al día',
+  'Check for new workouts': 'Buscar entrenamientos nuevos',
+  'Checking…': 'Comprobando…',
+  'matched to a workout on your watch.': 'emparejadas con un entrenamiento de tu reloj.',
+  'Nothing new lined up. A workout has to have been recorded on the watch at the same time.':
+    'No ha cuadrado nada nuevo. El reloj tiene que haber grabado un entrenamiento a la vez.',
+  'Apple Health needs the installed app on an iPhone. A browser cannot reach it.':
+    'Apple Salud necesita la app instalada en un iPhone. Un navegador no puede acceder.',
+  'This device has no Health store to read from.':
+    'Este dispositivo no tiene un almacén de Salud del que leer.',
+  'Forge matches each session you log against the workouts your watch recorded, and takes the average and peak heart rate from whichever one covers the same stretch of time. It reads only, and writes nothing back to Health.':
+    'Forge compara cada sesión que registras con los entrenamientos que grabó tu reloj, y toma la frecuencia cardíaca media y máxima del que cubre el mismo tramo de tiempo. Solo lee: no escribe nada en Salud.',
+  'A watch usually syncs a few minutes after you finish, so a session logged just now often has no heart rate yet. This looks again over the last fortnight and fills in what it finds.':
+    'Un reloj suele sincronizarse unos minutos después de terminar, así que una sesión recién registrada a menudo aún no tiene frecuencia cardíaca. Esto vuelve a mirar las dos últimas semanas y rellena lo que encuentra.',
+  'Running heart rate': 'Frecuencia cardíaca corriendo',
+  'Workout heart rate': 'Frecuencia cardíaca entrenando',
+  bpm: 'ppm',
+
   // --- reminders ---------------------------------------------------------------
   Reminders: 'Avisos',
   'Planned sessions': 'Sesiones planificadas',

@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
   acuteChronicRatio,
+  averageHeartRate,
   consistency,
   effortBand,
   effortMinutes,
   estimate1RM,
+  isRunSession,
   personalRecords,
   prEventsBySession,
   pushPullRatio,
@@ -298,6 +300,63 @@ describe('sessionFootDistanceM', () => {
       set('farmers-carry', { distanceM: 40, weightKg: 32 }),
     ]);
     expect(sessionFootDistanceM(s)).toBe(8040);
+  });
+});
+
+describe('averageHeartRate', () => {
+  const withHr = (id: string, avgHrBpm: number, durationMin: number): LoggedSession => ({
+    ...session(id, '2026-01-01', []),
+    avgHrBpm,
+    durationMin,
+  });
+
+  /*
+   * Weighted by length for the same reason pace is. A ten-minute finisher at 165 and a
+   * two-hour long run at 140 are not two equal readings, and a flat mean of them reports an
+   * hour nobody trained.
+   */
+  it('weights by how long the session lasted', () => {
+    const out = averageHeartRate([withHr('a', 165, 10), withHr('b', 140, 120)]);
+    expect(out).toBeCloseTo((165 * 10 + 140 * 120) / 130, 3);
+  });
+
+  /*
+   * Most sessions were done without a watch. Treating a missing figure as a zero would drag
+   * every week toward a heart rate nobody had.
+   */
+  it('leaves out the sessions that have no figure', () => {
+    const out = averageHeartRate([withHr('a', 150, 60), session('b', '2026-01-01', [])]);
+    expect(out).toBe(150);
+  });
+
+  it('reports nothing when no session has one', () => {
+    expect(averageHeartRate([session('a', '2026-01-01', [])])).toBeNull();
+    expect(averageHeartRate([])).toBeNull();
+  });
+});
+
+describe('isRunSession', () => {
+  /*
+   * A session is a run if it contained running. An easy hour with push-ups on the hour is
+   * still a run as far as your heart is concerned, and the stricter reading would file most
+   * of a hybrid week as neither thing.
+   */
+  it('counts a session that contained any running', () => {
+    expect(
+      isRunSession(
+        session('a', '2026-01-01', [
+          set('easy-run', { distanceM: 5000, timeSec: 1500 }),
+          set('push-up', { reps: 20 }),
+        ]),
+      ),
+    ).toBe(true);
+  });
+
+  it('does not count a lift, or a ride', () => {
+    expect(isRunSession(session('a', '2026-01-01', [set('squat', { reps: 5 })]))).toBe(false);
+    expect(
+      isRunSession(session('b', '2026-01-01', [set('bike-erg', { distanceM: 20000 })])),
+    ).toBe(false);
   });
 });
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	  HealthKit, for reading the heart rate your watch recorded.
+
+	  Read only. `health-records` is deliberately absent: that is clinical records from a
+	  medical provider, an entirely different and far more sensitive body of data, and this
+	  app has no business asking for it.
+
+	  This entitlement is only half the story. The App ID itself must have HealthKit enabled
+	  in the Apple Developer portal, and the distribution provisioning profile regenerated
+	  afterwards, or signing fails with a mismatched-entitlements error.
+	-->
+	<key>com.apple.developer.healthkit</key>
+	<true/>
+	<key>com.apple.developer.healthkit.access</key>
+	<array/>
+</dict>
+</plist>

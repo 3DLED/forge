@@ -28,6 +28,8 @@ import {
   sessionFootDistanceM,
   sessionLoad,
   sessionVolumeKg,
+  averageHeartRate,
+  isRunSession,
   pushPullRatio,
   runTotals,
   volumeByPattern,
@@ -93,6 +95,8 @@ export default function ProgressView() {
         ),
         effort: effortMinutes(inWeek),
         run: runTotals(inWeek),
+        runHr: averageHeartRate(inWeek.filter(isRunSession)),
+        liftHr: averageHeartRate(inWeek.filter((session) => !isRunSession(session))),
         consistency: consistency(
           (plannedRows ?? []).filter((p) => p.date >= days[0] && p.date <= days[6]),
           inWeek,
@@ -211,6 +215,46 @@ export default function ProgressView() {
    * backwards. The values are then formatted back into a pace, which is what a runner thinks
    * in.
    */
+  /*
+   * Two heart rate charts, split exactly where the pace chart splits.
+   *
+   * Running and lifting produce different heart rates for reasons that have nothing to do
+   * with how hard either was — a set of swings spikes and drops where a steady hour sits — so
+   * one average across both describes neither, and a drift in it could be entirely explained
+   * by having lifted more that week.
+   */
+  const heartRateCards = useMemo(
+    () =>
+      (
+        [
+          { key: 'run', title: t('Running heart rate'), pick: (w: (typeof weeks)[number]) => w.runHr },
+          { key: 'lift', title: t('Workout heart rate'), pick: (w: (typeof weeks)[number]) => w.liftHr },
+        ] as const
+      )
+        .map((card) => {
+          const bars = weeks.map((week, index) => ({
+            label: week.label,
+            value: card.pick(week) ?? 0,
+            highlight: index === weeks.length - 1,
+          }));
+          const beats = bars.map((bar) => bar.value).filter((v) => v > 0);
+          return {
+            ...card,
+            bars,
+            // A tenth below the quietest week. Heart rates sit in a narrow band nowhere near
+            // zero, and a zero axis draws every week the same height whatever happened.
+            floor: beats.length > 1 ? Math.min(...beats) * 0.9 : 0,
+            average: beats.length > 0 ? averageHeartRate(
+              (sessions ?? []).filter((session) =>
+                card.key === 'run' ? isRunSession(session) : !isRunSession(session),
+              ),
+            ) : null,
+          };
+        })
+        .filter((card) => card.average != null),
+    [weeks, sessions, t],
+  );
+
   const paceBars = useMemo(
     () =>
       weeks.map((week, index) => ({
@@ -450,6 +494,25 @@ export default function ProgressView() {
           </p>
         </section>
       )}
+
+      {/*
+        Beside pace, because they are the two ways of asking how hard a week actually was and
+        they disagree usefully: a week that got slower at the same heart rate is a week you
+        were tired, where slower at a lower heart rate is a week you took easy.
+      */}
+      {heartRateCards.map((card) => (
+        <section className="card" key={card.key}>
+          <div className="card-head">
+            <h2>{card.title}</h2>
+            <span className="pill mono">{Math.round(card.average!)} {t('bpm')}</span>
+          </div>
+          <BarChart
+            bars={card.bars}
+            floor={card.floor}
+            formatValue={(bpm) => (bpm > 0 ? `${Math.round(bpm)} ${t('bpm')}` : '—')}
+          />
+        </section>
+      ))}
 
       {hasVolume && (
         <section className="card">

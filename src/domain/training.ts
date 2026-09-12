@@ -401,6 +401,39 @@ export function runTotals(sessions: LoggedSession[]): RunTotals {
   return totals;
 }
 
+/**
+ * Whether a session was a run.
+ *
+ * Any run movement at all rather than every one, because a session is a run if it contained
+ * running: an easy hour with push-ups on the hour is still a run as far as your heart is
+ * concerned, and the alternative reading would file most of a hybrid athlete's week as
+ * neither thing.
+ */
+export function isRunSession(session: LoggedSession): boolean {
+  return session.sets.some((set) => RUN_SLUGS.has(set.exerciseSlug));
+}
+
+/**
+ * Mean heart rate across the sessions that have one, weighted by how long they lasted.
+ *
+ * Weighted for the same reason pace is: a ten-minute finisher at 165 and a two-hour long run
+ * at 140 are not two equal readings, and averaging them flat reports an hour nobody trained.
+ *
+ * Sessions with no figure are absent rather than zero — most of them were done without a
+ * watch, and a missing heart rate is a fact about the recording, not about the effort.
+ */
+export function averageHeartRate(sessions: LoggedSession[]): number | null {
+  let beats = 0;
+  let minutes = 0;
+  for (const session of sessions) {
+    if (session.avgHrBpm == null || session.avgHrBpm <= 0) continue;
+    const length = Math.max(1, session.durationMin ?? estimateDurationMin(session));
+    beats += session.avgHrBpm * length;
+    minutes += length;
+  }
+  return minutes > 0 ? beats / minutes : null;
+}
+
 export interface PatternTotals {
   pattern: MovementPattern;
   /** Sets performed. A round of an AMRAP counts each of its movements once, as volume does. */

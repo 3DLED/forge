@@ -443,6 +443,19 @@ export interface LoggedSession extends Entity {
   durationMin?: number;
   feel?: 'great' | 'good' | 'ok' | 'rough' | 'bad';
   notes?: string;
+  /**
+   * Heart rate from the watch, matched to this session through Apple Health.
+   *
+   * Stored rather than recomputed, unlike every other figure in this app. The others are
+   * derived from sets that are right here; this one comes from another device through a
+   * bridge that needs permission, an installed app and a watch that has finished syncing.
+   * Recomputing it would mean a chart that empties itself when any of those is briefly untrue.
+   *
+   * Absent means nothing lined up, which is the ordinary case for a session done without a
+   * watch — and is why nothing here treats a missing figure as a zero.
+   */
+  avgHrBpm?: number;
+  maxHrBpm?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -680,6 +693,11 @@ export interface Profile extends Entity {
    * property of any one session, so it belongs to the person and travels in their backup.
    */
   reminders?: ReminderSettings;
+  /**
+   * Whether to read heart rate from Apple Health. One switch, because there is one thing
+   * being read and one permission behind it — see `data/healthSource`.
+   */
+  appleHealth?: boolean;
 }
 
 /** Bodyweight, resting HR, and anything else tracked over time rather than per set. */

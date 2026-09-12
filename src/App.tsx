@@ -8,6 +8,7 @@ import MoreView from './features/more/MoreView';
 import EquipmentView from './features/more/EquipmentView';
 import RunSettingsView from './features/more/RunSettingsView';
 import RemindersView from './features/more/RemindersView';
+import HealthView from './features/more/HealthView';
 import SettingsView from './features/more/SettingsView';
 import AppearanceView from './features/more/AppearanceView';
 import BodyView from './features/more/BodyView';
@@ -19,6 +20,7 @@ import SavedWorkoutsView from './features/more/SavedWorkoutsView';
 import ErrorBoundary from './ui/ErrorBoundary';
 import CrashScreen from './ui/CrashScreen';
 import { useSessionReminders } from './ui/useSessionReminders';
+import { useHealthSync } from './ui/useHealthSync';
 import { useT } from './i18n/useT';
 
 const TABS = [
@@ -35,6 +37,7 @@ export default function App() {
   // Here rather than in a screen: the plan changes from everywhere, and a sync that only ran
   // while you happened to be looking at the settings would be a sync that never ran.
   useSessionReminders();
+  useHealthSync();
   return (
     <div className="app">
       <main className="app-main">
@@ -67,6 +70,7 @@ export default function App() {
           <Route path="/more/equipment" element={<EquipmentView />} />
           <Route path="/more/run" element={<RunSettingsView />} />
           <Route path="/more/reminders" element={<RemindersView />} />
+          <Route path="/more/health" element={<HealthView />} />
           <Route path="/more/settings" element={<SettingsView />} />
           <Route path="/more/appearance" element={<AppearanceView />} />
           <Route path="*" element={<Navigate to="/today" replace />} />
