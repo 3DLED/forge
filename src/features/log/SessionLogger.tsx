@@ -25,6 +25,7 @@ import RunScreen from './RunScreen';
 import WorkoutTimer from './WorkoutTimer';
 import PinnedTimer from './PinnedTimer';
 import { useBlockTimer } from './useBlockTimer';
+import { useWakeLock } from '../../ui/useWakeLock';
 import { blockShape, blockTitle } from './blockLabels';
 import NewBlockSheet from './NewBlockSheet';
 import SuggestWorkoutSheet from './SuggestWorkoutSheet';
@@ -165,6 +166,19 @@ export default function SessionLogger() {
   const [browsingSaved, setBrowsingSaved] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [restEndsAt, setRestEndsAt] = useState<number | null>(null);
+
+  /*
+   * The screen stays on for the whole session, not just while a clock is running.
+   *
+   * Straight sets are most of a session and most of this app's use: the phone is propped
+   * against a wall, you tick a set, you rest, you tick the next. Waking it each time to find
+   * the row you were on is the kind of friction that gets an app left in a pocket, and the
+   * timer this used to hang off only exists for the few minutes an AMRAP lasts.
+   *
+   * Released once the session is finished, and by the browser the moment the app is
+   * backgrounded, so nothing is holding a screen awake in a pocket.
+   */
+  useWakeLock(Boolean(session && !session.endedAt));
   /** The movement the current rest follows, which is what makes "up next" answerable. */
   const [restingAfter, setRestingAfter] = useState<string | null>(null);
   /**

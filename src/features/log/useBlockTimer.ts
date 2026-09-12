@@ -25,6 +25,7 @@ import {
 } from '../../ui/beep';
 import { formatClock } from '../../domain/units';
 import type { LoggedBlock } from '../../domain/types';
+import { useWakeLock } from '../../ui/useWakeLock';
 
 export interface TimerResult {
   timeSec: number;
@@ -222,37 +223,4 @@ export function useBlockTimer(
       roundSplitsSec: splits.length > 0 ? splits : undefined,
     },
   };
-}
-
-/** Keeps the screen awake while the clock runs. Unsupported browsers simply do without. */
-function useWakeLock(active: boolean): void {
-  useEffect(() => {
-    if (!active || !('wakeLock' in navigator)) return;
-
-    let sentinel: WakeLockSentinel | null = null;
-    let cancelled = false;
-
-    const request = async () => {
-      try {
-        const lock = await navigator.wakeLock.request('screen');
-        if (cancelled) void lock.release();
-        else sentinel = lock;
-      } catch {
-        // Denied or unsupported — not worth surfacing.
-      }
-    };
-
-    void request();
-    // The lock is dropped when the tab is hidden, so it has to be retaken on return.
-    const onVisible = () => {
-      if (document.visibilityState === 'visible' && !sentinel) void request();
-    };
-    document.addEventListener('visibilitychange', onVisible);
-
-    return () => {
-      cancelled = true;
-      document.removeEventListener('visibilitychange', onVisible);
-      void sentinel?.release();
-    };
-  }, [active]);
 }

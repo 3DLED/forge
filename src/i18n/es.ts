@@ -294,6 +294,9 @@ export const ES: Record<string, string> = {
   'Export backup': 'Exportar copia de seguridad',
   'Could not save the file.': 'No se pudo guardar el archivo.',
 
+  'Left open. Open it to finish or discard it.':
+    'Quedó abierta. Ábrela para terminarla o descartarla.',
+
   // --- apple health -------------------------------------------------------------
   'Apple Health': 'Apple Salud',
   'Not connected': 'Sin conectar',

@@ -10,6 +10,7 @@ import { useT, type Translator } from '../../i18n/useT';
 import { plannedBetween, sessionsBetween, startFromPlanned, startSession } from '../../data/sessions';
 import {
   addDays,
+  formatDayLabel,
   monthName,
   todayKey,
   weekDays,
@@ -17,6 +18,14 @@ import {
   weekdayOf,
 } from '../../domain/dates';
 import { sessionLoad } from '../../domain/training';
+
+/**
+ * How far back to look for a workout left open.
+ *
+ * Long enough to cover a week away, short enough that something genuinely abandoned stops
+ * being mentioned rather than becoming a permanent fixture of the screen.
+ */
+const ABANDONED_DAYS = 14;
 
 export default function TodayView() {
   const navigate = useNavigate();
@@ -43,6 +52,26 @@ export default function TodayView() {
   const weekLoad = (weekSessions ?? []).reduce((total, s) => total + sessionLoad(s), 0);
   /** A session opened but never finished — resuming it beats starting another. */
   const inProgress = todaySessions.find((s) => !s.endedAt);
+
+  /*
+   * A session left open on a previous day.
+   *
+   * Today only ever looked at today, so walking out mid-workout meant the session was gone by
+   * morning: not deleted, just invisible, with its sets sitting in the database and no screen
+   * in the app that would show them. The week query does not fix it either, since a Sunday
+   * session disappears again on Monday.
+   *
+   * A trailing fortnight rather than all of history. Something abandoned in March is a
+   * decision you have made, and a card about it for the rest of the year is nagging; something
+   * abandoned on Tuesday is almost certainly an unfinished workout.
+   */
+  const recent = useLiveQuery(
+    () => sessionsBetween(addDays(today, -ABANDONED_DAYS), today),
+    [today],
+  );
+  const abandoned = (recent ?? [])
+    .filter((session) => !session.endedAt && session.date < today)
+    .sort((a, b) => b.date.localeCompare(a.date))[0];
 
   /**
    * Sessions already spoken for by a planned card above.
@@ -182,6 +211,28 @@ export default function TodayView() {
           onClick={() => navigate(`/log/${inProgress.id}`)}
         >
           {t('Continue')} {inProgress.name}
+        </button>
+      )}
+
+      {/*
+        Quiet, and below today's own business. It is a loose end rather than a thing to do, and
+        putting it at the top would make every morning open on a workout you already walked
+        away from. Opening it is the only offer: finishing and discarding both live in the
+        logger, and choosing between them needs to see what is in it.
+      */}
+      {abandoned && (
+        <button
+          className="card tight pr-row"
+          style={{ marginTop: '0.5rem' }}
+          onClick={() => navigate(`/log/${abandoned.id}`)}
+        >
+          <div className="row between">
+            <span className="grow truncate">{abandoned.name}</span>
+            <span className="small faint">{formatDayLabel(abandoned.date, today)}</span>
+          </div>
+          <div className="tiny faint" style={{ marginTop: '0.15rem', textAlign: 'left' }}>
+            {t('Left open. Open it to finish or discard it.')}
+          </div>
         </button>
       )}
 
