@@ -24,7 +24,7 @@ import {
   deleteCustomPlan,
   isTrainingDay,
 } from '../../data/customPlans';
-import { buildCustomPlanFile, downloadShareFile } from '../../data/share';
+import { buildCustomPlanFile, saveShareFile } from '../../data/share';
 import { weekdayName } from '../../domain/dates';
 import type { CustomPlan } from '../../domain/types';
 import { useT } from '../../i18n/useT';
@@ -39,8 +39,13 @@ export default function PlansView() {
   const mine = plans ?? [];
 
   const share = async (plan: CustomPlan) => {
-    const filename = downloadShareFile(await buildCustomPlanFile(plan));
-    setNotice(`Saved ${filename}. Anyone with Forge can import it and pick their own start date.`);
+    const result = await saveShareFile(await buildCustomPlanFile(plan));
+    if (result.outcome === 'cancelled') return;
+    setNotice(
+      result.outcome === 'saved'
+        ? `Saved ${result.filename}. Anyone with Forge can import it and pick their own start date.`
+        : (result.reason ?? t('Could not save the file.')),
+    );
   };
 
   return (

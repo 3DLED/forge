@@ -6,7 +6,7 @@ import { useApp } from '../../ui/AppProvider';
 import Sheet from '../../ui/Sheet';
 import AskSheet from '../../ui/AskSheet';
 import { DEFAULT_THEME, THEMES } from '../../ui/themes';
-import { downloadBackup, restoreBackup, wipeAllData } from '../../data/backup';
+import { exportBackup, restoreBackup, wipeAllData } from '../../data/backup';
 import { db } from '../../db/db';
 import { displayWeight, weightLabel } from '../../domain/units';
 import { allInjuries } from '../../data/injuries';
@@ -192,7 +192,17 @@ export default function MoreView() {
 
         <button
           className="btn block"
-          onClick={async () => setStatus(`${t('Saved')} ${await downloadBackup()}`)}
+          onClick={async () => {
+            const result = await exportBackup();
+            // Dismissing the share sheet is a decision, not an error. Saying nothing is the
+            // only reply that does not read as a complaint about it.
+            if (result.outcome === 'cancelled') return;
+            setStatus(
+              result.outcome === 'saved'
+                ? `${t('Saved')} ${result.filename}`
+                : (result.reason ?? t('Could not save the file.')),
+            );
+          }}
         >
           {t('Export backup')}
         </button>

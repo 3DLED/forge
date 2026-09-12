@@ -16,7 +16,7 @@ import ImportSheet from './ImportSheet';
 import { plural } from '../../ui/text';
 import { useApp } from '../../ui/AppProvider';
 import { deleteSavedWorkout, isTimedWorkout, savedWorkouts } from '../../data/namedWorkouts';
-import { buildWorkoutFile, downloadShareFile } from '../../data/share';
+import { buildWorkoutFile, saveShareFile } from '../../data/share';
 import { blockShape } from '../log/blockLabels';
 import type { SessionTemplate } from '../../domain/types';
 import { useT } from '../../i18n/useT';
@@ -31,8 +31,13 @@ export default function SavedWorkoutsView() {
   const mine = saved ?? [];
 
   const share = async (template: SessionTemplate) => {
-    const filename = downloadShareFile(await buildWorkoutFile(template));
-    setNotice(`Saved ${filename}. Send it to anyone with Forge and they can import it.`);
+    const result = await saveShareFile(await buildWorkoutFile(template));
+    if (result.outcome === 'cancelled') return;
+    setNotice(
+      result.outcome === 'saved'
+        ? `Saved ${result.filename}. Send it to anyone with Forge and they can import it.`
+        : (result.reason ?? t('Could not save the file.')),
+    );
   };
 
   /** "AMRAP 12:00" for a timed piece, "4 movements" for a straight one. */

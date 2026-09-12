@@ -8,6 +8,7 @@
 
 import { DATA_TABLES, db, type DataTableName } from '../db/db';
 import { getMeta, setMeta } from '../db/repo';
+import { saveTextFile, type SaveResult } from './fileSave';
 
 export const BACKUP_FORMAT = 1;
 
@@ -34,22 +35,18 @@ export async function buildBackup(): Promise<BackupFile> {
   };
 }
 
-export async function downloadBackup(): Promise<string> {
+/**
+ * Writes the backup out, by whatever route the platform has — see `data/fileSave`.
+ *
+ * Returns what actually happened rather than a filename. The old signature could only say
+ * what it had *meant* to write, and on iOS it meant it every time while nothing was saved.
+ */
+export async function exportBackup(): Promise<SaveResult> {
   const backup = await buildBackup();
-  const filename = `forge-backup-${backup.exportedAt.slice(0, 10)}.json`;
-
-  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = filename;
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
-  // Revoking immediately can cancel the download on some mobile browsers.
-  setTimeout(() => URL.revokeObjectURL(url), 10_000);
-
-  return filename;
+  return saveTextFile(
+    `forge-backup-${backup.exportedAt.slice(0, 10)}.json`,
+    JSON.stringify(backup, null, 2),
+  );
 }
 
 export interface ImportResult {

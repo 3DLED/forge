@@ -18,7 +18,7 @@ import Sheet from '../../ui/Sheet';
 import AskSheet from '../../ui/AskSheet';
 import { plural } from '../../ui/text';
 import { endPlan, planProgress } from '../../data/plans';
-import { buildPlanFile, downloadShareFile } from '../../data/share';
+import { buildPlanFile, saveShareFile } from '../../data/share';
 import { daysBetween, formatDayLabel, todayKey } from '../../domain/dates';
 import type { Plan } from '../../domain/types';
 import { useT } from '../../i18n/useT';
@@ -144,8 +144,13 @@ export default function PlanSheet({
           className="btn block"
           style={{ marginTop: '0.9rem' }}
           onClick={async () => {
-            const name = downloadShareFile(await buildPlanFile(plan));
-            setShared(`Saved ${name}. Anyone with Forge can import it and pick their own start date.`);
+            const result = await saveShareFile(await buildPlanFile(plan));
+            if (result.outcome === 'cancelled') return;
+            setShared(
+              result.outcome === 'saved'
+                ? `Saved ${result.filename}. Anyone with Forge can import it and pick their own start date.`
+                : (result.reason ?? t('Could not save the file.')),
+            );
           }}
         >
           ↗ Share this plan

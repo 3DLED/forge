@@ -292,6 +292,7 @@ export const ES: Record<string, string> = {
   'Saved workouts': 'Entrenamientos guardados',
   'Your data': 'Tus datos',
   'Export backup': 'Exportar copia de seguridad',
+  'Could not save the file.': 'No se pudo guardar el archivo.',
   'Restore backup': 'Restaurar copia de seguridad',
   'Restore from backup': 'Restaurar desde copia de seguridad',
   Restoring: 'Restaurando',

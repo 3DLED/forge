@@ -28,6 +28,7 @@ import {
   templateRepo,
 } from './repos';
 import { ulid } from '../domain/ids';
+import { saveTextFile, type SaveResult } from './fileSave';
 import { translateCustomPlan } from './customPlans';
 import { ONGOING_PLAN_WEEKS, generatePlan } from '../domain/planning';
 import { addDays, daysBetween, todayKey } from '../domain/dates';
@@ -289,19 +290,9 @@ export function shareFilename(file: ShareFile): string {
   return `forge-${file.kind}-${slugifyName(name ?? '')}.json`;
 }
 
-export function downloadShareFile(file: ShareFile): string {
-  const filename = shareFilename(file);
-  const blob = new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = filename;
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
-  // Revoking immediately can cancel the download on some mobile browsers.
-  setTimeout(() => URL.revokeObjectURL(url), 10_000);
-  return filename;
+/** Hands one plan or workout to whatever this platform saves files with. */
+export function saveShareFile(file: ShareFile): Promise<SaveResult> {
+  return saveTextFile(shareFilename(file), JSON.stringify(file, null, 2));
 }
 
 // --- reading files back -----------------------------------------------------
