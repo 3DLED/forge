@@ -14,6 +14,7 @@
  * Storage is canonical SI — kilograms, meters, seconds. Display converts (see units.ts).
  */
 
+import type { ReminderSettings } from './reminderSettings';
 import type { RunSettings } from './runSettings';
 
 /** ULID: lexicographically sortable, generated offline, safe for a future sync. */
@@ -672,6 +673,13 @@ export interface Profile extends Entity {
    * used. See `runSettings.ts`.
    */
   run?: RunSettings;
+  /**
+   * Whether the app may interrupt you, and about what. See `reminderSettings.ts`.
+   *
+   * Beside the run settings and for the same reason: a standing preference rather than a
+   * property of any one session, so it belongs to the person and travels in their backup.
+   */
+  reminders?: ReminderSettings;
 }
 
 /** Bodyweight, resting HR, and anything else tracked over time rather than per set. */

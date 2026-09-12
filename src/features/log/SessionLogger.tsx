@@ -19,6 +19,7 @@ import AskSheet from '../../ui/AskSheet';
 import ExercisePicker from './ExercisePicker';
 import ExerciseGroup from './ExerciseGroup';
 import RestTimer, { type UpNext } from './RestTimer';
+import { reminderSettingsFor } from '../../domain/reminderSettings';
 import HoldTimer from './HoldTimer';
 import RunScreen from './RunScreen';
 import WorkoutTimer from './WorkoutTimer';
@@ -850,6 +851,18 @@ export default function SessionLogger() {
     };
   })();
 
+  /*
+   * The words for the rest cue, built here because this is where the translator is — and
+   * handed to the panel rather than arranged from here, so that arming and disarming follow
+   * the panel's own life rather than needing to be remembered at four call sites.
+   */
+  const restCue = reminderSettingsFor(profile.reminders).rest
+    ? {
+        title: t('Rest done'),
+        body: upNext ? `${t('Up next')} · ${upNext.label}` : t('Back to it.'),
+      }
+    : null;
+
   const jumpToNext = () => {
     const slug = upNext?.slug;
     endRest();
@@ -1573,6 +1586,7 @@ export default function SessionLogger() {
         <RestTimer
           endsAt={restEndsAt}
           upNext={upNext}
+          cue={restCue}
           onExtend={(seconds) => setRestEndsAt((end) => (end ?? Date.now()) + seconds * 1000)}
           onDismiss={endRest}
           onJump={jumpToNext}

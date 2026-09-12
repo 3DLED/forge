@@ -6,6 +6,7 @@ import { useApp } from '../../ui/AppProvider';
 import Sheet from '../../ui/Sheet';
 import AskSheet from '../../ui/AskSheet';
 import { DEFAULT_THEME, THEMES } from '../../ui/themes';
+import { reminderSettingsFor, describeReminders } from '../../domain/reminderSettings';
 import { exportBackup, restoreBackup, wipeAllData } from '../../data/backup';
 import { db } from '../../db/db';
 import { displayWeight, weightLabel } from '../../domain/units';
@@ -75,6 +76,17 @@ export default function MoreView() {
           <strong>{t('Run alerts')}</strong>
           <br />
           <span className="tiny faint">{describeRunSettings(runSettingsFor(units, profile.run), lang)}</span>
+        </span>
+        <span className="faint">›</span>
+      </Link>
+
+      <Link to="/more/reminders" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">
+          <strong>{t('Reminders')}</strong>
+          <br />
+          <span className="tiny faint">
+            {describeReminders(reminderSettingsFor(profile.reminders), lang)}
+          </span>
         </span>
         <span className="faint">›</span>
       </Link>

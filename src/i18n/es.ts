@@ -294,6 +294,34 @@ export const ES: Record<string, string> = {
   'Export backup': 'Exportar copia de seguridad',
   'Could not save the file.': 'No se pudo guardar el archivo.',
 
+  // --- reminders ---------------------------------------------------------------
+  Reminders: 'Avisos',
+  'Planned sessions': 'Sesiones planificadas',
+  'Planned sessions at': 'Sesiones planificadas a las',
+  'rest timer': 'temporizador de descanso',
+  Nothing: 'Nada',
+  At: 'A las',
+  'Remind me': 'Avisarme',
+  'No reminder': 'Sin aviso',
+  'Rest timer': 'Temporizador de descanso',
+  'Tell me': 'Avisarme',
+  'Stay quiet': 'En silencio',
+  'One notification on the morning of any day with something planned, naming the session. Days you have already finished or skipped say nothing.':
+    'Un aviso por la mañana en cualquier día que tenga algo planificado, con el nombre de la sesión. Los días que ya has completado u omitido no dicen nada.',
+  'Early enough to change the shape of the day, rather than to tell you what you have already missed.':
+    'Lo bastante temprano como para cambiar la forma del día, en vez de contarte lo que ya te has perdido.',
+  'The beep needs the screen awake and the app in front of you, which between sets it usually is not. This is the same cue, delivered by the phone instead.':
+    'El pitido necesita la pantalla encendida y la app delante de ti, cosa que entre series casi nunca pasa. Este es el mismo aviso, pero lo da el teléfono.',
+  'Reminders need the installed app. A browser can only notify you while it is open, which is the one time you do not need telling.':
+    'Los avisos necesitan la app instalada. Un navegador solo puede avisarte mientras está abierto, que es justo cuando no hace falta.',
+  'Notifications are switched off for Hybrid Forge. Turn them back on in your phone settings and these will start working.':
+    'Las notificaciones están desactivadas para Hybrid Forge. Vuelve a activarlas en los ajustes del teléfono y esto empezará a funcionar.',
+  'Training today': 'Entrenamiento hoy',
+  'Something is planned for today.': 'Hay algo planificado para hoy.',
+  'Rest done': 'Descanso terminado',
+  'Up next': 'A continuación',
+  'Back to it.': 'De vuelta al trabajo.',
+
   // --- when something threw ---------------------------------------------------
   'Hybrid Forge hit a problem': 'Hybrid Forge ha tenido un problema',
   'This screen hit a problem': 'Esta pantalla ha tenido un problema',

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { beepFinish, buzz } from '../../ui/beep';
+import { armRestCue, cancelRestCue } from '../../data/notifications';
 
 /**
  * Counts down to a wall-clock instant rather than decrementing a number, so the timer stays
@@ -25,6 +26,7 @@ export interface UpNext {
 export default function RestTimer({
   endsAt,
   upNext,
+  cue,
   onExtend,
   onDismiss,
   onJump,
@@ -32,6 +34,11 @@ export default function RestTimer({
   endsAt: number;
   /** What the rest is for. Absent once nothing is left unticked. */
   upNext?: UpNext | null;
+  /**
+   * Words for the notification that carries this cue past a sleeping screen, or null when
+   * that is switched off. Built by the caller, which is where the translator lives.
+   */
+  cue?: { title: string; body: string } | null;
   onExtend: (seconds: number) => void;
   onDismiss: () => void;
   /** Close the rest and scroll to whatever is next. */
@@ -68,6 +75,29 @@ export default function RestTimer({
     beepFinish();
     buzz([120, 80, 120]);
   }, [done, endsAt]);
+
+  /*
+   * The same cue, delivered by the phone.
+   *
+   * The beep above needs an unlocked AudioContext and a page that is still running. Between
+   * sets the screen is usually off with the phone on the floor, which is to say the cue was
+   * missing at exactly the moment it was wanted.
+   *
+   * Armed from inside the panel because the panel's life already is the rest: it mounts when
+   * the rest starts and unmounts when it is skipped or dismissed, so arming and disarming
+   * come free rather than having to be remembered at four call sites. A new deadline from
+   * +30s re-arms it for the same reason.
+   *
+   * If it fires while you are watching the countdown you get a banner as well as a beep,
+   * which is a nuisance. Arming only once the app is backgrounded would avoid that and lose a
+   * race against the phone suspending the page, and a duplicate cue is a far better failure
+   * than a missing one.
+   */
+  useEffect(() => {
+    if (!cue) return;
+    void armRestCue(new Date(endsAt), cue.title, cue.body);
+    return () => void cancelRestCue();
+  }, [endsAt, cue?.title, cue?.body]);
 
   return (
     <div className={`rest-timer${done ? ' done' : ''}`}>
