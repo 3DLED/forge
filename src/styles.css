@@ -307,6 +307,51 @@ input[type='number']::-webkit-inner-spin-button {
   opacity: 0.7;
 }
 
+/* --- the screen that shows when something threw --------------------------- */
+
+/*
+ * Built from the same parts as `.empty` rather than sharing it. This one holds buttons that
+ * have to be reachable with a thumb, and centring a full-width control inside a block meant
+ * for a sentence and a glyph is how you get a crash screen you cannot press.
+ */
+.crash {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  text-align: center;
+  padding: 2.5rem 1rem calc(2.5rem + var(--safe-bottom));
+  color: var(--muted);
+}
+
+.crash .glyph {
+  font-size: 2.5rem;
+  opacity: 0.7;
+}
+
+.crash p {
+  margin: 0;
+}
+
+/*
+ * Wraps rather than scrolls sideways. A stack trace is the one thing on this screen somebody
+ * might read to me over the phone, and a horizontal scrollbar on a handset hides most of it.
+ */
+.crash-detail {
+  margin: 0;
+  padding: 0.6rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--faint);
+  font-family: var(--font-code);
+  font-size: 0.7rem;
+  line-height: 1.45;
+  text-align: left;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
 /* --- set logging grid ---------------------------------------------------- */
 
 /*

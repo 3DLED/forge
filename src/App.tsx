@@ -1,4 +1,4 @@
-import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
+import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import TodayView from './features/today/TodayView';
 import SessionLogger from './features/log/SessionLogger';
 import PlanView from './features/plan/PlanView';
@@ -15,6 +15,8 @@ import TestsView from './features/more/TestsView';
 import ExerciseLibraryView from './features/more/ExerciseLibraryView';
 import PlansView from './features/more/PlansView';
 import SavedWorkoutsView from './features/more/SavedWorkoutsView';
+import ErrorBoundary from './ui/ErrorBoundary';
+import CrashScreen from './ui/CrashScreen';
 import { useT } from './i18n/useT';
 
 const TABS = [
@@ -27,9 +29,22 @@ const TABS = [
 
 export default function App() {
   const t = useT();
+  const location = useLocation();
   return (
     <div className="app">
       <main className="app-main">
+        {/*
+          Keyed on the path, so going somewhere else clears the error rather than carrying a
+          broken Progress screen onto Today. The tab bar is outside this deliberately: one
+          screen falling over should leave every other one a tap away, which is the whole
+          difference between a bad page and a dead app.
+        */}
+        <ErrorBoundary
+          key={location.pathname}
+          fallback={({ error, reset }) => (
+            <CrashScreen error={error} scope="screen" reset={reset} t={t} />
+          )}
+        >
         <Routes>
           <Route path="/" element={<Navigate to="/today" replace />} />
           <Route path="/today" element={<TodayView />} />
@@ -50,6 +65,7 @@ export default function App() {
           <Route path="/more/appearance" element={<AppearanceView />} />
           <Route path="*" element={<Navigate to="/today" replace />} />
         </Routes>
+        </ErrorBoundary>
       </main>
 
       <nav className="tabbar">

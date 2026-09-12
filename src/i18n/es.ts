@@ -293,6 +293,17 @@ export const ES: Record<string, string> = {
   'Your data': 'Tus datos',
   'Export backup': 'Exportar copia de seguridad',
   'Could not save the file.': 'No se pudo guardar el archivo.',
+
+  // --- when something threw ---------------------------------------------------
+  'Hybrid Forge hit a problem': 'Hybrid Forge ha tenido un problema',
+  'This screen hit a problem': 'Esta pantalla ha tenido un problema',
+  'Your training data is safe — this is a display problem, and nothing was deleted.':
+    'Tus datos de entrenamiento están a salvo: es un problema de visualización y no se ha borrado nada.',
+  'Reload the app': 'Recargar la aplicación',
+  'Try this screen again': 'Reintentar esta pantalla',
+  'Show details': 'Ver detalles',
+  'Hide details': 'Ocultar detalles',
+  'Saving…': 'Guardando…',
   'Restore backup': 'Restaurar copia de seguridad',
   'Restore from backup': 'Restaurar desde copia de seguridad',
   Restoring: 'Restaurando',

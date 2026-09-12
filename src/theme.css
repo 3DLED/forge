@@ -193,3 +193,16 @@
 
   --overlay-ink: rgba(255, 255, 255, 0.28);
 }
+
+/*
+ * Outside every theme, and the only token here that is.
+ *
+ * `--font-num` is `inherit` in three of the four directions, because a theme is entitled to
+ * decide that its figures sit in its own face. A stack trace is not a design decision: it is
+ * read a character at a time, and it is the one thing on screen somebody might read back to
+ * me down a phone line. Declared once on `:root`, which every theme inherits from for the
+ * tokens it does not override.
+ */
+:root {
+  --font-code: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+}
