@@ -89,15 +89,22 @@
 		<string>audio</string>
 	</array>
 	<!--
-	  HealthKit. iOS shows this string verbatim in the permission sheet, so it is the only
-	  place to say what is read and that nothing is written.
+	  HealthKit. iOS shows these strings verbatim in the permission sheet, so they are the
+	  only place to say what is read and that nothing is written.
 
-	  There is deliberately no NSHealthUpdateUsageDescription. The app requests no share
-	  types at all, and declaring a write description it never uses would claim access to
-	  somebody's health record that it does not want and does not take.
+	  BOTH keys are required, and the second one is not optional however read-only the app
+	  is. App Store Connect rejects the upload with error 90683 when the HealthKit
+	  entitlement is present and NSHealthUpdateUsageDescription is missing: the check is
+	  against the entitlement, not against what the code actually calls. Leaving it out on
+	  the grounds that nothing is written cost one build.
+
+	  So the write string says the true thing instead. It should never be shown, since no
+	  share types are ever requested — see data/healthSource.
 	-->
 	<key>NSHealthShareUsageDescription</key>
 	<string>Hybrid Forge reads the heart rate your watch recorded, so a logged session can show what your heart was doing. It never writes anything to Health.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Hybrid Forge does not write anything to Health. It only reads the heart rate your watch recorded.</string>
 	<!--
 	  Export compliance, answered once here instead of on every upload.
 	
