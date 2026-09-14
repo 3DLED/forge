@@ -1,0 +1,15 @@
+{
+  "name": "forge-folder-backup",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Keeps one Hybrid Forge backup file in a folder chosen in the Files app. iOS only.",
+  "license": "UNLICENSED",
+  "capacitor": {
+    "ios": {
+      "src": "ios"
+    }
+  },
+  "peerDependencies": {
+    "@capacitor/core": ">=8.0.0"
+  }
+}

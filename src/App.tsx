@@ -21,6 +21,7 @@ import ErrorBoundary from './ui/ErrorBoundary';
 import CrashScreen from './ui/CrashScreen';
 import { useSessionReminders } from './ui/useSessionReminders';
 import { useHealthSync } from './ui/useHealthSync';
+import { useAutoBackup } from './ui/useAutoBackup';
 import { useT } from './i18n/useT';
 
 const TABS = [
@@ -38,6 +39,7 @@ export default function App() {
   // while you happened to be looking at the settings would be a sync that never ran.
   useSessionReminders();
   useHealthSync();
+  useAutoBackup();
   return (
     <div className="app">
       <main className="app-main">

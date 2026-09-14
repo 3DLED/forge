@@ -19,6 +19,8 @@ import { activeInjuries } from '../../domain/injuries';
 import { todayKey } from '../../domain/dates';
 import { describeRunSettings, runSettingsFor } from '../../domain/runSettings';
 import { useT } from '../../i18n/useT';
+import { Capacitor } from '@capacitor/core';
+import AutoBackupPanel from './AutoBackupPanel';
 
 export default function MoreView() {
   const t = useT();
@@ -218,7 +220,9 @@ export default function MoreView() {
       <div className="card">
         <p className="small muted">
           {/* One line on purpose: the copy checker reads `t('...')` as a whole call. */}
-          {t('Everything lives in this browser on this device. Nothing is uploaded, and no account exists — which also means a cleared browser takes your history with it. Export regularly and keep the file somewhere that syncs.')}
+          {Capacitor.isNativePlatform()
+            ? t('Everything lives in this app on this device. Nothing is uploaded and no account exists, so losing the phone loses your history unless a backup is kept somewhere else.')
+            : t('Everything lives in this browser on this device. Nothing is uploaded, and no account exists — which also means a cleared browser takes your history with it. Export regularly and keep the file somewhere that syncs.')}
         </p>
         <div className="small mono faint" style={{ marginBottom: '0.75rem' }}>
           {t.count(counts?.sessions ?? 0, 'session')} · {counts?.planned ?? 0} {t('planned')} ·{' '}
@@ -262,6 +266,8 @@ export default function MoreView() {
         </button>
 
         {status && <p className="small" style={{ marginTop: '0.75rem', marginBottom: 0 }}>{status}</p>}
+
+        <AutoBackupPanel />
       </div>
 
       <div className="card">

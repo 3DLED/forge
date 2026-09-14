@@ -306,6 +306,22 @@ export const ES: Record<string, string> = {
   'Each piece of this session sets its own pace, so there is no single target to change here.':
     'Cada tramo de esta sesión marca su propio ritmo, así que aquí no hay un único objetivo que cambiar.',
 
+  // --- automatic backup -----------------------------------------------------------
+  'Automatic backup': 'Copia automática',
+  'Pick a folder in Files, such as iCloud Drive, Google Drive or OneDrive, and Forge keeps one copy of your data there, replaced whenever your training changes.':
+    'Elige una carpeta en Archivos, como iCloud Drive, Google Drive u OneDrive, y Forge guardará allí una copia de tus datos, que se reemplaza cada vez que cambia tu entrenamiento.',
+  'Choose a folder': 'Elegir una carpeta',
+  'Saving to': 'Guardando en',
+  'Last saved': 'Última copia',
+  'Not saved yet': 'Aún sin guardar',
+  'Back up now': 'Hacer copia ahora',
+  'Change folder': 'Cambiar carpeta',
+  'Backed up.': 'Copia hecha.',
+  'That folder can no longer be reached. Choose it again.':
+    'Ya no se puede acceder a esa carpeta. Vuelve a elegirla.',
+  'Everything lives in this app on this device. Nothing is uploaded and no account exists, so losing the phone loses your history unless a backup is kept somewhere else.':
+    'Todo vive en esta app, en este dispositivo. No se sube nada y no hay cuenta, así que perder el teléfono es perder tu historial, salvo que tengas una copia en otro sitio.',
+
   // --- apple health -------------------------------------------------------------
   'Apple Health': 'Apple Salud',
   'Not connected': 'Sin conectar',
