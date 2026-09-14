@@ -120,23 +120,32 @@ export default function TodayView() {
         </div>
         <div className="row" style={{ justifyContent: 'space-between' }}>
           {week.map((day) => {
-            const logged = (weekSessions ?? []).some((s) => s.date === day && s.endedAt);
-            const planned = (weekPlanned ?? []).some((p) => p.date === day && p.status === 'planned');
+            const logged = (weekSessions ?? []).filter((s) => s.date === day && s.endedAt);
+            // Moved slots are shown where they went; completed ones are already a tick above.
+            const slots = (weekPlanned ?? []).filter(
+              (p) => p.date === day && (p.status === 'planned' || p.status === 'skipped'),
+            );
             const isToday = day === today;
             return (
               <div key={day} style={{ textAlign: 'center', flex: 1 }}>
                 <div className="tiny faint">{weekdayName(weekdayOf(day), true).slice(0, 1)}</div>
-                <div
-                  style={{
-                    margin: '0.25rem auto 0',
-                    width: 10,
-                    height: 10,
-                    borderRadius: '50%',
-                    background: logged ? 'var(--good)' : planned ? 'var(--accent)' : 'var(--surface-3)',
-                    outline: isToday ? '2px solid var(--accent)' : undefined,
-                    outlineOffset: '2px',
-                  }}
-                />
+                {/*
+                  The Plan calendar's own markers, so a day means the same thing on both tabs.
+                  A single coloured dot could not say "skipped" at all, and green-for-done
+                  beside lime-for-planned was the distinction nobody could see in sunlight.
+                */}
+                <span className={`cal-dots week-marks${isToday ? ' today' : ''}`}>
+                  {logged.map((session) => (
+                    <span className="cal-dot done" key={session.id} />
+                  ))}
+                  {slots.map((slot) => (
+                    <span
+                      className={`cal-dot${slot.status === 'skipped' ? ' skipped' : ''}`}
+                      key={slot.id}
+                    />
+                  ))}
+                  {logged.length + slots.length === 0 && <span className="cal-dot none" />}
+                </span>
               </div>
             );
           })}

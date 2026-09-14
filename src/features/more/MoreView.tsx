@@ -59,84 +59,16 @@ export default function MoreView() {
   return (
     <>
       <PageHeader title={t('More')} subtitle={profile.displayName} />
+      {/*
+        Grouped by what somebody came here to do, not by when each screen was built.
 
-      <Link to="/more/equipment" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <span className="grow">
-          <strong>{t('Equipment')}</strong>
-          <br />
-          <span className="tiny faint">
-            {activeEquipment?.name ?? t('Not set')} · {t.count(activeEquipment?.items.length ?? 0, 'item')}
-          </span>
-        </span>
-        <span className="faint">›</span>
-      </Link>
-
-      <Link to="/more/run" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <span className="grow">
-          <strong>{t('Run alerts')}</strong>
-          <br />
-          <span className="tiny faint">{describeRunSettings(runSettingsFor(units, profile.run), lang)}</span>
-        </span>
-        <span className="faint">›</span>
-      </Link>
-
-      <Link to="/more/reminders" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <span className="grow">
-          <strong>{t('Reminders')}</strong>
-          <br />
-          <span className="tiny faint">
-            {describeReminders(reminderSettingsFor(profile.reminders), lang)}
-          </span>
-        </span>
-        <span className="faint">›</span>
-      </Link>
-
-      <Link to="/more/health" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <span className="grow">
-          <strong>{t('Apple Health')}</strong>
-          <br />
-          <span className="tiny faint">
-            {profile.appleHealth ? t('Heart rate from your watch') : t('Not connected')}
-          </span>
-        </span>
-        <span className="faint">›</span>
-      </Link>
-
-      <Link to="/more/settings" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <span className="grow">
-          <strong>{t('Settings')}</strong>
-          <br />
-          <span className="tiny faint">
-            {profile.units === 'imperial' ? t('Pounds and miles') : t('Kilograms and kilometres')}
-          </span>
-        </span>
-        <span className="faint">›</span>
-      </Link>
-
-      <Link to="/more/appearance" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <span className="grow">
-          <strong>{t('Appearance')}</strong>
-          <br />
-          <span className="tiny faint">
-            {THEMES.find((t) => t.id === (profile.theme ?? DEFAULT_THEME))?.name ?? 'Forge'} · {t('try the other directions')}
-          </span>
-        </span>
-        <span className="faint">›</span>
-      </Link>
-
-      <Link to="/more/movements" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
-        <span className="grow">
-          <strong>{t('Movements')}</strong>
-          <br />
-          <span className="tiny faint">
-            {customCount > 0
-              ? `${t.count(exercises.length, 'movement')}, ${customCount} ${t('of them yours')}`
-              : `${t.count(exercises.length, 'movement')} — ${t('add your own')}`}
-          </span>
-        </span>
-        <span className="faint">›</span>
-      </Link>
-
+        Twelve rows in the order they were added read as a junk drawer: Appearance sat between
+        Reminders and Movements. Training is the stuff sessions are made of; the body section
+        is what the app knows about you; alerts and connections are the things that reach you
+        or reach out; and the app section is how it looks and measures. Data stays last,
+        beside the one button on this screen that cannot be undone.
+      */}
+      <div className="section-title">{t('Training')}</div>
       <Link to="/more/plans" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">
           <strong>{t('Plans')}</strong>
@@ -158,6 +90,44 @@ export default function MoreView() {
             {workoutCount > 0
               ? `${t.count(workoutCount, 'workout')} — ${t('share, import, tidy up')}`
               : t('Workouts you have named come back here')}
+          </span>
+        </span>
+        <span className="faint">›</span>
+      </Link>
+
+      <Link to="/more/movements" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">
+          <strong>{t('Movements')}</strong>
+          <br />
+          <span className="tiny faint">
+            {customCount > 0
+              ? `${t.count(exercises.length, 'movement')}, ${customCount} ${t('of them yours')}`
+              : `${t.count(exercises.length, 'movement')} — ${t('add your own')}`}
+          </span>
+        </span>
+        <span className="faint">›</span>
+      </Link>
+
+      <Link to="/more/equipment" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">
+          <strong>{t('Equipment')}</strong>
+          <br />
+          <span className="tiny faint">
+            {activeEquipment?.name ?? t('Not set')} · {t.count(activeEquipment?.items.length ?? 0, 'item')}
+          </span>
+        </span>
+        <span className="faint">›</span>
+      </Link>
+
+      <div className="section-title">{t('Your body')}</div>
+      <Link to="/more/body" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">
+          <strong>{t('Bodyweight')}</strong>
+          <br />
+          <span className="tiny faint">
+            {profile.bodyweightKg
+              ? `${Math.round(displayWeight(profile.bodyweightKg, profile.units))} ${weightLabel(profile.units)} · ${t('the load in every push-up')}`
+              : t('Not set — bodyweight sets count as no work without it')}
           </span>
         </span>
         <span className="faint">›</span>
@@ -189,14 +159,56 @@ export default function MoreView() {
         <span className="faint">›</span>
       </Link>
 
-      <Link to="/more/body" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
+      <div className="section-title">{t('Alerts and connections')}</div>
+      <Link to="/more/run" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
         <span className="grow">
-          <strong>{t('Bodyweight')}</strong>
+          <strong>{t('Run alerts')}</strong>
+          <br />
+          <span className="tiny faint">{describeRunSettings(runSettingsFor(units, profile.run), lang)}</span>
+        </span>
+        <span className="faint">›</span>
+      </Link>
+
+      <Link to="/more/reminders" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">
+          <strong>{t('Reminders')}</strong>
           <br />
           <span className="tiny faint">
-            {profile.bodyweightKg
-              ? `${Math.round(displayWeight(profile.bodyweightKg, profile.units))} ${weightLabel(profile.units)} · ${t('the load in every push-up')}`
-              : t('Not set — bodyweight sets count as no work without it')}
+            {describeReminders(reminderSettingsFor(profile.reminders), lang)}
+          </span>
+        </span>
+        <span className="faint">›</span>
+      </Link>
+
+      <Link to="/more/health" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">
+          <strong>{t('Apple Health')}</strong>
+          <br />
+          <span className="tiny faint">
+            {profile.appleHealth ? t('Heart rate from your watch') : t('Not connected')}
+          </span>
+        </span>
+        <span className="faint">›</span>
+      </Link>
+
+      <div className="section-title">{t('App')}</div>
+      <Link to="/more/settings" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">
+          <strong>{t('Settings')}</strong>
+          <br />
+          <span className="tiny faint">
+            {profile.units === 'imperial' ? t('Pounds and miles') : t('Kilograms and kilometres')}
+          </span>
+        </span>
+        <span className="faint">›</span>
+      </Link>
+
+      <Link to="/more/appearance" className="pick" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span className="grow">
+          <strong>{t('Appearance')}</strong>
+          <br />
+          <span className="tiny faint">
+            {THEMES.find((t) => t.id === (profile.theme ?? DEFAULT_THEME))?.name ?? 'Forge'} · {t('try the other directions')}
           </span>
         </span>
         <span className="faint">›</span>

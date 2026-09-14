@@ -48,6 +48,25 @@ export const MAX_ACCURACY_M = 30;
 export const WINDOW_MS = 12_000;
 
 /**
+ * How much history a pace *alert* is judged over, which is not the same question.
+ *
+ * The number on screen wants to be quick: glance down after a hill and it should already say
+ * so. An alert wants to be slow, because it interrupts, and twelve seconds is short enough for
+ * one surge up a kerb to count. Over thirty seconds a median ignores anything shorter than
+ * fifteen, so a brief excursion past the tolerance never reaches the decision at all.
+ */
+export const ALERT_WINDOW_MS = 30_000;
+
+/**
+ * How long the smoothed pace must stay outside the band before anything is said.
+ *
+ * On top of the longer window, not instead of it. Together they are what makes the settings
+ * screen's promise true — half a minute off pace before it speaks — which for as long as this
+ * fired on the first reading outside the band, it was not.
+ */
+export const SUSTAIN_MS = 15_000;
+
+/**
  * Below this, treat it as standing still.
  *
  * Half a metre a second is a shuffle — around thirty-three minutes a kilometre. GPS speed is
@@ -129,7 +148,7 @@ export interface PaceReading {
  * Takes the whole buffer rather than accumulating internally, so the same input always gives
  * the same answer and a test can hand it a route without pretending to be a clock.
  */
-export function readPace(fixes: Fix[], now: number): PaceReading {
+export function readPace(fixes: Fix[], now: number, windowMs: number = WINDOW_MS): PaceReading {
   const good = fixes.filter(usable);
   const discarded = fixes.length - good.length;
 
@@ -138,7 +157,7 @@ export function readPace(fixes: Fix[], now: number): PaceReading {
 
   const speeds: number[] = [];
   for (let i = 0; i < good.length; i += 1) {
-    if (now - good[i].at > WINDOW_MS) continue;
+    if (now - good[i].at > windowMs) continue;
     const speed = speedOf(good[i], good[i - 1]);
     if (speed != null) speeds.push(speed);
   }
@@ -313,6 +332,21 @@ export interface CueState {
    * and not acted on is worth less than the one before it.
    */
   repeats?: number;
+  /**
+   * When the smoothed pace last left the band, or null while it is inside.
+   *
+   * Tracked on every reading, including the ones that say nothing, so that a gap or a split
+   * does not reset the clock on how long you have actually been off.
+   */
+  outsideSince?: number | null;
+  /**
+   * No pace alert before this instant, because something else is still being said.
+   *
+   * Speech flushes: a new sentence stops the one in progress. A pace alert one stride after a
+   * mile split therefore cut the split off mid-word, which is the wrong way round — the split
+   * is the thing you were waiting for.
+   */
+  quietUntil?: number;
 }
 
 export interface CueDecision {
@@ -335,18 +369,35 @@ export function decideCue(options: {
   now: number;
 }): CueDecision {
   const { reading, target, state, now } = options;
-  const keep = (reason: string): CueDecision => ({ kind: null, reason, state });
+  /*
+   * Neither the warm-up nor standing still counts toward being off pace. Accelerating from a
+   * standstill reads slow by definition, and a crossing is not a drift.
+   */
+  const settle = (reason: string): CueDecision => ({
+    kind: null,
+    reason,
+    state: { ...state, outsideSince: null },
+  });
 
-  if (now - state.startedAt < WARMUP_MS) return keep('warming up');
-  if (!reading.moving || reading.paceSecPerKm == null) return keep('not moving');
-  if (now - state.lastAt < MIN_GAP_MS) return keep('too soon');
+  if (now - state.startedAt < WARMUP_MS) return settle('warming up');
+  if (!reading.moving || reading.paceSecPerKm == null) return settle('not moving');
 
   // Slower means a bigger number of seconds per kilometre, which reads backwards all the way
   // down unless it is named once, here.
   const off = reading.paceSecPerKm - target.targetSecPerKm;
   const outside = Math.abs(off) > target.toleranceSecPerKm;
 
+  // Measured on every reading, before any gate below decides to stay quiet.
+  const outsideSince = outside ? (state.outsideSince ?? now) : null;
+  const next: CueState = { ...state, outsideSince };
+  const keep = (reason: string): CueDecision => ({ kind: null, reason, state: next });
+
+  if (state.quietUntil != null && now < state.quietUntil) return keep('something else is being said');
+  if (now - state.lastAt < MIN_GAP_MS) return keep('too soon');
+
   if (outside) {
+    if (now - (outsideSince ?? now) < SUSTAIN_MS) return keep('not off for long enough yet');
+
     const kind: CueKind = off > 0 ? 'tooSlow' : 'tooFast';
 
     if (kind === state.last) {
@@ -354,11 +405,11 @@ export function decideCue(options: {
       if (repeats >= MAX_REPEATS) return keep('said that enough times');
       // Each repeat waits twice as long as the last: 90 s, then three minutes, then six.
       if (now - state.lastAt < REPEAT_MS * 2 ** repeats) return keep('said that recently');
-      return { kind, state: { ...state, last: kind, lastAt: now, repeats: repeats + 1 } };
+      return { kind, state: { ...next, last: kind, lastAt: now, repeats: repeats + 1 } };
     }
 
     // A different complaint is news, and starts the backing-off over.
-    return { kind, state: { ...state, last: kind, lastAt: now, repeats: 0 } };
+    return { kind, state: { ...next, last: kind, lastAt: now, repeats: 0 } };
   }
 
   // Inside the band. Only worth saying if it had complained, and only once properly back.
@@ -366,7 +417,7 @@ export function decideCue(options: {
     if (Math.abs(off) > target.toleranceSecPerKm * RETURN_FRACTION) {
       return keep('back inside, but only just');
     }
-    return { kind: 'backOnPace', state: { ...state, last: 'backOnPace', lastAt: now, repeats: 0 } };
+    return { kind: 'backOnPace', state: { ...next, last: 'backOnPace', lastAt: now, repeats: 0 } };
   }
 
   return keep('on pace, nothing to report');

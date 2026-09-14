@@ -12,21 +12,23 @@ import {
   M_PER_MILE,
 } from './units';
 import {
-  MIN_GAP_MS,
-  MAX_REPEATS,
-  REPEAT_MS,
-  WARMUP_MS,
+  ALERT_WINDOW_MS,
   decideCue,
+  decideSplit,
+  MAX_REPEATS,
   medianSpeed,
   metresBetween,
+  MIN_GAP_MS,
   readPace,
+  REPEAT_MS,
   speedOf,
+  SPLIT_INTERVALS,
+  startSplits,
+  SUSTAIN_MS,
   usable,
+  WARMUP_MS,
   type CueState,
   type Fix,
-  SPLIT_INTERVALS,
-  decideSplit,
-  startSplits,
   type PaceTarget,
   type SplitState,
 } from './pace';
@@ -155,6 +157,23 @@ describe('reading a pace', () => {
     expect(reading.paceSecPerKm).toBeNull();
   });
 
+  /*
+   * The screen and the voice ask over different spans. Ten fast seconds at the end of twenty
+   * slow ones should show on screen straight away and change nothing the voice would say.
+   */
+  it('judges an alert over a longer window than the screen', () => {
+    const now = 100_000;
+    const fixes = Array.from({ length: 30 }, (_, k) => ({
+      at: now - k * 1000,
+      lat: 0,
+      lon: 0,
+      accuracy: 5,
+      speed: k < 10 ? 5 : 3,
+    })).reverse();
+    expect(readPace(fixes, now).paceSecPerKm).toBeCloseTo(200, 0);
+    expect(readPace(fixes, now, ALERT_WINDOW_MS).paceSecPerKm).toBeCloseTo(333.3, 0);
+  });
+
   it('only smooths over the recent window', () => {
     const old = steady(10, 5, 0);
     const recent = steady(3, 5, 60_000);
@@ -186,10 +205,15 @@ describe('reading a pace', () => {
 
 const target: PaceTarget = { targetSecPerKm: 300, toleranceSecPerKm: 15 };
 
+/*
+ * Off the band since the start unless a test says otherwise, so the older tests keep asking
+ * the question they were written for. Staying off long enough has its own tests below.
+ */
 const state = (over: Partial<CueState> = {}): CueState => ({
   last: null,
   lastAt: 0,
   startedAt: 0,
+  outsideSince: 0,
   ...over,
 });
 
@@ -372,13 +396,15 @@ describe('a run, start to finish', () => {
     // is nudged.
     const paces = [
       [10_000, 320], // warm-up: silent
-      [60_000, 340], // drifted slow
+      [50_000, 340], // drifted slow, but only just
+      [70_000, 340], // still slow, long enough to count
       [90_000, 345], // still slow, inside the minimum gap
       [140_000, 345], // still slow, inside the repeat window
       [200_000, 345], // still slow, repeat window passed
       [260_000, 301], // properly back
       [320_000, 300], // on pace, nothing to add
-      [400_000, 260], // gone too fast
+      [400_000, 260], // gone too fast, but only just
+      [430_000, 260], // and stayed there
     ] as const;
 
     for (const [now, pace] of paces) {
@@ -389,14 +415,69 @@ describe('a run, start to finish', () => {
 
     expect(said).toEqual([
       null,
+      null,
       'tooSlow',
       null,
       null,
       'tooSlow',
       'backOnPace',
       null,
+      null,
       'tooFast',
     ]);
+  });
+});
+
+/*
+ * #5, from the second test pass: alerts were chatty because a few seconds past the tolerance
+ * was enough. A drift is now only a drift once it has lasted.
+ */
+describe('staying off long enough to count', () => {
+  const at = (paceSecPerKm: number, now: number, from: CueState) =>
+    decideCue({ reading: reading(paceSecPerKm), target, state: from, now });
+
+  it('says nothing about a brief excursion past the tolerance', () => {
+    const left = at(340, 200_000, state({ outsideSince: null }));
+    expect(left.kind).toBeNull();
+    expect(at(340, 200_000 + SUSTAIN_MS - 5_000, left.state).kind).toBeNull();
+  });
+
+  it('speaks once the pace has stayed off for long enough', () => {
+    const left = at(340, 200_000, state({ outsideSince: null }));
+    expect(at(340, 200_000 + SUSTAIN_MS + 1, left.state).kind).toBe('tooSlow');
+  });
+
+  it('starts counting again once the pace comes back inside', () => {
+    const left = at(340, 200_000, state({ outsideSince: null }));
+    const back = at(300, 205_000, left.state);
+    const again = at(340, 208_000, back.state);
+    expect(at(340, 200_000 + SUSTAIN_MS + 1, again.state).kind).toBeNull();
+  });
+
+  /* Accelerating from a standstill reads slow by definition, and is not a drift. */
+  it('does not count the warm-up toward staying off', () => {
+    const warming = at(400, WARMUP_MS - 1_000, state({ outsideSince: null }));
+    expect(warming.state.outsideSince).toBeNull();
+    expect(at(400, WARMUP_MS + 1, warming.state).kind).toBeNull();
+  });
+
+  /* A gap or a split must not reset how long you have actually been off. */
+  it('keeps counting through a stretch where it would not speak anyway', () => {
+    const recent = state({ lastAt: 200_000, outsideSince: null });
+    const gagged = at(340, 210_000, recent);
+    expect(gagged.kind).toBeNull();
+    expect(gagged.state.outsideSince).toBe(210_000);
+    expect(at(340, 200_000 + MIN_GAP_MS + 1, gagged.state).kind).toBe('tooSlow');
+  });
+});
+
+/* #4: a pace alert used to cut a mile split off mid-word, because speech flushes. */
+describe('not talking over something else', () => {
+  it('holds a pace alert while another cue is still being said', () => {
+    const talking = state({ quietUntil: 205_000 });
+    const held = decideCue({ reading: reading(340), target, state: talking, now: 204_999 });
+    expect(held.kind).toBeNull();
+    expect(decideCue({ reading: reading(340), target, state: held.state, now: 205_001 }).kind).toBe('tooSlow');
   });
 });
 

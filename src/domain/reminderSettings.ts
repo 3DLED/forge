@@ -63,5 +63,7 @@ export function describeReminders(settings: ReminderSettings, lang?: Language): 
   if (settings.sessions) parts.push(`${say('Planned sessions at')} ${settings.sessionTime}`);
   if (settings.rest) parts.push(say('rest timer'));
   if (parts.length === 0) return say('Nothing');
-  return parts.join(' · ');
+  // The row reads as a sentence, and "rest timer" on its own started one in lower case.
+  const line = parts.join(' · ');
+  return line.charAt(0).toUpperCase() + line.slice(1);
 }

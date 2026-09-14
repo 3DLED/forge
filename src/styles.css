@@ -1213,6 +1213,35 @@ section[id^='movement-'] {
 .cal-dot.skipped { color: var(--faint); }
 .cal-dot.skipped::before { content: '✕'; }
 
+/*
+ * The same markers on Today's week strip, a size up.
+ *
+ * Three selectors deep on the glyphs so they beat `.cal-dot.done` above rather than tying with
+ * it and depending on source order. The today ring goes round the group instead of one dot,
+ * because a day can carry a tick and a planned dot at once.
+ */
+.week-marks {
+  margin: 0.3rem auto 0;
+  min-width: 16px;
+  min-height: 16px;
+  padding: 2px 3px;
+  border-radius: var(--radius-pill);
+  gap: 3px;
+}
+
+.week-marks.today { box-shadow: 0 0 0 2px var(--accent); }
+
+.week-strip .cal-dot { width: 8px; height: 8px; }
+
+.week-strip .cal-dot.done,
+.week-strip .cal-dot.skipped {
+  width: auto;
+  height: auto;
+  font-size: 12px;
+}
+
+.cal-dot.none { background: var(--surface-3); }
+
 .cal-legend {
   display: flex;
   flex-wrap: wrap;

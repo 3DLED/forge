@@ -65,6 +65,36 @@ export function speakable(text: string, lang?: Language): string {
   );
 }
 
+/** About how long one spoken word takes at the app's slightly slowed speaking rate. */
+export const SPOKEN_WORD_MS = 430;
+
+/** The pause an engine leaves at a full stop or comma. */
+export const SPOKEN_BREAK_MS = 400;
+
+/**
+ * A breath after the sentence ends, before anything else may start.
+ *
+ * Without it the next cue lands on the last syllable of this one, which is heard as the same
+ * interruption the quiet period exists to prevent.
+ */
+export const AFTER_SPEECH_MS = 2_000;
+
+/**
+ * Roughly how long a sentence takes to say, for keeping lower-priority cues out of the way.
+ *
+ * An estimate rather than a measurement: the native engine does report when it finishes, but
+ * a run has to behave the same with the web engine, with no voice installed, and in a test.
+ * It errs long on purpose. Guessing short means talking over a split, which is the bug; guessing
+ * long means a pace alert a second later than it could have been, which nobody will notice.
+ * The Spanish decimal comma counts as a pause for the same reason.
+ */
+export function speechMs(spoken: string): number {
+  const words = spoken.trim().split(/\s+/).filter(Boolean).length;
+  if (words === 0) return 0;
+  const breaks = (spoken.match(/[.,;:!?]/g) ?? []).length;
+  return words * SPOKEN_WORD_MS + breaks * SPOKEN_BREAK_MS + AFTER_SPEECH_MS;
+}
+
 /**
  * A duration, in words.
  *

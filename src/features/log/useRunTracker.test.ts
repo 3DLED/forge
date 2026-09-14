@@ -14,6 +14,7 @@ import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useRunTracker } from './useRunTracker';
 import { buildRunPlan } from '../../domain/runPlan';
+import { speakable, speechMs } from '../../domain/runVoice';
 import { runSettingsFor, type RunSettings } from '../../domain/runSettings';
 import type { Fix } from '../../domain/pace';
 import type { LocationSource } from '../../data/locationSource';
@@ -213,6 +214,38 @@ describe('what it says about pace', () => {
     const complaints = result.current.notes.filter((note) => note.kind === 'drift');
     expect(complaints.length).toBeGreaterThan(0);
     expect(complaints[0].text).toContain('Pick it up');
+  });
+
+  /*
+   * #4. Speech flushes, so a pace alert one stride after a split stopped the split mid-word.
+   * On a long slow run with quarter-mile splits the two land close together more than once,
+   * and every alert must wait out whatever was just said.
+   */
+  it('never starts a pace alert while a split is still being said', async () => {
+    const { result, receiver } = await trackerFor({
+      settings: settings({
+        paceAlerts: true,
+        targetSecPerKm: 240,
+        toleranceSecPerKm: 15,
+        splits: true,
+        splitUnit: 'quarterMile',
+      }),
+      plan: null,
+    });
+
+    act(() => receiver.advance(1500, 330));
+
+    const said = [...result.current.notes].reverse();
+    let close = 0;
+    for (let i = 1; i < said.length; i += 1) {
+      const before = said[i - 1];
+      if (said[i].kind !== 'drift' || before.kind !== 'split') continue;
+      const gap = said[i].at - before.at;
+      if (gap < 20_000) close += 1;
+      expect(gap).toBeGreaterThanOrEqual(speechMs(speakable(before.text)));
+    }
+    // Otherwise the test proves nothing: the case has to have actually come up.
+    expect(close).toBeGreaterThan(0);
   });
 
   it('announces each piece as it starts', async () => {

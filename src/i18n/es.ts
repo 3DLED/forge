@@ -297,6 +297,15 @@ export const ES: Record<string, string> = {
   'Left open. Open it to finish or discard it.':
     'Quedó abierta. Ábrela para terminarla o descartarla.',
 
+  // --- sections under More, and the mid-run settings -----------------------------
+  Training: 'Entrenamiento',
+  'Your body': 'Tu cuerpo',
+  'Alerts and connections': 'Avisos y conexiones',
+  App: 'Aplicación',
+  'Target pace': 'Ritmo objetivo',
+  'Each piece of this session sets its own pace, so there is no single target to change here.':
+    'Cada tramo de esta sesión marca su propio ritmo, así que aquí no hay un único objetivo que cambiar.',
+
   // --- apple health -------------------------------------------------------------
   'Apple Health': 'Apple Salud',
   'Not connected': 'Sin conectar',

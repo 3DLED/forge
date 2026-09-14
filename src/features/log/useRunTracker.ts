@@ -22,13 +22,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { locationSource, type LocationSource, type LocationWatch } from '../../data/locationSource';
 import {
+  ALERT_WINDOW_MS,
   decideCue,
   decideSplit,
   metresBetween,
   readPace,
   startSplits,
   usable,
-  WINDOW_MS,
   type CueState,
   type Fix,
   type PaceReading,
@@ -44,7 +44,7 @@ import {
   type RunProgress,
 } from '../../domain/runPlan';
 import { alertsArmed, type RunSettings } from '../../domain/runSettings';
-import { sayChange, sayDrift, saySplit, sayStart, speakable } from '../../domain/runVoice';
+import { sayChange, sayDrift, saySplit, sayStart, speakable, speechMs } from '../../domain/runVoice';
 import { speak, stopSpeaking, unlockSpeech } from '../../ui/speak';
 import type { Language, UnitSystem } from '../../domain/types';
 
@@ -56,13 +56,13 @@ export interface RunNote {
 }
 
 /**
- * Held slightly longer than the pace window.
+ * Held slightly longer than the longest window anything reads.
  *
- * The window is what gets averaged; the buffer needs one fix older than that so the earliest
- * fix inside it still has a previous one to be differenced against when the receiver gave no
- * speed of its own.
+ * That is the alert window, which is deliberately slower than the one the screen shows. The
+ * buffer needs one fix older than it so the earliest fix inside still has a previous one to
+ * be differenced against when the receiver gave no speed of its own.
  */
-const BUFFER_MS = WINDOW_MS + 10_000;
+const BUFFER_MS = ALERT_WINDOW_MS + 10_000;
 
 /** A piece already behind you, and what it actually cost. */
 export interface FinishedPiece {
@@ -153,9 +153,27 @@ export function useRunTracker(options: {
     [],
   );
 
-  const say = useCallback((text: string, kind: RunNote['kind'], at: number) => {
+  /**
+   * Shows it, says it, and reports roughly how long the saying will take, so the caller can
+   * keep anything less important from talking over it. With the voice off nothing is spoken,
+   * so there is nothing to protect.
+   */
+  const say = useCallback((text: string, kind: RunNote['kind'], at: number): number => {
     setNotes((current) => [{ at, text, kind }, ...current].slice(0, 40));
-    if (settingsRef.current.voice) speak(speakable(text, langRef.current), langRef.current);
+    if (!settingsRef.current.voice) return 0;
+    const spoken = speakable(text, langRef.current);
+    speak(spoken, langRef.current);
+    return speechMs(spoken);
+  }, []);
+
+  /**
+   * No pace alert until the sentence just started has finished.
+   *
+   * Speech flushes, so an alert one stride after a mile split used to stop the split mid-word.
+   * The split is what you were waiting for; the alert can wait a few seconds.
+   */
+  const holdAlerts = useCallback((until: number) => {
+    if (cueState.current) cueState.current = { ...cueState.current, quietUntil: until };
   }, []);
 
   /** One fix: distance, pace, and then everything that might need saying about them. */
@@ -223,7 +241,7 @@ export function useRunTracker(options: {
 
           const sentence = current.segmentCues ? sayChange(change, unitsRef.current, langRef.current) : null;
           if (sentence) {
-            say(sentence, 'segment', now);
+            holdAlerts(now + say(sentence, 'segment', now));
             return;
           }
         }
@@ -264,10 +282,13 @@ export function useRunTracker(options: {
         });
         splitState.current = decision.state;
         if (decision.cue) {
-          say(
-            saySplit({ cue: decision.cue, interval: current.splitUnit, units: unitsRef.current, lang: langRef.current, elapsedSec: seconds }),
-            'split',
-            now,
+          holdAlerts(
+            now +
+              say(
+                saySplit({ cue: decision.cue, interval: current.splitUnit, units: unitsRef.current, lang: langRef.current, elapsedSec: seconds }),
+                'split',
+                now,
+              ),
           );
           return;
         }
@@ -280,14 +301,20 @@ export function useRunTracker(options: {
        * a target exists whether or not anybody asked to be told about it.
        */
       if (alertsArmed(current, aim != null) && target && cueState.current) {
-        const decision = decideCue({ reading: paceNow, target, state: cueState.current, now });
+        /*
+         * Judged over the slower window, and the pace it reports is that smoothed one too. The
+         * number on screen is allowed to twitch after a kerb; the voice is not, and a sentence
+         * quoting the twitch would contradict the judgement it was spoken to explain.
+         */
+        const judged = readPace(buffer.current, now, ALERT_WINDOW_MS);
+        const decision = decideCue({ reading: judged, target, state: cueState.current, now });
         cueState.current = decision.state;
         if (decision.kind) {
-          say(sayDrift({ kind: decision.kind, reading: paceNow, target, units: unitsRef.current, lang: langRef.current }), 'drift', now);
+          say(sayDrift({ kind: decision.kind, reading: judged, target, units: unitsRef.current, lang: langRef.current }), 'drift', now);
         }
       }
     },
-    [runSeconds, say],
+    [holdAlerts, runSeconds, say],
   );
 
   const start = useCallback(() => {
@@ -316,7 +343,7 @@ export function useRunTracker(options: {
     setStatus('running');
 
     const opening = sayStart(planRef.current?.segments[0] ?? null, unitsRef.current, langRef.current);
-    say(opening, 'start', now);
+    holdAlerts(now + say(opening, 'start', now));
 
     void source
       .watch(
@@ -334,7 +361,7 @@ export function useRunTracker(options: {
         setError(failure.message);
         setStatus('idle');
       });
-  }, [handle, say, source, status]);
+  }, [handle, holdAlerts, say, source, status]);
 
   const pause = useCallback(() => {
     if (status !== 'running') return;

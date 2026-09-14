@@ -93,7 +93,12 @@ const EN: Vocabulary = {
 
   count(noun, value) {
     const [one, many] = EN_NOUNS[noun];
-    return `${EN.decimal(value)} ${value === 1 ? one : many}`;
+    /*
+     * Agreement is decided on the number as said, not as measured. A warm-up that covered
+     * 1.0002 miles is spoken as "1", and "1 miles" is what came out of the phone.
+     */
+    const said = EN.decimal(value);
+    return `${said} ${said === '1' ? one : many}`;
   },
 
   decimal(value) {
@@ -166,7 +171,9 @@ const ES: Vocabulary = {
 
   count(noun, value) {
     const [one, many] = ES_NOUNS[noun];
-    return `${ES.decimal(value)} ${value === 1 ? one : many}`;
+    // On the number as said, for the same reason as the English above.
+    const said = ES.decimal(value);
+    return `${said} ${said === '1' ? one : many}`;
   },
 
   decimal(value) {

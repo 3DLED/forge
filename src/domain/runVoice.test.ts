@@ -5,9 +5,21 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { sayChange, sayDrift, saySplit, sayStart, speakable, splitPlace } from './runVoice';
+import {
+  AFTER_SPEECH_MS,
+  sayChange,
+  sayDrift,
+  saySplit,
+  sayStart,
+  speakable,
+  speechMs,
+  splitPlace,
+  SPOKEN_BREAK_MS,
+  SPOKEN_WORD_MS,
+} from './runVoice';
 import { buildRunPlan, advanceRun, describeSegment, startRun, type RunPlan } from './runPlan';
 import type { PaceReading, SplitCue } from './pace';
+import { words } from './lang';
 
 const cue = (over: Partial<SplitCue> = {}): SplitCue => ({
   index: 3,
@@ -36,6 +48,14 @@ describe('where a split lands', () => {
     expect(splitPlace(5, 'halfMile')).toBe('2.5 miles');
     expect(splitPlace(3, 'quarterMile')).toBe('0.75 miles');
     expect(splitPlace(3, 'halfKm')).toBe('1.5 kilometres');
+  });
+
+  /* A measured distance is never exactly one. It is agreement with what is said that matters. */
+  it('agrees with the rounded number, not the measured one', () => {
+    expect(words('en').count('mile', 1.0002)).toBe('1 mile');
+    expect(words('en').count('mile', 0.9999)).toBe('1 mile');
+    expect(words('es').count('mile', 1.0002)).toBe('1 milla');
+    expect(words('en').count('mile', 1.25)).toBe('1.25 miles');
   });
 
   it('says mile, not miles, at one', () => {
@@ -197,6 +217,30 @@ describe('a segment change', () => {
     change = advanceRun({ plan: tempo, cursor: change.cursor, distanceM: 4000, elapsedSec: 1050 });
     change = advanceRun({ plan: tempo, cursor: change.cursor, distanceM: 5000, elapsedSec: 1350 });
     expect(sayChange(change, 'metric')).toContain('done');
+  });
+});
+
+/*
+ * How long a cue holds the floor. Only ever used to keep a pace alert from starting while
+ * something more important is still being said, which is why every error here should be long.
+ */
+describe('how long a cue takes to say', () => {
+  it('leaves a breath after even the shortest one', () => {
+    expect(speechMs('Mile 3')).toBe(2 * SPOKEN_WORD_MS + AFTER_SPEECH_MS);
+  });
+
+  it('grows with the words in it', () => {
+    expect(speechMs('Mile three on pace')).toBeGreaterThan(speechMs('Mile three'));
+  });
+
+  it('counts the pause an engine leaves at a stop', () => {
+    expect(speechMs('Mile 3. On pace')).toBe(
+      speechMs('Mile 3 On pace') + SPOKEN_BREAK_MS,
+    );
+  });
+
+  it('takes no time at all to say nothing', () => {
+    expect(speechMs('   ')).toBe(0);
   });
 });
 

@@ -18,15 +18,20 @@
  * anyway.
  */
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { lockScroll } from '../../ui/scrollLock';
+import Sheet from '../../ui/Sheet';
+import { stopSpeaking } from '../../ui/speak';
+import { profileRepo } from '../../data/repos';
+import { PaceAlertControls, PaceField } from '../more/PaceAlertControls';
 import { useApp } from '../../ui/AppProvider';
 import { useT } from '../../i18n/useT';
 import { useRunTracker } from './useRunTracker';
 import { buildRunPlan, describeSegment, type RunKind, type RunPlan } from '../../domain/runPlan';
 import { runSettingsFor, describeRunSettings, shapeFor } from '../../domain/runSettings';
-import { formatClock, formatDistance, formatPace } from '../../domain/units';
+import { formatClock, formatDistance, formatPace, paceLabel } from '../../domain/units';
+import type { RunSettings } from '../../domain/runSettings';
 
 export default function RunScreen({
   title,
@@ -53,6 +58,15 @@ export default function RunScreen({
   const navigate = useNavigate();
   const settings = runSettingsFor(units, profile.run);
   const shape = shapeFor(settings, runKind);
+  /** The mid-run sheet. Before the start the gear opens the full settings screen instead. */
+  const [tuning, setTuning] = useState(false);
+
+  /*
+   * Writes straight to the profile. The tracker reads settings through a ref on every fix, so
+   * a new target or a looser tolerance takes effect from the next second of the run.
+   */
+  const patch = (change: Partial<RunSettings>) =>
+    void profileRepo.update(profile.id, { run: { ...settings, ...change } });
 
   /*
    * The session's own prescription outranks the structure saved for this kind of run.
@@ -106,18 +120,19 @@ export default function RunScreen({
           <div className="tiny faint">{describeRunSettings(settings, lang)}</div>
         </div>
         {/*
-          Only before the gun. Restructuring a session you are three reps into would either
-          throw away the reps or lie about them, and there is no third option worth building.
+          Two jobs for one gear. Before the start it opens the full settings screen, where the
+          run's structure is set up. Once running, leaving this screen would end the run, and
+          restructuring a session three reps in would either throw the reps away or lie about
+          them. So mid-run it opens a sheet with only what is safe to change mid-stride:
+          whether to talk, whether to judge pace, how strictly, and against what.
         */}
-        {!started && (
-          <button
-            className="btn ghost sm"
-            onClick={() => navigate(`/more/run?for=${slug}`)}
-            aria-label={t('Run alerts')}
-          >
-            ⚙
-          </button>
-        )}
+        <button
+          className="btn ghost sm"
+          onClick={() => (started ? setTuning(true) : navigate(`/more/run?for=${slug}`))}
+          aria-label={t('Run alerts')}
+        >
+          ⚙
+        </button>
         <button className="btn ghost sm" onClick={onClose} aria-label={t('Close')}>
           ✕
         </button>
@@ -201,6 +216,52 @@ export default function RunScreen({
             </div>
           ))}
         </div>
+      )}
+
+      {tuning && (
+        <Sheet title={t('Run alerts')} onClose={() => setTuning(false)}>
+          <div className="section-title">{t('Voice')}</div>
+          <div className="row" style={{ gap: '0.5rem' }}>
+            <button
+              className={`btn grow${settings.voice ? ' primary' : ''}`}
+              onClick={() => patch({ voice: true })}
+            >
+              {t('Speak cues')}
+            </button>
+            <button
+              className={`btn grow${settings.voice ? '' : ' primary'}`}
+              onClick={() => {
+                // Silent has to be silent now, not after the sentence already under way.
+                stopSpeaking();
+                patch({ voice: false });
+              }}
+            >
+              {t('Silent')}
+            </button>
+          </div>
+
+          {/*
+            A standing target only means something on a run with one pace. Tempo and interval
+            pieces each carry their own, and a field here that changed nothing would be worse
+            than no field.
+          */}
+          {!plan || plan.segments.length <= 1 ? (
+            <PaceField
+              key="live-target"
+              label={`${t('Target pace')} (${paceLabel(units)})`}
+              value={settings.targetSecPerKm}
+              units={units}
+              onChange={(targetSecPerKm) => patch({ targetSecPerKm })}
+            />
+          ) : (
+            <p className="tiny faint" style={{ marginTop: '0.6rem' }}>
+              {t('Each piece of this session sets its own pace, so there is no single target to change here.')}
+            </p>
+          )}
+
+          <div className="section-title">{t('Pace alerts')}</div>
+          <PaceAlertControls settings={settings} units={units} patch={patch} />
+        </Sheet>
       )}
 
       <div className="run-actions">

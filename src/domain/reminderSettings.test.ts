@@ -54,6 +54,10 @@ describe('describeReminders', () => {
       .toBe('Planned sessions at 07:00 · rest timer');
   });
 
+  it('starts with a capital when the rest cue is the only thing on', () => {
+    expect(describeReminders({ sessions: false, sessionTime: '07:00', rest: true })).toBe('Rest timer');
+  });
+
   it('says so when nothing is', () => {
     expect(describeReminders({ sessions: false, sessionTime: '07:00', rest: false }))
       .toBe('Nothing');
