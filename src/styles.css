@@ -1638,3 +1638,101 @@ section[id^='movement-'] {
   background: #ffffff;
   object-fit: contain;
 }
+
+/* --- first open: setup and the tour ------------------------------------------ */
+
+/*
+ * Above the tab bar and the pinned timers, below sheets. The plan library opens as a sheet from
+ * the last step of setup and has to land on top of it.
+ */
+.setup {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  overflow-y: auto;
+  background: var(--bg);
+  padding: calc(var(--safe-top) + 1rem) 1.25rem calc(var(--safe-bottom) + 1rem);
+}
+
+.setup-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 560px;
+  min-height: 100%;
+  margin: 0 auto;
+}
+
+.setup-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.setup h1 { text-wrap: balance; }
+.setup p { margin: 0; }
+
+.setup-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+/* Swallows taps during the tour, so a stray one does not navigate out from under it. */
+.tour-blocker {
+  position: fixed;
+  inset: 0;
+  z-index: 44;
+}
+
+/*
+ * The spotlight. One element whose enormous shadow dims everything but the tab it sits over,
+ * instead of a backdrop with a hole cut in it.
+ */
+.tour-spot {
+  position: fixed;
+  z-index: 45;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 200vmax rgba(0, 0, 0, 0.62);
+  pointer-events: none;
+  transition: left 0.2s ease, width 0.2s ease;
+}
+
+.tour-bubble {
+  position: fixed;
+  z-index: 46;
+  width: 264px;
+  padding: 0.85rem 0.9rem;
+  background: var(--surface);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow, none);
+  transition: left 0.2s ease;
+}
+
+.tour-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: var(--arrow, 50%);
+  width: 12px;
+  height: 12px;
+  background: var(--surface);
+  border-right: var(--border-width) solid var(--border);
+  border-bottom: var(--border-width) solid var(--border);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.tour-bubble p { margin: 0.25rem 0 0.7rem; }
+
+/* --- share card ---------------------------------------------------------------- */
+
+.share-preview {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 0.75rem;
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+}

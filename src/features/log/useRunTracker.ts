@@ -44,6 +44,7 @@ import {
   type RunProgress,
 } from '../../domain/runPlan';
 import { alertsArmed, type RunSettings } from '../../domain/runSettings';
+import { TRACE_STEP_M } from '../../domain/runTrace';
 import { sayChange, sayDrift, saySplit, sayStart, speakable, speechMs } from '../../domain/runVoice';
 import { speak, stopSpeaking, unlockSpeech } from '../../ui/speak';
 import type { Language, UnitSystem } from '../../domain/types';
@@ -93,6 +94,8 @@ export interface RunTracker {
   /** Newest first, so the screen can show the last few without reversing. */
   notes: RunNote[];
   error: string | null;
+  /** Run seconds at every 100 m so far, copied. See `domain/runTrace`. */
+  trace: () => number[];
   start: () => void;
   pause: () => void;
   resume: () => void;
@@ -134,6 +137,8 @@ export function useRunTracker(options: {
   const cueState = useRef<CueState | null>(null);
   const cursorRef = useRef<RunCursor>(startRun());
   const watch = useRef<LocationWatch | null>(null);
+  /** Run seconds at every 100 m, for splits drawn after the run. See `domain/runTrace`. */
+  const trace = useRef<number[]>([]);
 
   /** Time banked from earlier stretches, plus when the current one began. */
   const banked = useRef(0);
@@ -189,6 +194,11 @@ export function useRunTracker(options: {
       const now = fix.at;
       if (previous.current) totalM.current += metresBetween(previous.current, fix);
       previous.current = fix;
+
+      // Every hundred metres crossed on this fix, stamped with the run clock rather than the
+      // wall clock, so a pause never shows up as the slowest split of the day.
+      const clock = Math.round(runSeconds(now));
+      while (totalM.current >= (trace.current.length + 1) * TRACE_STEP_M) trace.current.push(clock);
 
       buffer.current = [...buffer.current, fix].filter((f) => now - f.at <= BUFFER_MS);
 
@@ -327,6 +337,7 @@ export function useRunTracker(options: {
     buffer.current = [];
     previous.current = null;
     totalM.current = 0;
+    trace.current = [];
     banked.current = 0;
     since.current = now;
     splitState.current = startSplits(now);
@@ -426,6 +437,7 @@ export function useRunTracker(options: {
     finished: finishedPieces,
     notes,
     error,
+    trace: () => [...trace.current],
     start,
     pause,
     resume,

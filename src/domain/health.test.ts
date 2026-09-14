@@ -7,7 +7,14 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { heartRateForSession, heartRateOf, matchWorkout, sessionWindow } from './health';
+import {
+  heartRateForSession,
+  heartRateOf,
+  heartRatePerMinute,
+  MAX_SERIES_MINUTES,
+  matchWorkout,
+  sessionWindow,
+} from './health';
 import type { HealthWorkout } from './health';
 import type { LoggedSession } from './types';
 
@@ -136,5 +143,58 @@ describe('heartRateForSession', () => {
     expect(
       heartRateForSession(session(at('09:00'), at('10:00')), [workout('09:00', '10:00', [])]),
     ).toBeNull();
+  });
+});
+
+describe('heartRatePerMinute', () => {
+  const start = Date.parse(at('09:00'));
+  const sampled = (samples: { at: number; bpm: number }[]) => ({ ...workout('09:00', '10:00'), samples });
+
+  it('averages the samples inside each minute of the session', () => {
+    const out = heartRatePerMinute(
+      session(at('09:00'), at('10:00')),
+      sampled([
+        { at: start + 10_000, bpm: 140 },
+        { at: start + 40_000, bpm: 150 },
+        { at: start + 80_000, bpm: 160 },
+      ]),
+    )!;
+    expect(out).toHaveLength(60);
+    expect(out.slice(0, 3)).toEqual([145, 160, 0]);
+  });
+
+  /* A gap is a fact about the recording. Filling it would invent a heart rate nobody had. */
+  it('leaves a minute with no reading at zero rather than guessing', () => {
+    const out = heartRatePerMinute(
+      session(at('09:00'), at('10:00')),
+      sampled([
+        { at: start + 5_000, bpm: 140 },
+        { at: start + 185_000, bpm: 150 },
+      ]),
+    )!;
+    expect(out.slice(0, 4)).toEqual([140, 0, 0, 150]);
+  });
+
+  it('ignores samples from before or after the session', () => {
+    const out = heartRatePerMinute(
+      session(at('09:00'), at('10:00')),
+      sampled([
+        { at: start - 1_000, bpm: 99 },
+        { at: start + 3_600_000, bpm: 99 },
+        { at: start + 1_000, bpm: 141 },
+      ]),
+    )!;
+    expect(out[0]).toBe(141);
+    expect(out.filter((bpm) => bpm === 99)).toHaveLength(0);
+  });
+
+  it('has nothing to say without timestamped samples', () => {
+    expect(heartRatePerMinute(session(at('09:00'), at('10:00')), workout('09:00', '10:00'))).toBeNull();
+  });
+
+  it('stops drawing a session left open overnight', () => {
+    const long = session('2026-09-12T09:00:00.000Z', '2026-09-13T09:00:00.000Z');
+    const out = heartRatePerMinute(long, sampled([{ at: start + 1_000, bpm: 140 }]))!;
+    expect(out).toHaveLength(MAX_SERIES_MINUTES);
   });
 });

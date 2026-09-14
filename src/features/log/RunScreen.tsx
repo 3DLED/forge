@@ -50,7 +50,7 @@ export default function RunScreen({
   plannedDistanceM?: number;
   plannedPaceSecPerKm?: number;
   /** Writes the run back onto the set that opened this. */
-  onSave: (result: { distanceM: number; timeSec: number }) => void;
+  onSave: (result: { distanceM: number; timeSec: number; trace: number[] }) => void;
   onClose: () => void;
 }) {
   const { profile, units, lang } = useApp();
@@ -298,7 +298,7 @@ export default function RunScreen({
             <button
               className="btn primary block grow"
               onClick={() =>
-                onSave({ distanceM: Math.round(run.distanceM), timeSec: Math.round(run.elapsedSec) })
+                onSave({ distanceM: Math.round(run.distanceM), timeSec: Math.round(run.elapsedSec), trace: run.trace() })
               }
             >
               {t('Save to workout')}

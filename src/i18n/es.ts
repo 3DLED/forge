@@ -322,6 +322,46 @@ export const ES: Record<string, string> = {
   'Everything lives in this app on this device. Nothing is uploaded and no account exists, so losing the phone loses your history unless a backup is kept somewhere else.':
     'Todo vive en esta app, en este dispositivo. No se sube nada y no hay cuenta, así que perder el teléfono es perder tu historial, salvo que tengas una copia en otro sitio.',
 
+  // --- first open, the tour, and sharing ----------------------------------------
+  'Welcome to Hybrid Forge': 'Te damos la bienvenida a Hybrid Forge',
+  'A few quick questions so the first workout it suggests fits what you have and what you are training for. Everything here can be changed later under More.':
+    'Unas preguntas rápidas para que el primer entrenamiento que te sugiera encaje con lo que tienes y con tu objetivo. Todo esto se puede cambiar después en Más.',
+  'Skip setup': 'Omitir',
+  'Next': 'Siguiente',
+  'What do you train with?': '¿Con qué entrenas?',
+  'Pick the closest match. You can add or remove single pieces, and set the weights of the bells you own, under More.':
+    'Elige lo más parecido. En Más puedes añadir o quitar piezas sueltas y fijar el peso de las pesas rusas que tienes.',
+  'What are you training for?': '¿Para qué entrenas?',
+  'It shapes the sets, reps and rest the app suggests. Pick the nearest one; it is easy to change.':
+    'Define las series, repeticiones y descansos que sugiere la app. Elige el más parecido; es fácil de cambiar.',
+  'Want a plan to follow?': '¿Quieres seguir un plan?',
+  'A plan puts sessions on your calendar and adjusts them as you go. You can also just start a workout whenever you like.':
+    'Un plan pone sesiones en tu calendario y las ajusta sobre la marcha. También puedes empezar un entrenamiento cuando quieras.',
+  'Browse plans': 'Ver planes',
+  'What is planned for today, and where you start a workout or log a run.':
+    'Lo que tienes planificado para hoy, y donde empiezas un entrenamiento o registras una carrera.',
+  'Your calendar. Start a plan, move or skip a day, or block out a holiday.':
+    'Tu calendario. Empieza un plan, mueve u omite un día, o bloquea unas vacaciones.',
+  'Every session you have logged, newest first. Open one to review it or share it.':
+    'Cada sesión que has registrado, la más reciente primero. Abre una para revisarla o compartirla.',
+  'Training load, pace, heart rate and personal bests, week by week.':
+    'Carga de entrenamiento, ritmo, frecuencia cardíaca y récords personales, semana a semana.',
+  'Equipment, reminders, Apple Health, backups and settings.':
+    'Equipo, avisos, Apple Salud, copias de seguridad y ajustes.',
+  'Share': 'Compartir',
+  'Share image': 'Compartir imagen',
+  'Drawing the card…': 'Dibujando la tarjeta…',
+  'This device could not draw the card.': 'Este dispositivo no pudo dibujar la tarjeta.',
+  'Distance': 'Distancia',
+  'Avg pace': 'Ritmo medio',
+  'Sets': 'Series',
+  'Volume': 'Volumen',
+  'Mile': 'Milla',
+  'Km': 'Km',
+  'avg': 'media',
+  'max': 'máx.',
+  'more': 'más',
+
   // --- apple health -------------------------------------------------------------
   'Apple Health': 'Apple Salud',
   'Not connected': 'Sin conectar',

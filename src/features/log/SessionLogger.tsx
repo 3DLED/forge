@@ -19,6 +19,8 @@ import AskSheet from '../../ui/AskSheet';
 import ExercisePicker from './ExercisePicker';
 import ExerciseGroup from './ExerciseGroup';
 import RestTimer, { type UpNext } from './RestTimer';
+import ShareSheet from '../share/ShareSheet';
+import { encodeSeries } from '../../domain/series';
 import { reminderSettingsFor } from '../../domain/reminderSettings';
 import HoldTimer from './HoldTimer';
 import RunScreen from './RunScreen';
@@ -166,6 +168,8 @@ export default function SessionLogger() {
   const [browsingSaved, setBrowsingSaved] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [restEndsAt, setRestEndsAt] = useState<number | null>(null);
+  /** The share card for a finished session. */
+  const [sharing, setSharing] = useState(false);
 
   /*
    * The screen stays on for the whole session, not just while a clock is running.
@@ -774,7 +778,7 @@ export default function SessionLogger() {
    * prescription that came out at 4.94 km is a 4.94 km run, and rounding it up to the number
    * that was asked for would put a distance in your history you did not cover.
    */
-  const completeRun = (setId: string, result: { distanceM: number; timeSec: number }) => {
+  const completeRun = (setId: string, result: { distanceM: number; timeSec: number; trace?: number[] }) => {
     setTracking(null);
     const target = sets.find((s) => s.id === setId);
     if (!target) return;
@@ -786,6 +790,8 @@ export default function SessionLogger() {
               ...set,
               values: { ...set.values, distanceM: result.distanceM, timeSec: result.timeSec },
               completed: true,
+              // A run re-tracked over a finished set replaces its trace; one with no trace keeps the old.
+              runTrace: result.trace && result.trace.length > 0 ? encodeSeries(result.trace) : set.runTrace,
             }
           : set,
       ),
@@ -997,6 +1003,10 @@ export default function SessionLogger() {
               {session.notes}
             </div>
           )}
+          {/* Only once finished: a card of a session still being logged is a card of half of one. */}
+          <button className="btn sm block" style={{ marginTop: '0.6rem' }} onClick={() => setSharing(true)}>
+            {t('Share')}
+          </button>
         </div>
       ) : (
         <div className="card tight">
@@ -1586,6 +1596,8 @@ export default function SessionLogger() {
           />
         );
       })()}
+
+      {sharing && <ShareSheet session={session} onClose={() => setSharing(false)} />}
 
       {/* One panel at a time: a hold is running work, and rest has not started yet. */}
       {holding && (

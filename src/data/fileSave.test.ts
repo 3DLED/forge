@@ -28,7 +28,7 @@ vi.mock('@capacitor/share', () => ({
   Share: { share: (...args: unknown[]) => share(...(args as [])) },
 }));
 
-const { saveTextFile } = await import('./fileSave');
+const { saveImageFile, saveTextFile } = await import('./fileSave');
 
 beforeEach(() => {
   isNative.mockReturnValue(false);
@@ -100,6 +100,36 @@ describe('in a browser', () => {
     expect(share).not.toHaveBeenCalled();
     expect(result).toEqual({ outcome: 'saved', filename: 'forge-plan-ocr.json' });
 
+    HTMLAnchorElement.prototype.click = realClick;
+  });
+});
+
+describe('an image', () => {
+  it('writes the picture as bare base64 on a phone, then offers it to the share sheet', async () => {
+    isNative.mockReturnValue(true);
+    const result = await saveImageFile('forge-sunday-run.png', 'data:image/png;base64,QUJD');
+    expect(writeFile).toHaveBeenCalledWith({ path: 'forge-sunday-run.png', data: 'QUJD', directory: 'CACHE' });
+    expect(share).toHaveBeenCalledWith({ title: 'forge-sunday-run.png', files: ['file:///cache/forge.json'] });
+    expect(result).toEqual({ outcome: 'saved', filename: 'forge-sunday-run.png' });
+  });
+
+  it('calls a dismissed share sheet cancelled here too', async () => {
+    isNative.mockReturnValue(true);
+    share.mockRejectedValue(new Error('Share canceled'));
+    expect((await saveImageFile('card.png', 'data:image/png;base64,QUJD')).outcome).toBe('cancelled');
+  });
+
+  it('downloads the picture in a browser', async () => {
+    const clicks: HTMLAnchorElement[] = [];
+    const realClick = HTMLAnchorElement.prototype.click;
+    HTMLAnchorElement.prototype.click = function click(this: HTMLAnchorElement) {
+      clicks.push(this);
+    };
+    const result = await saveImageFile('card.png', 'data:image/png;base64,QUJD');
+    expect(clicks[0]?.download).toBe('card.png');
+    expect(clicks[0]?.href).toBe('data:image/png;base64,QUJD');
+    expect(writeFile).not.toHaveBeenCalled();
+    expect(result.outcome).toBe('saved');
     HTMLAnchorElement.prototype.click = realClick;
   });
 });

@@ -20,6 +20,8 @@ export interface HealthWorkout {
   endedAt: number;
   /** Beats per minute, sampled through the workout. Empty when the watch recorded none. */
   heartRate: number[];
+  /** The same samples with the moment each was taken, for the minute-by-minute series. */
+  samples?: { at: number; bpm: number }[];
 }
 
 export interface HeartRate {
@@ -119,4 +121,41 @@ export function heartRateForSession(
 ): HeartRate | null {
   const matched = matchWorkout(session, workouts);
   return matched ? heartRateOf(matched) : null;
+}
+
+/**
+ * No session is drawn longer than this. A workout left open overnight is a real record and a
+ * nonsense chart, and 1,440 zeros is not worth storing to prove it.
+ */
+export const MAX_SERIES_MINUTES = 360;
+
+/**
+ * Heart rate minute by minute across the session, from the watch's own timestamped samples.
+ *
+ * Minutes count from the start of the *session*, not of the watch workout, because the card
+ * lines the curve up with what was logged here. A minute with no reading is 0 rather than an
+ * interpolation: a gap in the watch data is a fact about the recording, and drawing a line
+ * across it would invent a heart rate nobody had.
+ */
+export function heartRatePerMinute(session: LoggedSession, workout: HealthWorkout): number[] | null {
+  const window = sessionWindow(session);
+  if (!window || !workout.samples || workout.samples.length === 0) return null;
+
+  const minutes = Math.min(
+    MAX_SERIES_MINUTES,
+    Math.max(1, Math.ceil((window.endedAt - window.startedAt) / 60_000)),
+  );
+  const sums = new Array<number>(minutes).fill(0);
+  const counts = new Array<number>(minutes).fill(0);
+
+  for (const sample of workout.samples) {
+    if (!(sample.bpm > 0) || sample.at < window.startedAt || sample.at >= window.endedAt) continue;
+    const minute = Math.floor((sample.at - window.startedAt) / 60_000);
+    if (minute >= minutes) continue;
+    sums[minute] += sample.bpm;
+    counts[minute] += 1;
+  }
+
+  if (counts.every((count) => count === 0)) return null;
+  return sums.map((sum, i) => (counts[i] > 0 ? Math.round(sum / counts[i]) : 0));
 }

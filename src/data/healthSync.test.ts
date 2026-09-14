@@ -10,7 +10,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const supported = vi.fn(() => true);
-const workouts = vi.fn(async () => [] as { startedAt: number; endedAt: number; heartRate: number[] }[]);
+const workouts = vi.fn(
+  async () =>
+    [] as { startedAt: number; endedAt: number; heartRate: number[]; samples?: { at: number; bpm: number }[] }[],
+);
 
 vi.mock('./healthSource', () => ({
   healthSupported: () => supported(),
@@ -62,7 +65,7 @@ describe('syncHeartRates', () => {
 
   /* It runs on every app open, so a second pass has to be free. */
   it('leaves a session that already has a figure alone', async () => {
-    await logged('a', { avgHrBpm: 99, maxHrBpm: 101 });
+    await logged('a', { avgHrBpm: 99, maxHrBpm: 101, hrPerMinute: '99' });
     workouts.mockResolvedValue(watchRan());
 
     expect(await syncHeartRates()).toEqual({ filled: 0, unmatched: 0 });
@@ -94,8 +97,49 @@ describe('syncHeartRates', () => {
   });
 
   it('does not query when there is nothing left to fill', async () => {
-    await logged('a', { avgHrBpm: 140 });
+    await logged('a', { avgHrBpm: 140, hrPerMinute: '140' });
     await syncHeartRates();
     expect(workouts).not.toHaveBeenCalled();
+  });
+
+  it('stores the minute-by-minute heart rate alongside the average', async () => {
+    await logged('a');
+    const start = Date.parse(at('09:00'));
+    workouts.mockResolvedValue([
+      {
+        startedAt: start,
+        endedAt: Date.parse(at('10:00')),
+        heartRate: [140, 150, 160],
+        samples: [
+          { at: start + 10_000, bpm: 140 },
+          { at: start + 40_000, bpm: 150 },
+          { at: start + 70_000, bpm: 160 },
+        ],
+      },
+    ]);
+
+    expect(await syncHeartRates()).toEqual({ filled: 1, unmatched: 0 });
+    const saved = await db.loggedSessions.get('a');
+    expect(saved?.avgHrBpm).toBe(150);
+    expect(saved?.hrPerMinute?.startsWith('145,160,0')).toBe(true);
+  });
+
+  /* Matched before the series existed: gains the curve, keeps the figure it already had. */
+  it('adds the curve to a session that only had an average, without replacing the average', async () => {
+    await logged('a', { avgHrBpm: 99, maxHrBpm: 101 });
+    const start = Date.parse(at('09:00'));
+    workouts.mockResolvedValue([
+      {
+        startedAt: start,
+        endedAt: Date.parse(at('10:00')),
+        heartRate: [150],
+        samples: [{ at: start + 5_000, bpm: 150 }],
+      },
+    ]);
+
+    expect(await syncHeartRates()).toEqual({ filled: 1, unmatched: 0 });
+    const saved = await db.loggedSessions.get('a');
+    expect(saved?.avgHrBpm).toBe(99);
+    expect(saved?.hrPerMinute?.startsWith('150')).toBe(true);
   });
 });

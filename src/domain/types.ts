@@ -368,6 +368,14 @@ export interface LoggedSet {
    * 90-second rounds or fell off a cliff at round six.
    */
   roundSplitsSec?: number[];
+  /**
+   * For a tracked run: elapsed seconds at every 100 m, comma-separated. See `domain/runTrace`.
+   *
+   * Kept instead of splits so they can be drawn in whichever unit is on screen when somebody
+   * looks, and as text because a backup is pretty-printed JSON, where an array puts every
+   * number on a line of its own.
+   */
+  runTrace?: string;
 }
 
 /** How a logged block is scored. */
@@ -456,6 +464,12 @@ export interface LoggedSession extends Entity {
    */
   avgHrBpm?: number;
   maxHrBpm?: number;
+  /**
+   * Heart rate by minute from the start of the session, comma-separated, with 0 for a minute the
+   * watch recorded nothing. Text for the same reason as `runTrace`: about 52 KB a year for five
+   * sessions a week, against roughly 180 KB as an array.
+   */
+  hrPerMinute?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -698,6 +712,14 @@ export interface Profile extends Entity {
    * being read and one permission behind it — see `data/healthSource`.
    */
   appleHealth?: boolean;
+  /**
+   * When first-run setup was finished or skipped. Absent means it has not been, and the setup
+   * screen shows. Installs from before setup existed are stamped once by bootstrap, so nobody
+   * already training is sent through it.
+   */
+  onboardedAt?: Instant;
+  /** When the tour of the tabs was finished or skipped. Shown once, straight after setup. */
+  touredAt?: Instant;
 }
 
 /** Bodyweight, resting HR, and anything else tracked over time rather than per set. */

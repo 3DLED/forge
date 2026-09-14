@@ -346,6 +346,28 @@ async function verifySeedIntegrity(): Promise<void> {
   }
 }
 
+/** Set on the first launch that knows about first-run setup, and never cleared. */
+const ONBOARDING_SETTLED = 'onboardingSettled';
+
+/**
+ * Decides, once per install, whether first-run setup applies to it.
+ *
+ * Only once, because the obvious rule is wrong. "Not the first run, so already set up" would
+ * also catch somebody who installed yesterday and closed the app halfway through setup, and
+ * they would never see it again. So the question is asked on the first launch that has this
+ * code: a new install is left to go through setup, and an install that was already training
+ * before setup existed is marked as done. After that the answer stands, whatever happens.
+ */
+async function settleOnboarding(profile: Profile, firstRun: boolean): Promise<Profile> {
+  if (await getMeta<boolean>(ONBOARDING_SETTLED, false)) return profile;
+  await setMeta(ONBOARDING_SETTLED, true);
+  if (firstRun || profile.onboardedAt) return profile;
+
+  const stamp = new Date().toISOString();
+  await profileRepo.update(profile.id, { onboardedAt: stamp, touredAt: stamp });
+  return { ...profile, onboardedAt: stamp, touredAt: stamp };
+}
+
 async function runBootstrap(): Promise<BootstrapResult> {
   if (import.meta.env.DEV) await verifySeedIntegrity();
   await db.open();
@@ -360,7 +382,7 @@ async function runBootstrap(): Promise<BootstrapResult> {
   const library = await allSeedExercises();
   const exercisesAdded = await seedExercises(library);
   await syncSeedFlags(library);
-  const profile = await ensureProfile();
+  const profile = await settleOnboarding(await ensureProfile(), firstRun);
 
   if (previousSeed !== SEED_VERSION) await setMeta('seedVersion', SEED_VERSION);
 

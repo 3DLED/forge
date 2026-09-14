@@ -113,6 +113,20 @@ describe('measuring a run', () => {
     expect(result.current.averageSecPerKm).toBeLessThan(305);
   });
 
+  /* The trace is what splits are drawn from after the run, in whatever unit is on screen then. */
+  it('keeps the run clock at every hundred metres', async () => {
+    const { result, receiver } = await trackerFor({ settings: settings() });
+
+    act(() => receiver.advance(300, 300));
+
+    const trace = result.current.trace();
+    expect(trace.length).toBeGreaterThanOrEqual(9);
+    expect(trace[0]).toBeGreaterThanOrEqual(29);
+    expect(trace[0]).toBeLessThanOrEqual(33);
+    expect(trace[8] - trace[7]).toBeGreaterThanOrEqual(29);
+    expect(trace[8] - trace[7]).toBeLessThanOrEqual(31);
+  });
+
   /* Standing still already costs no distance; the clock is the part that has to be told. */
   it('holds the clock across a pause and does not lose the distance', async () => {
     const { result, receiver } = await trackerFor({ settings: settings() });

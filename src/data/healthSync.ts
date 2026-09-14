@@ -13,7 +13,9 @@
 import { db } from '../db/db';
 import { sessionsBetween } from './sessions';
 import { healthWorkoutsBetween, healthSupported } from './healthSource';
-import { heartRateForSession } from '../domain/health';
+import { heartRateOf, heartRatePerMinute, matchWorkout } from '../domain/health';
+import { encodeSeries } from '../domain/series';
+import type { StoredLoggedSession } from '../db/db';
 import { addDays, todayKey } from '../domain/dates';
 
 /**
@@ -42,8 +44,10 @@ export async function syncHeartRates(): Promise<HealthSyncResult> {
   if (!healthSupported()) return { filled: 0, unmatched: 0 };
 
   const from = addDays(todayKey(), -BACKFILL_DAYS);
+  // Anything missing either figure. Sessions matched before the minute-by-minute series existed
+  // have an average and no curve, and should gain the curve without losing the average.
   const sessions = (await sessionsBetween(from, todayKey())).filter(
-    (session) => session.endedAt && session.avgHrBpm == null,
+    (session) => session.endedAt && (session.avgHrBpm == null || session.hrPerMinute == null),
   );
   if (sessions.length === 0) return { filled: 0, unmatched: 0 };
 
@@ -52,19 +56,30 @@ export async function syncHeartRates(): Promise<HealthSyncResult> {
     new Date(`${addDays(from, -1)}T00:00:00`),
     new Date(`${addDays(todayKey(), 1)}T00:00:00`),
   );
-  if (workouts.length === 0) return { filled: 0, unmatched: sessions.length };
+  const withoutAverage = sessions.filter((session) => session.avgHrBpm == null).length;
+  if (workouts.length === 0) return { filled: 0, unmatched: withoutAverage };
 
   let filled = 0;
+  let averaged = 0;
   for (const session of sessions) {
-    const rate = heartRateForSession(session, workouts);
-    if (!rate) continue;
-    await db.loggedSessions.update(session.id, {
-      avgHrBpm: rate.avgBpm,
-      maxHrBpm: rate.maxBpm,
-      updatedAt: new Date().toISOString(),
-    });
+    const matched = matchWorkout(session, workouts);
+    const rate = matched ? heartRateOf(matched) : null;
+    if (!matched || !rate) continue;
+
+    // Only what is missing. A figure already on the session was matched earlier and stays put.
+    const changes: Partial<StoredLoggedSession> = {};
+    if (session.avgHrBpm == null) {
+      changes.avgHrBpm = rate.avgBpm;
+      changes.maxHrBpm = rate.maxBpm;
+      averaged += 1;
+    }
+    const perMinute = session.hrPerMinute == null ? heartRatePerMinute(session, matched) : null;
+    if (perMinute) changes.hrPerMinute = encodeSeries(perMinute);
+
+    if (Object.keys(changes).length === 0) continue;
+    await db.loggedSessions.update(session.id, { ...changes, updatedAt: new Date().toISOString() });
     filled += 1;
   }
 
-  return { filled, unmatched: sessions.length - filled };
+  return { filled, unmatched: withoutAverage - averaged };
 }

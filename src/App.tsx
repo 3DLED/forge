@@ -22,6 +22,9 @@ import CrashScreen from './ui/CrashScreen';
 import { useSessionReminders } from './ui/useSessionReminders';
 import { useHealthSync } from './ui/useHealthSync';
 import { useAutoBackup } from './ui/useAutoBackup';
+import { useApp } from './ui/AppProvider';
+import Setup from './features/onboarding/Setup';
+import Tour from './features/onboarding/Tour';
 import { useT } from './i18n/useT';
 
 const TABS = [
@@ -35,6 +38,7 @@ const TABS = [
 export default function App() {
   const t = useT();
   const location = useLocation();
+  const { profile } = useApp();
   // Here rather than in a screen: the plan changes from everywhere, and a sync that only ran
   // while you happened to be looking at the settings would be a sync that never ran.
   useSessionReminders();
@@ -92,6 +96,9 @@ export default function App() {
           </NavLink>
         ))}
       </nav>
+
+      {/* First open only: setup, then a tour of the tabs. See bootstrap's settleOnboarding. */}
+      {!profile.onboardedAt ? <Setup /> : !profile.touredAt ? <Tour /> : null}
     </div>
   );
 }

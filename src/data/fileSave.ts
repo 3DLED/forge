@@ -93,6 +93,40 @@ async function nativeSave(filename: string, text: string): Promise<SaveResult> {
   }
 }
 
+/**
+ * Saves a picture drawn in the page, such as a share card, by the same two routes.
+ *
+ * Takes the data URL a canvas produces. The native side wants bare base64 and no text
+ * encoding, which is how the filesystem plugin is told the bytes are binary.
+ */
+export async function saveImageFile(filename: string, dataUrl: string): Promise<SaveResult> {
+  if (!Capacitor.isNativePlatform()) {
+    const anchor = document.createElement('a');
+    anchor.href = dataUrl;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    return { outcome: 'saved', filename };
+  }
+  try {
+    const written = await Filesystem.writeFile({
+      path: filename,
+      data: dataUrl.slice(dataUrl.indexOf(',') + 1),
+      directory: Directory.Cache,
+    });
+    await Share.share({ title: filename, files: [written.uri] });
+    return { outcome: 'saved', filename };
+  } catch (error) {
+    if (wasCancelled(error)) return { outcome: 'cancelled', filename };
+    return {
+      outcome: 'failed',
+      filename,
+      reason: error instanceof Error ? error.message : 'Could not save the file.',
+    };
+  }
+}
+
 /** Saves `text` as `filename`, by whichever route this platform actually has. */
 export function saveTextFile(
   filename: string,

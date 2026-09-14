@@ -80,6 +80,7 @@ export async function healthWorkoutsBetween(from: Date, to: Date): Promise<Healt
       startedAt: Date.parse(workout.startDate),
       endedAt: Date.parse(workout.endDate),
       heartRate: (workout.heartRate ?? []).map((sample) => sample.bpm),
+      samples: (workout.heartRate ?? []).map((sample) => ({ at: Date.parse(sample.timestamp), bpm: sample.bpm })),
     }));
   } catch {
     return [];
