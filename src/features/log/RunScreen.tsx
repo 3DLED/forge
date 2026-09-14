@@ -251,6 +251,7 @@ export default function RunScreen({
               label={`${t('Target pace')} (${paceLabel(units)})`}
               value={settings.targetSecPerKm}
               units={units}
+              optional
               onChange={(targetSecPerKm) => patch({ targetSecPerKm })}
             />
           ) : (

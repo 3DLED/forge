@@ -151,7 +151,8 @@ export const ES: Record<string, string> = {
   'Each rep': 'Cada repetición',
   'Jog between': 'Trotar entre',
   'Say something once I am off by': 'Avisarme cuando me desvíe',
-  'Minutes and seconds, like 8:30': 'Minutos y segundos, como 8:30',
+  Minutes: 'Minutos',
+  'No target': 'Sin objetivo',
   'Nothing spoken': 'Nada hablado',
   'pace alerts': 'avisos de ritmo',
   // The split intervals, whose English labels are the keys in `domain/pace`.

@@ -387,6 +387,7 @@ export default function RunSettingsView() {
           label={`Target pace (${paceLabel(units)})`}
           value={settings.targetSecPerKm}
           units={units}
+          optional
           onChange={(targetSecPerKm) => patch({ targetSecPerKm })}
         />
       )}
@@ -449,7 +450,7 @@ function MinutesRow({
 }
 
 /*
- * The typed fields hold (PaceField, from PaceAlertControls, and the distance field below) their text locally and are therefore only seeded once, when
+ * The distance field below holds its text locally and is therefore only seeded once, when
  * they mount. That is right while you are typing and wrong when the value beneath them is
  * replaced — which happens on every switch between shapes. Keys make the switch a remount, so
  * the two cases stay separate instead of one silently defeating the other.

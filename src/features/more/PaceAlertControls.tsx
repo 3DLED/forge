@@ -7,8 +7,7 @@
  * answer then should be the same controls, not a smaller cousin of them.
  */
 
-import { useState } from 'react';
-import { displayPace, M_PER_MILE, paceInputValue, parsePaceInput } from '../../domain/units';
+import { displayPace, M_PER_MILE, parsePaceInput } from '../../domain/units';
 import type { RunSettings } from '../../domain/runSettings';
 import type { UnitSystem } from '../../domain/types';
 import { useT } from '../../i18n/useT';
@@ -72,48 +71,83 @@ export function PaceAlertControls({
   );
 }
 
+/** Minutes offered on the wheel, per mile or per kilometre: a sprint rep to a brisk walk. */
+const MINUTE_RANGE: Record<UnitSystem, [number, number]> = { imperial: [4, 20], metric: [2, 13] };
+const SECONDS = Array.from({ length: 60 }, (_, s) => s);
+
 /**
- * A pace, typed.
+ * A pace, picked on two wheels: minutes, then seconds.
  *
- * Held as text while you edit it rather than parsed on every keystroke: "8:" is halfway to a
- * valid pace, and a field that erases itself the moment you type a colon is unusable. The
- * stored value only moves when what is typed means something.
+ * It used to be typed, and on a long run it could not be. The phone's number pad has no colon,
+ * so "8:30" went in as 830 and "11" came back as eleven seconds a mile. Two selects are the
+ * iPhone's own scroll wheels, and neither of them can mean the wrong unit.
+ *
+ * `optional` adds "No target" to the top of the minutes wheel, for the one pace a run can do
+ * without. The pieces of a tempo or interval session always have one.
  */
 export function PaceField({
   label,
   value,
   units,
   onChange,
+  optional = false,
 }: {
   label: string;
   value: number | undefined;
   units: UnitSystem;
   onChange: (secPerKm: number | undefined) => void;
+  optional?: boolean;
 }) {
   const t = useT();
-  const [text, setText] = useState(value == null ? '' : paceInputValue(value, units));
-  const parsed = parsePaceInput(text, units);
+  const shown = value == null ? null : Math.round(displayPace(value, units));
+  const minutes = shown == null ? null : Math.floor(shown / 60);
+  const seconds = shown == null ? 0 : shown % 60;
+
+  // A pace saved before the wheels existed can sit outside their range; it still has to show.
+  const [low, high] = MINUTE_RANGE[units];
+  const minuteOptions = Array.from({ length: high - low + 1 }, (_, i) => low + i);
+  if (minutes != null && !minuteOptions.includes(minutes)) {
+    minuteOptions.push(minutes);
+    minuteOptions.sort((a, b) => a - b);
+  }
+
+  const pick = (m: number, s: number) => onChange(parsePaceInput(`${m}:${s}`, units) ?? undefined);
 
   return (
-    <label className="run-field" style={{ marginTop: '0.6rem' }}>
+    <div className="run-field" role="group" aria-label={label} style={{ marginTop: '0.6rem' }}>
       <span className="tiny faint">{label}</span>
-      <input
-        type="text"
-        inputMode="numeric"
-        placeholder={units === 'imperial' ? '8:30' : '5:20'}
-        value={text}
-        onChange={(event) => {
-          setText(event.target.value);
-          if (event.target.value.trim() === '') onChange(undefined);
-          else {
-            const next = parsePaceInput(event.target.value, units);
-            if (next != null) onChange(next);
-          }
-        }}
-      />
-      {text.trim() !== '' && parsed == null && (
-        <span className="tiny faint">{t('Minutes and seconds, like 8:30')}</span>
-      )}
-    </label>
+      <div className="pace-wheels">
+        <select
+          aria-label={t('Minutes')}
+          value={minutes ?? ''}
+          onChange={(event) => {
+            if (event.target.value === '') onChange(undefined);
+            else pick(Number(event.target.value), seconds);
+          }}
+        >
+          {(optional || minutes == null) && <option value="">{t('No target')}</option>}
+          {minuteOptions.map((m) => (
+            <option key={m} value={m}>
+              {m}
+            </option>
+          ))}
+        </select>
+        <span className="pace-colon" aria-hidden="true">
+          :
+        </span>
+        <select
+          aria-label={t('Seconds')}
+          value={seconds}
+          disabled={minutes == null}
+          onChange={(event) => minutes != null && pick(minutes, Number(event.target.value))}
+        >
+          {SECONDS.map((s) => (
+            <option key={s} value={s}>
+              {String(s).padStart(2, '0')}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
   );
 }
